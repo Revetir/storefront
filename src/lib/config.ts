@@ -5,7 +5,7 @@ import {
 } from "algoliasearch/lite"
 
 // Get backend URL from environment variables
-const MEDUSA_BACKEND_URL = process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
+const MEDUSA_BACKEND_URL = process.env.MEDUSA_BACKEND_URL
 
 if (!MEDUSA_BACKEND_URL) {
   throw new Error("MEDUSA_BACKEND_URL environment variable is required")

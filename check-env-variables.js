@@ -12,11 +12,6 @@ const requiredEnvs = [
       "Your production Medusa backend URL (e.g., https://your-backend.railway.app)",
   },
   {
-    key: "NEXT_PUBLIC_MEDUSA_BACKEND_URL",
-    description:
-      "Your production Medusa backend URL for client-side access (same as MEDUSA_BACKEND_URL)",
-  },
-  {
     key: "NEXT_PUBLIC_ALGOLIA_APP_ID",
     description:
       "Your Algolia application ID for search functionality",
