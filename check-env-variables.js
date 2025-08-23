@@ -3,9 +3,33 @@ const c = require("ansi-colors")
 const requiredEnvs = [
   {
     key: "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY",
-    // TODO: we need a good doc to point this to
     description:
       "Learn how to create a publishable key: https://docs.medusajs.com/v2/resources/storefront-development/publishable-api-keys",
+  },
+  {
+    key: "MEDUSA_BACKEND_URL",
+    description:
+      "Your production Medusa backend URL (e.g., https://your-backend.railway.app)",
+  },
+  {
+    key: "NEXT_PUBLIC_MEDUSA_BACKEND_URL",
+    description:
+      "Your production Medusa backend URL for client-side access (same as MEDUSA_BACKEND_URL)",
+  },
+  {
+    key: "NEXT_PUBLIC_ALGOLIA_APP_ID",
+    description:
+      "Your Algolia application ID for search functionality",
+  },
+  {
+    key: "NEXT_PUBLIC_ALGOLIA_API_KEY",
+    description:
+      "Your Algolia search API key (public key for client-side search)",
+  },
+  {
+    key: "NEXT_PUBLIC_ALGOLIA_PRODUCT_INDEX_NAME",
+    description:
+      "Your Algolia product index name (usually 'products')",
   },
 ]
 

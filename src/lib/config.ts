@@ -4,11 +4,11 @@ import {
   LiteClient as SearchClient,
 } from "algoliasearch/lite"
 
-// Defaults to standard port for Medusa server
-let MEDUSA_BACKEND_URL = "http://localhost:9000"
+// Get backend URL from environment variables
+const MEDUSA_BACKEND_URL = process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
 
-if (process.env.MEDUSA_BACKEND_URL) {
-  MEDUSA_BACKEND_URL = process.env.MEDUSA_BACKEND_URL
+if (!MEDUSA_BACKEND_URL) {
+  throw new Error("MEDUSA_BACKEND_URL environment variable is required")
 }
 
 export const sdk = new Medusa({
