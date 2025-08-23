@@ -1,0 +1,120 @@
+import React, { Suspense } from "react"
+
+import ImageGallery from "@modules/products/components/image-gallery"
+import ProductActions from "@modules/products/components/product-actions"
+import ProductOnboardingCta from "@modules/products/components/product-onboarding-cta"
+import ProductTabs from "@modules/products/components/product-tabs"
+import RelatedProductsClient from "@modules/products/components/related-products/related-products-client"
+import ProductInfo from "@modules/products/templates/product-info"
+import ProductInfoMobile from "@modules/products/templates/product-info/product-info-mobile"
+import ProductDescriptionMobile from "@modules/products/templates/product-info/product-description-mobile"
+import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
+import { notFound } from "next/navigation"
+import ProductActionsWrapper from "./product-actions-wrapper"
+import { HttpTypes } from "@medusajs/types"
+
+type ProductTemplateProps = {
+  product: HttpTypes.StoreProduct
+  region: HttpTypes.StoreRegion
+  countryCode: string
+  relatedProducts: HttpTypes.StoreProduct[]
+}
+
+const ProductTemplate: React.FC<ProductTemplateProps> = ({
+  product,
+  region,
+  countryCode,
+  relatedProducts,
+}) => {
+  if (!product || !product.id) {
+    return notFound()
+  }
+
+  return (
+    <>
+      {/* Mobile Layout */}
+      <div className="md:hidden">
+        {/* Image Gallery - Full width at top */}
+        <div className="w-full">
+          <ImageGallery images={product?.images || []} product={product} />
+        </div>
+
+        {/* Product Info (Type & Title only) - Below gallery with increased spacing */}
+        <div className="px-4 pt-4 pb-6">
+          <ProductInfoMobile product={product} />
+        </div>
+
+        {/* Product Actions - Below product info */}
+        <div className="px-4 pb-6">
+          <div className="flex flex-col gap-y-3 w-full">
+            <ProductOnboardingCta />
+            <Suspense
+              fallback={
+                <ProductActions
+                  disabled={true}
+                  product={product}
+                  region={region}
+                />
+              }
+            >
+              <ProductActionsWrapper id={product.id} region={region} />
+            </Suspense>
+          </div>
+        </div>
+
+        {/* Product Description - Below product actions */}
+        <ProductDescriptionMobile product={product} />
+        
+        {/* Additional spacing for mobile between description and recommended products */}
+        <div className="md:hidden h-4"></div>
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="hidden md:flex relative w-full">
+        {/* Left column - Product Info (sticky) */}
+        <div className="w-1/4 pl-6">
+          <div className="sticky top-0 h-screen flex items-center">
+            <ProductInfo product={product} />
+          </div>
+        </div>
+
+        {/* Center column - Image Gallery (within container) */}
+        <div className="w-2/4 flex justify-center py-6">
+          <div className="w-full">
+            <ImageGallery images={product?.images || []} product={product} />
+          </div>
+        </div>
+
+        {/* Right column - Product Actions (sticky) */}
+        <div className="w-1/4 pr-6">
+          <div className="sticky top-0 h-screen flex items-center">
+            <div className="flex flex-col gap-y-12 w-full">
+              <ProductOnboardingCta />
+              <Suspense
+                fallback={
+                  <ProductActions
+                    disabled={true}
+                    product={product}
+                    region={region}
+                  />
+                }
+              >
+                <ProductActionsWrapper id={product.id} region={region} />
+              </Suspense>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Related products section (within container) */}
+      <div
+        className="content-container my-16 small:my-32"
+        data-testid="related-products-container"
+      >
+        <RelatedProductsClient products={relatedProducts} region={region} />
+      </div>
+    </>
+  )
+}
+
+export default ProductTemplate

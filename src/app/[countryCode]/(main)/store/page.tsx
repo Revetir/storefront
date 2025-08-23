@@ -1,0 +1,95 @@
+import { Metadata } from "next"
+
+import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import StoreTemplate from "@modules/store/templates"
+import { listProductsWithSort } from "@lib/data/products"
+import { getRegion } from "@lib/data/regions"
+import { listProductTypes } from "@lib/data/product-types"
+
+export const metadata: Metadata = {
+  title: "Store",
+  description: "Explore all of our products.",
+}
+
+type Params = {
+  searchParams: Promise<{
+    sortBy?: SortOptions
+    page?: string
+    brand?: string
+    maxPrice?: string
+  }>
+  params: Promise<{
+    countryCode: string
+  }>
+}
+
+export default async function StorePage(props: Params) {
+  const params = await props.params;
+  const searchParams = await props.searchParams;
+  const { sortBy, page, brand, maxPrice } = searchParams
+
+  // Fetch product data on the server
+  const PRODUCT_LIMIT = 60
+  const pageNumber = page ? parseInt(page, 10) : 1
+  const sort = sortBy || "created_at"
+
+  const queryParams: any = {
+    limit: PRODUCT_LIMIT,
+  }
+
+  if (sort === "created_at") {
+    queryParams.order = "created_at"
+  }
+
+  // Convert brand value to type ID if brand filter is provided
+  if (brand) {
+    const productTypes = await listProductTypes()
+    const typeObj = productTypes.find(t => t.value === brand)
+    if (typeObj) {
+      queryParams.type_id = [typeObj.id]
+    }
+  }
+
+  const region = await getRegion(params.countryCode)
+
+  if (!region) {
+    return null
+  }
+
+  let {
+    response: { products, count },
+  } = await listProductsWithSort({
+    page: pageNumber,
+    queryParams,
+    sortBy: sort,
+    countryCode: params.countryCode,
+  })
+
+  // Apply price filtering if maxPrice is provided
+  if (maxPrice) {
+    const maxPriceNumber = parseInt(maxPrice)
+    products = products.filter((product) => {
+      return product.variants?.some((variant) => {
+        const price = variant.calculated_price?.calculated_amount
+        return price && price < maxPriceNumber
+      })
+    })
+    count = products.length
+  }
+
+  const totalPages = Math.ceil(count / PRODUCT_LIMIT)
+
+  return (
+    <StoreTemplate
+      sortBy={sortBy}
+      page={page}
+      countryCode={params.countryCode}
+      type={brand}
+      maxPrice={maxPrice}
+      products={products}
+      region={region}
+      totalPages={totalPages}
+      currentPage={pageNumber}
+    />
+  )
+}
