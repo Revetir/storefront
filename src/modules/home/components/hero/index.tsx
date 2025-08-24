@@ -24,7 +24,7 @@ const Hero = () => {
         }}
       >
         {/* Sale Image */}
-        <div style={{ width: "100vw" }}>
+        <div style={{ width: "100%" }}>
           <a href="/store" style={{ display: "block", textDecoration: "none" }}>
             <img
               src={imageUrl}
