@@ -2,7 +2,7 @@ import React from "react";
 
 const Hero = () => {
   const imageUrl =
-    "/images/sorrylol.gif";
+    "/images/opening_sale_banner.gif";
 
   return (
     <section
