@@ -81,9 +81,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
           {/* Right half - Product Info and Actions */}
           <div className="w-1/2 px-4">
-            <div className="flex flex-col gap-y-6">
-              <ProductInfo product={product} />
-              <div className="flex flex-col gap-y-4 pt-4">
+            <div className="flex flex-col gap-y-8">
+              {/* CTAs First */}
+              <div className="flex flex-col gap-y-4">
                 <ProductOnboardingCta />
                 <Suspense
                   fallback={
@@ -96,6 +96,14 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
                 >
                   <ProductActionsWrapper id={product.id} region={region} />
                 </Suspense>
+              </div>
+
+              {/* Product Details Second */}
+              <div className="flex flex-col gap-y-4">
+                <div className="text-xs uppercase tracking-wide text-gray-500 font-medium">
+                  ITEM INFO
+                </div>
+                <ProductInfo product={product} />
               </div>
             </div>
           </div>
