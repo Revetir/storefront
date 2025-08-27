@@ -96,7 +96,6 @@ export default async function CategoryPage(props: Props) {
   }
 
   // Fetch product data on the server
-  const PRODUCT_LIMIT = 60
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
 
@@ -108,12 +107,7 @@ export default async function CategoryPage(props: Props) {
 
   // Build query parameters
   const queryParams: any = {
-    limit: PRODUCT_LIMIT,
     category_id: allCategoryIds,
-  }
-
-  if (sort === "created_at") {
-    queryParams.order = "created_at"
   }
 
   // Convert brand value to type ID if brand filter is provided
@@ -131,16 +125,17 @@ export default async function CategoryPage(props: Props) {
     notFound()
   }
 
-  let {
+  // Use server-side pagination
+  const {
     response: { products, count },
+    totalPages,
+    currentPage,
   } = await listProductsWithSort({
     page: pageNumber,
     queryParams,
     sortBy: sort,
     countryCode: params.countryCode,
   })
-
-  const totalPages = Math.ceil(count / PRODUCT_LIMIT)
 
   return (
     <CategoryTemplate
@@ -154,7 +149,7 @@ export default async function CategoryPage(props: Props) {
       products={products}
       region={region}
       totalPages={totalPages}
-      currentPage={pageNumber}
+      currentPage={currentPage}
     />
   )
 }

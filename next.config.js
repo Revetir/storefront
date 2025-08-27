@@ -18,6 +18,12 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Vercel-specific optimizations
+  experimental: {
+    optimizePackageImports: ['@medusajs/ui'],
+  },
+  compress: true,
+  poweredByHeader: false,
   images: {
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -47,6 +53,37 @@ const nextConfig = {
         hostname: "fscswsaqnvpbvpoijebn.supabase.co",
       },
     ],
+  },
+  // Add headers for better caching
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+        ],
+      },
+    ]
   },
 }
 

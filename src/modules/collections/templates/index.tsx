@@ -31,20 +31,48 @@ const CollectionTemplate = ({
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
   const [isMobileRefinementOpen, setIsMobileRefinementOpen] = useState(false)
+  const [activeRefinementTab, setActiveRefinementTab] = useState<"refine" | "sort">("refine")
 
   return (
     <>
       <div className="py-6" data-testid="collection-container">
         <div className="relative">
-          {/* Mobile Refinement Buttons - < 768px */}
-          <div className="md:hidden flex justify-center mb-6">
-            <div className="flex gap-4">
-              <button
-                onClick={() => setIsMobileRefinementOpen(true)}
-                className="px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
-              >
-                Refine & Sort
-              </button>
+          {/* Mobile Layout - < 768px */}
+          <div className="md:hidden">
+            <div className="flex justify-center w-full">
+              <div className="max-w-[768px] px-4">
+                <div className="mb-6">
+                  <div className="flex gap-2 w-full">
+                    <button
+                      onClick={() => {
+                        setActiveRefinementTab("refine")
+                        setIsMobileRefinementOpen(true)
+                      }}
+                      className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
+                    >
+                      Refine
+                    </button>
+                    <button
+                      onClick={() => {
+                        setActiveRefinementTab("sort")
+                        setIsMobileRefinementOpen(true)
+                      }}
+                      className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
+                    >
+                      Sort
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="w-full">
+                  <PaginatedProductsClient
+                    products={products}
+                    region={region}
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -53,12 +81,24 @@ const CollectionTemplate = ({
             <div className="flex justify-center w-full">
               <div className="max-w-[768px] px-4">
                 <div className="mb-6">
-                  <div className="flex justify-center">
+                  <div className="flex gap-2 w-full">
                     <button
-                      onClick={() => setIsMobileRefinementOpen(true)}
-                      className="px-8 py-3 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
+                      onClick={() => {
+                        setActiveRefinementTab("refine")
+                        setIsMobileRefinementOpen(true)
+                      }}
+                      className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
                     >
-                      Refine & Sort
+                      Refine
+                    </button>
+                    <button
+                      onClick={() => {
+                        setActiveRefinementTab("sort")
+                        setIsMobileRefinementOpen(true)
+                      }}
+                      className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
+                    >
+                      Sort
                     </button>
                   </div>
                 </div>
@@ -123,6 +163,7 @@ const CollectionTemplate = ({
         isOpen={isMobileRefinementOpen}
         onClose={() => setIsMobileRefinementOpen(false)}
         sortBy={sort}
+        initialTab={activeRefinementTab}
       />
     </>
   )

@@ -12,11 +12,11 @@ export default async function ProductActionsWrapper({
   id: string
   region: HttpTypes.StoreRegion
 }) {
+  // Use more efficient caching for real-time pricing
   const product = await listProducts({
     queryParams: { id: [id] },
     regionId: region.id,
   }).then(({ response }) => response.products[0])
-
 
   if (!product) {
     return null

@@ -17,7 +17,7 @@ type Props = {
   }>
 }
 
-export const PRODUCT_LIMIT = 12
+export const PRODUCT_LIMIT = 60
 
 export async function generateStaticParams() {
   const { collections } = await listCollections({
@@ -85,31 +85,25 @@ export default async function CollectionPage(props: Props) {
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
 
-  const queryParams: any = {
-    limit: PRODUCT_LIMIT,
-    collection_id: [collection.id],
-  }
-
-  if (sort === "created_at") {
-    queryParams.order = "created_at"
-  }
-
   const region = await getRegion(params.countryCode)
 
   if (!region) {
     notFound()
   }
 
-  let {
+  // Use server-side pagination
+  const {
     response: { products, count },
+    totalPages,
+    currentPage,
   } = await listProductsWithSort({
     page: pageNumber,
-    queryParams,
+    queryParams: {
+      collection_id: [collection.id],
+    },
     sortBy: sort,
     countryCode: params.countryCode,
   })
-
-  const totalPages = Math.ceil(count / PRODUCT_LIMIT)
 
   return (
     <CollectionTemplate
@@ -120,7 +114,7 @@ export default async function CollectionPage(props: Props) {
       products={products}
       region={region}
       totalPages={totalPages}
-      currentPage={pageNumber}
+      currentPage={currentPage}
     />
   )
 }

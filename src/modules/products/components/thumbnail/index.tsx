@@ -14,6 +14,7 @@ type ThumbnailProps = {
   className?: string
   "data-testid"?: string
   product?: HttpTypes.StoreProduct
+  priority?: boolean
 }
 
 const Thumbnail: React.FC<ThumbnailProps> = ({
@@ -24,6 +25,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   className,
   "data-testid": dataTestid,
   product,
+  priority = false,
 }) => {
   const initialImage = thumbnail || images?.[0]?.url
 
@@ -35,7 +37,12 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
       )}
       data-testid={dataTestid}
     >
-      <ImageOrPlaceholder image={initialImage} size={size} product={product} />
+      <ImageOrPlaceholder 
+        image={initialImage} 
+        size={size} 
+        product={product} 
+        priority={priority}
+      />
     </Container>
   )
 }
@@ -44,7 +51,8 @@ const ImageOrPlaceholder = ({
   image,
   size,
   product,
-}: Pick<ThumbnailProps, "size" | "product"> & { image?: string }) => {
+  priority = false,
+}: Pick<ThumbnailProps, "size" | "product" | "priority"> & { image?: string }) => {
   const getAltText = () => {
     if (!product) return "Thumbnail"
     const brand = product.type?.value || "Product"
@@ -58,10 +66,10 @@ const ImageOrPlaceholder = ({
       alt={getAltText()}
       className="absolute inset-0 object-cover object-center"
       draggable={false}
-      quality={95}
+      quality={80}
       sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, (max-width: 1200px) 600px, 800px"
       fill
-      priority={size === "full" || size === "large"}
+      priority={priority || size === "full" || size === "large"}
       placeholder="blur"
       blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
         `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><filter id="b"><feGaussianBlur stdDeviation="12" /></filter><image preserveAspectRatio="none" filter="url(#b)" href="${image}" width="100%" height="100%"/></svg>`

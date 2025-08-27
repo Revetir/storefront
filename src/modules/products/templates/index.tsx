@@ -12,6 +12,7 @@ import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-relat
 import { notFound } from "next/navigation"
 import ProductActionsWrapper from "./product-actions-wrapper"
 import { HttpTypes } from "@medusajs/types"
+import { Text } from "@medusajs/ui"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -32,7 +33,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
   return (
     <>
-      {/* Mobile Layout */}
+      {/* Mobile Layout - < 768px */}
       <div className="md:hidden">
         {/* Image Gallery - Full width at top */}
         <div className="w-full">
@@ -69,8 +70,96 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         <div className="md:hidden h-4"></div>
       </div>
 
-      {/* Desktop Layout */}
-      <div className="hidden md:flex relative w-full">
+      {/* Tablet Layout - 768px - 1022px */}
+      <div className="hidden md:block small:hidden">
+        <div className="flex w-full min-h-screen items-center">
+          {/* Left side - Image Gallery (65% width) */}
+          <div className="w-[65%] flex items-center justify-center">
+            <div className="w-full max-w-full px-4">
+              <ImageGallery images={product?.images || []} product={product} />
+            </div>
+          </div>
+
+          {/* Right side - Product Info and Actions (35% width) */}
+          <div className="w-[35%] px-4 flex items-center">
+            <div className="flex flex-col gap-y-8 w-full">
+              {/* Product Type and Title First */}
+              <ProductInfoMobile product={product} />
+
+              {/* CTAs Second */}
+              <div className="flex flex-col gap-y-4 mb-5">
+                <ProductOnboardingCta />
+                <Suspense
+                  fallback={
+                    <ProductActions
+                      disabled={true}
+                      product={product}
+                      region={region}
+                    />
+                  }
+                >
+                  <ProductActionsWrapper id={product.id} region={region} />
+                </Suspense>
+              </div>
+
+              {/* Product Description Third */}
+              <div className="flex flex-col gap-y-4">
+                <div className="text-xs uppercase tracking-wide text-gray-500 font-medium">
+                  ITEM INFO
+                </div>
+                <Text
+                  className="text-medium text-ui-fg-base whitespace-pre-line"
+                  data-testid="product-description" 
+                >
+                  {product.description}
+                </Text>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Compact Desktop Layout - 1023px - 1725px */}
+      <div className="hidden small:block large:hidden">
+        <div className="flex w-full min-h-screen">
+          {/* Left column - Product Info (sticky) */}
+          <div className="w-1/4 pl-6">
+            <div className="sticky top-0 h-screen flex items-center">
+              <ProductInfo product={product} />
+            </div>
+          </div>
+
+          {/* Center column - Image Gallery */}
+          <div className="w-2/4 flex justify-center py-6">
+            <div className="w-full">
+              <ImageGallery images={product?.images || []} product={product} />
+            </div>
+          </div>
+
+          {/* Right column - Product Actions (sticky) */}
+          <div className="w-1/4 pr-6">
+            <div className="sticky top-0 h-screen flex items-center">
+              <div className="flex flex-col gap-y-8 w-full">
+                <ProductOnboardingCta />
+                <Suspense
+                  fallback={
+                    <ProductActions
+                      disabled={true}
+                      product={product}
+                      region={region}
+                    />
+                  }
+                >
+                  <ProductActionsWrapper id={product.id} region={region} />
+                </Suspense>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Large Desktop Layout - > 1725px */}
+      <div className="hidden large:flex relative w-full">
         {/* Left column - Product Info (sticky) */}
         <div className="w-1/4 pl-6">
           <div className="sticky top-0 h-screen flex items-center">

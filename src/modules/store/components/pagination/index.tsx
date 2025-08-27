@@ -2,6 +2,7 @@
 
 import { clx } from "@medusajs/ui"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useTransition } from "react"
 
 export function Pagination({
   page,
@@ -15,6 +16,7 @@ export function Pagination({
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [isPending, startTransition] = useTransition()
 
   // Helper function to generate an array of numbers within a range
   const arrayRange = (start: number, stop: number) =>
@@ -24,7 +26,19 @@ export function Pagination({
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams)
     params.set("page", newPage.toString())
-    router.push(`${pathname}?${params.toString()}`)
+    
+    startTransition(() => {
+      router.push(`${pathname}?${params.toString()}`)
+    })
+  }
+
+  // Function to prefetch adjacent pages
+  const prefetchPage = (pageNum: number) => {
+    if (pageNum >= 1 && pageNum <= totalPages) {
+      const params = new URLSearchParams(searchParams)
+      params.set("page", pageNum.toString())
+      router.prefetch(`${pathname}?${params.toString()}`)
+    }
   }
 
   // Function to render a page button
@@ -40,10 +54,16 @@ export function Pagination({
         {
           "font-bold underline text-black": isCurrent,
           "text-gray-700 hover:text-black": !isCurrent,
-        }
+        },
+        isPending && "opacity-50 cursor-not-allowed"
       )}
-      disabled={isCurrent}
+      disabled={isCurrent || isPending}
       onClick={() => handlePageChange(p)}
+      onMouseEnter={() => {
+        // Prefetch adjacent pages on hover
+        prefetchPage(p - 1)
+        prefetchPage(p + 1)
+      }}
     >
       {label}
     </button>
