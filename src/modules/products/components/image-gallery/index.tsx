@@ -12,7 +12,8 @@ type ImageGalleryProps = {
 
 const ImageGallery = ({ images, product }: ImageGalleryProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const mobileScrollContainerRef = useRef<HTMLDivElement>(null)
+  const tabletScrollContainerRef = useRef<HTMLDivElement>(null)
 
   const getAltText = (index: number) => {
     const brand = product.type?.value || "Product"
@@ -20,11 +21,11 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
     return `${brand} ${title} ${index + 1}`.trim()
   }
 
-  // Update current image index based on scroll position
+  // Update current image index based on scroll position for mobile
   useEffect(() => {
-    const handleScroll = () => {
-      if (scrollContainerRef.current) {
-        const container = scrollContainerRef.current
+    const handleMobileScroll = () => {
+      if (mobileScrollContainerRef.current) {
+        const container = mobileScrollContainerRef.current
         const scrollLeft = container.scrollLeft
         const imageWidth = container.scrollWidth / images.length
         const newIndex = Math.round(scrollLeft / imageWidth)
@@ -32,10 +33,29 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
       }
     }
 
-    const container = scrollContainerRef.current
+    const container = mobileScrollContainerRef.current
     if (container) {
-      container.addEventListener('scroll', handleScroll)
-      return () => container.removeEventListener('scroll', handleScroll)
+      container.addEventListener('scroll', handleMobileScroll)
+      return () => container.removeEventListener('scroll', handleMobileScroll)
+    }
+  }, [images.length])
+
+  // Update current image index based on scroll position for tablet
+  useEffect(() => {
+    const handleTabletScroll = () => {
+      if (tabletScrollContainerRef.current) {
+        const container = tabletScrollContainerRef.current
+        const scrollLeft = container.scrollLeft
+        const imageWidth = container.scrollWidth / images.length
+        const newIndex = Math.round(scrollLeft / imageWidth)
+        setCurrentImageIndex(newIndex)
+      }
+    }
+
+    const container = tabletScrollContainerRef.current
+    if (container) {
+      container.addEventListener('scroll', handleTabletScroll)
+      return () => container.removeEventListener('scroll', handleTabletScroll)
     }
   }, [images.length])
 
@@ -44,7 +64,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
       {/* Mobile: Horizontal scrolling gallery with indicators */}
       <div className="md:hidden w-full">
         <div 
-          ref={scrollContainerRef}
+          ref={mobileScrollContainerRef}
           className="flex overflow-x-auto snap-x snap-mandatory gap-0 px-0 pb-2 no-scrollbar"
         >
           {images.map((image, index) => {
@@ -98,7 +118,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
       {/* Tablet: Horizontal scrolling gallery with indicators */}
       <div className="hidden md:block small:hidden w-full h-full">
         <div 
-          ref={scrollContainerRef}
+          ref={tabletScrollContainerRef}
           className="flex overflow-x-auto snap-x snap-mandatory gap-0 px-0 pb-2 no-scrollbar"
         >
           {images.map((image, index) => {
