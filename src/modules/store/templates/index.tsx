@@ -1,6 +1,7 @@
 "use client"
 
 import { Suspense, useState } from "react"
+import { HttpTypes } from "@medusajs/types"
 
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
