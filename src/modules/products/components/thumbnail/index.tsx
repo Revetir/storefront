@@ -59,7 +59,7 @@ const ImageOrPlaceholder = ({
       className="absolute inset-0 object-cover object-center"
       draggable={false}
       quality={95}
-      sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 1024px) 480px, (max-width: 1440px) 600px, 800px"
+      sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, (max-width: 1200px) 600px, 800px"
       fill
       priority={size === "full" || size === "large"}
       placeholder="blur"

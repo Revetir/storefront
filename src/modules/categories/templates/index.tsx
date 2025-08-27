@@ -88,24 +88,22 @@ const CategoryTemplate = ({
             </div>
           </div>
 
-          {/* Large Desktop Layout - ≥ 1440px */}
+          {/* Large Desktop Layout - ≥ 1440px (Original Layout) */}
           <div className="hidden large:block">
-            <div className="flex justify-center w-full">
-              <div className="max-w-[1400px] px-8">
-                <div className="flex gap-12">
-                  {/* Full Sidebar */}
-                  <div className="w-80 flex-shrink-0">
-                    <RefinementList sortBy={sort} />
-                  </div>
-                  {/* Product Grid */}
-                  <div className="flex-1">
-                    <PaginatedProductsClient
-                      products={products}
-                      region={region}
-                      totalPages={totalPages}
-                      currentPage={currentPage}
-                    />
-                  </div>
+            <div className="relative">
+              {/* Desktop Refinement List - Original positioning */}
+              <div className="absolute left-9 top-0 z-10">
+                <RefinementList sortBy={sort} />
+              </div>
+              
+              <div className="flex justify-center w-full">
+                <div className="max-w-[1200px] px-4 md:px-6">
+                  <PaginatedProductsClient
+                    products={products}
+                    region={region}
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                  />
                 </div>
               </div>
             </div>

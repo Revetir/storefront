@@ -52,8 +52,6 @@ export default function SearchModal() {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       const isMobile = window.innerWidth < 768; // md breakpoint
-      const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024; // small breakpoint
-      const isSmallDesktop = window.innerWidth >= 1024 && window.innerWidth < 1440; // large breakpoint
       
       let left = rect.left;
       let width = 400;
@@ -66,21 +64,6 @@ export default function SearchModal() {
         
         // Position vertically with some space from the top
         top = Math.max(16, Math.min(rect.bottom + 8, window.innerHeight - 200)); // 8px below button, but ensure it doesn't go too low
-      } else if (isTablet) {
-        // On tablet, use a medium width and position relative to button
-        width = Math.min(window.innerWidth - 64, 500); // Tablet-optimized width
-        left = Math.max(16, Math.min(rect.left - (width / 2) + (rect.width / 2), window.innerWidth - width - 16));
-        top = rect.bottom + 8;
-      } else if (isSmallDesktop) {
-        // On small desktop, use standard width with adjusted positioning
-        width = 450;
-        left = Math.max(16, Math.min(rect.left - (width / 2) + (rect.width / 2), window.innerWidth - width - 16));
-        top = rect.bottom + 8;
-      } else {
-        // On large desktop, use full width with standard positioning
-        width = 500;
-        left = Math.max(16, Math.min(rect.left - (width / 2) + (rect.width / 2), window.innerWidth - width - 16));
-        top = rect.bottom + 8;
       }
       
       setDropdownStyle({

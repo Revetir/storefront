@@ -21,10 +21,7 @@ export default function RelatedProductsClient({ products, region }: RelatedProdu
         </p>
       </div>
 
-      <ul className="grid grid-cols-2 w-full gap-x-4 gap-y-6 
-                     md:grid-cols-2 md:gap-x-4 md:gap-y-6
-                     small:grid-cols-3 small:gap-x-6 small:gap-y-8
-                     large:grid-cols-4 large:gap-x-8 large:gap-y-10">
+      <ul className="grid grid-cols-2 w-full gap-x-4 gap-y-6 md:grid-cols-3 lg:grid-cols-4 md:gap-x-6 md:gap-y-8">
         {products.map((product) => (
           <li key={product.id} className="h-full w-full">
             <ProductPreview product={product} region={region} />
