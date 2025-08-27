@@ -42,7 +42,7 @@ const StoreTemplate = ({
       <div className="py-6" data-testid="category-container">
         <div className="relative">
           {/* Mobile Layout - < 768px */}
-          <div className="block md:hidden">
+          <div className="md:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[768px] px-4">
                 <div className="mb-6">
@@ -94,7 +94,7 @@ const StoreTemplate = ({
             </div>
           </div>
 
-          {/* Small Desktop Layout - 1023px - 1725px */}
+          {/* Small Desktop Layout - 1024px - 1724px */}
           <div className="hidden small:block large:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[1200px] px-6">
@@ -117,7 +117,7 @@ const StoreTemplate = ({
             </div>
           </div>
 
-          {/* Large Desktop Layout - > 1725px (Original Layout) */}
+          {/* Large Desktop Layout - >= 1725px */}
           <div className="hidden large:block">
             <div className="relative">
               {/* Desktop Refinement List - Original positioning */}
