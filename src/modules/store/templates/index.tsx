@@ -42,39 +42,8 @@ const StoreTemplate = ({
     <>
       <div className="py-6" data-testid="category-container">
         <div className="relative">
-<<<<<<< HEAD
-          {/* Mobile Refinement Buttons - < 768px */}
-          <div className="md:hidden flex justify-center mb-6">
-            <div className="flex gap-4">
-              <button
-                onClick={() => setIsMobileRefinementOpen(true)}
-                className="px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
-              >
-                Refine & Sort
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile Products - < 768px */}
-          <div className="md:hidden">
-            <div className="flex justify-center w-full">
-              <div className="max-w-[768px] px-4">
-                <PaginatedProductsClient
-                  products={products}
-                  region={region}
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Tablet Layout - 767px - 1022px */}
-          <div className="hidden md:block small:hidden">
-=======
           {/* Mobile Layout - < 768px */}
           <div className="md:hidden">
->>>>>>> preview
             <div className="flex justify-center w-full">
               <div className="max-w-[768px] px-4">
                 <div className="mb-6">
