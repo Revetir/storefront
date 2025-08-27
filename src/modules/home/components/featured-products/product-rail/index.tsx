@@ -30,9 +30,14 @@ export default async function ProductRail({
     <div className="content-container py-12 small:py-24">
       <ul className="grid grid-cols-2 small:grid-cols-3 gap-x-6 gap-y-24 small:gap-y-36">
         {pricedProducts &&
-          pricedProducts.map((product) => (
+          pricedProducts.map((product, index) => (
             <li key={product.id}>
-              <ProductPreview product={product} region={region} isFeatured />
+              <ProductPreview 
+                product={product} 
+                region={region} 
+                isFeatured 
+                priority={index < 6} // Priority loading for first 6 featured products
+              />
             </li>
           ))}
       </ul>

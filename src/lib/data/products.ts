@@ -53,6 +53,7 @@ export const listProducts = async ({
 
   const next = {
     ...(await getCacheOptions("products")),
+    revalidate: 3600, // Add revalidation to cache options
   }
 
   const finalQuery = {
@@ -73,7 +74,6 @@ export const listProducts = async ({
         query: finalQuery,
         headers,
         next,
-        cache: "force-cache",
       }
     )
     .then(({ products, count }) => {
@@ -95,7 +95,7 @@ export const listProducts = async ({
  * It will then return the paginated products based on the page and limit parameters.
  */
 export const listProductsWithSort = async ({
-  page = 0,
+  page = 1,
   queryParams,
   sortBy = "created_at",
   countryCode,
@@ -104,38 +104,59 @@ export const listProductsWithSort = async ({
   queryParams?: ProductQueryParams
   sortBy?: SortOptions
   countryCode: string
-}): Promise<{ response: { products: HttpTypes.StoreProduct[]; count: number }; nextPage: number | null; queryParams?: ProductQueryParams }> => {
+}): Promise<{ 
+  response: { products: HttpTypes.StoreProduct[]; count: number }; 
+  nextPage: number | null; 
+  totalPages: number;
+  currentPage: number;
+  queryParams?: ProductQueryParams 
+}> => {
   const limit = queryParams?.limit || 12
+  const offset = (page - 1) * limit
 
-  // If we have filtering parameters (like type_id), fetch with a reasonable limit and apply filters
-  // Otherwise, fetch more products for client-side sorting
-  const fetchLimit = queryParams?.type_id || queryParams?.category_id || queryParams?.collection_id ? limit * 10 : 1000
+  // Use proper server-side pagination and sorting
+  const finalQueryParams = {
+    ...queryParams,
+    limit,
+    offset,
+    // Server-side sorting
+    order: getSortOrder(sortBy),
+  }
 
   const {
     response: { products, count },
   } = await listProducts({
-    pageParam: 0,
-    queryParams: {
-      ...queryParams,
-      limit: fetchLimit,
-    },
+    pageParam: 1, // Always start from page 1
+    queryParams: finalQueryParams,
     countryCode,
   })
 
-  const sortedProducts = sortProducts(products, sortBy)
-
-  const pageParam = (page - 1) * limit
-  const nextPage = count > pageParam + limit ? pageParam + limit : null
-
-  const paginatedProducts = sortedProducts.slice(pageParam, pageParam + limit)
+  const totalPages = Math.ceil(count / limit)
+  const nextPage = page < totalPages ? page + 1 : null
 
   return {
     response: {
-      products: paginatedProducts,
+      products, // Already paginated and sorted by server
       count,
     },
     nextPage,
-    queryParams,
+    totalPages,
+    currentPage: page,
+    queryParams: finalQueryParams,
+  }
+}
+
+// Helper function to convert frontend sort options to Medusa's order format
+const getSortOrder = (sortBy: SortOptions): string => {
+  switch (sortBy) {
+    case "created_at":
+      return "created_at"
+    case "price_asc":
+      return "variants.calculated_price"
+    case "price_desc":
+      return "-variants.calculated_price"
+    default:
+      return "created_at"
   }
 }
 
@@ -153,7 +174,8 @@ export const getNewestProduct = async ({
     } = await listProducts({
       pageParam: 1,
       queryParams: {
-        limit: 100, // Fetch more products to ensure we get the newest one
+        limit: 1,
+        order: "created_at", // Server-side sorting
       },
       countryCode,
     })
@@ -162,14 +184,7 @@ export const getNewestProduct = async ({
       return null
     }
 
-    // Sort by created_at desc to get the newest product
-    const sortedProducts = products.sort((a, b) => {
-      const dateA = new Date(a.created_at || 0)
-      const dateB = new Date(b.created_at || 0)
-      return dateB.getTime() - dateA.getTime()
-    })
-
-    return sortedProducts[0]
+    return products[0]
   } catch (error) {
     console.error("Error fetching newest product:", error)
     return null
@@ -192,23 +207,13 @@ export const getNewestProducts = async ({
     } = await listProducts({
       pageParam: 1,
       queryParams: {
-        limit: 100, // Fetch more products to ensure we get the newest ones
+        limit,
+        order: "created_at", // Server-side sorting
       },
       countryCode,
     })
 
-    if (products.length === 0) {
-      return []
-    }
-
-    // Sort by created_at desc to get the newest products
-    const sortedProducts = products.sort((a, b) => {
-      const dateA = new Date(a.created_at || 0)
-      const dateB = new Date(b.created_at || 0)
-      return dateB.getTime() - dateA.getTime()
-    })
-
-    return sortedProducts.slice(0, limit)
+    return products
   } catch (error) {
     console.error("Error fetching newest products:", error)
     return []
@@ -229,7 +234,8 @@ export const getNewestProductUnder100 = async ({
     } = await listProducts({
       pageParam: 1,
       queryParams: {
-        limit: 100, // Fetch more products to ensure we get the newest one under $100
+        limit: 50, // Reduced from 100 to 50 for better performance
+        order: "created_at", // Server-side sorting
       },
       countryCode,
     })
@@ -238,26 +244,20 @@ export const getNewestProductUnder100 = async ({
       return null
     }
 
-    // Filter products under $100 and sort by created_at desc
-    const productsUnder100 = products
-      .filter((product) => {
-        // Check if product has variants with calculated prices
-        const hasVariants = product.variants && product.variants.length > 0
-        if (!hasVariants) return false
+    // Filter products under $100 (client-side filtering still needed for price)
+    const productsUnder100 = products.find((product) => {
+      // Check if product has variants with calculated prices
+      const hasVariants = product.variants && product.variants.length > 0
+      if (!hasVariants) return false
 
-        // Check if any variant is under $100
-        return product.variants?.some((variant) => {
-          const price = variant.calculated_price?.calculated_amount
-          return price && price < 150
-        }) || false
-      })
-      .sort((a, b) => {
-        const dateA = new Date(a.created_at || 0)
-        const dateB = new Date(b.created_at || 0)
-        return dateB.getTime() - dateA.getTime()
-      })
+      // Check if any variant is under $100
+      return product.variants?.some((variant) => {
+        const price = variant.calculated_price?.calculated_amount
+        return price && price < 150
+      }) || false
+    })
 
-    return productsUnder100[0] || null
+    return productsUnder100 || null
   } catch (error) {
     console.error("Error fetching newest product under $100:", error)
     return null

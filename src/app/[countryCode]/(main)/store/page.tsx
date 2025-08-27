@@ -29,17 +29,10 @@ export default async function StorePage(props: Params) {
   const { sortBy, page, brand, maxPrice } = searchParams
 
   // Fetch product data on the server
-  const PRODUCT_LIMIT = 60
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
 
-  const queryParams: any = {
-    limit: PRODUCT_LIMIT,
-  }
-
-  if (sort === "created_at") {
-    queryParams.order = "created_at"
-  }
+  const queryParams: any = {}
 
   // Convert brand value to type ID if brand filter is provided
   if (brand) {
@@ -56,8 +49,11 @@ export default async function StorePage(props: Params) {
     return null
   }
 
-  let {
+  // Use server-side pagination
+  const {
     response: { products, count },
+    totalPages,
+    currentPage,
   } = await listProductsWithSort({
     page: pageNumber,
     queryParams,
@@ -66,18 +62,18 @@ export default async function StorePage(props: Params) {
   })
 
   // Apply price filtering if maxPrice is provided
+  let filteredProducts = products
+  let filteredCount = count
   if (maxPrice) {
     const maxPriceNumber = parseInt(maxPrice)
-    products = products.filter((product) => {
+    filteredProducts = products.filter((product) => {
       return product.variants?.some((variant) => {
         const price = variant.calculated_price?.calculated_amount
         return price && price < maxPriceNumber
       })
     })
-    count = products.length
+    filteredCount = filteredProducts.length
   }
-
-  const totalPages = Math.ceil(count / PRODUCT_LIMIT)
 
   return (
     <StoreTemplate
@@ -86,10 +82,10 @@ export default async function StorePage(props: Params) {
       countryCode={params.countryCode}
       type={brand}
       maxPrice={maxPrice}
-      products={products}
+      products={filteredProducts}
       region={region}
       totalPages={totalPages}
-      currentPage={pageNumber}
+      currentPage={currentPage}
     />
   )
 }

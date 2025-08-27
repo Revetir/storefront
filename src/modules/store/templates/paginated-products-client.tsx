@@ -23,9 +23,13 @@ export default function PaginatedProductsClient({
         className="grid grid-cols-2 w-full gap-x-4 gap-y-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-x-6 md:gap-y-8"
         data-testid="products-list"
       >
-        {products.map((p) => (
+        {products.map((p, index) => (
           <li key={p.id} className="h-full w-full">
-            <ProductPreview product={p} region={region} />
+            <ProductPreview 
+              product={p} 
+              region={region} 
+              priority={index < 6} // Priority loading for first 6 products (above-the-fold)
+            />
           </li>
         ))}
       </ul>

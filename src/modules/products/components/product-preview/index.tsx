@@ -12,10 +12,12 @@ export default function ProductPreview({
   product,
   isFeatured,
   region,
+  priority = false,
 }: {
   product: HttpTypes.StoreProduct
   isFeatured?: boolean
   region: HttpTypes.StoreRegion
+  priority?: boolean
 }) {
   // const pricedProduct = await listProducts({
   //   regionId: region.id,
@@ -40,6 +42,7 @@ export default function ProductPreview({
           size="full"
           isFeatured={isFeatured}
           product={product}
+          priority={priority}
         />
         <div className="flex flex-col txt-compact-medium mt-3 leading-snug space-y-1">
           {product.type?.value && (

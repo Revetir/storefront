@@ -83,7 +83,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
           <div className="lg:w-2/3">
             <div className="relative overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 transition-transform duration-500 ease-in-out">
-                {visibleProducts.map((product) => (
+                {visibleProducts.map((product, index) => (
                   <Link 
                     key={product.id} 
                     href={`/products/${product.handle}`}
@@ -95,6 +95,8 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                         alt={`${product.type?.value || 'Product'} ${product.title}`}
                         fill
                         className="rounded-md object-cover"
+                        priority={index < 3} // Priority loading for first 3 visible products
+                        quality={80}
                       />
                     </div>
                     <div className="text-left">
