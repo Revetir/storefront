@@ -95,8 +95,8 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
         )}
       </div>
 
-      {/* Tablet and Compact Desktop: Horizontal scrolling gallery with indicators */}
-      <div className="hidden md:block large:hidden w-full h-full">
+      {/* Tablet: Horizontal scrolling gallery with indicators */}
+      <div className="hidden md:block small:hidden w-full h-full">
         <div 
           ref={scrollContainerRef}
           className="flex overflow-x-auto snap-x snap-mandatory gap-0 px-0 pb-2 no-scrollbar"
@@ -147,6 +147,50 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Compact Desktop: Vertical scrolling gallery with first image centered */}
+      <div className="hidden small:block large:hidden w-full">
+        <div className="flex flex-col gap-y-4 min-h-screen">
+          {/* Top spacer to center first image */}
+          <div className="flex-1"></div>
+          
+          {/* Images container */}
+          <div className="flex flex-col gap-y-4">
+            {images.map((image, index) => {
+              return (
+                <Container
+                  key={image.id}
+                  className="relative aspect-square w-full overflow-hidden shadow-none bg-ui-bg-subtle"
+                  id={image.id}
+                >
+                  {!!image.url && (
+                    <Image
+                      src={image.url}
+                      priority={index <= 2 ? true : false}
+                      className="absolute inset-0 rounded-rounded"
+                      alt={getAltText(index)}
+                      fill
+                      unoptimized={true}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 800px"
+                      style={{
+                        objectFit: "cover",
+                      }}
+                      quality={95}
+                      placeholder="blur"
+                      blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
+                        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><filter id="b"><feGaussianBlur stdDeviation="12" /></filter><image preserveAspectRatio="none" filter="url(#b)" href="${image.url}" width="100%" height="100%"/></svg>`
+                      ).toString('base64')}`}
+                    />
+                  )}
+                </Container>
+              )
+            })}
+          </div>
+          
+          {/* Bottom spacer to balance the layout */}
+          <div className="flex-1"></div>
+        </div>
       </div>
 
       {/* Large Desktop: Vertical stacked gallery */}
