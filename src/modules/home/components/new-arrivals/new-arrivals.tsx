@@ -97,6 +97,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                         className="rounded-md object-cover"
                         priority={index < 3} // Priority loading for first 3 visible products
                         quality={80}
+                        unoptimized={true}
                       />
                     </div>
                     <div className="text-left">

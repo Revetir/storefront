@@ -31,6 +31,8 @@ const nextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Add iOS-specific optimizations
+    unoptimized: false,
     remotePatterns: [
       {
         protocol: "http",
@@ -54,7 +56,7 @@ const nextConfig = {
       },
     ],
   },
-  // Add headers for better caching
+  // Add headers for better caching and iOS compatibility
   async headers() {
     return [
       {
@@ -80,6 +82,20 @@ const nextConfig = {
           {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
+          },
+        ],
+      },
+      // Add iOS-specific headers for better image handling
+      {
+        source: '/_next/image(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+          {
+            key: 'Accept-Ranges',
+            value: 'bytes',
           },
         ],
       },

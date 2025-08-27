@@ -16,6 +16,7 @@ const CuratedProducts = () => {
                   className="object-cover rounded-md"
                   priority={true}
                   quality={80}
+                  unoptimized={true}
                 />
               </div>
             <h3 className="text-center mt-2 text-lg font-medium">Streetwear</h3>
@@ -31,6 +32,7 @@ const CuratedProducts = () => {
                 className="object-cover rounded-md"
                 priority={true}
                 quality={80}
+                unoptimized={true}
               />
             </div>
             <h3 className="text-center mt-2 text-lg font-medium">Dark Luxury</h3>
@@ -45,6 +47,7 @@ const CuratedProducts = () => {
                 fill
                 className="object-cover rounded-md"
                 quality={80}
+                unoptimized={true}
               />
             </div>
             <h3 className="text-center mt-2 text-lg font-medium">Retro Americana</h3>
@@ -59,6 +62,7 @@ const CuratedProducts = () => {
                 fill
                 className="object-cover rounded-md"
                 quality={80}
+                unoptimized={true}
               />
             </div>
             <h3 className="text-center mt-2 text-lg font-medium">Minimalist</h3>
