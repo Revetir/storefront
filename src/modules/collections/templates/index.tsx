@@ -36,15 +36,30 @@ const CollectionTemplate = ({
     <>
       <div className="py-6" data-testid="collection-container">
         <div className="relative">
-          {/* Mobile Refinement Buttons - < 768px */}
-          <div className="md:hidden flex justify-center mb-6">
-            <div className="flex gap-4">
-              <button
-                onClick={() => setIsMobileRefinementOpen(true)}
-                className="px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
-              >
-                Refine & Sort
-              </button>
+          {/* Mobile Layout - < 768px */}
+          <div className="md:hidden">
+            <div className="flex justify-center w-full">
+              <div className="max-w-[768px] px-4">
+                <div className="mb-6">
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => setIsMobileRefinementOpen(true)}
+                      className="px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
+                    >
+                      Refine & Sort
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="w-full">
+                  <PaginatedProductsClient
+                    products={products}
+                    region={region}
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                  />
+                </div>
+              </div>
             </div>
           </div>
 

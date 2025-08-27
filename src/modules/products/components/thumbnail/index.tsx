@@ -30,9 +30,9 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   const initialImage = thumbnail || images?.[0]?.url
 
   return (
-    <div
+    <Container
       className={clx(
-        "relative w-full h-full aspect-[1/1] overflow-hidden bg-ui-bg-subtle",
+        "relative w-full h-full aspect-[1/1] p-0 overflow-hidden shadow-none p-4 bg-ui-bg-subtle ",
         className
       )}
       data-testid={dataTestid}
@@ -43,7 +43,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
         product={product} 
         priority={priority}
       />
-    </div>
+    </Container>
   )
 }
 
@@ -67,7 +67,7 @@ const ImageOrPlaceholder = ({
       className="absolute inset-0 object-cover object-center"
       draggable={false}
       quality={80}
-      sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+      sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, (max-width: 1200px) 600px, 800px"
       fill
       priority={priority || size === "full" || size === "large"}
       placeholder="blur"
