@@ -121,35 +121,37 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
       {/* Compact Desktop Layout - 1023px - 1725px */}
       <div className="hidden small:block large:hidden">
-        <div className="flex justify-center w-full min-h-screen items-center">
-          <div className="max-w-[1200px] px-6">
-            <div className="flex gap-8">
-              {/* Left half - Image Gallery */}
-              <div className="w-1/2">
-                <div className="w-full">
-                  <ImageGallery images={product?.images || []} product={product} />
-                </div>
-              </div>
+        <div className="flex w-full min-h-screen">
+          {/* Left column - Product Info (sticky) */}
+          <div className="w-1/4 pl-6">
+            <div className="sticky top-0 h-screen flex items-center">
+              <ProductInfo product={product} />
+            </div>
+          </div>
 
-              {/* Right half - Product Info and Actions */}
-              <div className="w-1/2">
-                <div className="flex flex-col gap-y-6">
-                  <ProductInfo product={product} />
-                  <div className="flex flex-col gap-y-3">
-                    <ProductOnboardingCta />
-                    <Suspense
-                      fallback={
-                        <ProductActions
-                          disabled={true}
-                          product={product}
-                          region={region}
-                        />
-                      }
-                    >
-                      <ProductActionsWrapper id={product.id} region={region} />
-                    </Suspense>
-                  </div>
-                </div>
+          {/* Center column - Image Gallery */}
+          <div className="w-2/4 flex justify-center py-6">
+            <div className="w-full">
+              <ImageGallery images={product?.images || []} product={product} />
+            </div>
+          </div>
+
+          {/* Right column - Product Actions (sticky) */}
+          <div className="w-1/4 pr-6">
+            <div className="sticky top-0 h-screen flex items-center">
+              <div className="flex flex-col gap-y-8 w-full">
+                <ProductOnboardingCta />
+                <Suspense
+                  fallback={
+                    <ProductActions
+                      disabled={true}
+                      product={product}
+                      region={region}
+                    />
+                  }
+                >
+                  <ProductActionsWrapper id={product.id} region={region} />
+                </Suspense>
               </div>
             </div>
           </div>
