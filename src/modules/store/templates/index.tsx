@@ -57,10 +57,10 @@ const StoreTemplate = ({
             <div className="flex justify-center w-full">
               <div className="max-w-[768px] px-4">
                 <div className="mb-6">
-                  <div className="flex gap-4">
+                  <div className="flex justify-center">
                     <button
                       onClick={() => setIsMobileRefinementOpen(true)}
-                      className="px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
+                      className="px-8 py-3 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
                     >
                       Refine & Sort
                     </button>
@@ -76,7 +76,7 @@ const StoreTemplate = ({
             </div>
           </div>
 
-          {/* Small Desktop Layout - 1023px - 1670px */}
+          {/* Small Desktop Layout - 1023px - 1725px */}
           <div className="hidden small:block large:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[1200px] px-6">
@@ -99,7 +99,7 @@ const StoreTemplate = ({
             </div>
           </div>
 
-          {/* Large Desktop Layout - > 1670px (Original Layout) */}
+          {/* Large Desktop Layout - > 1725px (Original Layout) */}
           <div className="hidden large:block">
             <div className="relative">
               {/* Desktop Refinement List - Original positioning */}
