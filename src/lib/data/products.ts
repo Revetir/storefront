@@ -51,17 +51,18 @@ export const listProducts = async ({
     ...(await getAuthHeaders()),
   }
 
-  const next = {
-    ...(await getCacheOptions("products")),
-    revalidate: 3600, // Add revalidation to cache options
-  }
-
   const finalQuery = {
     limit,
     offset,
     region_id: region.id,
-    fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,*categories",
+    fields: "id,title,handle,thumbnail,images,variants.calculated_price,type,collection_id,tags,created_at", // Optimize fields
     ...queryParams,
+  }
+
+  const next = {
+    ...(await getCacheOptions("products")),
+    revalidate: 7200, // Increase to 2 hours for better cache hit rates
+    tags: [`products-${region.id}`, `products-${JSON.stringify(finalQuery)}`], // Add specific cache tags
   }
   
   console.log('API Query Parameters:', finalQuery)

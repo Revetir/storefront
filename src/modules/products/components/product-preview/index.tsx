@@ -7,6 +7,7 @@ import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
+import { useRouter } from "next/navigation"
 
 export default function ProductPreview({
   product,
@@ -19,6 +20,8 @@ export default function ProductPreview({
   region: HttpTypes.StoreRegion
   priority?: boolean
 }) {
+  const router = useRouter()
+
   // const pricedProduct = await listProducts({
   //   regionId: region.id,
   //   queryParams: { id: [product.id!] },
@@ -32,8 +35,17 @@ export default function ProductPreview({
     product,
   })
 
+  const handleMouseEnter = () => {
+    // Prefetch the product page on hover
+    router.prefetch(`/products/${product.handle}`)
+  }
+
   return (
-    <LocalizedClientLink href={`/products/${product.handle}`} className="group">
+    <LocalizedClientLink 
+      href={`/products/${product.handle}`} 
+      className="group"
+      onMouseEnter={handleMouseEnter}
+    >
 
       <div data-testid="product-wrapper" className="h-full w-full flex flex-col">
         <Thumbnail

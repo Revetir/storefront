@@ -9,6 +9,7 @@ type SortProductsProps = {
   sortBy: SortOptions
   setQueryParams: (name: string, value: SortOptions) => void
   "data-testid"?: string
+  disabled?: boolean
 }
 
 const sortOptions = [
@@ -30,8 +31,10 @@ const SortProducts = ({
   "data-testid": dataTestId,
   sortBy,
   setQueryParams,
+  disabled = false,
 }: SortProductsProps) => {
   const handleSelect = (value: SortOptions) => {
+    if (disabled) return
     setQueryParams("sortBy", value)
   }
 
@@ -42,11 +45,12 @@ const SortProducts = ({
         <button
           key={option.value}
           onClick={() => handleSelect(option.value as SortOptions)}
+          disabled={disabled}
           className={`text-left px-2 py-1 cursor-pointer uppercase text-xs font-sans ${
             sortBy === option.value
               ? "font-bold underline text-black"
               : "text-gray-700 hover:text-black"
-          }`}
+          } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
           data-testid={dataTestId ? `${dataTestId}-${option.value}` : undefined}
         >
           {option.label}
