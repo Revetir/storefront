@@ -111,16 +111,21 @@ export const listProductsWithSort = async ({
   currentPage: number;
   queryParams?: ProductQueryParams 
 }> => {
-  const limit = queryParams?.limit || 12
-  const offset = (page - 1) * limit
+  const limit = queryParams?.limit || 60 // Restored to 60 products per page
+  
+  // For price sorting, we need to fetch more products and sort client-side
+  // since Medusa's API doesn't properly support server-side price sorting
+  const isPriceSorting = sortBy === "price_asc" || sortBy === "price_desc"
+  const fetchLimit = isPriceSorting ? limit * 3 : limit // Fetch more for price sorting
+  const offset = isPriceSorting ? 0 : (page - 1) * limit
 
-  // Use proper server-side pagination and sorting
+  // Use proper server-side pagination and sorting for non-price sorts
   const finalQueryParams = {
     ...queryParams,
-    limit,
+    limit: fetchLimit,
     offset,
-    // Server-side sorting
-    order: getSortOrder(sortBy),
+    // Only use server-side sorting for created_at
+    ...(sortBy === "created_at" && { order: "-created_at" }),
   }
 
   const {
@@ -131,13 +136,29 @@ export const listProductsWithSort = async ({
     countryCode,
   })
 
-  const totalPages = Math.ceil(count / limit)
+  let sortedProducts = products
+  let totalCount = count
+
+  // Apply client-side sorting for price sorting
+  if (isPriceSorting) {
+    sortedProducts = sortProducts(products, sortBy)
+    totalCount = sortedProducts.length
+  }
+
+  // Apply pagination for price sorting
+  const startIndex = isPriceSorting ? (page - 1) * limit : 0
+  const endIndex = isPriceSorting ? startIndex + limit : sortedProducts.length
+  const paginatedProducts = isPriceSorting 
+    ? sortedProducts.slice(startIndex, endIndex)
+    : sortedProducts
+
+  const totalPages = Math.ceil(totalCount / limit)
   const nextPage = page < totalPages ? page + 1 : null
 
   return {
     response: {
-      products, // Already paginated and sorted by server
-      count,
+      products: paginatedProducts,
+      count: totalCount,
     },
     nextPage,
     totalPages,
@@ -150,13 +171,13 @@ export const listProductsWithSort = async ({
 const getSortOrder = (sortBy: SortOptions): string => {
   switch (sortBy) {
     case "created_at":
-      return "created_at"
+      return "-created_at" // Descending order for latest arrivals
     case "price_asc":
-      return "variants.calculated_price"
+      return "variants.calculated_price" // Ascending price
     case "price_desc":
-      return "-variants.calculated_price"
+      return "-variants.calculated_price" // Descending price
     default:
-      return "created_at"
+      return "-created_at" // Default to latest arrivals
   }
 }
 
@@ -175,7 +196,7 @@ export const getNewestProduct = async ({
       pageParam: 1,
       queryParams: {
         limit: 1,
-        order: "created_at", // Server-side sorting
+        order: "-created_at", // Descending order for newest first
       },
       countryCode,
     })
@@ -208,7 +229,7 @@ export const getNewestProducts = async ({
       pageParam: 1,
       queryParams: {
         limit,
-        order: "created_at", // Server-side sorting
+        order: "-created_at", // Descending order for newest first
       },
       countryCode,
     })
@@ -235,7 +256,7 @@ export const getNewestProductUnder100 = async ({
       pageParam: 1,
       queryParams: {
         limit: 50, // Reduced from 100 to 50 for better performance
-        order: "created_at", // Server-side sorting
+        order: "-created_at", // Descending order for newest first
       },
       countryCode,
     })
