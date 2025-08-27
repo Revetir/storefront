@@ -40,12 +40,7 @@ const StoreTemplate = ({
     <>
       <div className="py-6" data-testid="category-container">
         <div className="relative">
-          {/* Desktop Refinement List */}
-          <div className="hidden md:block absolute left-9 top-0 z-10">
-            <RefinementList sortBy={sort} selectedType={type} />
-          </div>
-          
-          {/* Mobile Refinement Buttons */}
+          {/* Mobile Refinement Buttons - < 768px */}
           <div className="md:hidden flex justify-center mb-6">
             <div className="flex gap-4">
               <button
@@ -56,18 +51,67 @@ const StoreTemplate = ({
               </button>
             </div>
           </div>
-          
-          <div className="flex justify-center w-full">
-            <div className="max-w-[1200px] px-4 md:px-6">
-              {/* <div className="mb-8 text-2xl-semi">
-                <h1 data-testid="store-page-title">All products</h1>
-              </div> */}
-              <PaginatedProductsClient
-                products={products}
-                region={region}
-                totalPages={totalPages}
-                currentPage={currentPage}
-              />
+
+          {/* Tablet Layout - 768px - 1024px */}
+          <div className="hidden md:block small:hidden">
+            <div className="flex justify-center w-full">
+              <div className="max-w-[768px] px-4">
+                <div className="mb-6">
+                  <RefinementList sortBy={sort} selectedType={type} />
+                </div>
+                <PaginatedProductsClient
+                  products={products}
+                  region={region}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Small Desktop Layout - 1024px - 1440px */}
+          <div className="hidden small:block large:hidden">
+            <div className="flex justify-center w-full">
+              <div className="max-w-[1200px] px-6">
+                <div className="flex gap-8">
+                  {/* Compact Sidebar */}
+                  <div className="w-64 flex-shrink-0">
+                    <RefinementList sortBy={sort} selectedType={type} />
+                  </div>
+                  {/* Product Grid */}
+                  <div className="flex-1">
+                    <PaginatedProductsClient
+                      products={products}
+                      region={region}
+                      totalPages={totalPages}
+                      currentPage={currentPage}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Large Desktop Layout - ≥ 1440px */}
+          <div className="hidden large:block">
+            <div className="flex justify-center w-full">
+              <div className="max-w-[1400px] px-8">
+                <div className="flex gap-12">
+                  {/* Full Sidebar */}
+                  <div className="w-80 flex-shrink-0">
+                    <RefinementList sortBy={sort} selectedType={type} />
+                  </div>
+                  {/* Product Grid */}
+                  <div className="flex-1">
+                    <PaginatedProductsClient
+                      products={products}
+                      region={region}
+                      totalPages={totalPages}
+                      currentPage={currentPage}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

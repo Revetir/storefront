@@ -6,12 +6,12 @@ import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-g
 import RefinementList from "@modules/store/components/refinement-list"
 import MobileRefinementPanel from "@modules/store/components/mobile-refinement-panel"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import PaginatedProductsClient from "@modules/store/templates/paginated-products-client"
-import { HttpTypes } from "@medusajs/types"
 
-export default function CollectionTemplate({
-  sortBy,
+import PaginatedProductsClient from "@modules/store/templates/paginated-products-client"
+
+const CollectionTemplate = ({
   collection,
+  sortBy,
   page,
   countryCode,
   products,
@@ -19,29 +19,24 @@ export default function CollectionTemplate({
   totalPages,
   currentPage,
 }: {
+  collection: any
   sortBy?: SortOptions
-  collection: HttpTypes.StoreCollection
   page?: string
   countryCode: string
-  products: HttpTypes.StoreProduct[]
-  region: HttpTypes.StoreRegion
+  products: any[]
+  region: any
   totalPages: number
   currentPage: number
-}) {
+}) => {
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
   const [isMobileRefinementOpen, setIsMobileRefinementOpen] = useState(false)
 
   return (
     <>
-      <div className="py-6" data-testid="category-container">
+      <div className="py-6" data-testid="collection-container">
         <div className="relative">
-          {/* Desktop Refinement List */}
-          <div className="hidden md:block absolute left-9 top-0 z-10">
-            <RefinementList sortBy={sort} />
-          </div>
-          
-          {/* Mobile Refinement Buttons */}
+          {/* Mobile Refinement Buttons - < 768px */}
           <div className="md:hidden flex justify-center mb-6">
             <div className="flex gap-4">
               <button
@@ -52,18 +47,67 @@ export default function CollectionTemplate({
               </button>
             </div>
           </div>
-          
-          <div className="flex justify-center w-full">
-            <div className="max-w-[1200px] px-4 md:px-6">
-              <div className="mb-8 text-2xl-semi">
-                <h1>Curated {collection.title}</h1>
+
+          {/* Tablet Layout - 768px - 1024px */}
+          <div className="hidden md:block small:hidden">
+            <div className="flex justify-center w-full">
+              <div className="max-w-[768px] px-4">
+                <div className="mb-6">
+                  <RefinementList sortBy={sort} />
+                </div>
+                <PaginatedProductsClient
+                  products={products}
+                  region={region}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                />
               </div>
-              <PaginatedProductsClient
-                products={products}
-                region={region}
-                totalPages={totalPages}
-                currentPage={currentPage}
-              />
+            </div>
+          </div>
+
+          {/* Small Desktop Layout - 1024px - 1440px */}
+          <div className="hidden small:block large:hidden">
+            <div className="flex justify-center w-full">
+              <div className="max-w-[1200px] px-6">
+                <div className="flex gap-8">
+                  {/* Compact Sidebar */}
+                  <div className="w-64 flex-shrink-0">
+                    <RefinementList sortBy={sort} />
+                  </div>
+                  {/* Product Grid */}
+                  <div className="flex-1">
+                    <PaginatedProductsClient
+                      products={products}
+                      region={region}
+                      totalPages={totalPages}
+                      currentPage={currentPage}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Large Desktop Layout - ≥ 1440px */}
+          <div className="hidden large:block">
+            <div className="flex justify-center w-full">
+              <div className="max-w-[1400px] px-8">
+                <div className="flex gap-12">
+                  {/* Full Sidebar */}
+                  <div className="w-80 flex-shrink-0">
+                    <RefinementList sortBy={sort} />
+                  </div>
+                  {/* Product Grid */}
+                  <div className="flex-1">
+                    <PaginatedProductsClient
+                      products={products}
+                      region={region}
+                      totalPages={totalPages}
+                      currentPage={currentPage}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -78,3 +122,5 @@ export default function CollectionTemplate({
     </>
   )
 }
+
+export default CollectionTemplate

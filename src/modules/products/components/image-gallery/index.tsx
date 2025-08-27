@@ -62,7 +62,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     alt={getAltText(index)}
                     fill
                     unoptimized={true}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 60vw, (max-width: 1280px) 50vw, 800px"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, (max-width: 1440px) 60vw, 50vw"
                     style={{
                       objectFit: "cover",
                     }}
@@ -112,7 +112,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                   alt={getAltText(index)}
                   fill
                   unoptimized={true}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 60vw, (max-width: 1280px) 50vw, 800px"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, (max-width: 1440px) 60vw, 50vw"
                   style={{
                     objectFit: "cover",
                   }}

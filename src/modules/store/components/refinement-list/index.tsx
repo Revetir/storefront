@@ -35,7 +35,10 @@ const RefinementList = ({ sortBy, 'data-testid': dataTestId, selectedType }: Ref
   }
 
   return (
-    <div className="flex small:flex-col gap-12 py-4 mb-8 small:px-0 small:min-w-[250px]">
+    <div className="flex flex-col gap-8 py-4 
+                    md:gap-6 md:py-2
+                    small:gap-8 small:py-4
+                    large:gap-12 large:py-6">
       <SortProducts sortBy={sortBy} setQueryParams={setQueryParams} data-testid={dataTestId} />
       <CategorySidebar className="border-r-0 p-0 w-full" />
       <TypeRefinementList selectedType={selectedType} />

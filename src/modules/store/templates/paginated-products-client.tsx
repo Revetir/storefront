@@ -17,25 +17,19 @@ export default function PaginatedProductsClient({
   totalPages, 
   currentPage 
 }: PaginatedProductsClientProps) {
-  // Determine number of columns based on screen size (2 for mobile, 4 for desktop)
-  const NUM_COLUMNS_DESKTOP = 4
-  const remainder = products.length % NUM_COLUMNS_DESKTOP
-  const emptySlots = remainder === 0 ? 0 : NUM_COLUMNS_DESKTOP - remainder
-
   return (
     <>
       <ul
-        className="grid grid-cols-2 w-full gap-x-4 gap-y-6 md:grid-cols-3 lg:grid-cols-4 md:gap-x-6 md:gap-y-8"
+        className="grid grid-cols-2 w-full gap-x-4 gap-y-6 
+                   md:grid-cols-2 md:gap-x-4 md:gap-y-6
+                   small:grid-cols-3 small:gap-x-6 small:gap-y-8
+                   large:grid-cols-4 large:gap-x-8 large:gap-y-10"
         data-testid="products-list"
       >
         {products.map((p) => (
           <li key={p.id} className="h-full w-full">
             <ProductPreview product={p} region={region} />
           </li>
-        ))}
-        {/* Render empty slots to fill out the last row */}
-        {Array.from({ length: emptySlots }).map((_, idx) => (
-          <li key={`empty-${idx}`} aria-hidden="true" className="invisible h-full w-full" />
         ))}
       </ul>
       {totalPages > 1 && (
