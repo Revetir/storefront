@@ -74,8 +74,8 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       <div className="hidden md:block small:hidden">
         <div className="flex w-full min-h-screen items-center">
           {/* Left half - Image Gallery (centered vertically) */}
-          <div className="w-1/2 px-4 flex items-center justify-center">
-            <div className="w-full max-w-full">
+          <div className="w-1/2 flex items-center justify-center">
+            <div className="w-full max-w-full px-4">
               <ImageGallery images={product?.images || []} product={product} />
             </div>
           </div>
@@ -87,7 +87,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
               <ProductInfoMobile product={product} />
 
               {/* CTAs Second */}
-              <div className="flex flex-col gap-y-4">
+              <div className="flex flex-col gap-y-4 mb-5">
                 <ProductOnboardingCta />
                 <Suspense
                   fallback={

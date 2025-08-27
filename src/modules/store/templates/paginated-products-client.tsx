@@ -39,9 +39,10 @@ export default function PaginatedProductsClient({
       <ul
         className="grid grid-cols-2 w-full gap-x-4 gap-y-6 md:grid-cols-2 small:grid-cols-3 medium:grid-cols-4 md:gap-x-6 md:gap-y-8"
         data-testid="products-list"
+        style={{ minHeight: '400px' }}
       >
         {products.map((p, index) => (
-          <li key={p.id} className="h-full w-full">
+          <li key={p.id} className="h-full w-full min-h-0">
             <ProductPreview 
               product={p} 
               region={region} 

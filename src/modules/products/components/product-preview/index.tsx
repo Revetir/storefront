@@ -43,20 +43,25 @@ export default function ProductPreview({
   return (
     <LocalizedClientLink 
       href={`/products/${product.handle}`} 
-      className="group"
+      className="group block w-full h-full"
       onMouseEnter={handleMouseEnter}
     >
-
-      <div data-testid="product-wrapper" className="h-full w-full flex flex-col">
-        <Thumbnail
-          thumbnail={product.thumbnail}
-          images={product.images}
-          size="full"
-          isFeatured={isFeatured}
-          product={product}
-          priority={priority}
-        />
-        <div className="flex flex-col txt-compact-medium mt-3 leading-snug space-y-1">
+      <div 
+        data-testid="product-wrapper" 
+        className="h-full w-full flex flex-col"
+        style={{ minHeight: '200px' }}
+      >
+        <div className="flex-1">
+          <Thumbnail
+            thumbnail={product.thumbnail}
+            images={product.images}
+            size="full"
+            isFeatured={isFeatured}
+            product={product}
+            priority={priority}
+          />
+        </div>
+        <div className="flex flex-col txt-compact-medium mt-3 leading-snug space-y-1 flex-shrink-0">
           {product.type?.value && (
             <p className="text-ui-fg-muted text-small font-medium leading-snug uppercase">
               {product.type.value}

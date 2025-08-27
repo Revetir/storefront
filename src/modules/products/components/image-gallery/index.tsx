@@ -62,7 +62,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     alt={getAltText(index)}
                     fill
                     unoptimized={true}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 60vw, (max-width: 1280px) 50vw, 800px"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 800px"
                     style={{
                       objectFit: "cover",
                     }}
@@ -96,7 +96,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
       </div>
 
       {/* Tablet and Compact Desktop: Horizontal scrolling gallery with indicators */}
-      <div className="hidden md:block large:hidden w-full">
+      <div className="hidden md:block large:hidden w-full h-full">
         <div 
           ref={scrollContainerRef}
           className="flex overflow-x-auto snap-x snap-mandatory gap-0 px-0 pb-2 no-scrollbar"
@@ -116,7 +116,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     alt={getAltText(index)}
                     fill
                     unoptimized={true}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 60vw, (max-width: 1280px) 50vw, 800px"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 800px"
                     style={{
                       objectFit: "cover",
                     }}
@@ -166,7 +166,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                   alt={getAltText(index)}
                   fill
                   unoptimized={true}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 60vw, (max-width: 1280px) 50vw, 800px"
+                                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 800px"
                   style={{
                     objectFit: "cover",
                   }}
