@@ -71,7 +71,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
       {/* Tablet Layout - 768px - 1022px */}
       <div className="hidden md:block small:hidden">
-        <div className="flex w-full">
+        <div className="flex w-full min-h-screen items-center">
           {/* Left half - Image Gallery */}
           <div className="w-1/2 px-4">
             <div className="w-full">
@@ -81,9 +81,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
           {/* Right half - Product Info and Actions */}
           <div className="w-1/2 px-4">
-            <div className="flex flex-col gap-y-8">
+            <div className="flex flex-col gap-y-6">
               <ProductInfo product={product} />
-              <div className="flex flex-col gap-y-4">
+              <div className="flex flex-col gap-y-3">
                 <ProductOnboardingCta />
                 <Suspense
                   fallback={
@@ -104,7 +104,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
       {/* Compact Desktop Layout - 1023px - 1725px */}
       <div className="hidden small:block large:hidden">
-        <div className="flex justify-center w-full">
+        <div className="flex justify-center w-full min-h-screen items-center">
           <div className="max-w-[1200px] px-6">
             <div className="flex gap-8">
               {/* Left half - Image Gallery */}
@@ -116,9 +116,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
               {/* Right half - Product Info and Actions */}
               <div className="w-1/2">
-                <div className="flex flex-col gap-y-8">
+                <div className="flex flex-col gap-y-6">
                   <ProductInfo product={product} />
-                  <div className="flex flex-col gap-y-4">
+                  <div className="flex flex-col gap-y-3">
                     <ProductOnboardingCta />
                     <Suspense
                       fallback={
