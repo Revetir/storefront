@@ -32,7 +32,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
   return (
     <>
-      {/* Mobile Layout */}
+      {/* Mobile Layout - < 768px */}
       <div className="md:hidden">
         {/* Image Gallery - Full width at top */}
         <div className="w-full">
@@ -69,8 +69,82 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         <div className="md:hidden h-4"></div>
       </div>
 
-      {/* Desktop Layout */}
-      <div className="hidden md:flex relative w-full">
+      {/* Tablet Layout - 768px - 1022px */}
+      <div className="hidden md:block small:hidden">
+        <div className="flex flex-col items-center w-full">
+          {/* Image Gallery - Centered with proper spacing */}
+          <div className="w-full max-w-[768px] px-4 pt-8">
+            <ImageGallery images={product?.images || []} product={product} />
+          </div>
+
+          {/* Product Info and Actions - Below gallery */}
+          <div className="w-full max-w-[768px] px-4 pt-8">
+            <div className="flex flex-col gap-y-6">
+              <ProductInfo product={product} />
+              <div className="flex flex-col gap-y-3">
+                <ProductOnboardingCta />
+                <Suspense
+                  fallback={
+                    <ProductActions
+                      disabled={true}
+                      product={product}
+                      region={region}
+                    />
+                  }
+                >
+                  <ProductActionsWrapper id={product.id} region={region} />
+                </Suspense>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Compact Desktop Layout - 1023px - 1725px */}
+      <div className="hidden small:block large:hidden">
+        <div className="flex justify-center w-full">
+          <div className="max-w-[1200px] px-6">
+            <div className="flex gap-8 pt-8">
+              {/* Left column - Product Info */}
+              <div className="w-1/3">
+                <div className="sticky top-8">
+                  <ProductInfo product={product} />
+                </div>
+              </div>
+
+              {/* Center column - Image Gallery */}
+              <div className="w-1/3 flex justify-center">
+                <div className="w-full">
+                  <ImageGallery images={product?.images || []} product={product} />
+                </div>
+              </div>
+
+              {/* Right column - Product Actions */}
+              <div className="w-1/3">
+                <div className="sticky top-8">
+                  <div className="flex flex-col gap-y-6">
+                    <ProductOnboardingCta />
+                    <Suspense
+                      fallback={
+                        <ProductActions
+                          disabled={true}
+                          product={product}
+                          region={region}
+                        />
+                      }
+                    >
+                      <ProductActionsWrapper id={product.id} region={region} />
+                    </Suspense>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Large Desktop Layout - > 1725px */}
+      <div className="hidden large:flex relative w-full">
         {/* Left column - Product Info (sticky) */}
         <div className="w-1/4 pl-6">
           <div className="sticky top-0 h-screen flex items-center">

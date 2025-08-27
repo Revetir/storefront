@@ -37,12 +37,17 @@ const StoreTemplate = ({
   const sort = sortBy || "created_at"
   const [isMobileRefinementOpen, setIsMobileRefinementOpen] = useState(false)
 
+  // Debug: Log products count
+  console.log('StoreTemplate - Products count:', products?.length || 0);
+  console.log('StoreTemplate - Current page:', currentPage);
+  console.log('StoreTemplate - Total pages:', totalPages);
+
   return (
     <>
       <div className="py-6" data-testid="category-container">
         <div className="relative">
           {/* Mobile Layout - < 768px */}
-          <div className="md:hidden">
+          <div className="block md:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[768px] px-4">
                 <div className="mb-6">
@@ -55,6 +60,12 @@ const StoreTemplate = ({
                     </button>
                   </div>
                 </div>
+                
+                {/* Debug: Show products count */}
+                <div className="mb-4 text-sm text-gray-500">
+                  Products: {products?.length || 0}
+                </div>
+                
                 <PaginatedProductsClient
                   products={products}
                   region={region}
