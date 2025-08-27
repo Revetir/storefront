@@ -20,7 +20,6 @@ const nextConfig = {
   },
   // Vercel-specific optimizations
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['@medusajs/ui'],
   },
   compress: true,
