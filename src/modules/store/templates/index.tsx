@@ -56,12 +56,14 @@ const StoreTemplate = ({
                   </div>
                 </div>
                 
-                <PaginatedProductsClient
-                  products={products}
-                  region={region}
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                />
+                <div className="w-full">
+                  <PaginatedProductsClient
+                    products={products}
+                    region={region}
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -80,12 +82,14 @@ const StoreTemplate = ({
                     </button>
                   </div>
                 </div>
-                <PaginatedProductsClient
-                  products={products}
-                  region={region}
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                />
+                <div className="w-full">
+                  <PaginatedProductsClient
+                    products={products}
+                    region={region}
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                  />
+                </div>
               </div>
             </div>
           </div>

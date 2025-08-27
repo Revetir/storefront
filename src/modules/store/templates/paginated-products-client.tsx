@@ -17,8 +17,25 @@ export default function PaginatedProductsClient({
   totalPages, 
   currentPage 
 }: PaginatedProductsClientProps) {
+  // Debug logging to help identify issues
+  console.log('PaginatedProductsClient render:', {
+    productsCount: products?.length || 0,
+    totalPages,
+    currentPage,
+    hasRegion: !!region
+  })
+
+  // Handle empty products case
+  if (!products || products.length === 0) {
+    return (
+      <div className="w-full py-12 text-center">
+        <p className="text-ui-fg-muted">No products found.</p>
+      </div>
+    )
+  }
+
   return (
-    <>
+    <div className="w-full">
       <ul
         className="grid grid-cols-2 w-full gap-x-4 gap-y-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-x-6 md:gap-y-8"
         data-testid="products-list"
@@ -40,6 +57,6 @@ export default function PaginatedProductsClient({
           totalPages={totalPages}
         />
       )}
-    </>
+    </div>
   )
 }
