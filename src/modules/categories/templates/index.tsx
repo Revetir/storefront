@@ -48,12 +48,19 @@ const CategoryTemplate = ({
             </div>
           </div>
 
-          {/* Tablet Layout - 768px - 1024px */}
+          {/* Tablet Layout - 767px - 1022px */}
           <div className="hidden md:block small:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[768px] px-4">
                 <div className="mb-6">
-                  <RefinementList sortBy={sort} />
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => setIsMobileRefinementOpen(true)}
+                      className="px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
+                    >
+                      Refine & Sort
+                    </button>
+                  </div>
                 </div>
                 <PaginatedProductsClient
                   products={products}
@@ -65,7 +72,7 @@ const CategoryTemplate = ({
             </div>
           </div>
 
-          {/* Small Desktop Layout - 1024px - 1440px */}
+          {/* Small Desktop Layout - 1023px - 1670px */}
           <div className="hidden small:block large:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[1200px] px-6">
@@ -88,7 +95,7 @@ const CategoryTemplate = ({
             </div>
           </div>
 
-          {/* Large Desktop Layout - ≥ 1440px (Original Layout) */}
+          {/* Large Desktop Layout - > 1670px (Original Layout) */}
           <div className="hidden large:block">
             <div className="relative">
               {/* Desktop Refinement List - Original positioning */}
