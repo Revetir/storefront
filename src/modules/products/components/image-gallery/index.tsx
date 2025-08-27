@@ -95,8 +95,62 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
         )}
       </div>
 
-      {/* Desktop: Vertical stacked gallery */}
-      <div className="hidden md:flex flex-col flex-1 small:mx-16 gap-y-4">
+      {/* Tablet and Compact Desktop: Horizontal scrolling gallery with indicators */}
+      <div className="hidden md:block large:hidden w-full">
+        <div 
+          ref={scrollContainerRef}
+          className="flex overflow-x-auto snap-x snap-mandatory gap-0 px-0 pb-2 no-scrollbar"
+        >
+          {images.map((image, index) => {
+            return (
+              <Container
+                key={image.id}
+                className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden shadow-none bg-ui-bg-subtle"
+                id={image.id}
+              >
+                {!!image.url && (
+                  <Image
+                    src={image.url}
+                    priority={index <= 2 ? true : false}
+                    className="absolute inset-0 rounded-rounded"
+                    alt={getAltText(index)}
+                    fill
+                    unoptimized={true}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 60vw, (max-width: 1280px) 50vw, 800px"
+                    style={{
+                      objectFit: "cover",
+                    }}
+                    quality={95}
+                    placeholder="blur"
+                    blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
+                      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><filter id="b"><feGaussianBlur stdDeviation="12" /></filter><image preserveAspectRatio="none" filter="url(#b)" href="${image.url}" width="100%" height="100%"/></svg>`
+                    ).toString('base64')}`}
+                  />
+                )}
+              </Container>
+            )
+          })}
+        </div>
+        
+        {/* Image indicators */}
+        {images.length > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-4">
+            {images.map((_, index) => (
+              <div
+                key={index}
+                className={`h-1 rounded-full transition-all duration-300 ${
+                  index === currentImageIndex 
+                    ? 'bg-black w-8' 
+                    : 'bg-gray-300 w-4'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Large Desktop: Vertical stacked gallery */}
+      <div className="hidden large:flex flex-col flex-1 small:mx-16 gap-y-4">
         {images.map((image, index) => {
           return (
             <Container
