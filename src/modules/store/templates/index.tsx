@@ -42,7 +42,7 @@ const StoreTemplate = ({
       <div className="py-6" data-testid="category-container">
         <div className="relative">
           {/* Mobile Layout - < 768px */}
-          <div className="block md:hidden">
+          <div className="md:hidden" style={{ display: 'block' }}>
             <div className="flex justify-center w-full">
               <div className="max-w-[768px] px-4">
                 <div className="mb-6">

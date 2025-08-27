@@ -83,7 +83,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           <div className="w-1/2 px-4">
             <div className="flex flex-col gap-y-6">
               <ProductInfo product={product} />
-              <div className="flex flex-col gap-y-3">
+              <div className="flex flex-col gap-y-4 pt-4">
                 <ProductOnboardingCta />
                 <Suspense
                   fallback={
