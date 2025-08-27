@@ -64,6 +64,7 @@ export async function getOrSetCart(countryCode: string) {
   }
 
   if (!cart) {
+    // Create new cart
     const cartResp = await sdk.store.cart.create(
       { region_id: region.id },
       {},
@@ -73,12 +74,14 @@ export async function getOrSetCart(countryCode: string) {
 
     await setCartId(cart.id)
 
+    // Single cache invalidation for new cart
     const cartCacheTag = await getCacheTag("carts")
     revalidateTag(cartCacheTag)
-  }
-
-  if (cart && cart?.region_id !== region.id) {
+  } else if (cart?.region_id !== region.id) {
+    // Update cart region if needed
     await sdk.store.cart.update(cart.id, { region_id: region.id }, {}, headers)
+    
+    // Single cache invalidation for region update
     const cartCacheTag = await getCacheTag("carts")
     revalidateTag(cartCacheTag)
   }
@@ -134,6 +137,7 @@ export async function addToCart({
     ...(await getAuthHeaders()),
   }
 
+  // Batch the line item creation and cache invalidation
   await sdk.store.cart
     .createLineItem(
       cart.id,
@@ -145,11 +149,17 @@ export async function addToCart({
       headers
     )
     .then(async () => {
-      const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
-
-      const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      revalidateTag(fulfillmentCacheTag)
+      // Batch cache invalidations to reduce overhead
+      const [cartCacheTag, fulfillmentCacheTag] = await Promise.all([
+        getCacheTag("carts"),
+        getCacheTag("fulfillment")
+      ])
+      
+      // Use Promise.all for concurrent cache invalidation
+      await Promise.all([
+        revalidateTag(cartCacheTag),
+        revalidateTag(fulfillmentCacheTag)
+      ])
     })
     .catch(medusaError)
 }

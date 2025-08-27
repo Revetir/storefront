@@ -107,12 +107,19 @@ export default function ProductActions({
     if (!selectedVariant?.id) return null
 
     setIsAdding(true)
-    await addToCart({
-      variantId: selectedVariant.id,
-      quantity: 1,
-      countryCode,
-    })
-    setIsAdding(false)
+    
+    try {
+      await addToCart({
+        variantId: selectedVariant.id,
+        quantity: 1,
+        countryCode,
+      })
+    } catch (error) {
+      console.error('Error adding to cart:', error)
+      // Could add toast notification here for error feedback
+    } finally {
+      setIsAdding(false)
+    }
   }
 
   return (
