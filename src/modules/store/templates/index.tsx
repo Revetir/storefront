@@ -42,7 +42,7 @@ const StoreTemplate = ({
       <div className="py-6" data-testid="category-container">
         <div className="relative">
           {/* Mobile Layout - < 768px */}
-          <div className="md:hidden" style={{ display: 'block' }}>
+          <div className="block md:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[768px] px-4">
                 <div className="mb-6">
@@ -56,11 +56,6 @@ const StoreTemplate = ({
                   </div>
                 </div>
                 
-                {/* Test: Simple text to see if mobile container renders */}
-                <div className="text-red-500 font-bold mb-4">
-                  MOBILE CONTAINER IS RENDERING - Products: {products?.length || 0}
-                </div>
-                
                 <PaginatedProductsClient
                   products={products}
                   region={region}
@@ -71,7 +66,7 @@ const StoreTemplate = ({
             </div>
           </div>
 
-          {/* Tablet Layout - 767px - 1022px */}
+          {/* Tablet Layout - 768px - 1023px */}
           <div className="hidden md:block small:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[768px] px-4">
