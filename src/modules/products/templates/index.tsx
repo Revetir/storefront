@@ -73,15 +73,15 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       {/* Tablet Layout - 768px - 1022px */}
       <div className="hidden md:block small:hidden">
         <div className="flex w-full min-h-screen items-center">
-          {/* Left half - Image Gallery (centered vertically) */}
-          <div className="w-1/2 flex items-center justify-center">
+          {/* Left side - Image Gallery (65% width) */}
+          <div className="w-[65%] flex items-center justify-center">
             <div className="w-full max-w-full px-4">
               <ImageGallery images={product?.images || []} product={product} />
             </div>
           </div>
 
-          {/* Right half - Product Info and Actions */}
-          <div className="w-1/2 px-4 flex items-center">
+          {/* Right side - Product Info and Actions (35% width) */}
+          <div className="w-[35%] px-4 flex items-center">
             <div className="flex flex-col gap-y-8 w-full">
               {/* Product Type and Title First */}
               <ProductInfoMobile product={product} />

@@ -14,15 +14,17 @@ interface MobileRefinementPanelProps {
   onClose: () => void
   sortBy: SortOptions
   selectedType?: string
+  initialTab?: "refine" | "sort"
 }
 
 const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
   isOpen,
   onClose,
   sortBy,
-  selectedType
+  selectedType,
+  initialTab = "refine"
 }) => {
-  const [activeTab, setActiveTab] = useState<"refine" | "sort">("refine")
+  const [activeTab, setActiveTab] = useState<"refine" | "sort">(initialTab)
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
