@@ -53,6 +53,20 @@ const StoreTemplate = ({
             </div>
           </div>
 
+          {/* Mobile Products - < 768px */}
+          <div className="md:hidden">
+            <div className="flex justify-center w-full">
+              <div className="max-w-[768px] px-4">
+                <PaginatedProductsClient
+                  products={products}
+                  region={region}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Tablet Layout - 767px - 1022px */}
           <div className="hidden md:block small:hidden">
             <div className="flex justify-center w-full">
