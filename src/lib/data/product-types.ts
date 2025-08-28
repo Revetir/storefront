@@ -11,5 +11,7 @@ export const listProductTypes = async (): Promise<ProductType[]> => {
     "/store/product-types",
     { method: "GET" }
   )
-  return product_types
+  
+  // Sort product types alphabetically by brand name (value)
+  return product_types.sort((a, b) => a.value.localeCompare(b.value))
 } 
