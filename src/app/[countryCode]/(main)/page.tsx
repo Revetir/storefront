@@ -13,6 +13,28 @@ export const metadata: Metadata = {
   title: "Curated luxury fashion | REVETIR",
   description:
     "Luxury fashion & independent Asian designers",
+  openGraph: {
+    title: "REVETIR - Curated Luxury Fashion",
+    description: "Discover luxury fashion and independent Asian designers. Free shipping & returns in the US.",
+    url: "https://revetir.com",
+    siteName: "REVETIR",
+    images: [
+      {
+        url: "/images/open_graph_image.png",
+        width: 1200,
+        height: 630,
+        alt: "REVETIR - Curated Luxury Fashion",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "REVETIR - Curated Luxury Fashion",
+    description: "Discover luxury fashion and independent Asian designers. Free shipping & returns in the US.",
+    images: ["/images/open_graph_image.png"],
+  },
 }
 
 export default async function Home(props: {
