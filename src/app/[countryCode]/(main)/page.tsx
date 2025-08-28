@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description:
     "Luxury fashion & independent Asian designers",
   openGraph: {
-    title: "REVETIR - Curated Luxury Fashion",
+    title: "Curated Luxury Fashion | REVETIR",
     description: "Discover luxury fashion and independent Asian designers. Free shipping & returns in the US.",
     url: "https://revetir.com",
     siteName: "REVETIR",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "REVETIR - Curated Luxury Fashion",
+    title: "Curated Luxury Fashion | REVETIR",
     description: "Discover luxury fashion and independent Asian designers. Free shipping & returns in the US.",
     images: ["/images/open_graph_image.png"],
   },
