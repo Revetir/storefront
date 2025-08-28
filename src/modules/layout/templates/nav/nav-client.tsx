@@ -54,7 +54,7 @@ export default function NavClient({ regions, customer, categories, cart }: NavCl
               href="/"
               className="text-lg font-medium uppercase tracking-wide text-black"
             >
-              Revetir
+              REVETIR
             </LocalizedClientLink>
           </div>
 

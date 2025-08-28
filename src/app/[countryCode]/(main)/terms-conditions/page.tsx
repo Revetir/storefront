@@ -1,8 +1,8 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions | Revetir",
-  description: "Read Revetir's terms and conditions for using our website and services.",
+  title: "Terms & Conditions | REVETIR",
+  description: "Read REVETIR's terms and conditions for using our website and services.",
 }
 
 export default function TermsConditionsPage() {
@@ -16,13 +16,13 @@ export default function TermsConditionsPage() {
             If you live in the United States of America ("U.S."), the following Terms and Conditions apply to you:
           </p>
           
-          <h2 className="text-2xl font-semibold mb-4">Revetir Terms and Conditions</h2>
+          <h2 className="text-2xl font-semibold mb-4">REVETIR Terms and Conditions</h2>
           <p className="text-gray-600 mb-8">
             Last updated: March, 2025
           </p>
           
           <p className="text-gray-600 mb-8">
-            This website is published by M.B. Smith d.b.a Revetir, headquartered at 1 Beihuayuan Street, Chaoyang District, Beijing, 100024, China ("we" or "Revetir").
+            This website is published by M.B. Smith d.b.a REVETIR, headquartered at 1 Beihuayuan Street, Chaoyang District, Beijing, 100024, China ("we" or "REVETIR").
           </p>
           
           <section className="mb-8">

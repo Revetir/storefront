@@ -1,8 +1,8 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Payment Information | Revetir",
-  description: "Learn about payment methods and security on Revetir.",
+  title: "Payment Information | REVETIR",
+  description: "Learn about payment methods and security on REVETIR.",
 }
 
 export default function PaymentInformationPage() {
@@ -20,7 +20,7 @@ export default function PaymentInformationPage() {
           
           <h2 className="text-2xl font-bold mb-6 mt-8">Payment Method</h2>
           <p className="text-gray-600 leading-relaxed mb-6">
-          We accept a wide variety of payment methods through Stripe, including major credit and debit cards (Visa, Mastercard, American Express, Discover), digital wallets like Apple Pay and Google Pay, and buy now, pay later through Klarna. All credit card transactions are processed through secure, encrypted payment gateways that meet industry standards for data protection and security.
+          We accept a wide variety of payment methods through Stripe, including major credit and debit cards (Visa, Mastercard, American Express, Discover), digital wallets like Apple Pay and Google Pay, and buy now, pay later through Klarna, Afterpay, and Affirm. All credit card transactions are processed through secure, encrypted payment gateways that meet industry standards for data protection and security.
           </p>
           
           <p className="text-gray-600 leading-relaxed mb-6">
@@ -33,11 +33,11 @@ export default function PaymentInformationPage() {
 
           <h2 className="text-2xl font-bold mb-6 mt-8">Payment Security</h2>
           <p className="text-gray-600 leading-relaxed mb-6">
-          Your payment security is our top priority. All transactions on our site are processed through Stripe, a certified PCI Service Provider Level 1—the most stringent level of certification available in the payments industry. Revetir never sees any sensitive payment information, only that payment has been made — Stripe directly handles your sensitive information, using advanced encryption and secure tokenization to ensure your card information is always secure.
+          Your payment security is our top priority. All transactions on our site are processed through Stripe, a certified PCI Service Provider Level 1—the most stringent level of certification available in the payments industry. REVETIR never sees any sensitive payment information, only that payment has been made — Stripe directly handles your sensitive information, using advanced encryption and secure tokenization to ensure your card information is always secure.
           </p>
           
           <p className="text-gray-600 leading-relaxed">
-            We also employ anti-fraud prevention measures through Stripe Radar to prevent payment fraud and abuse. Revetir takes payment disputes very seriously — please contact us as soon as possible if you believe there to be an issue with your payment. 
+            We also employ anti-fraud prevention measures through Stripe Radar to prevent payment fraud and abuse. REVETIR takes payment disputes very seriously — please contact us as soon as possible if you believe there to be an issue with your payment. 
           </p>
         </div>
       </div>

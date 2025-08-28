@@ -2,8 +2,8 @@ import { Metadata } from "next"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export const metadata: Metadata = {
-  title: "Ordering | Revetir",
-  description: "Learn how to place orders on Revetir.",
+  title: "Ordering | REVETIR",
+  description: "Learn how to place orders on REVETIR.",
 }
 
 export default function OrderingPage() {
@@ -29,7 +29,7 @@ export default function OrderingPage() {
           </ul>
           
           <p className="text-gray-600 leading-relaxed mb-6">
-            All orders are subject to acceptance and availability. By placing an order, you agree that you are at least 18 years old, that all details you provide to Revetir are true and accurate, that you are an authorized user of the method of payment used to place your order and that there are sufficient funds in your method of payment to cover the cost of the order.
+            All orders are subject to acceptance and availability. By placing an order, you agree that you are at least 18 years old, that all details you provide to REVETIR are true and accurate, that you are an authorized user of the method of payment used to place your order and that there are sufficient funds in your method of payment to cover the cost of the order.
           </p>
           
           <h2 className="text-2xl font-semibold mb-4 mt-8">Order Confirmation</h2>
@@ -43,7 +43,7 @@ export default function OrderingPage() {
           </p>
           
           <p className="text-gray-600 leading-relaxed mb-6">
-                         When we dispatch your goods, we will send a confirmation to your e-mail address which will be our acceptance of your order creating a legally binding sales contract between you and Revetir subject to and in accordance with our <LocalizedClientLink href="/terms-conditions" className="hover:text-black hover:underline">Terms & Conditions</LocalizedClientLink>. If we dispatch your goods separately, we may send you a confirmation, and there will be a separate contract, for each. If your order is cancelled for any reasons, including if we cannot accept your order, then any payment you made for ordered goods will be refunded and there will be no contract between you and Revetir.
+                         When we dispatch your goods, we will send a confirmation to your e-mail address which will be our acceptance of your order creating a legally binding sales contract between you and REVETIR subject to and in accordance with our <LocalizedClientLink href="/terms-conditions" className="hover:text-black hover:underline">Terms & Conditions</LocalizedClientLink>. If we dispatch your goods separately, we may send you a confirmation, and there will be a separate contract, for each. If your order is cancelled for any reasons, including if we cannot accept your order, then any payment you made for ordered goods will be refunded and there will be no contract between you and REVETIR.
           </p>
           
           <p className="text-gray-600 leading-relaxed mb-6">
@@ -81,7 +81,7 @@ export default function OrderingPage() {
           </p>
           
           <ol className="list-decimal pl-6 mb-6 text-gray-600 leading-relaxed">
-            <li>Log in to your Revetir account.</li>
+            <li>Log in to your REVETIR account.</li>
             <li>Click on the Orders tab on the left-hand side and see details for the relevant order.</li>
             <li>Next to Status, the order will be marked as either Placed, Processing or Shipped.</li>
           </ol>

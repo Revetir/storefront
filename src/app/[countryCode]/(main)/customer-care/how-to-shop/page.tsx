@@ -2,8 +2,8 @@ import { Metadata } from "next"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export const metadata: Metadata = {
-  title: "How to Shop | Revetir",
-  description: "Learn how to shop effectively on Revetir.",
+  title: "How to Shop | REVETIR",
+  description: "Learn how to shop effectively on REVETIR.",
 }
 
 export default function HowToShopPage() {
@@ -22,7 +22,7 @@ export default function HowToShopPage() {
           </p>
           
           <p className="text-gray-600 leading-relaxed mb-6">
-            Once a category is selected, the Revetir collection of brands will appear along the left side, underneath a list of subcategories.
+            Once a category is selected, the REVETIR collection of brands will appear along the left side, underneath a list of subcategories.
           </p>
           
           <h2 className="text-2xl font-bold mb-6 mt-8">Checking Out</h2>

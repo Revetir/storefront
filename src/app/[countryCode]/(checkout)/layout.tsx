@@ -29,7 +29,7 @@ export default function CheckoutLayout({
             className="text-lg font-medium uppercase tracking-wide text-black"
             data-testid="store-link"
           >
-            Revetir
+            REVETIR
           </LocalizedClientLink>
           <div className="flex-1 basis-0" />
         </nav>

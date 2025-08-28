@@ -10,9 +10,9 @@ import NewArrivals from "@modules/home/components/new-arrivals/new-arrivals"
 import { getNewestProducts } from "@lib/data/products"
 
 export const metadata: Metadata = {
-  title: "Revetir",
+  title: "Curated luxury fashion | REVETIR",
   description:
-    "Luxury fashion & independent designers",
+    "Luxury fashion & independent Asian designers",
 }
 
 export default async function Home(props: {

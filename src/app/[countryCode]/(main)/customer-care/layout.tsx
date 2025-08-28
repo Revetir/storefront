@@ -68,7 +68,7 @@ const revetirPages = [
   {
     title: "About Us",
     href: "/customer-care/about-us",
-    description: "Learn about Revetir"
+    description: "Learn about REVETIR"
   },
   {
     title: "Editorial Archive",

@@ -2,7 +2,7 @@ import { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Accessibility | Revetir",
-  description: "Learn about Revetir's commitment to accessibility and the features we provide for all users.",
+  description: "Learn about REVETIR's commitment to accessibility and the features we provide for all users.",
 }
 
 export default function AccessibilityPage() {

@@ -1,8 +1,8 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Partnerships | Revetir",
-  description: "Partner with Revetir to create sustainable fashion solutions and grow together.",
+  title: "Partnerships | REVETIR",
+  description: "Partner with REVETIR to create sustainable fashion solutions and grow together.",
 }
 
 export default function PartnershipsPage() {
@@ -14,7 +14,7 @@ export default function PartnershipsPage() {
         <div className="mb-12">
           <h2 className="text-2xl font-semibold mb-6">Partner With Us</h2>
           <p className="text-gray-600 leading-relaxed mb-4">
-            At Revetir, we believe in the power of collaboration to drive positive change 
+            At REVETIR, we believe in the power of collaboration to drive positive change 
             in the fashion industry. We're always looking for like-minded partners who 
             share our commitment to quality, inclusion, and ethics above profit.
           </p>
@@ -65,7 +65,7 @@ export default function PartnershipsPage() {
         <div>
           <h2 className="text-2xl font-semibold mb-6">Get Started</h2>
           <p className="text-gray-600 mb-4">
-            Ready to explore a partnership with Revetir? We welcome your inquiry at:
+            Ready to explore a partnership with REVETIR? We welcome your inquiry at:
           </p>
           <div className="space-y-2">
               <p><strong>partnerships@revetir.com</strong></p>

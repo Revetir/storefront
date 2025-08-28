@@ -1,8 +1,8 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Revetir",
-  description: "Learn how Revetir collects, uses, and protects your personal information in accordance with GDPR and CCPA.",
+  title: "Privacy Policy | REVETIR",
+  description: "Learn how REVETIR collects, uses, and protects your personal information in accordance with GDPR and CCPA.",
 }
 
 export default function PrivacyPage() {
@@ -17,7 +17,7 @@ export default function PrivacyPage() {
           </p>
           
           <p className="text-gray-600 mb-8">
-            Revetir (referred to as "we", "us" or "our") is a luxury e-commerce company headquartered at <strong>1 Beihuayuan Street, Chaoyang District, Beijing 100024, China</strong>. We respect your privacy and are committed to protecting your personal information in accordance with applicable laws (including the EU General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA)). This Privacy Policy explains how we collect, use, disclose and protect your personal data when you use our website or purchase our products. It also describes your privacy rights under applicable laws and how to exercise them. By using our website or providing your information to Revetir, you agree to the practices described in this policy.
+            REVETIR (referred to as "we", "us" or "our") is a luxury e-commerce company headquartered at <strong>1 Beihuayuan Street, Chaoyang District, Beijing 100024, China</strong>. We respect your privacy and are committed to protecting your personal information in accordance with applicable laws (including the EU General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA)). This Privacy Policy explains how we collect, use, disclose and protect your personal data when you use our website or purchase our products. It also describes your privacy rights under applicable laws and how to exercise them. By using our website or providing your information to REVETIR, you agree to the practices described in this policy.
           </p>
           
           <section className="mb-8">

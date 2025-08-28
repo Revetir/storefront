@@ -20,16 +20,16 @@ export default function ProductInformationPage() {
         <div className="prose prose-lg max-w-none">
           <h2 className="text-2xl font-bold mb-6 mt-8">Product Authenticity</h2>
           <p className="text-gray-600 leading-relaxed mb-6">
-            The Revetir Marketplace is directly supplied by brands, department stores, and manufacturers verified by our team to sell authentic products. For added assurance, every order that Revetir ships undergoes a thorough examination and comparison against known authentic references to the best of our ability and based on available information and expertise. Certain items may also include the designer's own proof of authenticity, such as an authenticity card, RFID/NFC tag, dust bag or other packaging.
+            The REVETIR Marketplace is directly supplied by brands, department stores, and manufacturers verified by our team to sell authentic products. For added assurance, every order that REVETIR ships undergoes a thorough examination and comparison against known authentic references to the best of our ability and based on available information and expertise. Certain items may also include the designer's own proof of authenticity, such as an authenticity card, RFID/NFC tag, dust bag or other packaging.
           </p>
           
           <h2 className="text-2xl font-bold mb-6 mt-8">Product Details</h2>
           <p className="text-gray-600 leading-relaxed mb-6">
-            Revetir is committed to ensuring that the photos, descriptions, availability and other details of the goods published on Revetir's website are as accurate and up-to-date as possible.
+            REVETIR is committed to ensuring that the photos, descriptions, availability and other details of the goods published on REVETIR's website are as accurate and up-to-date as possible.
           </p>
           
           <p className="text-gray-600 leading-relaxed mb-6">
-            Unfortunately, sometimes inaccuracies and errors may occur that affect your order. Revetir will send a message to your e-mail address if the actual details are different from those stated in your order. In this case, you and Revetir will not be bound by your original order and, unless you and Revetir agree otherwise, your order will be cancelled, with any payment you made for your ordered goods refunded, and there will be no contract resulting from your order.
+            Unfortunately, sometimes inaccuracies and errors may occur that affect your order. REVETIR will send a message to your e-mail address if the actual details are different from those stated in your order. In this case, you and REVETIR will not be bound by your original order and, unless you and REVETIR agree otherwise, your order will be cancelled, with any payment you made for your ordered goods refunded, and there will be no contract resulting from your order.
           </p>
           
                      <div className="flex justify-between items-center mb-6 mt-8">

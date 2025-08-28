@@ -2,7 +2,7 @@ import { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "About Us | Revetir",
-  description: "Learn about Revetir's mission to connect global customers with Asia's best fashion brands.",
+  description: "Learn about REVETIR's mission to connect global customers with Asia's best fashion brands.",
 }
 
 export default function AboutUsPage() {

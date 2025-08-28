@@ -31,7 +31,7 @@ export default function PromotionsPage() {
         <h1 className="text-3xl font-bold mb-8">Promotions</h1>
         
         <p className="text-gray-600 mb-8">
-          Revetir occasionally offers promotional codes to loyal customers, with account holders gaining access to exclusive member-only promotions.
+          REVETIR occasionally offers promotional codes to loyal customers, with account holders gaining access to exclusive member-only promotions.
         </p>
 
         <p className="text-gray-600 mb-8">
@@ -115,9 +115,9 @@ export default function PromotionsPage() {
         </div>
         
         <div className="mb-8">
-          <h2 className="text-base font-semibold mb-4">General Terms and Conditions applicable to promotional codes offered by Revetir</h2>
+          <h2 className="text-base font-semibold mb-4">General Terms and Conditions applicable to promotional codes offered by REVETIR</h2>
           <p className="text-gray-600 italic">
-            Promotional codes are applicable on full price items only and cannot be applied to items which are already discounted. Discounts are applied before tax and shipping. Discounted items returned to Revetir will be refunded in the amount paid and not the original value of the item(s). Revetir reserves the right to modify or discontinue promotions at any time. Orders placed using inapplicable, invalid, or expired coupons due to technical or telecommunications problems will be canceled at Revetir's sole discretion.
+            Promotional codes are applicable on full price items only and cannot be applied to items which are already discounted. Discounts are applied before tax and shipping. Discounted items returned to REVETIR will be refunded in the amount paid and not the original value of the item(s). REVETIR reserves the right to modify or discontinue promotions at any time. Orders placed using inapplicable, invalid, or expired coupons due to technical or telecommunications problems will be canceled at REVETIR's sole discretion.
           </p>
         </div>
         

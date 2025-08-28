@@ -19,7 +19,7 @@ const faqData: FAQCategory[] = [
     items: [
       {
         question: "What payment methods do you accept?",
-        answer: "We offer a wide variety of payment methods through Stripe, including major credit and debit cards (Visa, Mastercard, American Express, Discover), digital wallets like Apple Pay and Google Pay, and buy now, pay later through Klarna."
+        answer: "We offer a wide variety of payment methods through Stripe, including major credit and debit cards (Visa, Mastercard, American Express, Discover), digital wallets like Apple Pay and Google Pay, and buy now, pay later through Klarna, Affirm, and Afterpay."
       },
       {
         question: "Do I need to make an account to place an order?",
