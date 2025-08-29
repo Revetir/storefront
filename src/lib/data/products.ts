@@ -285,3 +285,33 @@ export const getNewestProductUnder100 = async ({
     return null
   }
 }
+
+/**
+ * Fetch all products for sitemap generation
+ * This function fetches all products without pagination to generate sitemap entries
+ */
+export const getAllProductsForSitemap = async ({
+  countryCode,
+}: {
+  countryCode: string
+}): Promise<HttpTypes.StoreProduct[]> => {
+  try {
+    // Fetch all products with a high limit to get all products
+    const {
+      response: { products },
+    } = await listProducts({
+      pageParam: 1,
+      queryParams: {
+        limit: 1000, // High limit to get all products
+        fields: "handle,title,updated_at,created_at,status",
+        status: "published", // Only published products
+      },
+      countryCode,
+    })
+
+    return products
+  } catch (error) {
+    console.error("Error fetching all products for sitemap:", error)
+    return []
+  }
+}
