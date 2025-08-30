@@ -18,10 +18,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/sitemap_main.xml`,
       lastModified: new Date(),
     },
-    {
-      url: `${baseUrl}/us/sitemap-products`,
-      lastModified: new Date(),
-    },
     ...productSitemapPages
   ]
 }
