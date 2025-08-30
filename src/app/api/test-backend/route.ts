@@ -14,52 +14,53 @@ export async function GET() {
     
     console.log('🔧 Environment check:', envCheck)
     
-    // Test regions endpoint
+    const backendUrl = process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
+    const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+    
+    // Test regions endpoint with publishable key
     let regionsResponse = null
     try {
-      regionsResponse = await sdk.client.fetch('/store/regions')
-      console.log('✅ Regions endpoint working')
+      const regionsRawResponse = await fetch(`${backendUrl}/store/regions`, {
+        method: 'GET',
+        headers: {
+          'x-publishable-api-key': publishableKey!,
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (regionsRawResponse.ok) {
+        regionsResponse = await regionsRawResponse.json()
+        console.log('✅ Regions endpoint working')
+      } else {
+        console.error('❌ Regions endpoint failed:', regionsRawResponse.status, regionsRawResponse.statusText)
+      }
     } catch (error) {
       console.error('❌ Regions endpoint failed:', error)
     }
     
-    // Test products endpoint with different approaches
+    // Test products endpoint with publishable key (correct Medusa Store API approach)
     let productsResponse: any = null
     let productsError: any = null
     
     try {
-      // Try without any query parameters first
-      productsResponse = await sdk.client.fetch('/store/products')
-      console.log('✅ Products endpoint working (no params), found:', productsResponse.count)
-    } catch (error) {
-      productsError = error
-      console.error('❌ Products endpoint failed (no params):', error)
-      
-      // Try with different query structure
-      try {
-        productsResponse = await sdk.client.fetch('/store/products', {
-          method: 'GET',
-          query: {
-            limit: 5
-          }
-        })
-        console.log('✅ Products endpoint working (with limit), found:', productsResponse.count)
-      } catch (error2) {
-        console.error('❌ Products endpoint failed (with limit):', error2)
-        
-        // Try with explicit method
-        try {
-          productsResponse = await sdk.client.fetch('/store/products', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          })
-          console.log('✅ Products endpoint working (explicit method), found:', productsResponse.count)
-        } catch (error3) {
-          console.error('❌ Products endpoint failed (explicit method):', error3)
+      const productsRawResponse = await fetch(`${backendUrl}/store/products`, {
+        method: 'GET',
+        headers: {
+          'x-publishable-api-key': publishableKey!,
+          'Content-Type': 'application/json'
         }
+      })
+      
+      if (productsRawResponse.ok) {
+        productsResponse = await productsRawResponse.json()
+        console.log('✅ Products endpoint working, found:', productsResponse.count)
+      } else {
+        console.error('❌ Products endpoint failed:', productsRawResponse.status, productsRawResponse.statusText)
+        productsError = `${productsRawResponse.status}: ${productsRawResponse.statusText}`
       }
+    } catch (error) {
+      console.error('❌ Products endpoint failed:', error)
+      productsError = error
     }
     
     return NextResponse.json({
@@ -67,7 +68,8 @@ export async function GET() {
       environment: envCheck,
       regions: regionsResponse ? 'working' : 'failed',
       products: productsResponse ? `working (${productsResponse.count} total)` : 'failed',
-      productsError: productsError ? productsError.message : null,
+      productsError: productsError ? productsError.toString() : null,
+      backendUrl: backendUrl,
       timestamp: new Date().toISOString()
     })
     

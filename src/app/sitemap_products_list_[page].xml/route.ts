@@ -1,27 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sdk } from '@lib/config'
 
-// Direct product fetching function - no regions dependency
+// Direct product fetching function using proper Medusa Store API authentication
 async function getProducts(page: number = 1, limit: number = 100) {
   try {
-    console.log('🔍 Fetching products directly...')
+    console.log('🔍 Fetching products with publishable API key...')
     
-    const response = await sdk.client.fetch<{ products: any[]; count: number }>(
-      "/store/products",
-      {
-        method: "GET",
-        query: {
-          limit,
-          offset: (page - 1) * limit,
-        },
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    const backendUrl = process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
+    const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+    
+    if (!publishableKey) {
+      console.error('❌ No publishable API key found')
+      return { products: [], count: 0 }
+    }
+    
+    // Use raw fetch with publishable API key as required by Medusa Store API
+    const rawResponse = await fetch(`${backendUrl}/store/products?limit=${limit}&offset=${(page - 1) * limit}`, {
+      method: 'GET',
+      headers: {
+        'x-publishable-api-key': publishableKey,
+        'Content-Type': 'application/json'
       }
-    )
-
-    console.log('✅ Products fetched successfully:', { count: response.count, productsLength: response.products?.length })
-    return response
+    })
+    
+    if (rawResponse.ok) {
+      const response = await rawResponse.json()
+      console.log('✅ Products fetched successfully:', { count: response.count, productsLength: response.products?.length })
+      return response
+    } else {
+      console.error('❌ Products fetch failed:', rawResponse.status, rawResponse.statusText)
+      return { products: [], count: 0 }
+    }
   } catch (error) {
     console.error('❌ Error fetching products:', error)
     return { products: [], count: 0 }
@@ -66,8 +75,8 @@ export async function GET(
     
     // Generate SSENSE-style sitemap: plain text with one URL per line
     const productUrls = products
-      .filter(product => product.handle && product.status === 'published') // Only include published products with handles
-      .map(product => `${baseUrl}/us/products/${product.handle}`)
+      .filter((product: any) => product.handle && product.status === 'published') // Only include published products with handles
+      .map((product: any) => `${baseUrl}/us/products/${product.handle}`)
       .join('\n')
 
     console.log('✅ Sitemap generated successfully')
