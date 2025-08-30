@@ -6,6 +6,23 @@ checkEnvVariables()
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+  experimental: {
+    appDir: true,
+  },
+  async rewrites() {
+    return [
+      // Rewrite brand URLs to existing product routes for SEO
+      {
+        source: '/us/products/:brand/:handle',
+        destination: '/us/products/:handle',
+      },
+      // Handle other country codes if needed
+      {
+        source: '/:country/products/:brand/:handle',
+        destination: '/:country/products/:handle',
+      }
+    ]
+  },
   reactStrictMode: true,
   logging: {
     fetches: {

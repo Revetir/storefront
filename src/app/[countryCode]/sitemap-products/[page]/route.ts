@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-async function getAllProducts() {
+async function getProductsForPage(page: number, limit: number = 100) {
   try {
     const backendUrl = process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
     const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
@@ -9,58 +9,42 @@ async function getAllProducts() {
       return { products: [], count: 0 }
     }
     
-    let allProducts = []
-    let page = 1
-    const limit = 100
-    let hasMore = true
-    
-    // Fetch all products using pagination
-    while (hasMore) {
-      const rawResponse = await fetch(`${backendUrl}/store/products?limit=${limit}&offset=${(page - 1) * limit}`, {
-        method: 'GET',
-        headers: {
-          'x-publishable-api-key': publishableKey,
-          'Content-Type': 'application/json'
-        }
-      })
-      
-      if (rawResponse.ok) {
-        const response = await rawResponse.json()
-        const products = response.products || []
-        
-        if (products.length === 0) {
-          hasMore = false
-        } else {
-          allProducts = [...allProducts, ...products]
-          page++
-          
-          // Safety check to prevent infinite loops
-          if (page > 50) {
-            console.log('⚠️ Safety limit reached, stopping pagination')
-            hasMore = false
-          }
-        }
-      } else {
-        console.error('❌ Products fetch failed:', rawResponse.status)
-        hasMore = false
+    const rawResponse = await fetch(`${backendUrl}/store/products?limit=${limit}&offset=${(page - 1) * limit}`, {
+      method: 'GET',
+      headers: {
+        'x-publishable-api-key': publishableKey,
+        'Content-Type': 'application/json'
       }
+    })
+    
+    if (rawResponse.ok) {
+      const response = await rawResponse.json()
+      return response
+    } else {
+      console.error('❌ Products fetch failed:', rawResponse.status)
+      return { products: [], count: 0 }
     }
-    
-    console.log(`✅ Fetched ${allProducts.length} total products across ${page - 1} pages`)
-    return { products: allProducts, count: allProducts.length }
-    
   } catch (error) {
-    console.error('❌ Error fetching all products:', error)
+    console.error('❌ Error fetching products:', error)
     return { products: [], count: 0 }
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ page: string }> }
+) {
   try {
+    const { page } = await params
+    const pageNumber = parseInt(page, 10) || 0
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://revetir.com'
-    const { products } = await getAllProducts()
+    
+    console.log(`📄 Generating sitemap for products, page ${pageNumber}`)
+    
+    const { products, count } = await getProductsForPage(pageNumber + 1, 100)
     
     if (!products || products.length === 0) {
+      console.log('⚠️ No products found for this page')
       return new NextResponse('', {
         headers: {
           'Content-Type': 'text/plain; charset=utf-8',
@@ -69,6 +53,8 @@ export async function GET(request: NextRequest) {
       })
     }
     
+    console.log(`✅ Found ${products.length} products for page ${pageNumber}`)
+    
     const filteredProducts = products.filter((product: any) => {
       const hasHandle = !!product.handle
       const hasStatus = 'status' in product
@@ -76,11 +62,8 @@ export async function GET(request: NextRequest) {
       return hasHandle && (!hasStatus || isPublished)
     })
     
-    console.log(`✅ Filtered to ${filteredProducts.length} products with valid handles`)
-    
     // Generate URLs with BOTH formats for SEO
     const productUrls = filteredProducts.map((product: any) => {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://revetir.com'
       const productType = product.type?.value || 'unknown'
       const cleanType = productType.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
       
