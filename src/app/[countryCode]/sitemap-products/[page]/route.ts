@@ -62,22 +62,12 @@ export async function GET(
       return hasHandle && (!hasStatus || isPublished)
     })
     
-    // Generate URLs with BOTH formats for SEO - FIXED to actually include brand keywords
+    // Generate ONLY standard product URLs - NO brand URLs to prevent duplicates
     const productUrls = filteredProducts.map((product: any) => {
-      const productType = product.type?.value || 'unknown'
-      const cleanType = productType.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-      
-      // Debug: Log what we're generating
-      console.log(`🔍 Product: ${product.title}, Type: ${productType}, Clean: ${cleanType}`)
-      
-      // Return both URL formats for SEO - NOW WITH ACTUAL BRAND KEYWORDS
-      const standardUrl = `${baseUrl}/us/products/${product.handle}`
-      const brandUrl = `${baseUrl}/us/products/${cleanType}/${product.handle}`
-      
-      return `${standardUrl}\n${brandUrl}`
+      return `${baseUrl}/us/products/${product.handle}`
     }).join('\n')
     
-    console.log('✅ Sitemap generated with brand keywords')
+    console.log('✅ Sitemap generated with standard URLs only (no duplicates)')
     
     return new NextResponse(productUrls, {
       headers: {
