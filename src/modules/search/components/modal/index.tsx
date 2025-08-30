@@ -187,7 +187,10 @@ function CustomSearchBox({ inputRef, onClose, gender }: { inputRef: React.RefObj
         onChange={e => refine(e.currentTarget.value)}
         className="w-full px-3 py-2 border border-gray-300 outline-none focus:border-gray-500 transition-all bg-white text-black placeholder-gray-400 !rounded-none !shadow-none uppercase text-xs font-sans"
         placeholder={placeholder}
-        style={{ boxShadow: "none" }}
+        style={{ 
+          boxShadow: "none",
+          fontSize: "16px" // Prevents iOS zoom on focus
+        }}
         autoFocus
       />
       {/* Close button, right-aligned, vertically centered, more space, uppercase, black, nav font */}
@@ -205,6 +208,25 @@ function CustomSearchBox({ inputRef, onClose, gender }: { inputRef: React.RefObj
 }
 
 const Hit = ({ hit }: { hit: any }) => {
+  const handleProductClick = () => {
+    // Blur any focused input to prevent mobile zoom issues
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    
+    // Force viewport reset on mobile
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      // Small delay to ensure the blur happens before navigation
+      setTimeout(() => {
+        // Force viewport to reset zoom level
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+          viewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
+        }
+      }, 100);
+    }
+  };
+
   return (
     <div className="flex flex-row gap-x-2 mt-4 relative">
       <img 
@@ -222,7 +244,12 @@ const Hit = ({ hit }: { hit: any }) => {
         <h3>{hit.title}</h3>
         {/* <p className="text-sm text-gray-500">{hit.description}</p> */}
       </div>
-      <Link href={`/products/${hit.handle}`} className="absolute right-0 top-0 w-full h-full" aria-label={`View Product: ${hit.title}`} />
+      <Link 
+        href={`/products/${hit.handle}`} 
+        className="absolute right-0 top-0 w-full h-full" 
+        aria-label={`View Product: ${hit.title}`}
+        onClick={handleProductClick}
+      />
     </div>
   )
 }
