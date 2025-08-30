@@ -13,8 +13,6 @@ async function getProducts(page: number = 1, limit: number = 100) {
         query: {
           limit,
           offset: (page - 1) * limit,
-          status: "published",
-          fields: "handle,title,updated_at",
         },
         headers: {
           'Content-Type': 'application/json',
@@ -68,7 +66,7 @@ export async function GET(
     
     // Generate SSENSE-style sitemap: plain text with one URL per line
     const productUrls = products
-      .filter(product => product.handle) // Only include products with handles
+      .filter(product => product.handle && product.status === 'published') // Only include published products with handles
       .map(product => `${baseUrl}/us/products/${product.handle}`)
       .join('\n')
 
