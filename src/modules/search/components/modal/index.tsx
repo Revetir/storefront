@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from "react"
 import ReactDOM from "react-dom"
 import { Hits, InstantSearch, Configure } from "react-instantsearch"
 import { getSearchClient } from "@lib/util/search-privacy"
-import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSearchBox } from 'react-instantsearch';
@@ -208,12 +207,13 @@ function CustomSearchBox({ inputRef, onClose, gender }: { inputRef: React.RefObj
 const Hit = ({ hit }: { hit: any }) => {
   return (
     <div className="flex flex-row gap-x-2 mt-4 relative">
-      <Image 
+      <img 
         src={hit.thumbnail} 
         alt={`${hit.type || 'Product'} ${hit.title}`}
         width={60} 
         height={60} 
         style={{ objectFit: 'cover', objectPosition: 'center', borderRadius: 4 }}
+        loading="lazy"
       />
       <div className="flex flex-col gap-y-1">
         {hit.type && (
