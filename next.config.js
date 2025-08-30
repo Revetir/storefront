@@ -2,9 +2,7 @@ const checkEnvVariables = require("./check-env-variables")
 
 checkEnvVariables()
 
-/**
- * @type {import('next').NextConfig}
- */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
     appDir: true,
@@ -20,6 +18,22 @@ const nextConfig = {
       {
         source: '/:country/products/:brand/:handle',
         destination: '/:country/products/:handle',
+      }
+    ]
+  },
+  async redirects() {
+    return [
+      // Redirect brand pages to store with brand filter
+      {
+        source: '/us/products/:brand',
+        destination: '/us/store?brand=:brand',
+        permanent: false, // Use 302 redirect to avoid caching issues
+      },
+      // Handle other country codes
+      {
+        source: '/:country/products/:brand',
+        destination: '/:country/store?brand=:brand',
+        permanent: false,
       }
     ]
   },
