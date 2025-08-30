@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sdk } from '@lib/config'
 
-// Direct product fetching function using proper Medusa Store API authentication
+// Direct product fetching function using the working authentication method
 async function getProducts(page: number = 1, limit: number = 100) {
   try {
     console.log('🔍 Fetching products with publishable API key...')
@@ -14,7 +13,7 @@ async function getProducts(page: number = 1, limit: number = 100) {
       return { products: [], count: 0 }
     }
     
-    // Use raw fetch with publishable API key as required by Medusa Store API
+    // Use the working authentication method from the diagnostic
     const rawResponse = await fetch(`${backendUrl}/store/products?limit=${limit}&offset=${(page - 1) * limit}`, {
       method: 'GET',
       headers: {
@@ -48,21 +47,13 @@ export async function GET(
     const pageNumber = parseInt(page, 10) || 0
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://revetir.com'
     
-    // Debug environment variables
-    console.log('🔧 Environment check:', {
-      MEDUSA_BACKEND_URL: process.env.MEDUSA_BACKEND_URL ? 'SET' : 'MISSING',
-      NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ? 'SET' : 'MISSING',
-      NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'using default',
-      baseUrl
-    })
-    
     console.log(`📄 Generating sitemap for products, page ${pageNumber}`)
     
     const { products, count } = await getProducts(pageNumber + 1, 100)
     
     if (!products || products.length === 0) {
       console.log('⚠️ No products found')
-      // Return empty but valid content
+      // Return empty content
       return new NextResponse('', {
         headers: {
           'Content-Type': 'text/plain; charset=utf-8',
