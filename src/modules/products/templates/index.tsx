@@ -113,6 +113,14 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
                 >
                   {product.description}
                 </Text>
+                {(product as any)?.product_sku?.sku && (
+                  <Text
+                    className="text-medium text-ui-fg-subtle mt-3"
+                    data-testid="product-sku"
+                  >
+                    {`SKU: ${(product as any).product_sku.sku}`}
+                  </Text>
+                )}
               </div>
             </div>
           </div>
