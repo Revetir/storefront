@@ -1,6 +1,8 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { getBrandBySlug, getBrandProducts } from "@lib/data/brands"
+import { getBrandBySlug } from "@lib/data/brands"
+import { listCategories, getCategoryByFlatHandle } from "@lib/data/categories"
+import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
@@ -59,88 +61,86 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 export default async function BrandPage(props: Props) {
-  try {
-    const searchParams = await props.searchParams
-    const params = await props.params
-    const { sortBy, page } = searchParams
-    const { countryCode, gender, brandSlug } = params
+  const searchParams = await props.searchParams
+  const params = await props.params
+  const { sortBy, page } = searchParams
+  const { countryCode, gender, brandSlug } = params
 
-    // Get region with error handling
-    let region
-    try {
-      region = await getRegion(countryCode)
-    } catch (error) {
-      console.error("Error fetching region:", error)
-      region = null
-    }
-
-    if (!region) {
-      notFound()
-    }
-
-    // Get the brand data with error handling
-    let brand
-    try {
-      brand = await getBrandBySlug(brandSlug)
-    } catch (error) {
-      console.error("Error fetching brand:", error)
-      brand = null
-    }
-
-    if (!brand) {
-      notFound()
-    }
-
-    // Fetch products for this brand using the brand products API
-    const pageNumber = page ? parseInt(page, 10) : 1
-    const limit = 60
-    const offset = (pageNumber - 1) * limit
-    const sort = sortBy || "created_at"
-
-    const { products, count } = await getBrandProducts({
-      brandSlug,
-      categorySlug: gender, // Pass the gender as category slug for filtering
-      limit,
-      offset,
-      sort,
-      countryCode,
-    })
-
-    // Calculate pagination
-    const totalPages = Math.ceil(count / limit)
-    const currentPage = pageNumber
-
-    // Create a mock category object for the template
-    const mockCategory = {
-      id: brand.id,
-      name: `${brand.name} ${gender === "men" ? "Men's" : "Women's"}`,
-      handle: `${gender}-${brandSlug}`,
-      description: brand.blurb,
-      metadata: {
-        intro_blurb: brand.blurb
-      }
-    }
-
-    return (
-      <CategoryTemplate
-        category={mockCategory}
-        sortBy={sortBy}
-        page={page}
-        countryCode={countryCode}
-        products={products}
-        region={region}
-        totalPages={totalPages}
-        currentPage={currentPage}
-      />
-    )
-  } catch (error) {
-    console.error("Error in BrandPage component:", error)
-    // Return a simple error page instead of crashing
-    return (
-      <div className="content-container py-6">
-        <h1>Error Loading Brand Page</h1>
-        <p>There was an error loading this brand page. Please try again later.</p>
-      </div>
-    )
+  // Validate gender
+  if (gender !== "men" && gender !== "women") {
+    notFound()
   }
+
+  const region = await getRegion(countryCode)
+  if (!region) {
+    notFound()
+  }
+
+  // Get the brand data
+  const brand = await getBrandBySlug(brandSlug)
+  if (!brand) {
+    notFound()
+  }
+
+  // Get the gender category (e.g., "men" or "women")
+  const genderCategory = await getCategoryByFlatHandle(gender)
+  if (!genderCategory) {
+    notFound()
+  }
+
+  const allCategories = await listCategories()
+
+  // Build category IDs for filtering (include all gender-specific categories)
+  const collectCategoryIds = (cat: any): string[] => {
+    return [cat.id, ...(cat.children || []).flatMap(collectCategoryIds)]
+  }
+  
+  // Get all gender-specific categories (those that start with the gender prefix)
+  const genderPrefix = gender === "men" ? "mens" : "womens"
+  const genderCategories = allCategories.filter(cat => 
+    cat.handle.startsWith(`${genderPrefix}-`)
+  )
+  const genderCategoryIds = genderCategories.flatMap(collectCategoryIds)
+
+  // Fetch products using the standard products API with brand and category filtering
+  const pageNumber = page ? parseInt(page, 10) : 1
+  const sort = sortBy || "created_at"
+
+  const {
+    response: { products, count },
+    totalPages,
+    currentPage,
+  } = await listProductsWithSort({
+    page: pageNumber,
+    queryParams: {
+      category_id: genderCategoryIds,
+      brand_id: [brand.id], // Filter by brand ID
+    },
+    sortBy: sort,
+    countryCode,
+  })
+
+  // Create a category object for the template that represents the brand + gender combination
+  const brandCategory = {
+    id: brand.id,
+    name: `${brand.name} ${gender === "men" ? "Men's" : "Women's"}`,
+    handle: `${gender}-${brandSlug}`,
+    description: brand.blurb,
+    metadata: {
+      intro_blurb: brand.blurb
+    }
+  }
+
+  return (
+    <CategoryTemplate
+      category={brandCategory}
+      sortBy={sortBy}
+      page={page}
+      countryCode={countryCode}
+      products={products}
+      region={region}
+      totalPages={totalPages}
+      currentPage={currentPage}
+    />
+  )
 }
