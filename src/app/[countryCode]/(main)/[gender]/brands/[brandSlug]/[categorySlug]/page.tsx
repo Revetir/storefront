@@ -4,7 +4,7 @@ import { getBrandBySlug, getBrandProducts } from "@lib/data/brands"
 import { getCategoryByFlatHandle } from "@lib/data/categories"
 import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import { BrandCategoryTemplate } from "@modules/brands/templates"
+import CategoryTemplate from "@modules/categories/templates"
 
 type Props = {
   params: Promise<{ 
@@ -74,7 +74,7 @@ export default async function BrandCategoryPage(props: Props) {
     notFound()
   }
 
-  // Fetch products for this brand and category
+  // Fetch products for this brand and category using the brand products API
   const pageNumber = page ? parseInt(page, 10) : 1
   const limit = 60
   const offset = (pageNumber - 1) * limit
@@ -93,15 +93,24 @@ export default async function BrandCategoryPage(props: Props) {
   const totalPages = Math.ceil(count / limit)
   const currentPage = pageNumber
 
+  // Create a mock category object that includes brand info
+  const mockCategory = {
+    ...category,
+    name: `${brand.name} ${category.name}`,
+    description: brand.blurb || category.metadata?.intro_blurb,
+    metadata: {
+      ...category.metadata,
+      intro_blurb: brand.blurb || category.metadata?.intro_blurb
+    }
+  }
+
   return (
-    <BrandCategoryTemplate
-      brand={brand}
-      category={category}
-      products={products}
+    <CategoryTemplate
+      category={mockCategory}
       sortBy={sortBy}
       page={page}
       countryCode={countryCode}
-      gender={gender}
+      products={products}
       region={region}
       totalPages={totalPages}
       currentPage={currentPage}

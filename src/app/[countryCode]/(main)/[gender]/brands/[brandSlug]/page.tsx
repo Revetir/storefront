@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { getBrandBySlug, getBrandProducts } from "@lib/data/brands"
 import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import BrandTemplate from "@modules/brands/templates"
+import CategoryTemplate from "@modules/categories/templates"
 
 type Props = {
   params: Promise<{ countryCode: string; gender: string; brandSlug: string }>
@@ -91,7 +91,7 @@ export default async function BrandPage(props: Props) {
       notFound()
     }
 
-    // Fetch products for this brand
+    // Fetch products for this brand using the brand products API
     const pageNumber = page ? parseInt(page, 10) : 1
     const limit = 60
     const offset = (pageNumber - 1) * limit
@@ -109,14 +109,24 @@ export default async function BrandPage(props: Props) {
     const totalPages = Math.ceil(count / limit)
     const currentPage = pageNumber
 
+    // Create a mock category object for the template
+    const mockCategory = {
+      id: brand.id,
+      name: `${brand.name} ${gender === "men" ? "Men's" : "Women's"}`,
+      handle: `${gender}-${brandSlug}`,
+      description: brand.blurb,
+      metadata: {
+        intro_blurb: brand.blurb
+      }
+    }
+
     return (
-      <BrandTemplate
-        brand={brand}
-        products={products}
+      <CategoryTemplate
+        category={mockCategory}
         sortBy={sortBy}
         page={page}
         countryCode={countryCode}
-        gender={gender}
+        products={products}
         region={region}
         totalPages={totalPages}
         currentPage={currentPage}
