@@ -2,7 +2,6 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getBrandBySlug, getBrandProducts } from "@lib/data/brands"
 import { getCategoryByFlatHandle } from "@lib/data/categories"
-import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { BrandCategoryTemplate } from "@modules/brands/templates"
@@ -62,6 +61,7 @@ export default async function BrandCategoryPage(props: Props) {
     notFound()
   }
 
+  // Get the brand data
   const brand = await getBrandBySlug(brandSlug)
   if (!brand) {
     notFound()
@@ -74,34 +74,24 @@ export default async function BrandCategoryPage(props: Props) {
     notFound()
   }
 
-  // Build category IDs for filtering (include children)
-  const collectCategoryIds = (cat: any): string[] => {
-    return [cat.id, ...(cat.children || []).flatMap(collectCategoryIds)]
-  }
-  const categoryIds = collectCategoryIds(category)
-
-  // Fetch products
+  // Fetch products for this brand and category
   const pageNumber = page ? parseInt(page, 10) : 1
+  const limit = 60
+  const offset = (pageNumber - 1) * limit
   const sort = sortBy || "created_at"
 
-  // For now, let's use the standard product API with category filtering
-  // This is a temporary solution until we can debug the brand API
-  const {
-    response: { products, count },
-    totalPages,
-    currentPage,
-  } = await listProductsWithSort({
-    page: pageNumber,
-    queryParams: {
-      category_id: categoryIds,
-      // We'll add brand filtering here once we figure out the correct approach
-    },
-    sortBy: sort,
+  const { products, count } = await getBrandProducts({
+    brandSlug,
+    categorySlug: `${genderPrefix}-${categorySlug}`,
+    limit,
+    offset,
+    sort,
     countryCode,
   })
 
-  // For now, we'll show all category products
-  // TODO: Add proper brand filtering once we debug the brand API
+  // Calculate pagination
+  const totalPages = Math.ceil(count / limit)
+  const currentPage = pageNumber
 
   return (
     <BrandCategoryTemplate

@@ -1,9 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { getBrandBySlug } from "@lib/data/brands"
+import { getBrandBySlug, getBrandProducts } from "@lib/data/brands"
 import { getRegion } from "@lib/data/regions"
-import { listCategories } from "@lib/data/categories"
-import { listProductsWithSort } from "@lib/data/products"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import BrandTemplate from "@modules/brands/templates"
 
@@ -55,59 +53,34 @@ export default async function BrandPage(props: Props) {
     notFound()
   }
 
+  // Get the brand data
   const brand = await getBrandBySlug(brandSlug)
   if (!brand) {
     notFound()
   }
 
-  // Get gender-specific categories
-  const allCategories = await listCategories()
-  const genderPrefix = gender === "men" ? "mens" : "womens"
-  const genderCategories = allCategories.filter(cat => 
-    cat.handle.startsWith(`${genderPrefix}-`)
-  )
-
-  // Build category IDs for filtering
-  const collectCategoryIds = (cat: any): string[] => {
-    return [cat.id, ...(cat.children || []).flatMap(collectCategoryIds)]
-  }
-  const genderCategoryIds = genderCategories.flatMap(collectCategoryIds)
-
-  // Fetch products using the standard approach
+  // Fetch products for this brand
   const pageNumber = page ? parseInt(page, 10) : 1
+  const limit = 60
+  const offset = (pageNumber - 1) * limit
   const sort = sortBy || "created_at"
 
-  // Build query parameters to filter by brand and gender categories
-  const queryParams: any = {
-    category_id: genderCategoryIds,
-    // We need to filter by brand, but the standard product API doesn't support brand filtering
-    // So we'll use the brand products API but with proper pagination
-  }
-
-  // For now, let's use the standard product API with brand filtering
-  // This is a temporary solution until we can debug the brand API
-  const {
-    response: { products, count },
-    totalPages,
-    currentPage,
-  } = await listProductsWithSort({
-    page: pageNumber,
-    queryParams: {
-      category_id: genderCategoryIds,
-      // We'll add brand filtering here once we figure out the correct approach
-    },
-    sortBy: sort,
+  const { products, count } = await getBrandProducts({
+    brandSlug,
+    limit,
+    offset,
+    sort,
     countryCode,
   })
 
-  // For now, we'll show all gender category products
-  // TODO: Add proper brand filtering once we debug the brand API
-  const filteredProducts = products
+  // Calculate pagination
+  const totalPages = Math.ceil(count / limit)
+  const currentPage = pageNumber
 
   return (
     <BrandTemplate
       brand={brand}
-      products={filteredProducts}
+      products={products}
       sortBy={sortBy}
       page={page}
       countryCode={countryCode}
