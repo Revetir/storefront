@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { getBrandBySlug, getBrandProducts } from "@lib/data/brands"
 import { listCategories, getCategoryByFlatHandle } from "@lib/data/categories"
 import { getRegion } from "@lib/data/regions"
-import { listProductsWithSort } from "@lib/data/products"
+import { listProductsWithBrandSupport } from "@lib/data/products"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
 
@@ -110,11 +110,11 @@ export default async function BrandPage(props: Props) {
     response: { products, count },
     totalPages,
     currentPage,
-  } = await listProductsWithSort({
+  } = await listProductsWithBrandSupport({
     page: pageNumber,
     queryParams: {
       category_id: genderCategoryIds,
-      brand_id: [brand.id], // Will be intercepted by middleware
+      brand_id: [brand.id], // Uses our custom endpoint that supports brand_id
     },
     sortBy: sort,
     countryCode,
