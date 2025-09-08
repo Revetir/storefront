@@ -13,11 +13,7 @@ type Props = {
   }>
 }
 
-export async function generateStaticParams() {
-  // This would need to be implemented to generate all brand pages
-  // For now, we'll rely on dynamic rendering
-  return []
-}
+// Removed generateStaticParams to force dynamic rendering
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
