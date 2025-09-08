@@ -59,9 +59,8 @@ export default async function GenderPage(props: Props) {
     notFound()
   }
 
-  // Get the gender category (e.g., "mens" or "womens")
-  const genderCategoryHandle = gender === "men" ? "mens" : "womens"
-  const genderCategory = await getCategoryByFlatHandle(genderCategoryHandle)
+  // Get the gender category (e.g., "men" or "women")
+  const genderCategory = await getCategoryByFlatHandle(gender)
   
   if (!genderCategory) {
     notFound()
@@ -74,7 +73,7 @@ export default async function GenderPage(props: Props) {
     return [cat.id, ...(cat.children || []).flatMap(collectCategoryIds)]
   }
   
-  // Get all gender-specific categories
+  // Get all gender-specific categories (those that start with the gender prefix)
   const genderPrefix = gender === "men" ? "mens" : "womens"
   const genderCategories = allCategories.filter(cat => 
     cat.handle.startsWith(`${genderPrefix}-`)
@@ -104,13 +103,10 @@ export default async function GenderPage(props: Props) {
       sortBy={sortBy}
       page={page}
       countryCode={countryCode}
-      categoryPath={[gender]}
-      allCategories={allCategories}
       products={products}
       region={region}
       totalPages={totalPages}
       currentPage={currentPage}
-      introBlurb={genderCategory.metadata?.intro_blurb as string | undefined}
     />
   )
 }
