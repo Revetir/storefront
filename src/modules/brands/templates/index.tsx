@@ -2,7 +2,7 @@ import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { Brand } from "@lib/data/brands"
 import { StoreRegion } from "@medusajs/types"
-import ProductGrid from "@modules/common/components/product-grid"
+import PaginatedProductsClient from "@modules/store/templates/paginated-products-client"
 import RefinementList from "@modules/store/components/refinement-list"
 import { Suspense } from "react"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
@@ -14,6 +14,7 @@ type BrandTemplateProps = {
   page?: string
   countryCode: string
   gender: string
+  region: StoreRegion
   totalPages: number
   currentPage: number
 }
@@ -25,6 +26,7 @@ const BrandTemplate = ({
   page,
   countryCode,
   gender,
+  region,
   totalPages,
   currentPage,
 }: BrandTemplateProps) => {
@@ -53,9 +55,9 @@ const BrandTemplate = ({
         </div>
         <div className="content-container">
           <Suspense fallback={<SkeletonProductGrid />}>
-            <ProductGrid
+            <PaginatedProductsClient
               products={products}
-              countryCode={countryCode}
+              region={region}
               totalPages={totalPages}
               currentPage={currentPage}
             />

@@ -3,7 +3,7 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import { Brand } from "@lib/data/brands"
 import { Category } from "@lib/data/categories"
 import { StoreRegion } from "@medusajs/types"
-import ProductGrid from "@modules/common/components/product-grid"
+import PaginatedProductsClient from "@modules/store/templates/paginated-products-client"
 import RefinementList from "@modules/store/components/refinement-list"
 import { Suspense } from "react"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
@@ -16,6 +16,7 @@ type BrandCategoryTemplateProps = {
   page?: string
   countryCode: string
   gender: string
+  region: StoreRegion
   totalPages: number
   currentPage: number
 }
@@ -28,6 +29,7 @@ const BrandCategoryTemplate = ({
   page,
   countryCode,
   gender,
+  region,
   totalPages,
   currentPage,
 }: BrandCategoryTemplateProps) => {
@@ -59,9 +61,9 @@ const BrandCategoryTemplate = ({
         </div>
         <div className="content-container">
           <Suspense fallback={<SkeletonProductGrid />}>
-            <ProductGrid
+            <PaginatedProductsClient
               products={products}
-              countryCode={countryCode}
+              region={region}
               totalPages={totalPages}
               currentPage={currentPage}
             />
