@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getBrandBySlug, getBrandProducts } from "@lib/data/brands"
+import { getBrandBySlug } from "@lib/data/brands"
 import { getRegion } from "@lib/data/regions"
 
 export async function GET(request: NextRequest) {
@@ -7,56 +7,46 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const brandSlug = searchParams.get('brandSlug') || 'chrome-hearts'
     const countryCode = searchParams.get('countryCode') || 'us'
-    const gender = searchParams.get('gender') || 'men'
     
-    console.log(`Testing brand page data fetching for: ${brandSlug}`)
+    console.log(`Simulating brand page data fetching for: ${brandSlug}`)
     
-    // Test each step of the brand page data fetching
+    // Simulate the exact same calls that the brand page makes
     const results: any = {}
     
-    // Step 1: Get region
+    // Step 1: Get region (this is called first in the brand page)
     try {
+      console.log("Step 1: Getting region...")
       const region = await getRegion(countryCode)
       results.region = region ? { id: region.id, name: region.name } : null
+      console.log("Step 1: Region fetched successfully")
     } catch (error) {
+      console.error("Step 1: Region fetch failed:", error)
       results.regionError = error instanceof Error ? error.message : "Unknown error"
     }
     
-    // Step 2: Get brand
+    // Step 2: Get brand (this is called second in the brand page)
     try {
+      console.log("Step 2: Getting brand...")
       const brand = await getBrandBySlug(brandSlug)
       results.brand = brand
+      console.log("Step 2: Brand fetched successfully")
     } catch (error) {
+      console.error("Step 2: Brand fetch failed:", error)
       results.brandError = error instanceof Error ? error.message : "Unknown error"
-    }
-    
-    // Step 3: Get brand products
-    try {
-      const { products, count } = await getBrandProducts({
-        brandSlug,
-        limit: 12,
-        offset: 0,
-        sort: "created_at",
-        countryCode,
-      })
-      results.products = { count: count, sampleProducts: products.slice(0, 2) }
-    } catch (error) {
-      results.productsError = error instanceof Error ? error.message : "Unknown error"
     }
     
     return NextResponse.json({
       success: true,
       brandSlug,
       countryCode,
-      gender,
       results
     })
     
   } catch (error) {
-    console.error("Brand page test error:", error)
+    console.error("Brand page simulation error:", error)
     return NextResponse.json({ 
       success: false,
-      error: "Brand page test failed",
+      error: "Brand page simulation failed",
       message: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined
     }, { status: 500 })
