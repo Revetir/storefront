@@ -68,4 +68,5 @@ const BrandTemplate = ({
   )
 }
 
+export { default as BrandCategoryTemplate } from "./brand-category"
 export default BrandTemplate

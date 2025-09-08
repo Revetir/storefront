@@ -2,9 +2,10 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getBrandBySlug, getBrandProducts } from "@lib/data/brands"
 import { getCategoryByFlatHandle } from "@lib/data/categories"
+import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import BrandCategoryTemplate from "@modules/brands/templates/brand-category"
+import { BrandCategoryTemplate } from "@modules/brands/templates"
 
 type Props = {
   params: Promise<{ 
@@ -81,8 +82,7 @@ export default async function BrandCategoryPage(props: Props) {
 
   // Fetch products
   const pageNumber = page ? parseInt(page, 10) : 1
-  const limit = 60
-  const offset = (pageNumber - 1) * limit
+  const sort = sortBy || "created_at"
 
   // For now, let's use the standard product API with category filtering
   // This is a temporary solution until we can debug the brand API
@@ -112,6 +112,7 @@ export default async function BrandCategoryPage(props: Props) {
       page={page}
       countryCode={countryCode}
       gender={gender}
+      region={region}
       totalPages={totalPages}
       currentPage={currentPage}
     />
