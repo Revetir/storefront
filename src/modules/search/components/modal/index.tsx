@@ -245,7 +245,9 @@ const Hit = ({ hit }: { hit: any }) => {
         {/* <p className="text-sm text-gray-500">{hit.description}</p> */}
       </div>
       <Link 
-        href={`/products/${hit.handle}`} 
+        href={hit.brand?.slug 
+          ? `/products/${hit.brand.slug}-${hit.handle}`
+          : `/products/${hit.handle}`} 
         className="absolute right-0 top-0 w-full h-full" 
         aria-label={`View Product: ${hit.title}`}
         onClick={handleProductClick}

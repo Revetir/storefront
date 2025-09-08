@@ -6,7 +6,7 @@ import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 
 type Props = {
-  params: Promise<{ countryCode: string; brandAndHandle: string }>
+  params: Promise<{ countryCode: string; slug: string[] }>
 }
 
 function parseBrandAndHandle(brandAndHandle: string): { brandSlug: string; productHandle: string } {
@@ -65,13 +65,13 @@ export async function generateStaticParams() {
     return countryProducts
       .flatMap((countryData) =>
         countryData.products
-          .filter((product) => product.handle && product.brand?.slug)
+          .filter((product) => product.handle && (product as any).brand?.slug)
           .map((product) => ({
             countryCode: countryData.country,
-            brandAndHandle: `${product.brand.slug}-${product.handle}`,
+            slug: [`${(product as any).brand.slug}-${product.handle}`],
           }))
       )
-      .filter((param) => param.brandAndHandle)
+      .filter((param) => param.slug[0])
   } catch (error) {
     console.error(
       `Failed to generate static paths for product pages: ${
@@ -84,7 +84,13 @@ export async function generateStaticParams() {
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
-  const { brandAndHandle } = params
+  const { slug } = params
+  
+  if (slug.length !== 1) {
+    notFound()
+  }
+  
+  const brandAndHandle = slug[0]
   const region = await getRegion(params.countryCode)
 
   if (!region) {
@@ -104,10 +110,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
   // Validate brand slug matches
   const { brandSlug } = parseBrandAndHandle(brandAndHandle)
-  if (product.brand?.slug && product.brand.slug !== brandSlug) {
+  if ((product as any).brand?.slug && (product as any).brand.slug !== brandSlug) {
     // Redirect to correct canonical URL
-    const correctUrl = `/${params.countryCode}/products/${product.brand.slug}-${product.handle}`
-    redirect(correctUrl, 301)
+    const correctUrl = `/${params.countryCode}/products/${(product as any).brand.slug}-${product.handle}`
+    redirect(correctUrl)
   }
 
   // Generate meta description using the new format
@@ -130,13 +136,20 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function ProductPage(props: Props) {
   const params = await props.params
+  const { slug } = params
+  
+  if (slug.length !== 1) {
+    notFound()
+  }
+  
+  const brandAndHandle = slug[0]
   const region = await getRegion(params.countryCode)
 
   if (!region) {
     notFound()
   }
 
-  const { productHandle } = parseBrandAndHandle(params.brandAndHandle)
+  const { productHandle } = parseBrandAndHandle(brandAndHandle)
 
   const pricedProduct = await listProducts({
     countryCode: params.countryCode,
@@ -148,15 +161,15 @@ export default async function ProductPage(props: Props) {
   }
 
   // Validate brand slug matches
-  const { brandSlug } = parseBrandAndHandle(params.brandAndHandle)
-  if (pricedProduct.brand?.slug && pricedProduct.brand.slug !== brandSlug) {
+  const { brandSlug } = parseBrandAndHandle(brandAndHandle)
+  if ((pricedProduct as any).brand?.slug && (pricedProduct as any).brand.slug !== brandSlug) {
     // Redirect to correct canonical URL
-    const correctUrl = `/${params.countryCode}/products/${pricedProduct.brand.slug}-${pricedProduct.handle}`
-    redirect(correctUrl, 301)
+    const correctUrl = `/${params.countryCode}/products/${(pricedProduct as any).brand.slug}-${pricedProduct.handle}`
+    redirect(correctUrl)
   }
 
   // Fetch related products data on the server
-  const queryParams: HttpTypes.StoreProductParams = {}
+  const queryParams: any = {}
   if (region?.id) {
     queryParams.region_id = region.id
   }

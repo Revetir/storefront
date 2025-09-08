@@ -86,7 +86,9 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                 {visibleProducts.map((product, index) => (
                   <Link 
                     key={product.id} 
-                    href={`/products/${product.handle}`}
+                    href={product.brand?.slug 
+                      ? `/products/${product.brand.slug}-${product.handle}`
+                      : `/products/${product.handle}`}
                     className="group hover:opacity-80 transition-opacity"
                   >
                     <div className="aspect-square relative mb-4">
