@@ -27,13 +27,11 @@ export const listBrands = async (): Promise<Brand[]> => {
 }
 
 export const getBrandBySlug = async (slug: string): Promise<Brand | null> => {
-  const next = await getCacheOptions("brand")
-
   try {
+    // Temporarily bypass cache options to test if that's causing the issue
     const { brand } = await sdk.client.fetch<{
       brand: Brand
     }>(`/store/brands/${slug}`, {
-      next,
       cache: "force-cache",
     })
 

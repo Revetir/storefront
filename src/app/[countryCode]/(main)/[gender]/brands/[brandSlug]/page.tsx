@@ -59,23 +59,12 @@ export default async function BrandPage(props: Props) {
     notFound()
   }
 
-  // Fetch products for this brand
-  const pageNumber = page ? parseInt(page, 10) : 1
-  const limit = 60
-  const offset = (pageNumber - 1) * limit
-  const sort = sortBy || "created_at"
-
-  const { products, count } = await getBrandProducts({
-    brandSlug,
-    limit,
-    offset,
-    sort,
-    countryCode,
-  })
-
-  // Calculate pagination
-  const totalPages = Math.ceil(count / limit)
-  const currentPage = pageNumber
+  // For now, let's use empty products to test if the issue is with getBrandProducts
+  // TODO: Debug why getBrandProducts is failing
+  const products: any[] = []
+  const count = 0
+  const totalPages = 0
+  const currentPage = 1
 
   return (
     <BrandTemplate
