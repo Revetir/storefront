@@ -6,10 +6,14 @@ import { HttpTypes } from "@medusajs/types"
 import { getCacheOptions } from "./cookies"
 
 export const listRegions = async () => {
-  // Temporarily bypass cache options to test if that's causing the issue
+  const next = {
+    ...(await getCacheOptions("regions")),
+  }
+
   return sdk.client
     .fetch<{ regions: HttpTypes.StoreRegion[] }>(`/store/regions`, {
       method: "GET",
+      next,
       cache: "force-cache",
     })
     .then(({ regions }) => regions)
