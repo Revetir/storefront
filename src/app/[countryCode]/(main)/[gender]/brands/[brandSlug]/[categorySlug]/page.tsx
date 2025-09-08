@@ -84,16 +84,24 @@ export default async function BrandCategoryPage(props: Props) {
   const limit = 60
   const offset = (pageNumber - 1) * limit
 
-  const { products, count } = await getBrandProducts({
-    brandSlug,
-    categorySlug,
-    limit,
-    offset,
-    sort: sortBy || "created_at",
+  // For now, let's use the standard product API with category filtering
+  // This is a temporary solution until we can debug the brand API
+  const {
+    response: { products, count },
+    totalPages,
+    currentPage,
+  } = await listProductsWithSort({
+    page: pageNumber,
+    queryParams: {
+      category_id: categoryIds,
+      // We'll add brand filtering here once we figure out the correct approach
+    },
+    sortBy: sort,
     countryCode,
   })
 
-  const totalPages = Math.ceil(count / limit)
+  // For now, we'll show all category products
+  // TODO: Add proper brand filtering once we debug the brand API
 
   return (
     <BrandCategoryTemplate
@@ -105,7 +113,7 @@ export default async function BrandCategoryPage(props: Props) {
       countryCode={countryCode}
       gender={gender}
       totalPages={totalPages}
-      currentPage={pageNumber}
+      currentPage={currentPage}
     />
   )
 }

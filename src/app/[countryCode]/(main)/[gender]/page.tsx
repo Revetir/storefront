@@ -1,14 +1,17 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { listCategories } from "@lib/data/categories"
-import { listBrands } from "@lib/data/brands"
+import { listCategories, getCategoryByFlatHandle } from "@lib/data/categories"
+import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
-import { Category } from "@lib/data/categories"
-import { Brand } from "@lib/data/brands"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import CategoryTemplate from "@modules/categories/templates"
 
 type Props = {
   params: Promise<{ countryCode: string; gender: string }>
+  searchParams: Promise<{
+    sortBy?: SortOptions
+    page?: string
+  }>
 }
 
 export async function generateStaticParams() {
@@ -41,7 +44,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 export default async function GenderPage(props: Props) {
+  const searchParams = await props.searchParams
   const params = await props.params
+  const { sortBy, page } = searchParams
   const { countryCode, gender } = params
 
   // Validate gender
@@ -54,77 +59,58 @@ export default async function GenderPage(props: Props) {
     notFound()
   }
 
-  // Get gender-specific categories
+  // Get the gender category (e.g., "mens" or "womens")
+  const genderCategoryHandle = gender === "men" ? "mens" : "womens"
+  const genderCategory = await getCategoryByFlatHandle(genderCategoryHandle)
+  
+  if (!genderCategory) {
+    notFound()
+  }
+
   const allCategories = await listCategories()
+
+  // Build category IDs for filtering (include all gender-specific categories)
+  const collectCategoryIds = (cat: any): string[] => {
+    return [cat.id, ...(cat.children || []).flatMap(collectCategoryIds)]
+  }
+  
+  // Get all gender-specific categories
   const genderPrefix = gender === "men" ? "mens" : "womens"
   const genderCategories = allCategories.filter(cat => 
     cat.handle.startsWith(`${genderPrefix}-`)
   )
+  const genderCategoryIds = genderCategories.flatMap(collectCategoryIds)
 
-  // Get all brands
-  const brands = await listBrands()
+  // Fetch products
+  const pageNumber = page ? parseInt(page, 10) : 1
+  const sort = sortBy || "created_at"
 
-  const genderDisplay = gender === "men" ? "Men's" : "Women's"
+  const {
+    response: { products, count },
+    totalPages,
+    currentPage,
+  } = await listProductsWithSort({
+    page: pageNumber,
+    queryParams: {
+      category_id: genderCategoryIds,
+    },
+    sortBy: sort,
+    countryCode,
+  })
 
   return (
-    <div className="content-container py-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          {genderDisplay} Fashion
-        </h1>
-        <p className="text-lg text-gray-600">
-          Discover the latest {genderDisplay.toLowerCase()} fashion from premium brands.
-        </p>
-      </div>
-
-      {/* Categories Section */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">Shop by Category</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {genderCategories.map((category) => {
-            const categorySlug = category.handle.replace(`${genderPrefix}-`, "")
-            return (
-              <LocalizedClientLink
-                key={category.id}
-                href={`/${countryCode}/${gender}/${categorySlug}`}
-                className="group p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-              >
-                <h3 className="font-medium text-gray-900 group-hover:text-gray-700">
-                  {category.name}
-                </h3>
-                {category.metadata?.intro_blurb && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    {category.metadata.intro_blurb as string}
-                  </p>
-                )}
-              </LocalizedClientLink>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Brands Section */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">Shop by Brand</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {brands.map((brand) => (
-            <LocalizedClientLink
-              key={brand.id}
-              href={`/${countryCode}/${gender}/brands/${brand.slug}`}
-              className="group p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-            >
-              <h3 className="font-medium text-gray-900 group-hover:text-gray-700">
-                {brand.name}
-              </h3>
-              {brand.blurb && (
-                <p className="text-sm text-gray-500 mt-1">
-                  {brand.blurb}
-                </p>
-              )}
-            </LocalizedClientLink>
-          ))}
-        </div>
-      </div>
-    </div>
+    <CategoryTemplate
+      category={genderCategory}
+      sortBy={sortBy}
+      page={page}
+      countryCode={countryCode}
+      categoryPath={[gender]}
+      allCategories={allCategories}
+      products={products}
+      region={region}
+      totalPages={totalPages}
+      currentPage={currentPage}
+      introBlurb={genderCategory.metadata?.intro_blurb as string | undefined}
+    />
   )
 }
