@@ -102,38 +102,23 @@ export default async function BrandPage(props: Props) {
   )
   const genderCategoryIds = genderCategories.flatMap(collectCategoryIds)
 
-  // Fetch products using the standard products API with category filtering only
+  // Use server-side brand filtering with extended products API
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
 
   const {
-    response: { products: allProducts, count: totalCount },
-    totalPages: allTotalPages,
-    currentPage: allCurrentPage,
+    response: { products, count },
+    totalPages,
+    currentPage,
   } = await listProductsWithSort({
-    page: 1, // Get all products from first page
+    page: pageNumber,
     queryParams: {
       category_id: genderCategoryIds,
-      limit: 1000, // Get more products for client-side filtering
+      brand_id: [brand.id], // Now supported by extended products API
     },
     sortBy: sort,
     countryCode,
   })
-
-  // Filter products by brand on the client side
-  const brandProducts = allProducts.filter((product: any) => {
-    // Check if product has brand relationship and matches our brand
-    return product.brand && product.brand.id === brand.id
-  })
-
-  // Apply pagination to filtered results
-  const limit = 60
-  const startIndex = (pageNumber - 1) * limit
-  const endIndex = startIndex + limit
-  const products = brandProducts.slice(startIndex, endIndex)
-  const count = brandProducts.length
-  const totalPages = Math.ceil(count / limit)
-  const currentPage = pageNumber
 
   // Create a category object for the template that represents the brand + gender combination
   const brandCategory = {
