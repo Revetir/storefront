@@ -38,10 +38,10 @@ export default function NavClient({ regions, customer, categories, cart }: NavCl
 
           {/* Left Section - Desktop Navigation */}
           <div className="hidden md:flex items-center gap-x-8 text-xs uppercase text-gray-700">
-            <LocalizedClientLink href="/categories/men" className="hover:text-black">
+            <LocalizedClientLink href="/men" className="hover:text-black">
               Menswear
             </LocalizedClientLink>
-            <LocalizedClientLink href="/categories/women" className="hover:text-black">
+            <LocalizedClientLink href="/women" className="hover:text-black">
               Womenswear
             </LocalizedClientLink>
             

@@ -37,12 +37,18 @@ export default function ProductPreview({
 
   const handleMouseEnter = () => {
     // Prefetch the product page on hover
-    router.prefetch(`/products/${product.handle}`)
+    const productUrl = product.brand?.slug 
+      ? `/products/${product.brand.slug}-${product.handle}`
+      : `/products/${product.handle}`
+    router.prefetch(productUrl)
   }
 
   return (
     <LocalizedClientLink 
-      href={`/products/${product.handle}`} 
+      href={product.brand?.slug 
+        ? `/products/${product.brand.slug}-${product.handle}`
+        : `/products/${product.handle}`
+      } 
       className="group"
       onMouseEnter={handleMouseEnter}
     >

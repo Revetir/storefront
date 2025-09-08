@@ -36,8 +36,24 @@ const ProductCategories = () => {
       <h2 className="text-xs uppercase text-gray-500 mb-3">Categories test</h2>
       <ul className="space-y-4">
         {categories.map((category) => {
-          const href = `/${countryCode}/categories/${category.handle}`
-          const isActive = pathname.includes(category.handle)
+          // Extract gender and category slug from handle
+          let gender: string
+          let categorySlug: string
+          
+          if (category.handle.startsWith("mens-")) {
+            gender = "men"
+            categorySlug = category.handle.replace("mens-", "")
+          } else if (category.handle.startsWith("womens-")) {
+            gender = "women"
+            categorySlug = category.handle.replace("womens-", "")
+          } else {
+            // Fallback to men if no gender prefix
+            gender = "men"
+            categorySlug = category.handle
+          }
+          
+          const href = `/${countryCode}/${gender}/${categorySlug}`
+          const isActive = pathname.includes(categorySlug)
 
           return (
             <li key={category.id}>

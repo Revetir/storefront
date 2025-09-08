@@ -9,7 +9,7 @@ async function getProductsForPage(page: number, limit: number = 100) {
       return { products: [], count: 0 }
     }
     
-    const rawResponse = await fetch(`${backendUrl}/store/products?limit=${limit}&offset=${(page - 1) * limit}`, {
+    const rawResponse = await fetch(`${backendUrl}/store/products?limit=${limit}&offset=${(page - 1) * limit}&fields=handle,brand.*`, {
       method: 'GET',
       headers: {
         'x-publishable-api-key': publishableKey,
@@ -57,17 +57,18 @@ export async function GET(
     
     const filteredProducts = products.filter((product: any) => {
       const hasHandle = !!product.handle
+      const hasBrand = !!product.brand?.slug
       const hasStatus = 'status' in product
       const isPublished = product.status === 'published'
-      return hasHandle && (!hasStatus || isPublished)
+      return hasHandle && hasBrand && (!hasStatus || isPublished)
     })
     
-    // Generate ONLY standard product URLs - NO brand URLs to prevent duplicates
+    // Generate canonical product URLs with brand slug
     const productUrls = filteredProducts.map((product: any) => {
-      return `${baseUrl}/us/products/${product.handle}`
+      return `${baseUrl}/us/products/${product.brand.slug}-${product.handle}`
     }).join('\n')
     
-    console.log('✅ Sitemap generated with standard URLs only (no duplicates)')
+    console.log('✅ Sitemap generated with canonical brand-product URLs')
     
     return new NextResponse(productUrls, {
       headers: {

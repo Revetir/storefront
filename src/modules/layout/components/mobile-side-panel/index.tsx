@@ -141,7 +141,25 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                   return (
                     <div key={category.id} className="flex items-center justify-between">
                       <LocalizedClientLink 
-                        href={`/categories/${category.handle}`}
+                        href={(() => {
+                          // Extract gender and category slug from handle
+                          let gender: string
+                          let categorySlug: string
+                          
+                          if (category.handle.startsWith("mens-")) {
+                            gender = "men"
+                            categorySlug = category.handle.replace("mens-", "")
+                          } else if (category.handle.startsWith("womens-")) {
+                            gender = "women"
+                            categorySlug = category.handle.replace("womens-", "")
+                          } else {
+                            // Fallback to men if no gender prefix
+                            gender = "men"
+                            categorySlug = category.handle
+                          }
+                          
+                          return `/${gender}/${categorySlug}`
+                        })()}
                         className="text-sm uppercase text-gray-700 hover:text-black font-medium"
                         onClick={onClose}
                       >
@@ -322,7 +340,25 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                             return (
                               <div key={childCategory.id} className="flex items-center justify-between">
                                 <LocalizedClientLink
-                                  href={`/categories/${childCategory.handle}`}
+                                  href={(() => {
+                                    // Extract gender and category slug from handle
+                                    let gender: string
+                                    let categorySlug: string
+                                    
+                                    if (childCategory.handle.startsWith("mens-")) {
+                                      gender = "men"
+                                      categorySlug = childCategory.handle.replace("mens-", "")
+                                    } else if (childCategory.handle.startsWith("womens-")) {
+                                      gender = "women"
+                                      categorySlug = childCategory.handle.replace("womens-", "")
+                                    } else {
+                                      // Fallback to men if no gender prefix
+                                      gender = "men"
+                                      categorySlug = childCategory.handle
+                                    }
+                                    
+                                    return `/${gender}/${categorySlug}`
+                                  })()}
                                   className="text-sm uppercase text-gray-700 hover:text-black py-2"
                                   onClick={closeAllPanels}
                                 >

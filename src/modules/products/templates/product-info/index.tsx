@@ -36,7 +36,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
             className="text-medium text-ui-fg-subtle mt-3"
             data-testid="product-sku"
           >
-            {`SKU: ${(product as any).product_sku.sku}`}
+            {`${(product as any).product_sku.sku}`}
           </Text>
         )}
       </div>
