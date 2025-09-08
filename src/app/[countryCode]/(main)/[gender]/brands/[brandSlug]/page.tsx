@@ -99,6 +99,7 @@ export default async function BrandPage(props: Props) {
 
     const { products, count } = await getBrandProducts({
       brandSlug,
+      categorySlug: gender, // Pass the gender as category slug for filtering
       limit,
       offset,
       sort,
