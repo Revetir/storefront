@@ -1,8 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { getBrandBySlug } from "@lib/data/brands"
-import { listCategories, getCategoryByFlatHandle } from "@lib/data/categories"
-import { listProductsWithSort } from "@lib/data/products"
+import { getBrandBySlug, getBrandProducts } from "@lib/data/brands"
+import { getCategoryByFlatHandle } from "@lib/data/categories"
 import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
@@ -89,23 +88,24 @@ export default async function BrandCategoryPage(props: Props) {
     notFound()
   }
 
-  // Use server-side brand and category filtering
+  // Use dedicated brand products API with specific category filtering
   const pageNumber = page ? parseInt(page, 10) : 1
+  const limit = 60
+  const offset = (pageNumber - 1) * limit
   const sort = sortBy || "created_at"
 
-  const {
-    response: { products, count },
-    totalPages,
-    currentPage,
-  } = await listProductsWithSort({
-    page: pageNumber,
-    queryParams: {
-      category_id: [category.id], // Filter by specific category
-      brand_id: [brand.id], // Filter by brand
-    },
-    sortBy: sort,
+  const { products, count } = await getBrandProducts({
+    brandSlug,
+    categorySlug: fullCategoryHandle, // Pass full category handle (e.g., "mens-accessories")
+    limit,
+    offset,
+    sort,
     countryCode,
   })
+
+  // Calculate pagination
+  const totalPages = Math.ceil(count / limit)
+  const currentPage = pageNumber
 
   // Create a category object for the template
   const brandCategoryTemplate = {

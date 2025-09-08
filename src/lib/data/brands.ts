@@ -66,7 +66,19 @@ export const getBrandProducts = async ({
 }> => {
   const next = await getCacheOptions("brand-products")
 
+  // First get the brand to get its ID
+  const brand = await getBrandBySlug(brandSlug)
+  if (!brand) {
+    return {
+      products: [],
+      count: 0,
+      limit,
+      offset,
+    }
+  }
+
   const queryParams: any = {
+    brand_id: brand.id,
     limit,
     offset,
     sort,
@@ -81,7 +93,7 @@ export const getBrandProducts = async ({
     count: number
     limit: number
     offset: number
-  }>(`/store/brands/${brandSlug}/products`, {
+  }>(`/store/products/brand-filtered`, {
     query: queryParams,
     next,
     cache: "force-cache",

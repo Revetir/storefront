@@ -1,8 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { getBrandBySlug } from "@lib/data/brands"
+import { getBrandBySlug, getBrandProducts } from "@lib/data/brands"
 import { listCategories, getCategoryByFlatHandle } from "@lib/data/categories"
-import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
@@ -102,23 +101,24 @@ export default async function BrandPage(props: Props) {
   )
   const genderCategoryIds = genderCategories.flatMap(collectCategoryIds)
 
-  // Use server-side brand filtering with extended products API
+  // Use dedicated brand products API with category filtering
   const pageNumber = page ? parseInt(page, 10) : 1
+  const limit = 60
+  const offset = (pageNumber - 1) * limit
   const sort = sortBy || "created_at"
 
-  const {
-    response: { products, count },
-    totalPages,
-    currentPage,
-  } = await listProductsWithSort({
-    page: pageNumber,
-    queryParams: {
-      category_id: genderCategoryIds,
-      brand_id: [brand.id], // Now supported by extended products API
-    },
-    sortBy: sort,
+  const { products, count } = await getBrandProducts({
+    brandSlug,
+    categorySlug: gender, // Pass gender for category filtering
+    limit,
+    offset,
+    sort,
     countryCode,
   })
+
+  // Calculate pagination
+  const totalPages = Math.ceil(count / limit)
+  const currentPage = pageNumber
 
   // Create a category object for the template that represents the brand + gender combination
   const brandCategory = {
