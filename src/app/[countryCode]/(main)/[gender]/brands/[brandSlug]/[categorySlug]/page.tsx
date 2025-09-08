@@ -61,13 +61,9 @@ export default async function BrandCategoryPage(props: Props) {
     notFound()
   }
 
-  // For now, let's create a simple brand object to avoid API issues
-  // TODO: Fix the brand API and use getBrandBySlug(brandSlug)
-  const brand = {
-    id: brandSlug,
-    name: brandSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-    slug: brandSlug,
-    blurb: `Shop ${brandSlug.replace(/-/g, ' ')} ${gender === "men" ? "men's" : "women's"} clothing at REVETIR.`
+  const brand = await getBrandBySlug(brandSlug)
+  if (!brand) {
+    notFound()
   }
 
   // Get category by gender-prefixed handle
