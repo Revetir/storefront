@@ -51,7 +51,7 @@ const Hero = () => {
           aria-label="Shop Menswear or Womenswear links"
         >
           <a
-            href="/categories/men"
+            href="/men"
             style={{
               flex: 1,
               padding: "2rem 0",
@@ -68,7 +68,7 @@ const Hero = () => {
             Shop Menswear
           </a>
           <a
-            href="/categories/women"
+            href="/women"
             style={{
               flex: 1,
               padding: "2rem 0",
