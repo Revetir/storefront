@@ -1,9 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getBrandBySlug, getBrandProducts } from "@lib/data/brands"
-import { listCategories, getCategoryByFlatHandle } from "@lib/data/categories"
 import { getRegion } from "@lib/data/regions"
-import { listProductsWithSort } from "@lib/data/products"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
 
@@ -82,103 +80,31 @@ export default async function BrandPage(props: Props) {
     notFound()
   }
 
-  // Get the gender category (e.g., "men" or "women")
-  const genderCategory = await getCategoryByFlatHandle(gender)
-  if (!genderCategory) {
-    notFound()
-  }
 
-  const allCategories = await listCategories()
-
-  // Build category IDs for filtering (include all gender-specific categories)
-  const collectCategoryIds = (cat: any): string[] => {
-    return [cat.id, ...(cat.children || []).flatMap(collectCategoryIds)]
-  }
-  
-  // Get all gender-specific categories (those that start with the gender prefix)
-  const genderPrefix = gender === "men" ? "mens" : "womens"
-  const genderCategories = allCategories.filter(cat => 
-    cat.handle.startsWith(`${genderPrefix}-`)
-  )
-  const genderCategoryIds = genderCategories.flatMap(collectCategoryIds)
-
-  // Debug logging for development
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[Brand Page Debug] Gender: ${gender}, Prefix: ${genderPrefix}`)
-    console.log(`[Brand Page Debug] Gender categories found:`, genderCategories.map(cat => ({ id: cat.id, handle: cat.handle, name: cat.name })))
-    console.log(`[Brand Page Debug] Gender category IDs:`, genderCategoryIds)
-  }
-
-  // Fetch products with a higher limit to ensure we get all relevant products for filtering
+  // Use server-side filtering for better performance
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
+  const limit = 60
+  const offset = (pageNumber - 1) * limit
 
-  // Fetch all products first, then filter by gender and brand on client side
-  // This ensures we don't miss products due to API category filtering issues
-  const {
-    response: { products: allProducts, count: totalCount },
-    totalPages: allTotalPages,
-    currentPage: allCurrentPage,
-  } = await listProductsWithSort({
-    page: 1, // Get products from first page
-    queryParams: {
-      limit: 2000, // Get all products for comprehensive client-side filtering
-      fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,*categories,+product_sku.*,*brand.*", // Ensure we get categories and brand info
-    },
-    sortBy: sort,
+  // Use the brand-specific API endpoint for server-side filtering
+  const { products, count } = await getBrandProducts({
+    brandSlug,
+    categorySlug: gender, // Pass gender as category filter
+    limit,
+    offset,
+    sort,
     countryCode,
   })
 
-  // Filter products by brand AND gender on the client side
-  const brandProducts = allProducts.filter((product: any) => {
-    // Check if product has brand relationship and matches our brand
-    if (!product.brand || product.brand.id !== brand.id) {
-      return false
-    }
-    
-    // Additional gender filtering: check if product is in gender-appropriate categories
-    if (!product.categories || !Array.isArray(product.categories)) {
-      // If no categories, skip this product to be safe
-      return false
-    }
-    
-    // Check if product belongs to any gender-specific category
-    const hasGenderCategory = product.categories.some((category: any) => {
-      return genderCategoryIds.includes(category.id)
-    })
-    
-    // Also check by category handle as a fallback
-    const hasGenderCategoryByHandle = product.categories.some((category: any) => {
-      return category.handle && category.handle.startsWith(`${genderPrefix}-`)
-    })
-    
-    // Debug logging for development
-    if (process.env.NODE_ENV === 'development' && product.brand?.id === brand.id) {
-      console.log(`Product: ${product.title}`)
-      console.log(`Categories:`, product.categories.map((c: any) => ({ id: c.id, handle: c.handle })))
-      console.log(`Gender category IDs:`, genderCategoryIds)
-      console.log(`Has gender category:`, hasGenderCategory)
-      console.log(`Has gender category by handle:`, hasGenderCategoryByHandle)
-      console.log(`Gender prefix:`, genderPrefix)
-      console.log('---')
-    }
-    
-    return hasGenderCategory || hasGenderCategoryByHandle
-  })
+  // Calculate pagination info
+  const totalPages = Math.ceil(count / limit)
+  const currentPage = pageNumber
 
   // Log for debugging if needed
   if (process.env.NODE_ENV === 'development') {
-    console.log(`[Brand Page] ${gender}/${brandSlug}: ${brandProducts.length} products found`)
+    console.log(`[Brand Page] ${gender}/${brandSlug}: ${products.length} products found (${count} total)`)
   }
-
-  // Apply pagination to filtered results
-  const limit = 60
-  const startIndex = (pageNumber - 1) * limit
-  const endIndex = startIndex + limit
-  const products = brandProducts.slice(startIndex, endIndex)
-  const count = brandProducts.length
-  const totalPages = Math.ceil(count / limit)
-  const currentPage = pageNumber
   // Create a category object for the template that represents the brand + gender combination
   const brandCategory = {
     id: brand.id,
