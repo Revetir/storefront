@@ -93,6 +93,12 @@ export default async function BrandCategoryPage(props: Props) {
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
 
+  // Collect this category and all descendant category IDs to include products in subcategories
+  const collectCategoryIds = (cat: any): string[] => {
+    return [cat.id, ...(cat.children || []).flatMap(collectCategoryIds)]
+  }
+  const categoryIds = collectCategoryIds(category)
+
   const {
     response: { products, count },
     totalPages,
@@ -100,8 +106,8 @@ export default async function BrandCategoryPage(props: Props) {
   } = await listProductsWithBrandSupport({
     page: pageNumber,
     queryParams: {
-      category_id: [category.id], // Filter by specific category
-      brand_id: [brand.id], // Uses our custom endpoint that supports brand_id
+      category_id: categoryIds,
+      brand_id: [brand.id],
     },
     sortBy: sort,
     countryCode,
