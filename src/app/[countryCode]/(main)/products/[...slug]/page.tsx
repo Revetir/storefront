@@ -9,33 +9,49 @@ type Props = {
   params: Promise<{ countryCode: string; slug: string[] }>
 }
 
-function parseBrandAndHandle(brandAndHandle: string): { brandSlug: string; productHandle: string } {
-  // Try to find the longest possible product handle by testing from the end
+async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCode: string): Promise<{ product: HttpTypes.StoreProduct; brandSlug: string } | null> {
   const parts = brandAndHandle.split("-")
-  
+
+  if (parts.length < 2) {
+    // No dash: treat entire string as handle, resolve and redirect later
+    const product = await listProducts({
+      countryCode,
+      queryParams: {
+        handle: brandAndHandle,
+        fields: "handle,brand.*",
+        limit: 1,
+      },
+    }).then(({ response }) => response.products[0])
+
+    if (!product) {
+      return null
+    }
+
+    return { product, brandSlug: (product as any).brand?.slug || "" }
+  }
+
+  // Try candidates by increasing the brand portion from the left
+  // i represents how many segments belong to brand
   for (let i = 1; i < parts.length; i++) {
-    const productHandleCandidate = parts.slice(i).join("-")
-    // We'll validate this exists when we fetch the product
-    return {
-      brandSlug: parts.slice(0, i).join("-"),
-      productHandle: productHandleCandidate
+    const brandCandidate = parts.slice(0, i).join("-")
+    const handleCandidate = parts.slice(i).join("-")
+
+    const candidate = await listProducts({
+      countryCode,
+      queryParams: {
+        handle: handleCandidate,
+        // ensure brand is included to validate
+        fields: "handle,brand.*",
+        limit: 1,
+      },
+    }).then(({ response }) => response.products[0])
+
+    if (candidate) {
+      return { product: candidate, brandSlug: brandCandidate }
     }
   }
-  
-  // Fallback: assume single dash split
-  const firstDash = brandAndHandle.indexOf("-")
-  if (firstDash > 0) {
-    return {
-      brandSlug: brandAndHandle.slice(0, firstDash),
-      productHandle: brandAndHandle.slice(firstDash + 1)
-    }
-  }
-  
-  // If no dash found, treat entire string as product handle
-  return {
-    brandSlug: "",
-    productHandle: brandAndHandle
-  }
+
+  return null
 }
 
 export async function generateStaticParams() {
@@ -97,21 +113,20 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
-  const { productHandle } = parseBrandAndHandle(brandAndHandle)
-
-  const product = await listProducts({
-    countryCode: params.countryCode,
-    queryParams: { handle: productHandle },
-  }).then(({ response }) => response.products[0])
-
-  if (!product) {
+  const resolved = await resolveProductByBrandAndHandle(brandAndHandle, params.countryCode)
+  if (!resolved) {
     notFound()
   }
 
-  // Validate brand slug matches
-  const { brandSlug } = parseBrandAndHandle(brandAndHandle)
+  const { product, brandSlug } = resolved
+
+  // If the URL was handle-only, enforce canonical brand-handle URL
+  if (!brandAndHandle.includes("-") && (product as any).brand?.slug) {
+    const correctUrl = `/${params.countryCode}/products/${(product as any).brand.slug}-${product.handle}`
+    redirect(correctUrl)
+  }
+
   if ((product as any).brand?.slug && (product as any).brand.slug !== brandSlug) {
-    // Redirect to correct canonical URL
     const correctUrl = `/${params.countryCode}/products/${(product as any).brand.slug}-${product.handle}`
     redirect(correctUrl)
   }
@@ -149,21 +164,29 @@ export default async function ProductPage(props: Props) {
     notFound()
   }
 
-  const { productHandle } = parseBrandAndHandle(brandAndHandle)
+  const resolved = await resolveProductByBrandAndHandle(brandAndHandle, params.countryCode)
+  if (!resolved) {
+    notFound()
+  }
+
+  const { product: resolvedProduct, brandSlug } = resolved
+
+  // If the URL was handle-only, enforce canonical brand-handle URL
+  if (!brandAndHandle.includes("-") && (resolvedProduct as any).brand?.slug) {
+    const correctUrl = `/${params.countryCode}/products/${(resolvedProduct as any).brand.slug}-${resolvedProduct.handle}`
+    redirect(correctUrl)
+  }
 
   const pricedProduct = await listProducts({
     countryCode: params.countryCode,
-    queryParams: { handle: productHandle },
+    queryParams: { handle: resolvedProduct.handle },
   }).then(({ response }) => response.products[0])
 
   if (!pricedProduct) {
     notFound()
   }
 
-  // Validate brand slug matches
-  const { brandSlug } = parseBrandAndHandle(brandAndHandle)
   if ((pricedProduct as any).brand?.slug && (pricedProduct as any).brand.slug !== brandSlug) {
-    // Redirect to correct canonical URL
     const correctUrl = `/${params.countryCode}/products/${(pricedProduct as any).brand.slug}-${pricedProduct.handle}`
     redirect(correctUrl)
   }

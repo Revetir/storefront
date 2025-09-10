@@ -1,29 +1,32 @@
 "use client"
 import React, { useEffect, useState } from "react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useParams, usePathname, useRouter } from "next/navigation"
 // @ts-ignore: Module not found in type declarations, but exists at runtime
 import { listProductTypes, ProductType } from "@lib/data/product-types"
 
 export default function TypeRefinementList({ selectedType: propSelectedType }: { selectedType?: string }) {
   const [types, setTypes] = useState<ProductType[]>([])
   const [loading, setLoading] = useState(true)
-  const searchParams = useSearchParams()
+  const params = useParams()
   const router = useRouter()
   const pathname = usePathname()
-  const selectedType = propSelectedType || searchParams.get("brand") || ""
+  const selectedType = propSelectedType || ""
 
   useEffect(() => {
     listProductTypes().then(setTypes).finally(() => setLoading(false))
   }, [])
 
   const handleSelect = (typeValue: string) => {
-    const params = new URLSearchParams(searchParams)
-    if (typeValue === selectedType) {
-      params.delete("brand")
-    } else {
-      params.set("brand", typeValue)
-    }
-    router.push(`${pathname}?${params.toString()}`)
+    // Toggle logic: if clicking the same brand, go back to gender root brands page
+    const countryCode = params?.countryCode as string
+    const gender = (params?.gender as string) || "men"
+    const brandSlug = typeValue.toLowerCase().replace(/\s+/g, "-")
+
+    const target = selectedType === typeValue
+      ? `/${countryCode}/${gender}/brands`
+      : `/${countryCode}/${gender}/brands/${brandSlug}`
+
+    router.push(target)
   }
 
   if (loading) return null

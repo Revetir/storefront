@@ -7,7 +7,7 @@ import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 
 export default function ProductPreview({
   product,
@@ -21,6 +21,8 @@ export default function ProductPreview({
   priority?: boolean
 }) {
   const router = useRouter()
+  const params = useParams()
+  const countryCode = (params?.countryCode as string) || ""
 
   // const pricedProduct = await listProducts({
   //   regionId: region.id,
@@ -40,7 +42,8 @@ export default function ProductPreview({
     const productUrl = product.brand?.slug 
       ? `/products/${product.brand.slug}-${product.handle}`
       : `/products/${product.handle}`
-    router.prefetch(productUrl)
+    const localizedUrl = countryCode ? `/${countryCode}${productUrl}` : productUrl
+    router.prefetch(localizedUrl)
   }
 
   return (

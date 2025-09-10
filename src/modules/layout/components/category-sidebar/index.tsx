@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams, usePathname, useSearchParams } from "next/navigation"
+import { useParams, usePathname } from "next/navigation"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Category } from "@lib/data/categories"
 
@@ -14,8 +14,8 @@ interface CategoryNodeProps {
   currentPath: string
   expandedCategories: Set<string>
   onToggleExpanded: (categoryId: string) => void
-  countryCode: string
-  searchParams: URLSearchParams
+  gender: string
+  brandSlug?: string
   level?: number
   parentPath?: string
   activeCategoryPath: string[]
@@ -26,8 +26,8 @@ const CategoryNode = ({
   currentPath,
   expandedCategories,
   onToggleExpanded,
-  countryCode,
-  searchParams,
+  gender,
+  brandSlug,
   level = 0,
   parentPath = "",
   activeCategoryPath,
@@ -35,10 +35,11 @@ const CategoryNode = ({
   const hasChildren = category.children && category.children.length > 0
   const isExpanded = expandedCategories.has(category.id)
   
-  // Use flat URL structure - just the category handle, but preserve existing search params
-  const categoryPath = searchParams.toString() 
-    ? `/categories/${category.handle}?${searchParams.toString()}`
-    : `/categories/${category.handle}`
+  // Derive category slug without gender prefix for pretty URLs
+  const categorySlug = category.handle.replace(/^(mens-|womens-)/, "")
+  const categoryPath = brandSlug
+    ? `/${gender}/brands/${brandSlug}/${categorySlug}`
+    : `/${gender}/${categorySlug}`
     
   const isCurrentCategory = currentPath === categoryPath
   const isInActivePath = activeCategoryPath.includes(category.handle)
@@ -128,13 +129,17 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
   
   const pathname = usePathname()
   const params = useParams()
-  const searchParams = useSearchParams()
   const countryCode = params?.countryCode as string
+  const genderParam = (params?.gender as string) || ""
+  const brandSlugParam = params?.brandSlug as string | undefined
 
-  // Extract the category path from the current pathname
-  const currentCategoryPath = pathname.includes('/categories/') 
-    ? pathname.split('/categories/')[1] || ''
-    : ''
+  // Determine the current category handle from pretty URL routes
+  // Supported: /{countryCode}/{gender}/{categorySlug} and /{countryCode}/{gender}/brands/{brandSlug}/{categorySlug}
+  let currentCategoryHandle = ""
+  const genderPrefix = genderParam === "men" ? "mens" : genderParam === "women" ? "womens" : ""
+  if (params && (params as any).categorySlug && genderPrefix) {
+    currentCategoryHandle = `${genderPrefix}-${(params as any).categorySlug}`
+  }
 
   // Helper function to find the path to a category
   const findCategoryPath = (cats: Category[], targetHandle: string, currentPath: string[] = []): string[] | null => {
@@ -164,27 +169,22 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
         const data = await res.json()
         setCategories(data.categories || [])
         
-        // Auto-expand categories that are in the current path
-        if (currentCategoryPath) {
-          const pathSegments = currentCategoryPath.split("/").filter(Boolean)
+        // Auto-expand categories along the chain to the current category
+        if (currentCategoryHandle) {
           const newExpanded = new Set<string>()
 
-          // Helper: Recursively find the path to the selected category and expand all parents
-          const expandPathToCategory = (cats: Category[], segments: string[], parentChain: string[] = []): boolean => {
+          // Helper: Recursively find the path to the selected category by handle and expand all parents
+          const expandPathToCategoryByHandle = (cats: Category[], targetHandle: string, parentChain: string[] = []): boolean => {
             for (const cat of cats) {
-              if (cat.handle === segments[0]) {
+              if (cat.handle === targetHandle) {
                 // Expand all parents in the chain
                 parentChain.forEach((id) => newExpanded.add(id))
                 newExpanded.add(cat.id)
-                if (segments.length > 1 && cat.children && cat.children.length > 0) {
-                  // Continue down the path
-                  return expandPathToCategory(cat.children, segments.slice(1), [...parentChain, cat.id])
-                }
                 // End of path (leaf or last segment)
                 return true
               }
               if (cat.children && cat.children.length > 0) {
-                if (expandPathToCategory(cat.children, segments, [...parentChain, cat.id])) {
+                if (expandPathToCategoryByHandle(cat.children, targetHandle, [...parentChain, cat.id])) {
                   return true
                 }
               }
@@ -192,16 +192,13 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
             return false
           }
 
-          expandPathToCategory(data.categories || [], pathSegments)
+          expandPathToCategoryByHandle(data.categories || [], currentCategoryHandle)
           setExpandedCategories(newExpanded)
 
           // Find and set the active category path for highlighting
-          const currentCategoryHandle = pathSegments[pathSegments.length - 1]
-          if (currentCategoryHandle) {
-            const path = findCategoryPath(data.categories || [], currentCategoryHandle)
-            if (path) {
-              setActiveCategoryPath(path)
-            }
+          const path = findCategoryPath(data.categories || [], currentCategoryHandle)
+          if (path) {
+            setActiveCategoryPath(path)
           }
         }
       } catch (err) {
@@ -212,7 +209,7 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
     }
 
     fetchCategories()
-  }, [currentCategoryPath])
+  }, [currentCategoryHandle])
 
   const handleToggleExpanded = (categoryId: string) => {
     setExpandedCategories(prev => {
@@ -261,8 +258,8 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
                 currentPath={pathname}
                 expandedCategories={expandedCategories}
                 onToggleExpanded={handleToggleExpanded}
-                countryCode={countryCode}
-                searchParams={searchParams}
+                gender={genderParam}
+                brandSlug={brandSlugParam}
                 activeCategoryPath={activeCategoryPath}
               />
             ))}

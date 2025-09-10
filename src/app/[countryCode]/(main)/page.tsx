@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import Hero from "@modules/home/components/hero"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import EditorialGrid from "@modules/home/components/editorial/editorial-grid"
@@ -89,8 +90,8 @@ export default async function Home(props: {
         }}
         aria-label="Shop Menswear or Womenswear links"
       >
-        <a
-          href="/categories/men"
+        <LocalizedClientLink
+          href="/men"
           style={{
             flex: 1,
             padding: "2rem 0",
@@ -105,9 +106,9 @@ export default async function Home(props: {
           aria-label="Shop Menswear Sale"
         >
           Shop Menswear
-        </a>
-        <a
-          href="/categories/men"
+        </LocalizedClientLink>
+        <LocalizedClientLink
+          href="/women"
           style={{
             flex: 1,
             padding: "2rem 0",
@@ -122,7 +123,7 @@ export default async function Home(props: {
           aria-label="Shop Womenswear Sale"
         >
           Shop Womenswear
-        </a>
+        </LocalizedClientLink>
       </nav>
     </>
   )

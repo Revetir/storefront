@@ -1,5 +1,5 @@
 import Image from "next/image"
-import Link from "next/link"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 const FeaturedBrands = () => {
   return (
@@ -15,11 +15,11 @@ const FeaturedBrands = () => {
           <div className="absolute bottom-6 left-6 text-white">
             <p className="text-sm font-medium mb-2">Featured Brand</p>
             <h3 className="text-2xl font-bold mb-4">Rebel Wave</h3>
-            <Link href="/store?brand=Rebel+Wave">
+            <LocalizedClientLink href="/men/brands/rebel-wave">
               <button className="bg-white text-black px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors">
                 Shop All
               </button>
-            </Link>
+            </LocalizedClientLink>
           </div>
         </div>
         <div className="relative h-[800px] w-full">
@@ -35,11 +35,11 @@ const FeaturedBrands = () => {
           <div className="absolute bottom-6 left-6 text-white">
             <p className="text-sm font-medium mb-2">Featured Brand</p>
             <h3 className="text-2xl font-bold mb-4">COMMON/DIVISOR</h3>
-            <Link href="/store?brand=Common+Divisor">
+            <LocalizedClientLink href="/men/brands/common-divisor">
               <button className="bg-white text-black px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors">
                 Shop All
               </button>
-            </Link>
+            </LocalizedClientLink>
           </div>
         </div>
       </div>

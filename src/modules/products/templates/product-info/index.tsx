@@ -10,13 +10,13 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
   return (
     <div id="product-info" className="relative flex small:items-center small:min-h-[80vh] px-8">
       <div className="flex flex-col gap-y-4 lg:max-w-[500px]">
-        {product.type?.value && (
-        <LocalizedClientLink
-          href={`/store?brand=${product.type.value.toLowerCase()}`}
-          className="text-medium text-ui-fg-base hover:text-ui-fg-subtle hover:underline"
-        >
-          {product.type.value}
-        </LocalizedClientLink>
+        {product.type?.value && (product as any)?.brand?.slug && (
+          <LocalizedClientLink
+            href={`/men/brands/${(product as any).brand.slug}`}
+            className="text-medium text-ui-fg-base hover:text-ui-fg-subtle hover:underline"
+          >
+            {product.type.value}
+          </LocalizedClientLink>
         )}
         <Heading
           className="text-large-regular leading-tight text-ui-fg-base"
