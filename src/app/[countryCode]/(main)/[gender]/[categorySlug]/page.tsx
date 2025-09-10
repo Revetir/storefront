@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getCategoryByFlatHandle, listCategories } from "@lib/data/categories"
-import { listProductsWithSort } from "@lib/data/products"
+import { listProductsWithBrandSupport } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
@@ -97,13 +97,11 @@ export default async function CategoryPage(props: Props) {
     response: { products, count },
     totalPages,
     currentPage,
-  } = await listProductsWithSort({
+  } = await listProductsWithBrandSupport({
     page: pageNumber,
     queryParams: {
       category_id: categoryIds,
-      // Include fields needed by the product grid (title/type) and brand for canonical links
       fields: "handle,title,thumbnail,*brand.*,*type.*",
-      expand: "brand,type",
     },
     sortBy: sort,
     countryCode,

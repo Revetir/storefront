@@ -2,7 +2,7 @@ import { Metadata } from "next"
 
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import StoreTemplate from "@modules/store/templates"
-import { listProductsWithSort } from "@lib/data/products"
+import { listProductsWithBrandSupport } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { listProductTypes } from "@lib/data/product-types"
 
@@ -54,13 +54,11 @@ export default async function StorePage(props: Params) {
     response: { products, count },
     totalPages,
     currentPage,
-  } = await listProductsWithSort({
+  } = await listProductsWithBrandSupport({
     page: pageNumber,
     queryParams: {
       ...queryParams,
-      // Include fields needed by the product grid (title/type) and brand for canonical links
       fields: "handle,title,thumbnail,*brand.*,*type.*",
-      expand: "brand,type",
     },
     sortBy: sort,
     countryCode: params.countryCode,
