@@ -92,6 +92,8 @@ export default async function GenderPage(props: Props) {
     page: pageNumber,
     queryParams: {
       category_id: genderCategoryIds,
+      // Ensure brand is included so product cards can link via brand-handle
+      fields: "handle,thumbnail,*brand.*",
     },
     sortBy: sort,
     countryCode,

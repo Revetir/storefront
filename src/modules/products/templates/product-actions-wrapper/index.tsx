@@ -14,7 +14,10 @@ export default async function ProductActionsWrapper({
 }) {
   // Use more efficient caching for real-time pricing
   const product = await listProducts({
-    queryParams: { id: [id] },
+    queryParams: {
+      id: [id],
+      fields: "*variants.calculated_price,+variants.inventory_quantity,*options.*",
+    },
     regionId: region.id,
   }).then(({ response }) => response.products[0])
 

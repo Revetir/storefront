@@ -56,7 +56,11 @@ export default async function StorePage(props: Params) {
     currentPage,
   } = await listProductsWithSort({
     page: pageNumber,
-    queryParams,
+    queryParams: {
+      ...queryParams,
+      // Ensure brand is included so product cards can link via brand-handle
+      fields: "handle,thumbnail,*brand.*",
+    },
     sortBy: sort,
     countryCode: params.countryCode,
   })

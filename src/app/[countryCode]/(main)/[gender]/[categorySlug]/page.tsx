@@ -99,6 +99,8 @@ export default async function CategoryPage(props: Props) {
     page: pageNumber,
     queryParams: {
       category_id: categoryIds,
+      // Ensure brand is included so product cards can link via brand-handle
+      fields: "handle,thumbnail,*brand.*",
     },
     sortBy: sort,
     countryCode,

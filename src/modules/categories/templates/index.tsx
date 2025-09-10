@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useState } from "react"
+import { Suspense, useEffect, useRef, useState } from "react"
 
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
@@ -32,6 +32,23 @@ const CategoryTemplate = ({
   const sort = sortBy || "created_at"
   const [isMobileRefinementOpen, setIsMobileRefinementOpen] = useState(false)
   const [activeRefinementTab, setActiveRefinementTab] = useState<"refine" | "sort">("refine")
+  
+  // Ensure footer appears below both sidebar and products on large screens
+  const sidebarRef = useRef<HTMLDivElement | null>(null)
+  const [sidebarHeight, setSidebarHeight] = useState<number>(0)
+
+  useEffect(() => {
+    // Measure sidebar height and set it as a min-height on the container
+    if (typeof ResizeObserver === "undefined") return
+    const target = sidebarRef.current
+    if (!target) return
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      setSidebarHeight(entry.contentRect.height)
+    })
+    observer.observe(target)
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <>
@@ -137,9 +154,9 @@ const CategoryTemplate = ({
 
           {/* Large Desktop Layout - > 1725px (Original Layout) */}
           <div className="hidden large:block">
-            <div className="relative">
+            <div className="relative" style={{ minHeight: sidebarHeight || undefined }}>
               {/* Desktop Refinement List - Original positioning */}
-              <div className="absolute left-9 top-0 z-10">
+              <div className="absolute left-9 top-0 z-10" ref={sidebarRef}>
                 <RefinementList sortBy={sort} />
               </div>
               

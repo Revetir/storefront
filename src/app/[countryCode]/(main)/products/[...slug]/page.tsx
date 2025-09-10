@@ -179,7 +179,12 @@ export default async function ProductPage(props: Props) {
 
   const pricedProduct = await listProducts({
     countryCode: params.countryCode,
-    queryParams: { handle: resolvedProduct.handle },
+    queryParams: {
+      handle: resolvedProduct.handle,
+      // Ensure all relations needed by the template are present
+      fields:
+        "*images,*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,*categories,+product_sku.*,*brand.*",
+    },
   }).then(({ response }) => response.products[0])
 
   if (!pricedProduct) {
@@ -206,7 +211,11 @@ export default async function ProductPage(props: Props) {
   }
 
   const relatedProducts = await listProducts({
-    queryParams,
+    queryParams: {
+      ...queryParams,
+      // Include brand to build canonical links in ProductPreview
+      fields: "handle,thumbnail,*brand.*",
+    },
     countryCode: params.countryCode,
   }).then(({ response }) => {
     return response.products.filter(
