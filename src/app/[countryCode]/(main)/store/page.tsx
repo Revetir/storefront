@@ -2,7 +2,7 @@ import { Metadata } from "next"
 
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import StoreTemplate from "@modules/store/templates"
-import { listProductsWithBrandSupport } from "@lib/data/products"
+import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { listProductTypes } from "@lib/data/product-types"
 
@@ -49,12 +49,12 @@ export default async function StorePage(props: Params) {
     return null
   }
 
-  // Use server-side pagination
+  // Use server-side pagination with brand data
   const {
     response: { products, count },
     totalPages,
     currentPage,
-  } = await listProductsWithBrandSupport({
+  } = await listProductsWithSort({
     page: pageNumber,
     queryParams: {
       ...queryParams,

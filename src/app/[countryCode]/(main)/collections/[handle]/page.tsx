@@ -6,7 +6,7 @@ import { listRegions } from "@lib/data/regions"
 import { StoreCollection, StoreRegion } from "@medusajs/types"
 import CollectionTemplate from "@modules/collections/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import { listProductsWithBrandSupport } from "@lib/data/products"
+import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 
 type Props = {
@@ -96,7 +96,7 @@ export default async function CollectionPage(props: Props) {
     response: { products, count },
     totalPages,
     currentPage,
-  } = await listProductsWithBrandSupport({
+  } = await listProductsWithSort({
     page: pageNumber,
     queryParams: {
       collection_id: [collection.id],

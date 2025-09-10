@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getCategoryByFlatHandle, listCategories } from "@lib/data/categories"
-import { listProductsWithBrandSupport } from "@lib/data/products"
+import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
@@ -97,7 +97,7 @@ export default async function CategoryPage(props: Props) {
     response: { products, count },
     totalPages,
     currentPage,
-  } = await listProductsWithBrandSupport({
+  } = await listProductsWithSort({
     page: pageNumber,
     queryParams: {
       category_id: categoryIds,
