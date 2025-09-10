@@ -214,8 +214,7 @@ export default async function ProductPage(props: Props) {
     queryParams: {
       ...queryParams,
       // Include brand to build canonical links in ProductPreview
-      fields: "handle,title,thumbnail,*brand.*,*type.*",
-      expand: "brand,type",
+      fields: "handle,thumbnail,*brand.*",
     },
     countryCode: params.countryCode,
   }).then(({ response }) => {

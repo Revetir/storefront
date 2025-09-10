@@ -57,8 +57,6 @@ export const listProducts = async ({
     region_id: region.id,
     fields: "id,title,handle,status,thumbnail,created_at,updated_at,deleted_at,is_giftcard,discountable,description,subtitle,material,weight,length,height,width,hs_code,origin_country,mid_code,metadata",
     ...queryParams,
-    // Override fields if provided in queryParams
-    ...(queryParams?.fields && { fields: queryParams.fields }),
   }
 
   const next = {
@@ -139,7 +137,7 @@ export const listProductsWithBrandSupport = async ({
     limit,
     offset,
     region_id: region.id,
-    fields: "id,title,handle,status,thumbnail,created_at,updated_at,deleted_at,is_giftcard,discountable,description,subtitle,material,weight,length,height,width,hs_code,origin_country,mid_code,metadata,*brand.*,*type.*",
+    fields: "id,title,handle,status,thumbnail,created_at,updated_at,deleted_at,is_giftcard,discountable,description,subtitle,material,weight,length,height,width,hs_code,origin_country,mid_code,metadata",
     ...queryParams,
   }
 
