@@ -102,6 +102,13 @@ export default async function BrandPage(props: Props) {
   )
   const genderCategoryIds = genderCategories.flatMap(collectCategoryIds)
 
+  // Debug logging for development
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[Brand Page Debug] Gender: ${gender}, Prefix: ${genderPrefix}`)
+    console.log(`[Brand Page Debug] Gender categories found:`, genderCategories.map(cat => ({ id: cat.id, handle: cat.handle, name: cat.name })))
+    console.log(`[Brand Page Debug] Gender category IDs:`, genderCategoryIds)
+  }
+
   // Fetch products with a higher limit to ensure we get all relevant products for filtering
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
@@ -116,6 +123,7 @@ export default async function BrandPage(props: Props) {
     page: 1, // Get products from first page
     queryParams: {
       limit: 2000, // Get all products for comprehensive client-side filtering
+      fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,*categories,+product_sku.*,*brand.*", // Ensure we get categories and brand info
     },
     sortBy: sort,
     countryCode,
@@ -143,6 +151,17 @@ export default async function BrandPage(props: Props) {
     const hasGenderCategoryByHandle = product.categories.some((category: any) => {
       return category.handle && category.handle.startsWith(`${genderPrefix}-`)
     })
+    
+    // Debug logging for development
+    if (process.env.NODE_ENV === 'development' && product.brand?.id === brand.id) {
+      console.log(`Product: ${product.title}`)
+      console.log(`Categories:`, product.categories.map((c: any) => ({ id: c.id, handle: c.handle })))
+      console.log(`Gender category IDs:`, genderCategoryIds)
+      console.log(`Has gender category:`, hasGenderCategory)
+      console.log(`Has gender category by handle:`, hasGenderCategoryByHandle)
+      console.log(`Gender prefix:`, genderPrefix)
+      console.log('---')
+    }
     
     return hasGenderCategory || hasGenderCategoryByHandle
   })
