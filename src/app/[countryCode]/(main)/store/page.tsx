@@ -66,7 +66,7 @@ export default async function StorePage(props: Params) {
     countryCode: params.countryCode,
   })
 
-  // Apply price filtering if maxPrice is provided
+  // comment lul
   let filteredProducts = products
   let filteredCount = count
   if (maxPrice) {
