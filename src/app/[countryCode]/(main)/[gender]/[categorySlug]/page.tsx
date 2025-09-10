@@ -49,8 +49,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
   const genderDisplay = gender === "men" ? "Men's" : "Women's"
   const title = `${genderDisplay} ${category.name} | REVETIR`
-  const description = category.metadata?.intro_blurb || 
-    `Shop ${genderDisplay.toLowerCase()} ${category.name.toLowerCase()} at REVETIR. Premium fashion with free shipping and returns.`
+  const description: string =
+    typeof category.metadata?.intro_blurb === "string"
+      ? category.metadata.intro_blurb
+      : `Shop ${genderDisplay.toLowerCase()} ${category.name.toLowerCase()} at REVETIR. Premium fashion with free shipping and returns.`
 
   return {
     title,
@@ -99,8 +101,8 @@ export default async function CategoryPage(props: Props) {
     page: pageNumber,
     queryParams: {
       category_id: categoryIds,
-      // Ensure brand is included so product cards can link via brand-handle
-      fields: "handle,thumbnail,*brand.*",
+      // Include fields needed by the product grid (title/type) and brand for canonical links
+      fields: "handle,title,thumbnail,*brand.*,*type.*",
     },
     sortBy: sort,
     countryCode,
@@ -112,8 +114,6 @@ export default async function CategoryPage(props: Props) {
       sortBy={sortBy}
       page={page}
       countryCode={countryCode}
-      categoryPath={[categorySlug]}
-      allCategories={allCategories}
       products={products}
       region={region}
       totalPages={totalPages}

@@ -58,8 +58,8 @@ export default async function StorePage(props: Params) {
     page: pageNumber,
     queryParams: {
       ...queryParams,
-      // Ensure brand is included so product cards can link via brand-handle
-      fields: "handle,thumbnail,*brand.*",
+      // Include fields needed by the product grid (title/type) and brand for canonical links
+      fields: "handle,title,thumbnail,*brand.*,*type.*",
     },
     sortBy: sort,
     countryCode: params.countryCode,
