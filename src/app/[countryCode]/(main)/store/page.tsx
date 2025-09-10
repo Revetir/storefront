@@ -49,7 +49,7 @@ export default async function StorePage(props: Params) {
     return null
   }
 
-  // Use server-side pagination
+  // Use server-side pagination with brand data
   const {
     response: { products, count },
     totalPages,
@@ -58,7 +58,6 @@ export default async function StorePage(props: Params) {
     page: pageNumber,
     queryParams: {
       ...queryParams,
-      // Include fields needed by the product grid (title/type) and brand for canonical links
       fields: "handle,title,thumbnail,*brand.*,*type.*",
     },
     sortBy: sort,

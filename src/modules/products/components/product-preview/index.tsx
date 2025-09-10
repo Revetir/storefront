@@ -39,7 +39,10 @@ export default function ProductPreview({
 
   const handleMouseEnter = () => {
     // Prefetch the product page on hover
-    const brandSlug = ((product as any)?.brand?.slug as string)
+    const brandSlug = (product as any)?.brand?.slug as string | undefined
+    if (!brandSlug) {
+      throw new Error(`Missing brand slug for product ${product.id || product.handle}`)
+    }
     const productUrl = `/products/${brandSlug}-${product.handle}`
     const localizedUrl = countryCode ? `/${countryCode}${productUrl}` : productUrl
     router.prefetch(localizedUrl)
@@ -47,7 +50,7 @@ export default function ProductPreview({
 
   return (
     <LocalizedClientLink 
-      href={`/products/${((product as any)?.brand?.slug as string)}-${product.handle}`} 
+      href={`/products/${(((product as any)?.brand?.slug as string))}-${product.handle}`} 
       className="group"
       onMouseEnter={handleMouseEnter}
     >
