@@ -92,9 +92,7 @@ export default async function GenderPage(props: Props) {
     page: pageNumber,
     queryParams: {
       category_id: genderCategoryIds,
-      // Include fields needed by the product grid (title/type) and brand for canonical links
       fields: "handle,title,thumbnail,*brand.*,*type.*",
-      expand: "brand,type",
     },
     sortBy: sort,
     countryCode,
