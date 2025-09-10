@@ -77,7 +77,7 @@ export default async function StorePage(props: Params) {
     })
     filteredCount = filteredProducts.length
   }
-
+/*comment*/
   return (
     <StoreTemplate
       sortBy={sortBy}
