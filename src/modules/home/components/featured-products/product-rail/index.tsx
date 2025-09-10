@@ -18,8 +18,9 @@ export default async function ProductRail({
     regionId: region.id,
     queryParams: {
       collection_id: collection.id,
-      // Include brand for canonical link, and price for display
-      fields: "*variants.calculated_price,*brand.*",
+      // Include brand and type for canonical link and display
+      fields: "handle,title,thumbnail,*brand.*,*type.*,*variants.calculated_price",
+      expand: "brand,type",
     },
   })
 

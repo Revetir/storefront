@@ -60,6 +60,7 @@ export default async function StorePage(props: Params) {
       ...queryParams,
       // Include fields needed by the product grid (title/type) and brand for canonical links
       fields: "handle,title,thumbnail,*brand.*,*type.*",
+      expand: "brand,type",
     },
     sortBy: sort,
     countryCode: params.countryCode,
