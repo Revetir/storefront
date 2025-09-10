@@ -102,29 +102,55 @@ export default async function BrandPage(props: Props) {
   )
   const genderCategoryIds = genderCategories.flatMap(collectCategoryIds)
 
-  // Fetch products using the standard products API with category filtering only
+  // Fetch products with a higher limit to ensure we get all relevant products for filtering
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
 
+  // Fetch all products first, then filter by gender and brand on client side
+  // This ensures we don't miss products due to API category filtering issues
   const {
     response: { products: allProducts, count: totalCount },
     totalPages: allTotalPages,
     currentPage: allCurrentPage,
   } = await listProductsWithSort({
-    page: 1, // Get all products from first page
+    page: 1, // Get products from first page
     queryParams: {
-      category_id: genderCategoryIds,
-      limit: 1000, // Get more products for client-side filtering
+      limit: 2000, // Get all products for comprehensive client-side filtering
     },
     sortBy: sort,
     countryCode,
   })
 
-  // Filter products by brand on the client side
+  // Filter products by brand AND gender on the client side
   const brandProducts = allProducts.filter((product: any) => {
     // Check if product has brand relationship and matches our brand
-    return product.brand && product.brand.id === brand.id
+    if (!product.brand || product.brand.id !== brand.id) {
+      return false
+    }
+    
+    // Additional gender filtering: check if product is in gender-appropriate categories
+    if (!product.categories || !Array.isArray(product.categories)) {
+      // If no categories, skip this product to be safe
+      return false
+    }
+    
+    // Check if product belongs to any gender-specific category
+    const hasGenderCategory = product.categories.some((category: any) => {
+      return genderCategoryIds.includes(category.id)
+    })
+    
+    // Also check by category handle as a fallback
+    const hasGenderCategoryByHandle = product.categories.some((category: any) => {
+      return category.handle && category.handle.startsWith(`${genderPrefix}-`)
+    })
+    
+    return hasGenderCategory || hasGenderCategoryByHandle
   })
+
+  // Log for debugging if needed
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[Brand Page] ${gender}/${brandSlug}: ${brandProducts.length} products found`)
+  }
 
   // Apply pagination to filtered results
   const limit = 60
