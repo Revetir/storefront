@@ -1,9 +1,9 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { getBrandBySlug } from "@lib/data/brands"
+import { getBrandBySlug, getBrandProducts } from "@lib/data/brands"
 import { listCategories, getCategoryByFlatHandle } from "@lib/data/categories"
-import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { listProductsWithSort } from "@lib/data/products"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
 
@@ -160,7 +160,6 @@ export default async function BrandPage(props: Props) {
   const count = brandProducts.length
   const totalPages = Math.ceil(count / limit)
   const currentPage = pageNumber
-
   // Create a category object for the template that represents the brand + gender combination
   const brandCategory = {
     id: brand.id,
