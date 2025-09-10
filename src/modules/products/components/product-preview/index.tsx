@@ -23,12 +23,6 @@ export default function ProductPreview({
   const router = useRouter()
   const params = useParams()
   const countryCode = (params?.countryCode as string) || ""
-  const brandSlug = (product as any)?.brand?.slug
-
-  // Require brand slug to build canonical product link; skip if missing
-  if (!brandSlug) {
-    return null
-  }
 
   // const pricedProduct = await listProducts({
   //   regionId: region.id,
@@ -45,14 +39,19 @@ export default function ProductPreview({
 
   const handleMouseEnter = () => {
     // Prefetch the product page on hover
-    const productUrl = `/products/${brandSlug}-${product.handle}`
+    const productUrl = product.brand?.slug 
+      ? `/products/${product.brand.slug}-${product.handle}`
+      : `/products/${product.handle}`
     const localizedUrl = countryCode ? `/${countryCode}${productUrl}` : productUrl
     router.prefetch(localizedUrl)
   }
 
   return (
     <LocalizedClientLink 
-      href={`/products/${brandSlug}-${product.handle}`}
+      href={product.brand?.slug 
+        ? `/products/${product.brand.slug}-${product.handle}`
+        : `/products/${product.handle}`
+      } 
       className="group"
       onMouseEnter={handleMouseEnter}
     >
