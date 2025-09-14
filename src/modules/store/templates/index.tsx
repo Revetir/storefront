@@ -15,7 +15,7 @@ const StoreTemplate = ({
   sortBy,
   page,
   countryCode,
-  type,
+  brand,
   maxPrice,
   products,
   region,
@@ -26,7 +26,7 @@ const StoreTemplate = ({
   sortBy?: SortOptions
   page?: string
   countryCode: string
-  type?: string
+  brand?: string
   maxPrice?: string
   products: HttpTypes.StoreProduct[]
   region: HttpTypes.StoreRegion
@@ -126,7 +126,7 @@ const StoreTemplate = ({
                 <div className="flex gap-8">
                   {/* Compact Sidebar */}
                   <div className="w-64 flex-shrink-0">
-                    <RefinementList sortBy={sort} selectedType={type} />
+                    <RefinementList sortBy={sort} selectedBrand={brand} />
                   </div>
                   {/* Product Grid */}
                   <div className="flex-1">
@@ -147,7 +147,7 @@ const StoreTemplate = ({
             <div className="relative">
               {/* Desktop Refinement List - Original positioning */}
               <div className="absolute left-9 top-0 z-10">
-                <RefinementList sortBy={sort} selectedType={type} />
+                <RefinementList sortBy={sort} selectedBrand={brand} />
               </div>
               
               <div className="flex justify-center w-full">
@@ -170,7 +170,7 @@ const StoreTemplate = ({
         isOpen={isMobileRefinementOpen}
         onClose={() => setIsMobileRefinementOpen(false)}
         sortBy={sort}
-        selectedType={type}
+        selectedBrand={brand}
         initialTab={activeRefinementTab}
       />
     </>

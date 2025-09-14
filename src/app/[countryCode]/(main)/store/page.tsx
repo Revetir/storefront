@@ -5,6 +5,7 @@ import StoreTemplate from "@modules/store/templates"
 import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { listProductTypes } from "@lib/data/product-types"
+import { listBrands } from "@lib/data/brands"
 
 export const metadata: Metadata = {
   title: "Store",
@@ -36,10 +37,10 @@ export default async function StorePage(props: Params) {
 
   // Convert brand value to type ID if brand filter is provided
   if (brand) {
-    const productTypes = await listProductTypes()
-    const typeObj = productTypes.find(t => t.value === brand)
-    if (typeObj) {
-      queryParams.type_id = [typeObj.id]
+    const productBrands = await listBrands()
+    const brandObj = productBrands.find(b => b.slug === brand)
+    if (brandObj) {
+      queryParams.brand_id = [brandObj.id]
     }
   }
 
@@ -59,7 +60,7 @@ export default async function StorePage(props: Params) {
     queryParams: {
       ...queryParams,
       // Include fields needed by the product grid (title/type) and brand for canonical links
-      fields: "handle,title,thumbnail,*brand.*,*type.*",
+      fields: "handle,title,thumbnail,+brand.*,*type.*",
     },
     sortBy: sort,
     countryCode: params.countryCode,
@@ -84,7 +85,7 @@ export default async function StorePage(props: Params) {
       sortBy={sortBy}
       page={page}
       countryCode={params.countryCode}
-      type={brand}
+      brand={brand}
       maxPrice={maxPrice}
       products={filteredProducts}
       region={region}

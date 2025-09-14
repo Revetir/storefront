@@ -65,8 +65,6 @@ export const listProducts = async ({
     tags: [`products-${region.id}`, `products-${JSON.stringify(finalQuery)}`], // Add specific cache tags
   }
   
-  console.log('API Query Parameters:', finalQuery)
-  
   return sdk.client
     .fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(
       "/store/products",
@@ -137,7 +135,7 @@ export const listProductsWithBrandSupport = async ({
     limit,
     offset,
     region_id: region.id,
-    fields: "id,title,handle,status,thumbnail,created_at,updated_at,deleted_at,is_giftcard,discountable,description,subtitle,material,weight,length,height,width,hs_code,origin_country,mid_code,metadata,brand.*,categories.*",
+    fields: "id,title,handle,status,thumbnail,created_at,updated_at,deleted_at,is_giftcard,discountable,description,subtitle,material,weight,length,height,width,hs_code,origin_country,mid_code,metadata,+brand.*,categories.*",
     ...queryParams,
   }
 
@@ -146,8 +144,6 @@ export const listProductsWithBrandSupport = async ({
     revalidate: 7200,
     tags: [`products-with-brands-${region.id}`, `products-with-brands-${JSON.stringify(finalQuery)}`],
   }
-  
-  console.log('Brand-filtered API Query Parameters:', finalQuery)
   
   try {
     const { products, count } = await sdk.client

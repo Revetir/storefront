@@ -8,12 +8,13 @@ import { useCallback } from "react"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategorySidebar from "@modules/layout/components/category-sidebar"
 import TypeRefinementList from "@modules/store/components/refinement-list/product-types"
+import BrandRefinementList from "../refinement-list/product-brands"
 
 interface MobileRefinementPanelProps {
   isOpen: boolean
   onClose: () => void
   sortBy: SortOptions
-  selectedType?: string
+  selectedBrand?: string
   initialTab?: "refine" | "sort"
 }
 
@@ -21,7 +22,7 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
   isOpen,
   onClose,
   sortBy,
-  selectedType,
+  selectedBrand,
   initialTab = "refine"
 }) => {
   const [activeTab, setActiveTab] = useState<"refine" | "sort">(initialTab)
@@ -97,7 +98,7 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
                 {/* Brands */}
                 <div>
                   <h3 className="text-sm font-medium uppercase tracking-wide mb-3">Brands</h3>
-                  <TypeRefinementList selectedType={selectedType} />
+                  <BrandRefinementList selectedBrand={selectedBrand} />
                 </div>
               </div>
             ) : (

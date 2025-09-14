@@ -9,12 +9,12 @@ type ProductInfoMobileProps = {
 const ProductInfoMobile = ({ product }: ProductInfoMobileProps) => {
   return (
     <div className="flex flex-col gap-y-2">
-      {product.type?.value && (product as any)?.brand?.slug && (
+      {product.brand?.name && (product as any)?.brand?.slug && (
         <LocalizedClientLink
           href={`/men/brands/${(product as any).brand.slug}`}
           className="text-medium text-ui-fg-base hover:text-ui-fg-subtle hover:underline"
         >
-          {product.type.value}
+          {product.brand.name.toUpperCase()}
         </LocalizedClientLink>
       )}
       <Heading
