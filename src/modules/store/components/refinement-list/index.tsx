@@ -6,15 +6,16 @@ import { useCallback, useTransition } from "react"
 import SortProducts, { SortOptions } from "./sort-products"
 import CategorySidebar from "@modules/layout/components/category-sidebar"
 import TypeRefinementList from "./product-types"
+import BrandRefinementList from "./product-brands"
 
 type RefinementListProps = {
   sortBy: SortOptions
   search?: boolean
   'data-testid'?: string
-  selectedType?: string
+  selectedBrand?: string
 }
 
-const RefinementList = ({ sortBy, 'data-testid': dataTestId, selectedType }: RefinementListProps) => {
+const RefinementList = ({ sortBy, 'data-testid': dataTestId, selectedBrand }: RefinementListProps) => {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -48,7 +49,7 @@ const RefinementList = ({ sortBy, 'data-testid': dataTestId, selectedType }: Ref
         disabled={isPending}
       />
       <CategorySidebar className="border-r-0 p-0 w-full" />
-      <TypeRefinementList selectedType={selectedType} />
+      <BrandRefinementList selectedBrand={selectedBrand} />
     </div>
   )
 }
