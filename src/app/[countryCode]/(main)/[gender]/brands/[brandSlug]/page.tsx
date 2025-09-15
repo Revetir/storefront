@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { getBrandBySlug } from "@lib/data/brands"
 import { getRegion } from "@lib/data/regions"
 import { listCategories } from "@lib/data/categories"
-import { listProductsWithSort } from "@lib/data/products"
+import { listProductsWithBrandSupport } from "@lib/data/products"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
 
@@ -95,7 +95,7 @@ export default async function BrandPage(props: Props) {
   )
   const genderCategoryIds = genderCategories.flatMap(collectCategoryIds)
 
-  // Fetch products using the same server-side filtering as gender/category pages
+  // Fetch products using the correct brand-supporting endpoint
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
 
@@ -103,13 +103,12 @@ export default async function BrandPage(props: Props) {
     response: { products, count },
     totalPages,
     currentPage,
-  } = await listProductsWithSort({
+  } = await listProductsWithBrandSupport({
     page: pageNumber,
     queryParams: {
       brand_id: [brand.id],
       category_id: genderCategoryIds,
-      // Include brand explicitly so ProductPreview can render it
-      fields: "handle,title,thumbnail,+brand.*,*type.*",
+      // Fields are handled by the backend endpoint
     },
     sortBy: sort,
     countryCode,
@@ -118,6 +117,7 @@ export default async function BrandPage(props: Props) {
   // Log for debugging if needed
   if (process.env.NODE_ENV === 'development') {
     console.log(`[Brand Page] ${gender}/${brandSlug}: ${products.length} products found (${count} total)`)
+    console.log(`[Brand Page] Brand ID: ${brand.id}, Gender Category IDs: ${genderCategoryIds.length}`)
   }
 
   // Create a category object for the template that represents the brand + gender combination
