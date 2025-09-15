@@ -1,7 +1,9 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { getBrandBySlug, getBrandProducts } from "@lib/data/brands"
+import { getBrandBySlug } from "@lib/data/brands"
 import { getRegion } from "@lib/data/regions"
+import { listCategories } from "@lib/data/categories"
+import { listProductsWithSort } from "@lib/data/products"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
 
@@ -80,31 +82,44 @@ export default async function BrandPage(props: Props) {
     notFound()
   }
 
+  // Build gender category IDs for filtering (same logic as gender page)
+  const allCategories = await listCategories()
+  const collectCategoryIds = (cat: any): string[] => {
+    return [cat.id, ...(cat.children || []).flatMap(collectCategoryIds)]
+  }
+  
+  // Get all gender-specific categories (those that start with the gender prefix)
+  const genderPrefix = gender === "men" ? "mens" : "womens"
+  const genderCategories = allCategories.filter(cat => 
+    cat.handle.startsWith(`${genderPrefix}-`)
+  )
+  const genderCategoryIds = genderCategories.flatMap(collectCategoryIds)
 
-  // Use server-side filtering for better performance
+  // Fetch products using the same server-side filtering as gender/category pages
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
-  const limit = 60
-  const offset = (pageNumber - 1) * limit
 
-  // Use the brand-specific API endpoint for server-side filtering
-  const { products, count } = await getBrandProducts({
-    brandSlug,
-    categorySlug: gender, // Pass gender as category filter
-    limit,
-    offset,
-    sort,
+  const {
+    response: { products, count },
+    totalPages,
+    currentPage,
+  } = await listProductsWithSort({
+    page: pageNumber,
+    queryParams: {
+      brand_id: [brand.id],
+      category_id: genderCategoryIds,
+      // Include brand explicitly so ProductPreview can render it
+      fields: "handle,title,thumbnail,+brand.*,*type.*",
+    },
+    sortBy: sort,
     countryCode,
   })
-
-  // Calculate pagination info
-  const totalPages = Math.ceil(count / limit)
-  const currentPage = pageNumber
 
   // Log for debugging if needed
   if (process.env.NODE_ENV === 'development') {
     console.log(`[Brand Page] ${gender}/${brandSlug}: ${products.length} products found (${count} total)`)
   }
+
   // Create a category object for the template that represents the brand + gender combination
   const brandCategory = {
     id: brand.id,
