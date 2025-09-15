@@ -28,6 +28,14 @@ const CategoryTemplate = ({
   totalPages: number
   currentPage: number
 }) => {
+  // Detect if this is a brand page by checking if the category handle contains a brand slug pattern
+  // Brand pages have handles like "men-brand-slug" or "women-brand-slug"
+  const isBrandPage = category.handle && category.handle.includes('-') && 
+    (category.handle.startsWith('men-') || category.handle.startsWith('women-')) &&
+    !category.handle.startsWith('mens-') && !category.handle.startsWith('womens-')
+  
+  // Extract brand slug from the category handle for brand pages
+  const selectedBrand = isBrandPage ? category.handle.split('-').slice(1).join('-') : undefined
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
   const [isMobileRefinementOpen, setIsMobileRefinementOpen] = useState(false)
@@ -119,7 +127,7 @@ const CategoryTemplate = ({
                 <div className="flex gap-8">
                   {/* Compact Sidebar */}
                   <div className="w-64 flex-shrink-0">
-                    <RefinementList sortBy={sort} />
+                    <RefinementList sortBy={sort} selectedBrand={selectedBrand} />
                   </div>
                   {/* Product Grid */}
                   <div className="flex-1">
@@ -140,7 +148,7 @@ const CategoryTemplate = ({
             <div className="relative">
               {/* Desktop Refinement List - Original positioning */}
               <div className="absolute left-9 top-0 z-10">
-                <RefinementList sortBy={sort} />
+                <RefinementList sortBy={sort} selectedBrand={selectedBrand} />
               </div>
               
               <div className="flex justify-center w-full">
@@ -163,6 +171,7 @@ const CategoryTemplate = ({
         isOpen={isMobileRefinementOpen}
         onClose={() => setIsMobileRefinementOpen(false)}
         sortBy={sort}
+        selectedBrand={selectedBrand}
         initialTab={activeRefinementTab}
       />
     </>
