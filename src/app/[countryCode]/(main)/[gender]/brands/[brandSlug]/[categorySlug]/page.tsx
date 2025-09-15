@@ -108,6 +108,16 @@ export default async function BrandCategoryPage(props: Props) {
   // Combine category IDs: intersection of gender categories and selected category tree
   const combinedCategoryIds = categoryIds.filter(id => genderCategoryIds.includes(id))
 
+  // Debug logging for development
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[Brand+Category Page] ${gender}/${brandSlug}/${categorySlug}`)
+    console.log(`[Brand+Category Page] Brand ID: ${brand.id}`)
+    console.log(`[Brand+Category Page] Category: ${category.name} (${category.id})`)
+    console.log(`[Brand+Category Page] Category IDs: ${categoryIds.length} [${categoryIds.slice(0, 3).join(', ')}${categoryIds.length > 3 ? '...' : ''}]`)
+    console.log(`[Brand+Category Page] Gender Category IDs: ${genderCategoryIds.length}`)
+    console.log(`[Brand+Category Page] Combined Category IDs: ${combinedCategoryIds.length} [${combinedCategoryIds.slice(0, 3).join(', ')}${combinedCategoryIds.length > 3 ? '...' : ''}]`)
+  }
+
   // Use server-side filtering with both brand and category parameters
   const {
     response: { products, count },
@@ -116,13 +126,23 @@ export default async function BrandCategoryPage(props: Props) {
   } = await listProductsWithBrandSupport({
     page: pageNumber,
     queryParams: {
-      brand_id: brand.id,
+      brand_id: [brand.id],
       category_id: combinedCategoryIds.length > 0 ? combinedCategoryIds : categoryIds,
       fields: "id,title,handle,status,thumbnail,created_at,updated_at,deleted_at,is_giftcard,discountable,description,subtitle,material,weight,length,height,width,hs_code,origin_country,mid_code,metadata,+brand.*,+categories.*,+variants.*,+images.*,+tags,+product_sku.*",
     },
     sortBy: sort,
     countryCode,
   })
+
+  // Debug logging for products
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[Brand+Category Page] Found ${products.length} products (${count} total)`)
+    if (products.length > 0) {
+      console.log(`[Brand+Category Page] First product: ${products[0].title}`)
+      console.log(`[Brand+Category Page] First product brand: ${(products[0] as any)?.brand?.name}`)
+      console.log(`[Brand+Category Page] First product categories: ${(products[0] as any)?.categories?.map((c: any) => c.name).join(', ') || 'none'}`)
+    }
+  }
 
   // Create a category object for the template
   const brandCategoryTemplate = {

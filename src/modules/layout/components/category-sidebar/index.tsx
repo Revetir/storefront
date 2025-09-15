@@ -63,6 +63,22 @@ const CategoryNode = ({
   const isCurrentCategory = currentPath === categoryPath
   const isInActivePath = activeCategoryPath.includes(category.handle)
 
+  // Function to get the path when toggling off the current category
+  const getToggleOffPath = () => {
+    if (isTopLevelGenderCategory) {
+      // For top-level gender categories, stay on the same page
+      return categoryPath
+    }
+    
+    if (isOnBrandPage && currentBrandSlug) {
+      // If we're on a brand+category page, go to just brand page
+      return `/${gender}/brands/${currentBrandSlug}`
+    } else {
+      // If we're on a category page, go to gender page
+      return `/${gender}`
+    }
+  }
+
   const handleToggle = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -103,7 +119,7 @@ const CategoryNode = ({
         
         {/* Category Link */}
         <LocalizedClientLink
-          href={categoryPath}
+          href={isCurrentCategory ? getToggleOffPath() : categoryPath}
           className={`flex-1 text-xs uppercase py-1 px-2 font-sans transition-colors ${
             isCurrentCategory
               ? "font-bold underline text-black"
@@ -156,8 +172,12 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
   // Supported: /{countryCode}/{gender}/{categorySlug} and /{countryCode}/{gender}/brands/{brandSlug}/{categorySlug}
   let currentCategoryHandle = ""
   const genderPrefix = genderParam === "men" ? "mens" : genderParam === "women" ? "womens" : ""
+  
   if (params && (params as any).categorySlug && genderPrefix) {
     currentCategoryHandle = `${genderPrefix}-${(params as any).categorySlug}`
+  } else if (genderParam && (genderParam === "men" || genderParam === "women")) {
+    // If we're on a gender page (e.g., /men or /women), set the top-level gender category as active
+    currentCategoryHandle = genderParam
   }
 
   // Helper function to find the path to a category
