@@ -108,7 +108,8 @@ export default async function BrandPage(props: Props) {
     queryParams: {
       brand_id: [brand.id],
       category_id: genderCategoryIds,
-      // Fields are handled by the backend endpoint
+      // Ensure we get all necessary fields for product cards
+      fields: "id,title,handle,status,thumbnail,created_at,updated_at,deleted_at,is_giftcard,discountable,description,subtitle,material,weight,length,height,width,hs_code,origin_country,mid_code,metadata,+brand.*,+categories.*,+variants.*,+images.*",
     },
     sortBy: sort,
     countryCode,
@@ -118,6 +119,10 @@ export default async function BrandPage(props: Props) {
   if (process.env.NODE_ENV === 'development') {
     console.log(`[Brand Page] ${gender}/${brandSlug}: ${products.length} products found (${count} total)`)
     console.log(`[Brand Page] Brand ID: ${brand.id}, Gender Category IDs: ${genderCategoryIds.length}`)
+    if (products.length > 0) {
+      console.log(`[Brand Page] First product brand data:`, (products[0] as any)?.brand)
+      console.log(`[Brand Page] First product has variants:`, products[0]?.variants?.length)
+    }
   }
 
   // Create a category object for the template that represents the brand + gender combination

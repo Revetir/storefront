@@ -112,7 +112,7 @@ export default async function BrandCategoryPage(props: Props) {
     page: 1,
     queryParams: {
       limit: 2000,
-      fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,*categories,+product_sku.*,+brand.*",
+      fields: "id,title,handle,status,thumbnail,created_at,updated_at,deleted_at,is_giftcard,discountable,description,subtitle,material,weight,length,height,width,hs_code,origin_country,mid_code,metadata,+brand.*,+categories.*,+variants.*,+images.*,+tags,+product_sku.*",
     },
     sortBy: sort,
     countryCode,

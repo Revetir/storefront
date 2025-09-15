@@ -28,7 +28,6 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   priority = false,
 }) => {
   const initialImage = thumbnail || images?.[0]?.url
-  const brand = product?.brand?.name || null
 
   return (
     <Container
@@ -38,11 +37,6 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
       )}
       data-testid={dataTestid}
     >
-      {brand && (
-        <span className="absolute top-2 left-2 z-10 bg-ui-bg-base text-ui-fg-base text-xs font-medium px-2 py-0.5 rounded-md shadow-md">
-          {brand}
-        </span>
-      )}
 
       <ImageOrPlaceholder
         image={initialImage}
