@@ -92,6 +92,7 @@ export const listProducts = async ({
 /**
  * This will fetch products with brand filtering support using our custom endpoint.
  * It bypasses MedusaJS's validation limitations for brand_id parameter.
+ * Now also supports category_id filtering for combined brand + category filtering.
  */
 export const listProductsWithBrandSupport = async ({
   page = 1,

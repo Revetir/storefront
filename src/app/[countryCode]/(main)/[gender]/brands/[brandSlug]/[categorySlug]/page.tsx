@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { getBrandBySlug } from "@lib/data/brands"
 import { getCategoryByFlatHandle, listCategories } from "@lib/data/categories"
 import { getRegion } from "@lib/data/regions"
-import { listProductsWithSort } from "@lib/data/products"
+import { listProductsWithBrandSupport } from "@lib/data/products"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
 
@@ -89,7 +89,7 @@ export default async function BrandCategoryPage(props: Props) {
     notFound()
   }
 
-  // Client-side filtering like brand page: fetch broadly, then filter by brand + gender + category
+  // Server-side filtering: use the enhanced products-with-brands endpoint
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
 
@@ -99,53 +99,30 @@ export default async function BrandCategoryPage(props: Props) {
   }
   const categoryIds = collectCategoryIds(category)
 
-  // Build gender category set similar to the brand page
+  // Build gender category set for additional filtering
   const allCategories = await listCategories()
   const collectIds = (cat: any): string[] => [cat.id, ...(cat.children || []).flatMap(collectIds)]
   const genderCategories = allCategories.filter((cat) => cat.handle.startsWith(`${genderPrefix}-`))
   const genderCategoryIds = genderCategories.flatMap(collectIds)
 
-  // Fetch a wide set of products, then filter on client
+  // Combine category IDs: intersection of gender categories and selected category tree
+  const combinedCategoryIds = categoryIds.filter(id => genderCategoryIds.includes(id))
+
+  // Use server-side filtering with both brand and category parameters
   const {
-    response: { products: allProducts },
-  } = await listProductsWithSort({
-    page: 1,
+    response: { products, count },
+    totalPages,
+    currentPage,
+  } = await listProductsWithBrandSupport({
+    page: pageNumber,
     queryParams: {
-      limit: 2000,
+      brand_id: brand.id,
+      category_id: combinedCategoryIds.length > 0 ? combinedCategoryIds : categoryIds,
       fields: "id,title,handle,status,thumbnail,created_at,updated_at,deleted_at,is_giftcard,discountable,description,subtitle,material,weight,length,height,width,hs_code,origin_country,mid_code,metadata,+brand.*,+categories.*,+variants.*,+images.*,+tags,+product_sku.*",
     },
     sortBy: sort,
     countryCode,
   })
-
-  const filtered = allProducts.filter((product: any) => {
-    // Brand match
-    if (!product.brand || product.brand.id !== brand.id) {
-      return false
-    }
-    // Categories present
-    if (!product.categories || !Array.isArray(product.categories)) {
-      return false
-    }
-    // Gender match (same logic as brand page)
-    const hasGenderCategory = product.categories.some((c: any) => genderCategoryIds.includes(c.id))
-    const hasGenderCategoryByHandle = product.categories.some((c: any) => c.handle && c.handle.startsWith(`${genderPrefix}-`))
-    if (!(hasGenderCategory || hasGenderCategoryByHandle)) {
-      return false
-    }
-    // Category tree match (selected category or its descendants)
-    const inSelectedCategoryTree = product.categories.some((c: any) => categoryIds.includes(c.id))
-    return inSelectedCategoryTree
-  })
-
-  // Paginate client-side to 60 per page
-  const limit = 60
-  const startIndex = (pageNumber - 1) * limit
-  const endIndex = startIndex + limit
-  const products = filtered.slice(startIndex, endIndex)
-  const count = filtered.length
-  const totalPages = Math.ceil(count / limit)
-  const currentPage = pageNumber
 
   // Create a category object for the template
   const brandCategoryTemplate = {
