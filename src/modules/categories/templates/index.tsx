@@ -1,6 +1,7 @@
 "use client"
 
 import { Suspense, useState } from "react"
+import { usePathname } from "next/navigation"
 
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
@@ -28,14 +29,19 @@ const CategoryTemplate = ({
   totalPages: number
   currentPage: number
 }) => {
-  // Detect if this is a brand page by checking if the category handle contains a brand slug pattern
-  // Brand pages have handles like "men-brand-slug" or "women-brand-slug"
-  const isBrandPage = category.handle && category.handle.includes('-') && 
-    (category.handle.startsWith('men-') || category.handle.startsWith('women-')) &&
-    !category.handle.startsWith('mens-') && !category.handle.startsWith('womens-')
+  // Detect if this is a brand page by checking the URL path structure
+  const pathname = usePathname()
+  const isBrandPage = pathname.includes('/brands/')
   
-  // Extract brand slug from the category handle for brand pages
-  const selectedBrand = isBrandPage ? category.handle.split('-').slice(1).join('-') : undefined
+  // Extract brand slug from URL path for brand pages
+  let selectedBrand: string | undefined = undefined
+  if (isBrandPage) {
+    const pathSegments = pathname.split('/')
+    const brandsIndex = pathSegments.indexOf('brands')
+    if (brandsIndex !== -1 && brandsIndex + 1 < pathSegments.length) {
+      selectedBrand = pathSegments[brandsIndex + 1]
+    }
+  }
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
   const [isMobileRefinementOpen, setIsMobileRefinementOpen] = useState(false)

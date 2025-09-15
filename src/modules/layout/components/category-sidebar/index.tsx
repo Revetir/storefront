@@ -37,9 +37,28 @@ const CategoryNode = ({
   
   // Derive category slug without gender prefix for pretty URLs
   const categorySlug = category.handle.replace(/^(mens-|womens-)/, "")
-  const categoryPath = brandSlug
-    ? `/${gender}/brands/${brandSlug}/${categorySlug}`
-    : `/${gender}/${categorySlug}`
+  
+  // Handle special case for top-level gender categories (men/women)
+  const isTopLevelGenderCategory = category.handle === "men" || category.handle === "women"
+  
+  // Determine the correct path based on current context
+  let categoryPath: string
+  const isOnBrandPage = currentPath.includes('/brands/')
+  const currentBrandSlug = isOnBrandPage ? currentPath.split('/brands/')[1]?.split('/')[0] : null
+  
+  if (isTopLevelGenderCategory) {
+    // For top-level gender categories, link directly to the gender page
+    categoryPath = `/${category.handle}`
+  } else if (brandSlug) {
+    // We're explicitly in brand context, use brand+category path
+    categoryPath = `/${gender}/brands/${brandSlug}/${categorySlug}`
+  } else if (isOnBrandPage && currentBrandSlug) {
+    // We're on a brand page but no brandSlug prop, preserve current brand
+    categoryPath = `/${gender}/brands/${currentBrandSlug}/${categorySlug}`
+  } else {
+    // Regular category path
+    categoryPath = `/${gender}/${categorySlug}`
+  }
     
   const isCurrentCategory = currentPath === categoryPath
   const isInActivePath = activeCategoryPath.includes(category.handle)
