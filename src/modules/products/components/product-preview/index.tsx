@@ -62,9 +62,9 @@ export default function ProductPreview({
           priority={priority}
         />
         <div className="flex flex-col txt-compact-medium mt-3 leading-snug space-y-1">
-          {product.type?.value && (
+          {(product as any)?.brand?.name && (
             <p className="text-ui-fg-muted text-small font-medium leading-snug uppercase">
-              {product.type.value}
+              {(product as any).brand.name}
             </p>
           )}
           <Text className="text-ui-fg-subtle leading-snug" data-testid="product-title">

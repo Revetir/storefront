@@ -18,7 +18,7 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       countryCode,
       queryParams: {
         handle: brandAndHandle,
-        fields: "handle,brand.*",
+        fields: "handle,+brand.*",
         limit: 1,
       },
     }).then(({ response }) => response.products[0])
@@ -41,7 +41,7 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       queryParams: {
         handle: handleCandidate,
         // ensure brand is included to validate
-        fields: "handle,brand.*",
+        fields: "handle,+brand.*",
         limit: 1,
       },
     }).then(({ response }) => response.products[0])
@@ -67,7 +67,7 @@ export async function generateStaticParams() {
     const promises = countryCodes.map(async (country) => {
       const { response } = await listProducts({
         countryCode: country,
-        queryParams: { limit: 100, fields: "handle,brand.*" },
+        queryParams: { limit: 100, fields: "handle,+brand.*" },
       })
 
       return {
@@ -214,7 +214,7 @@ export default async function ProductPage(props: Props) {
     queryParams: {
       ...queryParams,
       // Include brand to build canonical links in ProductPreview
-      fields: "handle,thumbnail,*brand.*",
+      fields: "handle,thumbnail,+brand.*",
     },
     countryCode: params.countryCode,
   }).then(({ response }) => {
