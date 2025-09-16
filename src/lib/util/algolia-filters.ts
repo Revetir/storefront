@@ -98,21 +98,7 @@ export async function searchProductsWithAlgolia(
     }
 
     console.log(`[Algolia Search] Filters:`, filters)
-
-    // Build sort attribute
-    let sortAttribute = "created_at:desc"
-    switch (sortBy) {
-      case "price_asc":
-        sortAttribute = "minPrice:asc"
-        break
-      case "price_desc":
-        sortAttribute = "minPrice:desc"
-        break
-      case "created_at":
-      default:
-        sortAttribute = "created_at:desc"
-        break
-    }
+    console.log(`[Algolia Search] Sort requested:`, sortBy)
 
     // Execute search
     const searchResults = await searchClient.search([{
@@ -136,9 +122,8 @@ export async function searchProductsWithAlgolia(
           'minPrice',
           'created_at',
           'updated_at'
-        ],
-        // Sort by the specified attribute
-        ...(sortAttribute && { sortBy: [sortAttribute] })
+        ]
+        // Note: Sorting will be handled by creating different indices or using Algolia's built-in ranking
       }
     }])
 
