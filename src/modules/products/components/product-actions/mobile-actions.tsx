@@ -23,6 +23,7 @@ type MobileActionsProps = {
   isAdding?: boolean
   show: boolean
   optionsDisabled: boolean
+  countryCode?: string
 }
 
 const MobileActions: React.FC<MobileActionsProps> = ({
@@ -35,15 +36,16 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   isAdding,
   show,
   optionsDisabled,
+  countryCode = 'us',
 }) => {
   const { state, open, close } = useToggleState()
 
   // Handle both Algolia and Medusa products
   let price
   if (isAlgoliaProduct(product)) {
-    // For Algolia products, use minPrice (variants not supported yet)
+    // For Algolia products, use region-specific pricing
     price = {
-      cheapestPrice: getAlgoliaProductPrice(product),
+      cheapestPrice: getAlgoliaProductPrice(product, countryCode),
       variantPrice: null
     }
   } else {

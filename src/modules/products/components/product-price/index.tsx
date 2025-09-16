@@ -7,15 +7,17 @@ import { HttpTypes } from "@medusajs/types"
 export default function ProductPrice({
   product,
   variant,
+  countryCode = 'us',
 }: {
   product: HttpTypes.StoreProduct
   variant?: HttpTypes.StoreProductVariant
+  countryCode?: string
 }) {
   let selectedPrice
   
   if (isAlgoliaProduct(product)) {
-    // For Algolia products, use minPrice (variants not supported yet)
-    selectedPrice = getAlgoliaProductPrice(product)
+    // For Algolia products, use region-specific pricing
+    selectedPrice = getAlgoliaProductPrice(product, countryCode)
   } else {
     const { cheapestPrice, variantPrice } = getProductPrice({
       product,

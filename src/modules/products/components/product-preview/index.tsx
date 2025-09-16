@@ -37,7 +37,7 @@ export default function ProductPreview({
   // Handle both Algolia and Medusa products
   let cheapestPrice
   if (isAlgoliaProduct(product)) {
-    cheapestPrice = getAlgoliaProductPrice(product)
+    cheapestPrice = getAlgoliaProductPrice(product, countryCode)
   } else {
     const priceResult = getProductPrice({
       product,

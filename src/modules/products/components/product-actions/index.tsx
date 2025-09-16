@@ -142,7 +142,7 @@ export default function ProductActions({
         </div>
       )}
 
-      <ProductPrice product={product} variant={selectedVariant} />
+      <ProductPrice product={product} variant={selectedVariant} countryCode={countryCode} />
 
       <p className="text-xs text-gray-500 mb-5">Enjoy complimentary shipping and returns within the United States</p>
 
@@ -194,6 +194,7 @@ export default function ProductActions({
           isAdding={isAdding}
           show={!inView}
           optionsDisabled={!!disabled || isAdding}
+          countryCode={countryCode}
         />
       </div>
     </div>

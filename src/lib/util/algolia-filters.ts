@@ -27,8 +27,20 @@ export interface AlgoliaProduct {
       calculated_amount: number
       currency_code: string
     }
+    pricing?: {
+      us?: {
+        calculated_amount: number
+        currency_code: string
+      }
+      eu?: {
+        calculated_amount: number
+        currency_code: string
+      }
+    }
   }>
   minPrice?: number | null
+  minPriceUs?: number | null
+  minPriceEu?: number | null
   created_at: string
   updated_at: string
 }

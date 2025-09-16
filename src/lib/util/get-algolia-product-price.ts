@@ -12,23 +12,52 @@ export interface AlgoliaProductPrice {
 }
 
 /**
- * Get price information from Algolia product using minPrice
+ * Determine which region pricing to use based on country code
  */
-export function getAlgoliaProductPrice(product: AlgoliaProduct): AlgoliaProductPrice | null {
-  if (!product.minPrice || product.minPrice <= 0) {
+function getRegionPricing(product: AlgoliaProduct, countryCode: string) {
+  // Map country codes to regions
+  const usCountries = ['us', 'ca'] // US and Canada use USD
+  const euCountries = ['gb', 'de', 'fr', 'it', 'es', 'nl', 'be', 'at', 'ie', 'pt', 'fi', 'dk', 'se', 'no', 'ch', 'lu', 'mt', 'cy', 'ee', 'lv', 'lt', 'pl', 'cz', 'sk', 'hu', 'si', 'hr', 'ro', 'bg', 'gr']
+  
+  const isUSRegion = usCountries.includes(countryCode.toLowerCase())
+  const isEURegion = euCountries.includes(countryCode.toLowerCase())
+  
+  if (isUSRegion) {
+    return {
+      minPrice: product.minPriceUs || product.minPrice,
+      currency: 'USD'
+    }
+  } else if (isEURegion) {
+    return {
+      minPrice: product.minPriceEu,
+      currency: 'EUR'
+    }
+  } else {
+    // Default to US pricing
+    return {
+      minPrice: product.minPriceUs || product.minPrice,
+      currency: 'USD'
+    }
+  }
+}
+
+/**
+ * Get price information from Algolia product using region-specific minPrice
+ */
+export function getAlgoliaProductPrice(product: AlgoliaProduct, countryCode: string = 'us'): AlgoliaProductPrice | null {
+  const regionPricing = getRegionPricing(product, countryCode)
+  
+  if (!regionPricing.minPrice || regionPricing.minPrice <= 0) {
     return null
   }
 
-  // Default to USD if no currency info available
-  const currency_code = "USD"
-
   return {
-    calculated_price_number: product.minPrice,
+    calculated_price_number: regionPricing.minPrice,
     calculated_price: convertToLocale({
-      amount: product.minPrice,
-      currency_code,
+      amount: regionPricing.minPrice,
+      currency_code: regionPricing.currency,
     }),
-    currency_code,
+    currency_code: regionPricing.currency,
     price_type: "default" as const,
   }
 }

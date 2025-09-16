@@ -87,8 +87,8 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                 {visibleProducts.map((product, index) => (
                   <Link 
                     key={product.id} 
-                    href={product.brand?.slug 
-                      ? `/products/${product.brand.slug}-${product.handle}`
+                    href={(product as any).brand?.slug 
+                      ? `/products/${(product as any).brand.slug}-${product.handle}`
                       : `/products/${product.handle}`}
                     className="group hover:opacity-80 transition-opacity"
                   >
@@ -111,8 +111,8 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                       <p className="text-gray-600">
                         {(() => {
                           if (isAlgoliaProduct(product)) {
-                            const algoliaPrice = getAlgoliaProductPrice(product)
-                            return algoliaPrice ? `$${algoliaPrice.calculated_price_number}` : 'Price not available'
+                            const algoliaPrice = getAlgoliaProductPrice(product, countryCode)
+                            return algoliaPrice ? algoliaPrice.calculated_price : 'Price not available'
                           } else {
                             return product.variants?.[0]?.calculated_price?.calculated_amount 
                               ? `$${product.variants[0].calculated_price.calculated_amount}`
