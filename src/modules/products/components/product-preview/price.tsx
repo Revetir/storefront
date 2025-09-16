@@ -2,20 +2,23 @@
 
 import { Text, clx } from "@medusajs/ui"
 import { VariantPrice } from "types/global"
+import { AlgoliaProductPrice } from "@lib/util/get-algolia-product-price"
 
-export default function PreviewPrice({ price }: { price: VariantPrice }) {
+type PreviewPriceData = VariantPrice | AlgoliaProductPrice
+
+export default function PreviewPrice({ price }: { price: PreviewPriceData }) {
   if (!price) {
     return null
   }
 
   return (
     <>
-      {price.price_type === "sale" && (
+      {price.price_type === "sale" && "original_price" in price && (
         <Text
           className="line-through text-ui-fg-muted"
           data-testid="original-price"
         >
-          {price.original_price}
+          {(price as VariantPrice).original_price}
         </Text>
       )}
       <Text

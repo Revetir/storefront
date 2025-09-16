@@ -3,6 +3,7 @@
 import { Text } from "@medusajs/ui"
 import { listProducts } from "@lib/data/products"
 import { getProductPrice } from "@lib/util/get-product-price"
+import { getAlgoliaProductPrice, isAlgoliaProduct } from "@lib/util/get-algolia-product-price"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
@@ -33,9 +34,16 @@ export default function ProductPreview({
   //   return null
   // }
 
-  const { cheapestPrice } = getProductPrice({
-    product,
-  })
+  // Handle both Algolia and Medusa products
+  let cheapestPrice
+  if (isAlgoliaProduct(product)) {
+    cheapestPrice = getAlgoliaProductPrice(product)
+  } else {
+    const priceResult = getProductPrice({
+      product,
+    })
+    cheapestPrice = priceResult.cheapestPrice
+  }
 
   const handleMouseEnter = () => {
     // Prefetch the product page on hover
