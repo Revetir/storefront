@@ -1,10 +1,10 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getCategoryByFlatHandle, listCategories } from "@lib/data/categories"
-import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
+import { searchProductsWithAlgolia, convertAlgoliaProductsToMedusaFormat } from "@lib/util/algolia-filters"
 
 type Props = {
   params: Promise<{ countryCode: string; gender: string; categorySlug: string }>
@@ -83,40 +83,22 @@ export default async function CategoryPage(props: Props) {
 
   const allCategories = await listCategories()
 
-  // TODO: Replace with Algolia filtering
-  // COMMENTED OUT: Medusa filtering logic - will be replaced with Algolia
-  /*
-  // Build category IDs for filtering (include children)
-  const collectCategoryIds = (cat: any): string[] => {
-    return [cat.id, ...(cat.children || []).flatMap(collectCategoryIds)]
-  }
-  const categoryIds = collectCategoryIds(category)
-
-  // Fetch products
+  // Fetch products using Algolia filtering
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
 
-  const {
-    response: { products, count },
-    totalPages,
-    currentPage,
-  } = await listProductsWithSort({
-    page: pageNumber,
-    queryParams: {
-      category_id: categoryIds,
-      // Include fields needed by the product grid (title/type) and brand for canonical links
-      fields: "handle,title,thumbnail,+brand.*,*type.*",
-    },
+  const algoliaResult = await searchProductsWithAlgolia({
+    gender: gender as "men" | "women",
+    categoryHandle: categorySlug,
     sortBy: sort,
-    countryCode,
+    page: pageNumber,
+    hitsPerPage: 20
   })
-  */
 
-  // TEMPORARY: Empty products array until Algolia filtering is implemented
-  const products: any[] = []
-  const count = 0
-  const totalPages = 0
-  const currentPage = 1
+  const products = convertAlgoliaProductsToMedusaFormat(algoliaResult.hits)
+  const count = algoliaResult.nbHits
+  const totalPages = algoliaResult.nbPages
+  const currentPage = algoliaResult.page
 
   return (
     <CategoryTemplate

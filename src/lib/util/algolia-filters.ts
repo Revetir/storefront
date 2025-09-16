@@ -1,0 +1,185 @@
+import { searchClient } from "@lib/config"
+import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+
+export interface AlgoliaProduct {
+  objectID: string
+  id: string
+  title: string
+  handle: string
+  thumbnail?: string
+  brand?: {
+    id: string
+    name: string
+    slug: string
+  }
+  gender: string[]
+  allCategoryHandles: string[]
+  allCategoryIds: string[]
+  categories: Array<{
+    id: string
+    handle: string
+    name: string
+  }>
+  variants?: Array<{
+    id: string
+    title: string
+    calculated_price?: {
+      calculated_amount: number
+      currency_code: string
+    }
+  }>
+  minPrice?: number | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AlgoliaSearchResult {
+  hits: AlgoliaProduct[]
+  nbHits: number
+  page: number
+  nbPages: number
+  hitsPerPage: number
+}
+
+export interface AlgoliaFilterOptions {
+  gender?: "men" | "women"
+  categoryHandle?: string
+  brandSlug?: string
+  sortBy?: SortOptions
+  page?: number
+  hitsPerPage?: number
+}
+
+/**
+ * Search products using Algolia with filters for category and brand
+ */
+export async function searchProductsWithAlgolia(
+  options: AlgoliaFilterOptions = {}
+): Promise<AlgoliaSearchResult> {
+  const {
+    gender,
+    categoryHandle,
+    brandSlug,
+    sortBy = "created_at",
+    page = 1,
+    hitsPerPage = 20
+  } = options
+
+  try {
+    const indexName = process.env.NEXT_PUBLIC_ALGOLIA_PRODUCT_INDEX_NAME
+    if (!indexName) {
+      throw new Error("Algolia product index name not configured")
+    }
+
+    // Build filters array
+    const filters: string[] = []
+
+    // Gender filter - convert to the format used in Algolia
+    if (gender) {
+      const genderValue = gender === "men" ? "menswear" : "womenswear"
+      filters.push(`gender:${genderValue}`)
+    }
+
+    // Category filter - use AllCategoryHandles attribute
+    if (categoryHandle) {
+      // Build the full category handle based on gender
+      const genderPrefix = gender === "men" ? "mens" : "womens"
+      const fullCategoryHandle = `${genderPrefix}-${categoryHandle}`
+      filters.push(`allCategoryHandles:${fullCategoryHandle}`)
+    }
+
+    // Brand filter
+    if (brandSlug) {
+      filters.push(`brand.slug:${brandSlug}`)
+    }
+
+    // Build sort attribute
+    let sortAttribute = "created_at:desc"
+    switch (sortBy) {
+      case "price_asc":
+        sortAttribute = "minPrice:asc"
+        break
+      case "price_desc":
+        sortAttribute = "minPrice:desc"
+        break
+      case "created_at":
+      default:
+        sortAttribute = "created_at:desc"
+        break
+    }
+
+    // Execute search
+    const searchResults = await searchClient.search([{
+      indexName,
+      params: {
+        query: "", // Empty query to get all products
+        filters: filters.length > 0 ? filters.join(" AND ") : undefined,
+        page: page - 1, // Algolia uses 0-based page indexing
+        hitsPerPage,
+        attributesToRetrieve: [
+          'objectID',
+          'id',
+          'title',
+          'handle',
+          'thumbnail',
+          'brand',
+          'gender',
+          'allCategoryHandles',
+          'categories',
+          'variants',
+          'minPrice',
+          'created_at',
+          'updated_at'
+        ],
+        // Sort by the specified attribute
+        ...(sortAttribute && { sortBy: [sortAttribute] })
+      }
+    }])
+
+    const result = searchResults.results[0]
+    if (!result) {
+      throw new Error("No search results returned from Algolia")
+    }
+
+    // Type assertion for proper Algolia search result
+    const searchResult = result as any
+
+    return {
+      hits: searchResult.hits as AlgoliaProduct[],
+      nbHits: searchResult.nbHits || 0,
+      page: (searchResult.page || 0) + 1, // Convert back to 1-based indexing
+      nbPages: searchResult.nbPages || 0,
+      hitsPerPage: searchResult.hitsPerPage || hitsPerPage
+    }
+  } catch (error) {
+    console.error("Error searching products with Algolia:", error)
+    
+    // Return empty result on error
+    return {
+      hits: [],
+      nbHits: 0,
+      page: 1,
+      nbPages: 0,
+      hitsPerPage
+    }
+  }
+}
+
+/**
+ * Convert Algolia products to the format expected by the UI components
+ */
+export function convertAlgoliaProductsToMedusaFormat(products: AlgoliaProduct[]): any[] {
+  return products.map(product => ({
+    id: product.id,
+    title: product.title,
+    handle: product.handle,
+    thumbnail: product.thumbnail,
+    brand: product.brand,
+    categories: product.categories,
+    variants: product.variants,
+    minPrice: product.minPrice,
+    created_at: product.created_at,
+    updated_at: product.updated_at,
+    // Add any other fields that might be expected by UI components
+  }))
+}

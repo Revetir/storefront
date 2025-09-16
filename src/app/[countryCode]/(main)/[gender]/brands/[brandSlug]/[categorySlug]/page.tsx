@@ -3,9 +3,9 @@ import { notFound } from "next/navigation"
 import { getBrandBySlug } from "@lib/data/brands"
 import { getCategoryByFlatHandle, listCategories } from "@lib/data/categories"
 import { getRegion } from "@lib/data/regions"
-import { listProductsWithBrandSupport } from "@lib/data/products"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
+import { searchProductsWithAlgolia, convertAlgoliaProductsToMedusaFormat } from "@lib/util/algolia-filters"
 
 type Props = {
   params: Promise<{ countryCode: string; gender: string; brandSlug: string; categorySlug: string }>
@@ -89,63 +89,29 @@ export default async function BrandCategoryPage(props: Props) {
     notFound()
   }
 
-  // TODO: Replace with Algolia filtering
-  // COMMENTED OUT: Medusa filtering logic - will be replaced with Algolia
-  /*
-  // Server-side filtering: use the enhanced products-with-brands endpoint
+  // Fetch products using Algolia filtering with both brand and category filters
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
 
-  // Build category IDs for the selected category including descendants
-  const collectCategoryIds = (cat: any): string[] => {
-    return [cat.id, ...(cat.children || []).flatMap(collectCategoryIds)]
-  }
-  const categoryIds = collectCategoryIds(category)
-
-  // Build gender category set for additional filtering
-  const allCategories = await listCategories()
-  const collectIds = (cat: any): string[] => [cat.id, ...(cat.children || []).flatMap(collectIds)]
-  const genderCategories = allCategories.filter((cat) => cat.handle.startsWith(`${genderPrefix}-`))
-  const genderCategoryIds = genderCategories.flatMap(collectIds)
-
-  // Combine category IDs: intersection of gender categories and selected category tree
-  const combinedCategoryIds = categoryIds.filter(id => genderCategoryIds.includes(id))
-
-  // Debug logging for development
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[Brand+Category Page] ${gender}/${brandSlug}/${categorySlug}`)
-    console.log(`[Brand+Category Page] Brand ID: ${brand.id}`)
-    console.log(`[Brand+Category Page] Category: ${category.name} (${category.id})`)
-    console.log(`[Brand+Category Page] Category IDs: ${categoryIds.length} [${categoryIds.slice(0, 3).join(', ')}${categoryIds.length > 3 ? '...' : ''}]`)
-    console.log(`[Brand+Category Page] Gender Category IDs: ${genderCategoryIds.length}`)
-    console.log(`[Brand+Category Page] Combined Category IDs: ${combinedCategoryIds.length} [${combinedCategoryIds.slice(0, 3).join(', ')}${combinedCategoryIds.length > 3 ? '...' : ''}]`)
-  }
-
-  // Use server-side filtering with both brand and category parameters
-  const {
-    response: { products, count },
-    totalPages,
-    currentPage,
-  } = await listProductsWithBrandSupport({
-    page: pageNumber,
-    queryParams: {
-      brand_id: [brand.id],
-      category_id: combinedCategoryIds.length > 0 ? combinedCategoryIds : categoryIds,
-      fields: "id,title,handle,status,thumbnail,created_at,updated_at,deleted_at,is_giftcard,discountable,description,subtitle,material,weight,length,height,width,hs_code,origin_country,mid_code,metadata,+brand.*,+categories.*,+variants.*,+images.*,+tags,+product_sku.*",
-    },
+  const algoliaResult = await searchProductsWithAlgolia({
+    gender: gender as "men" | "women",
+    brandSlug: brand.slug,
+    categoryHandle: categorySlug,
     sortBy: sort,
-    countryCode,
+    page: pageNumber,
+    hitsPerPage: 20
   })
-  */
 
-  // TEMPORARY: Empty products array until Algolia filtering is implemented
-  const products: any[] = []
-  const count = 0
-  const totalPages = 0
-  const currentPage = 1
+  const products = convertAlgoliaProductsToMedusaFormat(algoliaResult.hits)
+  const count = algoliaResult.nbHits
+  const totalPages = algoliaResult.nbPages
+  const currentPage = algoliaResult.page
 
   // Debug logging for products
   if (process.env.NODE_ENV === 'development') {
+    console.log(`[Brand+Category Page] ${gender}/${brandSlug}/${categorySlug}`)
+    console.log(`[Brand+Category Page] Brand: ${brand.name} (${brand.slug})`)
+    console.log(`[Brand+Category Page] Category: ${category.name} (${fullCategoryHandle})`)
     console.log(`[Brand+Category Page] Found ${products.length} products (${count} total)`)
     if (products.length > 0) {
       console.log(`[Brand+Category Page] First product: ${products[0].title}`)

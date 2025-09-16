@@ -3,9 +3,9 @@ import { notFound } from "next/navigation"
 import { getBrandBySlug } from "@lib/data/brands"
 import { getRegion } from "@lib/data/regions"
 import { listCategories } from "@lib/data/categories"
-import { listProductsWithBrandSupport } from "@lib/data/products"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
+import { searchProductsWithAlgolia, convertAlgoliaProductsToMedusaFormat } from "@lib/util/algolia-filters"
 
 type Props = {
   params: Promise<{ countryCode: string; gender: string; brandSlug: string }>
@@ -82,53 +82,27 @@ export default async function BrandPage(props: Props) {
     notFound()
   }
 
-  // TODO: Replace with Algolia filtering
-  // COMMENTED OUT: Medusa filtering logic - will be replaced with Algolia
-  /*
-  // Build gender category IDs for filtering (same logic as gender page)
-  const allCategories = await listCategories()
-  const collectCategoryIds = (cat: any): string[] => {
-    return [cat.id, ...(cat.children || []).flatMap(collectCategoryIds)]
-  }
-  
-  // Get all gender-specific categories (those that start with the gender prefix)
-  const genderPrefix = gender === "men" ? "mens" : "womens"
-  const genderCategories = allCategories.filter(cat => 
-    cat.handle.startsWith(`${genderPrefix}-`)
-  )
-  const genderCategoryIds = genderCategories.flatMap(collectCategoryIds)
-
-  // Fetch products using the correct brand-supporting endpoint
+  // Fetch products using Algolia filtering
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
 
-  const {
-    response: { products, count },
-    totalPages,
-    currentPage,
-  } = await listProductsWithBrandSupport({
-    page: pageNumber,
-    queryParams: {
-      brand_id: [brand.id],
-      category_id: genderCategoryIds,
-      // Ensure we get all necessary fields for product cards
-      fields: "id,title,handle,status,thumbnail,created_at,updated_at,deleted_at,is_giftcard,discountable,description,subtitle,material,weight,length,height,width,hs_code,origin_country,mid_code,metadata,+brand.*,+categories.*,+variants.*,+images.*",
-    },
+  const algoliaResult = await searchProductsWithAlgolia({
+    gender: gender as "men" | "women",
+    brandSlug: brand.slug,
     sortBy: sort,
-    countryCode,
+    page: pageNumber,
+    hitsPerPage: 20
   })
-  */
 
-  // TEMPORARY: Empty products array until Algolia filtering is implemented
-  const products: any[] = []
-  const count = 0
-  const totalPages = 0
-  const currentPage = 1
+  const products = convertAlgoliaProductsToMedusaFormat(algoliaResult.hits)
+  const count = algoliaResult.nbHits
+  const totalPages = algoliaResult.nbPages
+  const currentPage = algoliaResult.page
 
   // Log for debugging if needed
   if (process.env.NODE_ENV === 'development') {
     console.log(`[Brand Page] ${gender}/${brandSlug}: ${products.length} products found (${count} total)`)
-    console.log(`[Brand Page] Brand ID: ${brand.id}, Gender Category IDs: ${genderCategoryIds.length}`)
+    console.log(`[Brand Page] Brand ID: ${brand.id}`)
     if (products.length > 0) {
       console.log(`[Brand Page] First product brand data:`, (products[0] as any)?.brand)
       console.log(`[Brand Page] First product has variants:`, products[0]?.variants?.length)
