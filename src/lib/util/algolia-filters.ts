@@ -89,12 +89,14 @@ export async function searchProductsWithAlgolia(
       // Build the full category handle based on gender
       const genderPrefix = gender === "men" ? "mens" : "womens"
       const fullCategoryHandle = `${genderPrefix}-${categoryHandle}`
-      filters.push(`allCategoryHandles:${fullCategoryHandle}`)
+      filters.push(`allCategoryHandles:"${fullCategoryHandle}"`)
+      console.log(`[Algolia Search] Category filter: looking for "${fullCategoryHandle}" in allCategoryHandles`)
     }
 
     // Brand filter
     if (brandSlug) {
-      filters.push(`brand.slug:${brandSlug}`)
+      filters.push(`brand.slug:"${brandSlug}"`)
+      console.log(`[Algolia Search] Brand filter: looking for "${brandSlug}" in brand.slug`)
     }
 
     console.log(`[Algolia Search] Filters:`, filters)
@@ -138,6 +140,17 @@ export async function searchProductsWithAlgolia(
 
     // Type assertion for proper Algolia search result
     const searchResult = result as any
+
+    console.log(`[Algolia Search] Found ${searchResult.nbHits || 0} products`)
+    console.log(`[Algolia Search] Applied filters:`, filters.join(" AND "))
+    if (searchResult.hits && searchResult.hits.length > 0) {
+      console.log(`[Algolia Search] First hit sample:`, {
+        title: searchResult.hits[0].title,
+        brand: searchResult.hits[0].brand,
+        allCategoryHandles: searchResult.hits[0].allCategoryHandles,
+        gender: searchResult.hits[0].gender
+      })
+    }
 
     return {
       hits: searchResult.hits as AlgoliaProduct[],
