@@ -89,6 +89,9 @@ export default async function BrandCategoryPage(props: Props) {
     notFound()
   }
 
+  // TODO: Replace with Algolia filtering
+  // COMMENTED OUT: Medusa filtering logic - will be replaced with Algolia
+  /*
   // Server-side filtering: use the enhanced products-with-brands endpoint
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
@@ -133,6 +136,13 @@ export default async function BrandCategoryPage(props: Props) {
     sortBy: sort,
     countryCode,
   })
+  */
+
+  // TEMPORARY: Empty products array until Algolia filtering is implemented
+  const products: any[] = []
+  const count = 0
+  const totalPages = 0
+  const currentPage = 1
 
   // Debug logging for products
   if (process.env.NODE_ENV === 'development') {

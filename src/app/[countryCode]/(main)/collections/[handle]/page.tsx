@@ -81,6 +81,9 @@ export default async function CollectionPage(props: Props) {
     notFound()
   }
 
+  // TODO: Replace with Algolia filtering
+  // COMMENTED OUT: Medusa filtering logic - will be replaced with Algolia
+  /*
   // Fetch product data on the server
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
@@ -106,6 +109,18 @@ export default async function CollectionPage(props: Props) {
     sortBy: sort,
     countryCode: params.countryCode,
   })
+  */
+
+  const region = await getRegion(params.countryCode)
+  if (!region) {
+    notFound()
+  }
+
+  // TEMPORARY: Empty products array until Algolia filtering is implemented
+  const products: any[] = []
+  const count = 0
+  const totalPages = 0
+  const currentPage = 1
 
   return (
     <CollectionTemplate

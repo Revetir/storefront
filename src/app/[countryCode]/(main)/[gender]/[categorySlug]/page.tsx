@@ -83,6 +83,9 @@ export default async function CategoryPage(props: Props) {
 
   const allCategories = await listCategories()
 
+  // TODO: Replace with Algolia filtering
+  // COMMENTED OUT: Medusa filtering logic - will be replaced with Algolia
+  /*
   // Build category IDs for filtering (include children)
   const collectCategoryIds = (cat: any): string[] => {
     return [cat.id, ...(cat.children || []).flatMap(collectCategoryIds)]
@@ -107,6 +110,13 @@ export default async function CategoryPage(props: Props) {
     sortBy: sort,
     countryCode,
   })
+  */
+
+  // TEMPORARY: Empty products array until Algolia filtering is implemented
+  const products: any[] = []
+  const count = 0
+  const totalPages = 0
+  const currentPage = 1
 
   return (
     <CategoryTemplate

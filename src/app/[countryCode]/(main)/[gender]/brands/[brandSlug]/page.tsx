@@ -82,6 +82,9 @@ export default async function BrandPage(props: Props) {
     notFound()
   }
 
+  // TODO: Replace with Algolia filtering
+  // COMMENTED OUT: Medusa filtering logic - will be replaced with Algolia
+  /*
   // Build gender category IDs for filtering (same logic as gender page)
   const allCategories = await listCategories()
   const collectCategoryIds = (cat: any): string[] => {
@@ -114,6 +117,13 @@ export default async function BrandPage(props: Props) {
     sortBy: sort,
     countryCode,
   })
+  */
+
+  // TEMPORARY: Empty products array until Algolia filtering is implemented
+  const products: any[] = []
+  const count = 0
+  const totalPages = 0
+  const currentPage = 1
 
   // Log for debugging if needed
   if (process.env.NODE_ENV === 'development') {
