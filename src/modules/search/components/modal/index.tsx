@@ -2,11 +2,11 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import ReactDOM from "react-dom"
-import { Hits, InstantSearch, Configure } from "react-instantsearch"
+import { Hits, InstantSearch, Configure, Index } from "react-instantsearch"
 import { getSearchClient } from "@lib/util/search-privacy"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useSearchBox } from 'react-instantsearch';
+import { useSearchBox, useHits } from 'react-instantsearch';
 import Search from "@modules/common/icons/search"
 
 // Helper for click outside
@@ -158,7 +158,7 @@ export default function SearchModal() {
             </div>
             {/* Results area, with horizontal padding to match modal sides */}
             <div className="max-h-96 overflow-y-auto px-4 pb-4 md:px-8">
-              <SearchResults />
+              <SearchResults gender={gender} />
             </div>
           </InstantSearch>
         </div>,
@@ -207,7 +207,7 @@ function CustomSearchBox({ inputRef, onClose, gender }: { inputRef: React.RefObj
   );
 }
 
-const Hit = ({ hit }: { hit: any }) => {
+const ProductHit = ({ hit }: { hit: any }) => {
   const handleProductClick = () => {
     // Blur any focused input to prevent mobile zoom issues
     if (document.activeElement instanceof HTMLElement) {
@@ -238,8 +238,8 @@ const Hit = ({ hit }: { hit: any }) => {
         loading="lazy"
       />
       <div className="flex flex-col gap-y-1">
-        {hit.type && (
-          <span className="text-xs text-gray-500 uppercase tracking-wide">{hit.type}</span>
+        {hit.brand?.name && (
+          <span className="text-xs text-gray-500 uppercase tracking-wide">{hit.brand.name}</span>
         )}
         <h3>{hit.title}</h3>
         {/* <p className="text-sm text-gray-500">{hit.description}</p> */}
@@ -256,7 +256,98 @@ const Hit = ({ hit }: { hit: any }) => {
   )
 }
 
-function SearchResults() {
+const BrandHit = ({ hit, gender }: { hit: any, gender: "menswear" | "womenswear" }) => {
+  const handleBrandClick = () => {
+    // Blur any focused input to prevent mobile zoom issues
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    
+    // Force viewport reset on mobile
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      // Small delay to ensure the blur happens before navigation
+      setTimeout(() => {
+        // Force viewport to reset zoom level
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+          viewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
+        }
+      }, 100);
+    }
+  };
+
+  const genderPath = gender === "menswear" ? "men" : "women";
+
+  return (
+    <div className="flex flex-row gap-x-2 mt-4 relative">
+      <div 
+        className="w-[60px] h-[60px] bg-gray-100 flex items-center justify-center"
+        style={{ borderRadius: 4 }}
+      >
+        <span className="text-xs font-bold text-gray-600 uppercase">
+          {hit.name.substring(0, 3)}
+        </span>
+      </div>
+      <div className="flex flex-col gap-y-1">
+        <span className="text-xs text-gray-500 uppercase tracking-wide">BRAND</span>
+        <h3 className="font-semibold">{hit.name}</h3>
+        {hit.blurb && (
+          <p className="text-sm text-gray-500 line-clamp-2">{hit.blurb}</p>
+        )}
+      </div>
+      <Link 
+        href={`/${genderPath}/brands/${hit.slug}`}
+        className="absolute right-0 top-0 w-full h-full" 
+        aria-label={`View Brand: ${hit.name}`}
+        onClick={handleBrandClick}
+      />
+    </div>
+  )
+}
+
+// Component to conditionally show brands section only if there are brand results
+function BrandSection({ gender }: { gender: "menswear" | "womenswear" }) {
+  const { hits } = useHits();
+  
+  if (hits.length === 0) return null;
+  
+  return (
+    <div>
+      <h4 className="text-xs uppercase text-gray-500 font-bold tracking-wide mb-3">BRANDS</h4>
+      <Hits hitComponent={(props) => <BrandHit {...props} gender={gender} />} />
+    </div>
+  );
+}
+
+// Component to conditionally show products section only if there are product results
+function ProductSection() {
+  const { hits } = useHits();
+  
+  if (hits.length === 0) return null;
+  
+  return (
+    <div>
+      <h4 className="text-xs uppercase text-gray-500 font-bold tracking-wide mb-3">PRODUCTS</h4>
+      <Hits hitComponent={ProductHit} />
+    </div>
+  );
+}
+
+function SearchResults({ gender }: { gender: "menswear" | "womenswear" }) {
   const { query } = useSearchBox();
-  return query.trim() ? <Hits hitComponent={Hit} /> : null;
+  
+  if (!query.trim()) return null;
+  
+  return (
+    <div className="space-y-6">
+      {/* Brands Section - only shows if there are brand results */}
+      <Index indexName={process.env.NEXT_PUBLIC_ALGOLIA_BRAND_INDEX_NAME!}>
+        <Configure hitsPerPage={3} />
+        <BrandSection gender={gender} />
+      </Index>
+      
+      {/* Products Section - only shows if there are product results */}
+      <ProductSection />
+    </div>
+  );
 }
