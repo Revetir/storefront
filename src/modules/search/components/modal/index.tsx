@@ -2,11 +2,10 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import ReactDOM from "react-dom"
-import { Hits, InstantSearch, Configure, Index } from "react-instantsearch"
+import { Hits, InstantSearch, Configure, Index, useSearchBox, useHits } from "react-instantsearch"
 import { getSearchClient } from "@lib/util/search-privacy"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useSearchBox, useHits } from 'react-instantsearch';
 import Search from "@modules/common/icons/search"
 
 // Helper for click outside
@@ -305,19 +304,6 @@ const BrandHit = ({ hit, gender }: { hit: any, gender: "menswear" | "womenswear"
   )
 }
 
-// Component to conditionally show brands section only if there are brand results
-function BrandSection({ gender }: { gender: "menswear" | "womenswear" }) {
-  const { hits } = useHits();
-  
-  if (hits.length === 0) return null;
-  
-  return (
-    <div>
-      <h4 className="text-xs uppercase text-gray-500 font-bold tracking-wide mb-3">BRANDS</h4>
-      <Hits hitComponent={(props) => <BrandHit {...props} gender={gender} />} />
-    </div>
-  );
-}
 
 // Component to conditionally show products section only if there are product results
 function ProductSection() {
@@ -335,16 +321,53 @@ function ProductSection() {
 
 function SearchResults({ gender }: { gender: "menswear" | "womenswear" }) {
   const { query } = useSearchBox();
+  const [brandHits, setBrandHits] = useState<any[]>([]);
+  const [isLoadingBrands, setIsLoadingBrands] = useState(false);
+  
+  // Search brands when query changes
+  useEffect(() => {
+    if (!query.trim()) {
+      setBrandHits([]);
+      return;
+    }
+
+    const searchBrands = async () => {
+      setIsLoadingBrands(true);
+      try {
+        const searchClient = getSearchClient();
+        const response = await searchClient.search([{
+          indexName: process.env.NEXT_PUBLIC_ALGOLIA_BRAND_INDEX_NAME || 'brands',
+          query: query,
+          params: {
+            hitsPerPage: 3,
+          }
+        }]);
+        
+        setBrandHits(response.results[0]?.hits || []);
+      } catch (error) {
+        console.error('Error searching brands:', error);
+        setBrandHits([]);
+      } finally {
+        setIsLoadingBrands(false);
+      }
+    };
+
+    searchBrands();
+  }, [query]);
   
   if (!query.trim()) return null;
   
   return (
     <div className="space-y-6">
       {/* Brands Section - only shows if there are brand results */}
-      <Index indexName={process.env.NEXT_PUBLIC_ALGOLIA_BRAND_INDEX_NAME!}>
-        <Configure hitsPerPage={3} />
-        <BrandSection gender={gender} />
-      </Index>
+      {brandHits.length > 0 && (
+        <div>
+          <h4 className="text-xs uppercase text-gray-500 font-bold tracking-wide mb-3">BRANDS</h4>
+          {brandHits.map((hit) => (
+            <BrandHit key={hit.objectID} hit={hit} gender={gender} />
+          ))}
+        </div>
+      )}
       
       {/* Products Section - only shows if there are product results */}
       <ProductSection />
