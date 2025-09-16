@@ -71,6 +71,10 @@ export async function searchProductsWithAlgolia(
       throw new Error("Algolia product index name not configured")
     }
 
+    // Debug logging
+    console.log(`[Algolia Search] Starting search with index: ${indexName}`)
+    console.log(`[Algolia Search] Options:`, options)
+
     // Build filters array
     const filters: string[] = []
 
@@ -92,6 +96,8 @@ export async function searchProductsWithAlgolia(
     if (brandSlug) {
       filters.push(`brand.slug:${brandSlug}`)
     }
+
+    console.log(`[Algolia Search] Filters:`, filters)
 
     // Build sort attribute
     let sortAttribute = "created_at:desc"
@@ -141,6 +147,10 @@ export async function searchProductsWithAlgolia(
       throw new Error("No search results returned from Algolia")
     }
 
+    // Debug logging
+    console.log(`[Algolia Search] Raw search results:`, searchResults)
+    console.log(`[Algolia Search] First result:`, result)
+
     // Type assertion for proper Algolia search result
     const searchResult = result as any
 
@@ -153,6 +163,9 @@ export async function searchProductsWithAlgolia(
     }
   } catch (error) {
     console.error("Error searching products with Algolia:", error)
+    console.error("Search options were:", options)
+    console.error("Index name:", process.env.NEXT_PUBLIC_ALGOLIA_PRODUCT_INDEX_NAME)
+    console.error("Error occurred during Algolia search")
     
     // Return empty result on error
     return {
