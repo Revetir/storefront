@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { getNewestProducts } from '@lib/data/products'
 import { HttpTypes } from '@medusajs/types'
+import { getAlgoliaProductPrice, isAlgoliaProduct } from '@lib/util/get-algolia-product-price'
 
 interface NewArrivalsProps {
   countryCode: string
@@ -108,10 +109,16 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                       </p>
                       <h3 className="font-medium text-lg mb-1">{product.title}</h3>
                       <p className="text-gray-600">
-                        {product.variants?.[0]?.calculated_price?.calculated_amount 
-                          ? `$${product.variants[0].calculated_price.calculated_amount}`
-                          : 'Price not available'
-                        }
+                        {(() => {
+                          if (isAlgoliaProduct(product)) {
+                            const algoliaPrice = getAlgoliaProductPrice(product)
+                            return algoliaPrice ? `$${algoliaPrice.calculated_price_number}` : 'Price not available'
+                          } else {
+                            return product.variants?.[0]?.calculated_price?.calculated_amount 
+                              ? `$${product.variants[0].calculated_price.calculated_amount}`
+                              : 'Price not available'
+                          }
+                        })()}
                       </p>
                     </div>
                   </Link>

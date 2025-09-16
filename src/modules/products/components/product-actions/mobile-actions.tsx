@@ -7,6 +7,7 @@ import ChevronDown from "@modules/common/icons/chevron-down"
 import X from "@modules/common/icons/x"
 
 import { getProductPrice } from "@lib/util/get-product-price"
+import { getAlgoliaProductPrice, isAlgoliaProduct } from "@lib/util/get-algolia-product-price"
 import OptionSelect from "./option-select"
 import { HttpTypes } from "@medusajs/types"
 import { isSimpleProduct } from "@lib/util/product"
@@ -37,10 +38,20 @@ const MobileActions: React.FC<MobileActionsProps> = ({
 }) => {
   const { state, open, close } = useToggleState()
 
-  const price = getProductPrice({
-    product: product,
-    variantId: variant?.id,
-  })
+  // Handle both Algolia and Medusa products
+  let price
+  if (isAlgoliaProduct(product)) {
+    // For Algolia products, use minPrice (variants not supported yet)
+    price = {
+      cheapestPrice: getAlgoliaProductPrice(product),
+      variantPrice: null
+    }
+  } else {
+    price = getProductPrice({
+      product: product,
+      variantId: variant?.id,
+    })
+  }
 
   const selectedPrice = useMemo(() => {
     if (!price) {
