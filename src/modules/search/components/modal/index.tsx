@@ -278,28 +278,15 @@ const BrandHit = ({ hit, gender }: { hit: any, gender: "menswear" | "womenswear"
   const genderPath = gender === "menswear" ? "men" : "women";
 
   return (
-    <div className="flex flex-row gap-x-2 mt-4 relative">
-      <div 
-        className="w-[60px] h-[60px] bg-gray-100 flex items-center justify-center"
-        style={{ borderRadius: 4 }}
-      >
-        <span className="text-xs font-bold text-gray-600 uppercase">
-          {hit.name.substring(0, 3)}
-        </span>
-      </div>
-      <div className="flex flex-col gap-y-1">
-        <span className="text-xs text-gray-500 uppercase tracking-wide">BRAND</span>
-        <h3 className="font-semibold">{hit.name}</h3>
-        {hit.blurb && (
-          <p className="text-sm text-gray-500 line-clamp-2">{hit.blurb}</p>
-        )}
-      </div>
+    <div className="mt-4">
       <Link 
         href={`/${genderPath}/brands/${hit.slug}`}
-        className="absolute right-0 top-0 w-full h-full" 
+        className="text-black hover:text-gray-600 text-sm font-sans uppercase tracking-wide transition-colors"
         aria-label={`View Brand: ${hit.name}`}
         onClick={handleBrandClick}
-      />
+      >
+        {hit.name}
+      </Link>
     </div>
   )
 }
