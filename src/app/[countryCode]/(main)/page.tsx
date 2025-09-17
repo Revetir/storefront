@@ -65,7 +65,7 @@ export default async function Home(props: {
         <EditorialGrid />
       </div>
 
-      <div className="mt-20">
+      <div className="mt-10">
         <NewsSection />
       </div>
 
@@ -98,7 +98,7 @@ export default async function Home(props: {
             textAlign: "center",
             textTransform: "uppercase",
             fontWeight: "bold",
-            fontSize: "1.25rem",
+            fontSize: "1.75rem",
             color: "#000",
             textDecoration: "none",
             cursor: "pointer",
@@ -115,7 +115,7 @@ export default async function Home(props: {
             textAlign: "center",
             textTransform: "uppercase",
             fontWeight: "bold",
-            fontSize: "1.25rem",
+            fontSize: "1.75rem",
             color: "#000",
             textDecoration: "none",
             cursor: "pointer",
