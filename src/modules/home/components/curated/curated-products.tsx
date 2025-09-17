@@ -4,7 +4,7 @@ import Link from "next/link"
 const CuratedProducts = () => {
   return (
     <section className="w-full px-4 md:px-8 py-10">
-      <h2 className="text-2xl font-bold mb-6 text-left">Shop Curated Wardrobes</h2>
+      <h2 className="text-2xl font-bold mb-6 text-left uppercase">Shop Curated Wardrobes</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <Link href="/collections/streetwear">
           <div className="flex flex-col">
@@ -19,7 +19,7 @@ const CuratedProducts = () => {
                   unoptimized={true}
                 />
               </div>
-            <h3 className="text-center mt-2 text-lg font-medium">Streetwear</h3>
+            <h3 className="text-center mt-2 text-lg font-medium uppercase">Streetwear</h3>
           </div>
         </Link>
         <Link href="/collections/dark-luxury">
@@ -35,7 +35,7 @@ const CuratedProducts = () => {
                 unoptimized={true}
               />
             </div>
-            <h3 className="text-center mt-2 text-lg font-medium">Dark Luxury</h3>
+            <h3 className="text-center mt-2 text-lg font-medium uppercase">Dark Luxury</h3>
           </div>
         </Link>
         <Link href="/collections/retro-americana">
@@ -50,7 +50,7 @@ const CuratedProducts = () => {
                 unoptimized={true}
               />
             </div>
-            <h3 className="text-center mt-2 text-lg font-medium">Retro Americana</h3>
+            <h3 className="text-center mt-2 text-lg font-medium uppercase">Retro Americana</h3>
           </div>
         </Link>
         <Link href="collections/minimalist">
@@ -65,7 +65,7 @@ const CuratedProducts = () => {
                 unoptimized={true}
               />
             </div>
-            <h3 className="text-center mt-2 text-lg font-medium">Minimalist</h3>
+            <h3 className="text-center mt-2 text-lg font-medium uppercase">Minimalist</h3>
           </div>
         </Link>
       </div>

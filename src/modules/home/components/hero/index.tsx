@@ -88,9 +88,9 @@ const Hero = () => {
               padding: "2rem 0",
               textAlign: "center",
               textTransform: "uppercase",
-              fontWeight: "bold",
+              fontWeight: "600",
               fontSize: "1.75rem",
-              color: "#000",
+              color: "#333",
               textDecoration: "none",
               cursor: "pointer",
             }}
@@ -105,9 +105,9 @@ const Hero = () => {
               padding: "2rem 0",
               textAlign: "center",
               textTransform: "uppercase",
-              fontWeight: "bold",
+              fontWeight: "600",
               fontSize: "1.75rem",
-              color: "#000",
+              color: "#333",
               textDecoration: "none",
               cursor: "pointer",
             }}

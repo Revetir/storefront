@@ -65,7 +65,7 @@ export default async function Home(props: {
         <EditorialGrid />
       </div>
 
-      <div className="mt-10">
+      <div className="">
         <NewsSection />
       </div>
 
@@ -76,7 +76,7 @@ export default async function Home(props: {
       <div className="mt-20">
         <CuratedProducts />
       </div>
-      <div className="mt-20">
+      <div className="mt-10">
         <NewArrivals countryCode={countryCode} initialProducts={initialProducts} />
       </div>
 
@@ -97,9 +97,9 @@ export default async function Home(props: {
             padding: "2rem 0",
             textAlign: "center",
             textTransform: "uppercase",
-            fontWeight: "bold",
+            fontWeight: "600",
             fontSize: "1.75rem",
-            color: "#000",
+            color: "#333",
             textDecoration: "none",
             cursor: "pointer",
           }}
@@ -114,9 +114,9 @@ export default async function Home(props: {
             padding: "2rem 0",
             textAlign: "center",
             textTransform: "uppercase",
-            fontWeight: "bold",
+            fontWeight: "600",
             fontSize: "1.75rem",
-            color: "#000",
+            color: "#333",
             textDecoration: "none",
             cursor: "pointer",
           }}
