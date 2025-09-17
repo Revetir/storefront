@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react'
 import { getNewestProducts } from '@lib/data/products'
 import { HttpTypes } from '@medusajs/types'
 import { getAlgoliaProductPrice, isAlgoliaProduct } from '@lib/util/get-algolia-product-price'
+import { getProductPrice } from '@lib/util/get-product-price'
+import { Text, clx } from "@medusajs/ui"
 
 interface NewArrivalsProps {
   countryCode: string
@@ -84,14 +86,24 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
           <div className="lg:w-2/3">
             <div className="relative overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 transition-transform duration-500 ease-in-out">
-                {visibleProducts.map((product, index) => (
-                  <Link 
-                    key={product.id} 
-                    href={(product as any).brand?.slug 
-                      ? `/products/${(product as any).brand.slug}-${product.handle}`
-                      : `/products/${product.handle}`}
-                    className="group hover:opacity-80 transition-opacity"
-                  >
+                {visibleProducts.map((product, index) => {
+                  // Get proper pricing data like product preview does
+                  let cheapestPrice
+                  if (isAlgoliaProduct(product)) {
+                    cheapestPrice = getAlgoliaProductPrice(product, countryCode)
+                  } else {
+                    const priceResult = getProductPrice({ product })
+                    cheapestPrice = priceResult.cheapestPrice
+                  }
+
+                  return (
+                    <Link 
+                      key={product.id} 
+                      href={(product as any).brand?.slug 
+                        ? `/products/${(product as any).brand.slug}-${product.handle}`
+                        : `/products/${product.handle}`}
+                      className="group hover:opacity-80 transition-opacity"
+                    >
                     <div className="aspect-square relative mb-4">
                       <Image
                         src={product.thumbnail || "/images/imgi_1_elementor-placeholder-image.png"}
@@ -108,21 +120,34 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                         {(product as any).brand?.name || 'Product'}
                       </p>
                       <h3 className="font-medium text-lg mb-1">{product.title}</h3>
-                      <p className="text-gray-600">
-                        {(() => {
-                          if (isAlgoliaProduct(product)) {
-                            const algoliaPrice = getAlgoliaProductPrice(product, countryCode)
-                            return algoliaPrice ? algoliaPrice.calculated_price : 'Price not available'
-                          } else {
-                            return product.variants?.[0]?.calculated_price?.calculated_amount 
-                              ? `$${product.variants[0].calculated_price.calculated_amount}`
-                              : 'Price not available'
-                          }
-                        })()}
-                      </p>
+                      <div className="text-gray-600">
+                        {cheapestPrice ? (
+                          <>
+                            {cheapestPrice.price_type === "sale" && "original_price" in cheapestPrice && cheapestPrice.original_price && (
+                              <Text
+                                className="line-through text-ui-fg-muted"
+                                data-testid="original-price"
+                              >
+                                {cheapestPrice.original_price}
+                              </Text>
+                            )}
+                            <Text
+                              className={clx("text-ui-fg-muted", {
+                                "text-ui-fg-interactive": cheapestPrice.price_type === "sale",
+                              })}
+                              data-testid="price"
+                            >
+                              {cheapestPrice.calculated_price}
+                            </Text>
+                          </>
+                        ) : (
+                          'Price not available'
+                        )}
+                      </div>
                     </div>
                   </Link>
-                ))}
+                  )
+                })}
               </div>
             </div>
           </div>
