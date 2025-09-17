@@ -5,7 +5,8 @@ const CuratedProducts = () => {
   return (
     <section className="w-full px-4 md:px-8 py-10 select-none">
       <h2 className="text-2xl font-bold mb-6 text-left uppercase flex items-center" style={{ color: '#333' }}>
-        <span>Shop </span>
+        <span>Shop</span>
+        <span className="inline-block w-[0.25rem]"></span>
         <span className="text-lg font-medium tracking-wide text-black">REVETIR</span>
         <span>-curated wardrobes</span>
       </h2>
