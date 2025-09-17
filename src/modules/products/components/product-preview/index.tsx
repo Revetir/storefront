@@ -61,24 +61,43 @@ export default function ProductPreview({
     >
 
       <div data-testid="product-wrapper" className="h-full w-full flex flex-col">
-        <Thumbnail
-          thumbnail={product.thumbnail}
-          images={product.images}
-          size="full"
-          isFeatured={isFeatured}
-          product={product}
-          priority={priority}
-        />
-        <div className="flex flex-col txt-compact-medium mt-3 leading-snug space-y-1">
-          {(product as any)?.brand?.name && (
-            <p className="text-ui-fg-muted text-small font-medium leading-snug uppercase">
-              {(product as any).brand.name}
-            </p>
-          )}
-          <Text className="text-ui-fg-subtle leading-snug" data-testid="product-title">
-            {product.title}
-          </Text>
-          {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
+        {/* Thumbnail - fixed height for alignment */}
+        <div className="w-full aspect-square">
+          <Thumbnail
+            thumbnail={product.thumbnail}
+            images={product.images}
+            size="full"
+            isFeatured={isFeatured}
+            product={product}
+            priority={priority}
+          />
+        </div>
+        
+        {/* Product info - using CSS Grid for consistent alignment of top elements */}
+        <div className="mt-3 flex-1 flex flex-col">
+          {/* Brand - fixed height for alignment */}
+          <div className="h-5 flex items-center">
+            {(product as any)?.brand?.name && (
+              <p className="text-ui-fg-muted text-small font-medium leading-snug uppercase truncate">
+                {(product as any).brand.name}
+              </p>
+            )}
+          </div>
+          
+          {/* Title - fixed height for first line alignment, allows second line */}
+          <div className="h-10 flex items-start">
+            <Text 
+              className="text-ui-fg-subtle leading-snug line-clamp-2" 
+              data-testid="product-title"
+            >
+              {product.title}
+            </Text>
+          </div>
+          
+          {/* Price - flexible positioning, can be lower when title is 2 lines */}
+          <div className="mt-auto">
+            {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
+          </div>
         </div>
       </div>
     </LocalizedClientLink>
