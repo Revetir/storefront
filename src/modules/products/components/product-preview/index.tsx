@@ -73,8 +73,8 @@ export default function ProductPreview({
           />
         </div>
         
-        {/* Product info - using CSS Grid for consistent alignment of top elements */}
-        <div className="mt-3 flex-1 flex flex-col">
+        {/* Product info - using CSS Grid for consistent alignment */}
+        <div className="mt-3 flex-1 grid grid-rows-[auto_auto_1fr] gap-1">
           {/* Brand - fixed height for alignment */}
           <div className="h-5 flex items-center">
             {(product as any)?.brand?.name && (
@@ -84,15 +84,18 @@ export default function ProductPreview({
             )}
           </div>
           
-          {/* Title and Price - positioned together for dynamic spacing */}
-          <div className="h-10 flex flex-col justify-start">
+          {/* Title - first line aligned, allows second line */}
+          <div className="min-h-[1.5rem] flex items-start">
             <Text 
               className="text-ui-fg-subtle leading-snug line-clamp-2" 
               data-testid="product-title"
             >
               {product.title}
             </Text>
-            {/* Price - always mt-2 from actual text content */}
+          </div>
+          
+          {/* Price - positioned at start of remaining space, close to title */}
+          <div className="flex items-start">
             <div className="mt-2">
               {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
             </div>
