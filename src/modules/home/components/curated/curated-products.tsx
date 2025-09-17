@@ -4,7 +4,7 @@ import Link from "next/link"
 const CuratedProducts = () => {
   return (
     <section className="w-full px-4 md:px-8 py-10">
-      <h2 className="text-2xl font-bold mb-6 text-left uppercase">Shop Curated Wardrobes</h2>
+      <h2 className="text-3xl font-bold mb-6 text-left uppercase" style={{ color: '#333' }}>Shop Curated Wardrobes</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <Link href="/collections/streetwear">
           <div className="flex flex-col">

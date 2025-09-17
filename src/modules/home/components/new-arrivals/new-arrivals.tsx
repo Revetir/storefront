@@ -73,10 +73,13 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
         <div className="flex flex-col lg:flex-row lg:items-center">
           {/* Header - Left Side */}
           <div className="lg:w-1/3">
-            <h2 className="text-3xl font-bold text-left mb-4">NEW ARRIVALS</h2>
+            <h2 className="text-3xl font-bold text-left mb-4" style={{ color: '#333' }}>NEW ARRIVALS</h2>
             <Link 
               href="/store?sortBy=created_at"
-              className="inline-block bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition-colors w-fit"
+              className="inline-block px-6 py-3 rounded-md transition-colors w-fit"
+              style={{ backgroundColor: '#333', color: 'white' }}
+              onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#555'}
+              onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#333'}
             >
               SHOP ALL
             </Link>

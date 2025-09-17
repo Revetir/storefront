@@ -16,7 +16,7 @@ const FeaturedBrands = () => {
             <p className="text-sm font-medium mb-2 uppercase">Featured Brand</p>
             <h3 className="text-2xl font-bold mb-4 uppercase">Rebel Wave</h3>
             <LocalizedClientLink href="/men/brands/rebel-wave">
-              <button className="bg-white text-black px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors upperase">
+              <button className="bg-white text-black px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors uppercase">
                 Shop All
               </button>
             </LocalizedClientLink>
@@ -36,7 +36,7 @@ const FeaturedBrands = () => {
             <p className="text-sm font-medium mb-2 uppercase">Featured Brand</p>
             <h3 className="text-2xl font-bold mb-4 uppercase">COMMON/DIVISOR</h3>
             <LocalizedClientLink href="/men/brands/common-divisor">
-              <button className="bg-white text-black px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors upperase">
+              <button className="bg-white text-black px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors uppercase">
                 Shop All
               </button>
             </LocalizedClientLink>
