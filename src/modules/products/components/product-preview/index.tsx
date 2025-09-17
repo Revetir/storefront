@@ -96,7 +96,7 @@ export default function ProductPreview({
           
           {/* Price - positioned at start of remaining space, close to title */}
           <div className="flex items-start">
-            <div className="mt-2">
+            <div className="">
               {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
             </div>
           </div>
