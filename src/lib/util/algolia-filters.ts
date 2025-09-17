@@ -107,17 +107,17 @@ export async function searchProductsWithAlgolia(
     }
 
 
-    // Map frontend sort options to Algolia sorting
-    const getAlgoliaSort = (sortBy: SortOptions): string[] => {
+    // Map frontend sort options to Algolia ranking
+    const getAlgoliaRanking = (sortBy: SortOptions): string[] => {
       switch (sortBy) {
         case "created_at":
-          return ["created_at:desc"] // Newest first
+          return ["desc(created_at)", "typo", "geo", "words", "proximity", "attribute", "exact", "custom"]
         case "price_asc":
-          return ["minPriceUs:asc", "created_at:desc"] // Price low to high, then by newest
+          return ["asc(minPriceUs)", "desc(created_at)", "typo", "geo", "words", "proximity", "attribute", "exact", "custom"]
         case "price_desc":
-          return ["minPriceUs:desc", "created_at:desc"] // Price high to low, then by newest
+          return ["desc(minPriceUs)", "desc(created_at)", "typo", "geo", "words", "proximity", "attribute", "exact", "custom"]
         default:
-          return ["created_at:desc"]
+          return ["desc(created_at)", "typo", "geo", "words", "proximity", "attribute", "exact", "custom"]
       }
     }
 
@@ -129,7 +129,7 @@ export async function searchProductsWithAlgolia(
         filters: filters.length > 0 ? filters.join(" AND ") : undefined,
         page: page - 1, // Algolia uses 0-based page indexing
         hitsPerPage,
-        ranking: getAlgoliaSort(sortBy),
+        ranking: getAlgoliaRanking(sortBy),
         attributesToRetrieve: [
           'objectID',
           'id',
