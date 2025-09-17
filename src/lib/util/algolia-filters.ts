@@ -107,29 +107,37 @@ export async function searchProductsWithAlgolia(
     }
 
 
-    // Map frontend sort options to Algolia ranking
-    const getAlgoliaRanking = (sortBy: SortOptions): string[] => {
+    // Map frontend sort options to Algolia index names
+    // Note: You'll need to create replica indices in Algolia dashboard for each sort option
+    const getAlgoliaIndexName = (sortBy: SortOptions): string => {
+      const baseIndexName = process.env.NEXT_PUBLIC_ALGOLIA_PRODUCT_INDEX_NAME
+      if (!baseIndexName) {
+        throw new Error("Algolia product index name not configured")
+      }
+      
       switch (sortBy) {
         case "created_at":
-          return ["desc(created_at)", "typo", "geo", "words", "proximity", "attribute", "exact", "custom"]
+          return baseIndexName // Default index (newest first)
         case "price_asc":
-          return ["asc(minPriceUs)", "desc(created_at)", "typo", "geo", "words", "proximity", "attribute", "exact", "custom"]
+          return `${baseIndexName}_price_asc` // Replica index for price ascending
         case "price_desc":
-          return ["desc(minPriceUs)", "desc(created_at)", "typo", "geo", "words", "proximity", "attribute", "exact", "custom"]
+          return `${baseIndexName}_price_desc` // Replica index for price descending
         default:
-          return ["desc(created_at)", "typo", "geo", "words", "proximity", "attribute", "exact", "custom"]
+          return baseIndexName
       }
     }
 
+    // Get the appropriate index name based on sorting
+    const searchIndexName = getAlgoliaIndexName(sortBy)
+
     // Execute search
     const searchResults = await searchClient.search([{
-      indexName,
+      indexName: searchIndexName,
       params: {
         query: "", // Empty query to get all products
         filters: filters.length > 0 ? filters.join(" AND ") : undefined,
         page: page - 1, // Algolia uses 0-based page indexing
         hitsPerPage,
-        ranking: getAlgoliaRanking(sortBy),
         attributesToRetrieve: [
           'objectID',
           'id',
