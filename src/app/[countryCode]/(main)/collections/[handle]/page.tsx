@@ -101,7 +101,7 @@ export default async function CollectionPage(props: Props) {
     queryParams: {
       collection_id: [collection.id],
       // Include fields needed by the product grid (title/type) and brand for canonical links
-      fields: "handle,title,thumbnail,*brand.*,*type.*",
+      fields: "handle,title,thumbnail,+brand.*,*type.*",
     },
     sortBy: sort,
     countryCode: params.countryCode,
