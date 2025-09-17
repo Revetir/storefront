@@ -7,7 +7,7 @@ import { StoreCollection, StoreRegion } from "@medusajs/types"
 import CollectionTemplate from "@modules/collections/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { getRegion } from "@lib/data/regions"
-import { searchProductsWithAlgolia, convertAlgoliaProductsToMedusaFormat } from "@lib/util/algolia-filters"
+import { listProductsWithSort } from "@lib/data/products"
 
 type Props = {
   params: Promise<{ handle: string; countryCode: string }>
@@ -81,26 +81,31 @@ export default async function CollectionPage(props: Props) {
     notFound()
   }
 
+  // Fetch product data using Medusa's native filtering
+  const pageNumber = page ? parseInt(page) : 1
+  const sort = sortBy || "created_at"
+
   const region = await getRegion(params.countryCode)
+
   if (!region) {
     notFound()
   }
 
-  // Fetch products using Algolia filtering
-  const pageNumber = page ? parseInt(page, 10) : 1
-  const sort = sortBy || "created_at"
-
-  const algoliaResult = await searchProductsWithAlgolia({
-    collectionHandle: params.handle,
-    sortBy: sort,
+  // Use server-side pagination with collection filtering
+  const {
+    response: { products, count },
+    totalPages,
+    currentPage,
+  } = await listProductsWithSort({
     page: pageNumber,
-    hitsPerPage: 20
+    queryParams: {
+      collection_id: [collection.id],
+      // Include fields needed by the product grid (title/type) and brand for canonical links
+      fields: "handle,title,thumbnail,*brand.*,*type.*",
+    },
+    sortBy: sort,
+    countryCode: params.countryCode,
   })
-
-  const products = convertAlgoliaProductsToMedusaFormat(algoliaResult.hits)
-  const count = algoliaResult.nbHits
-  const totalPages = algoliaResult.nbPages
-  const currentPage = algoliaResult.page
 
   return (
     <CollectionTemplate

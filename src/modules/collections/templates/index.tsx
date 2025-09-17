@@ -3,9 +3,8 @@
 import { Suspense, useState } from "react"
 
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
-import RefinementList from "@modules/store/components/refinement-list"
-import MobileRefinementPanel from "@modules/store/components/mobile-refinement-panel"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import MobileRefinementPanel from "@modules/store/components/mobile-refinement-panel"
 
 import PaginatedProductsClient from "@modules/store/templates/paginated-products-client"
 
@@ -45,15 +44,6 @@ const CollectionTemplate = ({
                   <div className="flex gap-2 w-full">
                     <button
                       onClick={() => {
-                        setActiveRefinementTab("refine")
-                        setIsMobileRefinementOpen(true)
-                      }}
-                      className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
-                    >
-                      Refine
-                    </button>
-                    <button
-                      onClick={() => {
                         setActiveRefinementTab("sort")
                         setIsMobileRefinementOpen(true)
                       }}
@@ -84,15 +74,6 @@ const CollectionTemplate = ({
                   <div className="flex gap-2 w-full">
                     <button
                       onClick={() => {
-                        setActiveRefinementTab("refine")
-                        setIsMobileRefinementOpen(true)
-                      }}
-                      className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
-                    >
-                      Refine
-                    </button>
-                    <button
-                      onClick={() => {
                         setActiveRefinementTab("sort")
                         setIsMobileRefinementOpen(true)
                       }}
@@ -117,12 +98,8 @@ const CollectionTemplate = ({
             <div className="flex justify-center w-full">
               <div className="max-w-[1200px] px-6">
                 <div className="flex gap-8">
-                  {/* Compact Sidebar */}
-                  <div className="w-64 flex-shrink-0">
-                    <RefinementList sortBy={sort} />
-                  </div>
-                  {/* Product Grid */}
-                  <div className="flex-1">
+                  {/* Product Grid - Full Width */}
+                  <div className="w-full">
                     <PaginatedProductsClient
                       products={products}
                       region={region}
@@ -135,14 +112,9 @@ const CollectionTemplate = ({
             </div>
           </div>
 
-          {/* Large Desktop Layout - > 1725px (Original Layout) */}
+          {/* Large Desktop Layout - > 1725px */}
           <div className="hidden large:block">
             <div className="relative">
-              {/* Desktop Refinement List - Original positioning */}
-              <div className="absolute left-9 top-0 z-10">
-                <RefinementList sortBy={sort} />
-              </div>
-              
               <div className="flex justify-center w-full">
                 <div className="max-w-[1200px] px-4 md:px-6">
                   <PaginatedProductsClient
@@ -158,7 +130,7 @@ const CollectionTemplate = ({
         </div>
       </div>
 
-      {/* Mobile Refinement Panel */}
+      {/* Mobile Refinement Panel - Only for sorting now */}
       <MobileRefinementPanel
         isOpen={isMobileRefinementOpen}
         onClose={() => setIsMobileRefinementOpen(false)}
