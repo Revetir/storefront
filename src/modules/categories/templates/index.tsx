@@ -90,7 +90,7 @@ const CategoryTemplate = ({
             </div>
           </div>
 
-          {/* Tablet Layout - 767px - 1022px */}
+          {/* Tablet Layout - 768px - 1023px */}
           <div className="hidden md:block small:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[768px] px-4">
@@ -116,17 +116,20 @@ const CategoryTemplate = ({
                     </button>
                   </div>
                 </div>
-                <PaginatedProductsClient
-                  products={products}
-                  region={region}
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                />
+                
+                <div className="w-full">
+                  <PaginatedProductsClient
+                    products={products}
+                    region={region}
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Small Desktop Layout - 1023px - 1725px */}
+          {/* Small Desktop Layout - 1024px - 1724px */}
           <div className="hidden small:block large:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[1200px] px-6">
@@ -149,7 +152,7 @@ const CategoryTemplate = ({
             </div>
           </div>
 
-          {/* Large Desktop Layout - > 1725px (Original Layout) */}
+          {/* Large Desktop Layout - >= 1725px */}
           <div className="hidden large:block">
             <div className="relative">
               {/* Desktop Refinement List - Original positioning */}
