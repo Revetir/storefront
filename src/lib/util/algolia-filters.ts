@@ -86,6 +86,11 @@ export async function searchProductsWithAlgolia(
     // Debug logging
     console.log(`[Algolia Search] Starting search with index: ${indexName}`)
     console.log(`[Algolia Search] Options:`, options)
+    console.log(`[Algolia Search] Environment check:`, {
+      appId: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID ? 'SET' : 'MISSING',
+      apiKey: process.env.NEXT_PUBLIC_ALGOLIA_API_KEY ? 'SET' : 'MISSING',
+      indexName: process.env.NEXT_PUBLIC_ALGOLIA_PRODUCT_INDEX_NAME ? 'SET' : 'MISSING'
+    })
 
     // Build filters array
     const filters: string[] = []
@@ -113,6 +118,7 @@ export async function searchProductsWithAlgolia(
 
     console.log(`[Algolia Search] Filters:`, filters)
     console.log(`[Algolia Search] Sort requested:`, sortBy)
+    console.log(`[Algolia Search] Index name:`, indexName)
 
     // Execute search
     const searchResults = await searchClient.search([{
