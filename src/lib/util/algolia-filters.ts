@@ -15,11 +15,19 @@ export interface AlgoliaProduct {
   gender: string[]
   allCategoryHandles: string[]
   allCategoryIds: string[]
+  allCollectionHandles: string[]
+  allCollectionIds: string[]
   categories: Array<{
     id: string
     handle: string
     name: string
   }>
+  collections: Array<{
+    id: string
+    handle: string
+    title: string
+  }>
+  metadata?: Record<string, any>
   variants?: Array<{
     id: string
     title: string
@@ -63,6 +71,7 @@ export interface AlgoliaFilterOptions {
   gender?: "men" | "women"
   categoryHandle?: string
   brandSlug?: string
+  collectionHandle?: string
   sortBy?: SortOptions
   page?: number
   hitsPerPage?: number
@@ -78,6 +87,7 @@ export async function searchProductsWithAlgolia(
     gender,
     categoryHandle,
     brandSlug,
+    collectionHandle,
     sortBy = "created_at",
     page = 1,
     hitsPerPage = 20
@@ -110,6 +120,11 @@ export async function searchProductsWithAlgolia(
     // Brand filter
     if (brandSlug) {
       filters.push(`brand.slug:"${brandSlug}"`)
+    }
+
+    // Collection filter
+    if (collectionHandle) {
+      filters.push(`allCollectionHandles:"${collectionHandle}"`)
     }
 
 
@@ -153,7 +168,10 @@ export async function searchProductsWithAlgolia(
           'brand',
           'gender',
           'allCategoryHandles',
+          'allCollectionHandles',
           'categories',
+          'collections',
+          'metadata',
           'variants',
           'minPrice',
           'minPriceUs',
@@ -204,6 +222,8 @@ export function convertAlgoliaProductsToMedusaFormat(products: AlgoliaProduct[])
     thumbnail: product.thumbnail,
     brand: product.brand,
     categories: product.categories,
+    collections: product.collections,
+    metadata: product.metadata,
     variants: product.variants,
     minPrice: product.minPrice,
     minPriceUs: product.minPriceUs,

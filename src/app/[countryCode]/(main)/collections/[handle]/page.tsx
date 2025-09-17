@@ -6,8 +6,8 @@ import { listRegions } from "@lib/data/regions"
 import { StoreCollection, StoreRegion } from "@medusajs/types"
 import CollectionTemplate from "@modules/collections/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { searchProductsWithAlgolia, convertAlgoliaProductsToMedusaFormat } from "@lib/util/algolia-filters"
 
 type Props = {
   params: Promise<{ handle: string; countryCode: string }>
@@ -81,46 +81,26 @@ export default async function CollectionPage(props: Props) {
     notFound()
   }
 
-  // TODO: Replace with Algolia filtering
-  // COMMENTED OUT: Medusa filtering logic - will be replaced with Algolia
-  /*
-  // Fetch product data on the server
-  const pageNumber = page ? parseInt(page) : 1
+  const region = await getRegion(params.countryCode)
+  if (!region) {
+    notFound()
+  }
+
+  // Fetch products using Algolia filtering
+  const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
 
-  const region = await getRegion(params.countryCode)
-
-  if (!region) {
-    notFound()
-  }
-
-  // Use server-side pagination
-  const {
-    response: { products, count },
-    totalPages,
-    currentPage,
-  } = await listProductsWithSort({
-    page: pageNumber,
-    queryParams: {
-      collection_id: [collection.id],
-      // Include fields needed by the product grid (title/type) and brand for canonical links
-      fields: "handle,title,thumbnail,*brand.*,*type.*",
-    },
+  const algoliaResult = await searchProductsWithAlgolia({
+    collectionHandle: params.handle,
     sortBy: sort,
-    countryCode: params.countryCode,
+    page: pageNumber,
+    hitsPerPage: 20
   })
-  */
 
-  const region = await getRegion(params.countryCode)
-  if (!region) {
-    notFound()
-  }
-
-  // TEMPORARY: Empty products array until Algolia filtering is implemented
-  const products: any[] = []
-  const count = 0
-  const totalPages = 0
-  const currentPage = 1
+  const products = convertAlgoliaProductsToMedusaFormat(algoliaResult.hits)
+  const count = algoliaResult.nbHits
+  const totalPages = algoliaResult.nbPages
+  const currentPage = algoliaResult.page
 
   return (
     <CollectionTemplate
