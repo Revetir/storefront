@@ -105,7 +105,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                     </div>
                     <div className="text-left">
                       <p className="text-sm text-gray-500 mb-1 uppercase tracking-wide">
-                        {product.type?.value || 'Product'}
+                        {(product as any).brand?.name || 'Product'}
                       </p>
                       <h3 className="font-medium text-lg mb-1">{product.title}</h3>
                       <p className="text-gray-600">

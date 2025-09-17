@@ -314,6 +314,7 @@ export const getNewestProduct = async ({
 
 /**
  * Fetch the three newest products (sorted by created_at desc)
+ * Uses listProductsWithBrandSupport to ensure brand data is included
  */
 export const getNewestProducts = async ({
   countryCode,
@@ -325,12 +326,12 @@ export const getNewestProducts = async ({
   try {
     const {
       response: { products },
-    } = await listProducts({
-      pageParam: 1,
+    } = await listProductsWithBrandSupport({
+      page: 1,
       queryParams: {
         limit,
-        order: "-created_at", // Descending order for newest first
       },
+      sortBy: "created_at", // Descending order for newest first
       countryCode,
     })
 
