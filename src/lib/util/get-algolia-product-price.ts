@@ -87,6 +87,17 @@ export function getAlgoliaProductPrice(product: AlgoliaProduct, countryCode: str
   const isSale = cheapestVariant.price_list_type === "sale"
   const hasOriginalPrice = cheapestVariant.original_amount && cheapestVariant.original_amount > cheapestVariant.calculated_amount
 
+  // Debug logging (remove in production)
+  if (isSale) {
+    console.log('Sale price detected:', {
+      calculated_amount: cheapestVariant.calculated_amount,
+      original_amount: cheapestVariant.original_amount,
+      price_list_type: cheapestVariant.price_list_type,
+      hasOriginalPrice,
+      isSale
+    })
+  }
+
   const result: AlgoliaProductPrice = {
     calculated_price_number: cheapestVariant.calculated_amount,
     calculated_price: convertToLocale({
@@ -108,6 +119,14 @@ export function getAlgoliaProductPrice(product: AlgoliaProduct, countryCode: str
       cheapestVariant.original_amount,
       cheapestVariant.calculated_amount
     )
+    
+    // Debug logging (remove in production)
+    console.log('Sale price result:', {
+      calculated_price: result.calculated_price,
+      original_price: result.original_price,
+      price_type: result.price_type,
+      percentage_diff: result.percentage_diff
+    })
   }
 
   return result
@@ -173,13 +192,13 @@ export function getVariantPrice(variant: any, countryCode: string = 'us'): Algol
 }
 
 /**
- * Check if a product is from Algolia (has minPrice but no variants with calculated_price)
+ * Check if a product is from Algolia (has minPrice and pricing structure)
  */
 export function isAlgoliaProduct(product: any): product is AlgoliaProduct {
   return (
     product.minPrice !== undefined &&
-    (!product.variants || 
-     product.variants.length === 0 || 
-     !product.variants[0]?.calculated_price?.calculated_amount)
+    product.variants &&
+    product.variants.length > 0 &&
+    product.variants[0]?.pricing !== undefined
   )
 }

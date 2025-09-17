@@ -13,12 +13,12 @@ export default function PreviewPrice({ price }: { price: PreviewPriceData }) {
 
   return (
     <>
-      {price.price_type === "sale" && "original_price" in price && (
+      {price.price_type === "sale" && "original_price" in price && price.original_price && (
         <Text
           className="line-through text-ui-fg-muted"
           data-testid="original-price"
         >
-          {(price as VariantPrice).original_price}
+          {price.original_price}
         </Text>
       )}
       <Text
