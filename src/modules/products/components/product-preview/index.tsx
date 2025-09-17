@@ -84,19 +84,18 @@ export default function ProductPreview({
             )}
           </div>
           
-          {/* Title - fixed height for first line alignment, allows second line */}
-          <div className="h-10 flex items-start">
+          {/* Title and Price - positioned together for dynamic spacing */}
+          <div className="h-10 flex flex-col justify-start">
             <Text 
               className="text-ui-fg-subtle leading-snug line-clamp-2" 
               data-testid="product-title"
             >
               {product.title}
             </Text>
-          </div>
-          
-          {/* Price - positioned closer to title, can be lower when title is 2 lines */}
-          <div className="mt-2">
-            {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
+            {/* Price - always mt-2 from actual text content */}
+            <div className="mt-2">
+              {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
+            </div>
           </div>
         </div>
       </div>
