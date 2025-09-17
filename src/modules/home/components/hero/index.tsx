@@ -15,6 +15,7 @@ const Hero = () => {
         margin: "0 auto",
         padding: "2rem 1rem",
         fontFamily: "Sans-serif",
+        userSelect: "none",
       }}
       aria-label="Grand Opening Sale Hero Banner"
     >

@@ -68,7 +68,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
   const visibleProducts = products.slice(currentIndex, currentIndex + 3)
 
   return (
-    <section className="w-full px-4 md:px-16 py-10">
+    <section className="w-full px-4 md:px-16 py-10 select-none">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row lg:items-center">
           {/* Header - Left Side */}

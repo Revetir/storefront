@@ -3,7 +3,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 
 const FeaturedBrands = () => {
   return (
-    <section className="w-full px-4 md:px-8 lg:px-16 mt-16">
+    <section className="w-full px-4 md:px-8 lg:px-16 mt-16 select-none">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         <div className="relative h-[800px] w-full">
           <Image

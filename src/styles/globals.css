@@ -132,4 +132,15 @@
   body {
     @apply font-sans;
   }
+
+  /* Custom text selection styling */
+  ::selection {
+    background-color: #d1d5db; /* light gray */
+    color: inherit;
+  }
+
+  ::-moz-selection {
+    background-color: #d1d5db; /* light gray */
+    color: inherit;
+  }
 }
