@@ -25,16 +25,22 @@ export interface AlgoliaProduct {
     title: string
     calculated_price?: {
       calculated_amount: number
+      original_amount: number
       currency_code: string
+      price_list_type: string
     }
     pricing?: {
       us?: {
         calculated_amount: number
+        original_amount: number
         currency_code: string
+        price_list_type: string
       }
       eu?: {
         calculated_amount: number
+        original_amount: number
         currency_code: string
+        price_list_type: string
       }
     }
   }>

@@ -1,7 +1,7 @@
 import { clx } from "@medusajs/ui"
 
 import { getProductPrice } from "@lib/util/get-product-price"
-import { getAlgoliaProductPrice, isAlgoliaProduct } from "@lib/util/get-algolia-product-price"
+import { getAlgoliaProductPrice, getVariantPrice, isAlgoliaProduct } from "@lib/util/get-algolia-product-price"
 import { HttpTypes } from "@medusajs/types"
 
 export default function ProductPrice({
@@ -17,7 +17,11 @@ export default function ProductPrice({
   
   if (isAlgoliaProduct(product)) {
     // For Algolia products, use region-specific pricing
-    selectedPrice = getAlgoliaProductPrice(product, countryCode)
+    if (variant) {
+      selectedPrice = getVariantPrice(variant, countryCode)
+    } else {
+      selectedPrice = getAlgoliaProductPrice(product, countryCode)
+    }
   } else {
     const { cheapestPrice, variantPrice } = getProductPrice({
       product,
