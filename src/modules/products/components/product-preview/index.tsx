@@ -94,8 +94,8 @@ export default function ProductPreview({
             </Text>
           </div>
           
-          {/* Price - flexible positioning, can be lower when title is 2 lines */}
-          <div className="mt-auto">
+          {/* Price - positioned closer to title, can be lower when title is 2 lines */}
+          <div className="mt-2">
             {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
           </div>
         </div>
