@@ -63,6 +63,26 @@ export function getAlgoliaProductPrice(product: AlgoliaProduct, countryCode: str
 }
 
 /**
+ * Get variant pricing for a specific region
+ */
+export function getVariantPricing(variant: any, countryCode: string = 'us') {
+  const usCountries = ['us', 'ca']
+  const euCountries = ['gb', 'de', 'fr', 'it', 'es', 'nl', 'be', 'at', 'ie', 'pt', 'fi', 'dk', 'se', 'no', 'ch', 'lu', 'mt', 'cy', 'ee', 'lv', 'lt', 'pl', 'cz', 'sk', 'hu', 'si', 'hr', 'ro', 'bg', 'gr']
+  
+  const isUSRegion = usCountries.includes(countryCode.toLowerCase())
+  const isEURegion = euCountries.includes(countryCode.toLowerCase())
+  
+  if (isUSRegion && variant.pricing?.us) {
+    return variant.pricing.us
+  } else if (isEURegion && variant.pricing?.eu) {
+    return variant.pricing.eu
+  } else {
+    // Fallback to US pricing or original calculated_price
+    return variant.pricing?.us || variant.calculated_price
+  }
+}
+
+/**
  * Check if a product is from Algolia (has minPrice but no variants with calculated_price)
  */
 export function isAlgoliaProduct(product: any): product is AlgoliaProduct {

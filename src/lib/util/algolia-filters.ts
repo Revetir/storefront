@@ -134,6 +134,8 @@ export async function searchProductsWithAlgolia(
           'categories',
           'variants',
           'minPrice',
+          'minPriceUs',
+          'minPriceEu',
           'created_at',
           'updated_at'
         ]
@@ -201,6 +203,8 @@ export function convertAlgoliaProductsToMedusaFormat(products: AlgoliaProduct[])
     categories: product.categories,
     variants: product.variants,
     minPrice: product.minPrice,
+    minPriceUs: product.minPriceUs,
+    minPriceEu: product.minPriceEu,
     created_at: product.created_at,
     updated_at: product.updated_at,
     // Add any other fields that might be expected by UI components
