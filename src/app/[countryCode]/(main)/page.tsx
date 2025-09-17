@@ -61,7 +61,7 @@ export default async function Home(props: {
   return (
     <>
       <Hero />
-      <div className="mt-10">
+      <div className="">
         <EditorialGrid />
       </div>
 
