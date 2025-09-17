@@ -156,7 +156,7 @@ export default function SearchModal() {
               </div>
             </div>
             {/* Results area, with horizontal padding to match modal sides */}
-            <div className="max-h-96 overflow-y-auto px-4 pb-4 md:px-8">
+            <div className="max-h-96 overflow-y-auto px-4 pb-4 md:px-8" style={{ marginTop: "16px" }}>
               <SearchResults gender={gender} />
             </div>
           </InstantSearch>
