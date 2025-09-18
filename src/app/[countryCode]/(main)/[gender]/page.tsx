@@ -5,7 +5,6 @@ import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
 import { searchProductsWithAlgolia, convertAlgoliaProductsToMedusaFormat } from "@lib/util/algolia-filters"
-import { getCategoryBlurb } from "@lib/util/metadata"
 
 type Props = {
   params: Promise<{ countryCode: string; gender: string }>
@@ -85,9 +84,9 @@ export default async function GenderPage(props: Props) {
   const totalPages = algoliaResult.nbPages
   const currentPage = algoliaResult.page
 
-  // For gender pages, use gender category name and metadata blurb
+  // For gender pages, use gender category name and description
   const editorialTitle = genderCategory.name
-  const editorialBlurb = getCategoryBlurb(genderCategory.metadata)
+  const editorialBlurb = genderCategory.description
 
   return (
     <CategoryTemplate

@@ -50,9 +50,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
   const genderDisplay = gender === "men" ? "Men" : "Women"
   const title = `Designer ${category.name} for ${genderDisplay}`
-  const blurbText = getCategoryBlurb(category.metadata)
   const description: string =
-    blurbText || `Shop ${genderDisplay.toLowerCase()} ${category.name.toLowerCase()} at REVETIR. Premium fashion with free shipping and returns.`
+    `Shop ${genderDisplay.toLowerCase()} ${category.name.toLowerCase()} at REVETIR. Premium fashion with free shipping and returns.`
 
   return {
     title,
@@ -100,10 +99,10 @@ export default async function CategoryPage(props: Props) {
   const totalPages = algoliaResult.nbPages
   const currentPage = algoliaResult.page
 
-  // For category pages, use category name with gender and metadata blurb
+  // For category pages, use category name with gender and description
   const genderDisplay = gender === "men" ? "Men's" : "Women's"
   const editorialTitle = `${genderDisplay} ${category.name}`
-  const editorialBlurb = getCategoryBlurb(category.metadata)
+  const editorialBlurb = category.description
 
   return (
     <CategoryTemplate
