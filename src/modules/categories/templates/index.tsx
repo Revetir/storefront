@@ -50,72 +50,34 @@ const CategoryTemplate = ({
   return (
     <>
       <div className="py-6" data-testid="category-container">
-        <div className="relative">
-          {/* Mobile Layout - < 768px */}
+        <div className="w-full">
+          {/* Mobile/Tablet Layout - Show mobile refinement buttons */}
           <div className="md:hidden">
-            <div className="flex justify-center w-full">
-              <div className="max-w-[768px] px-4">
-                <div className="mb-6">
-                  <div className="flex gap-2 w-full">
-                    <button
-                      onClick={() => {
-                        setActiveRefinementTab("refine")
-                        setIsMobileRefinementOpen(true)
-                      }}
-                      className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
-                    >
-                      Refine
-                    </button>
-                    <button
-                      onClick={() => {
-                        setActiveRefinementTab("sort")
-                        setIsMobileRefinementOpen(true)
-                      }}
-                      className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
-                    >
-                      Sort
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="w-full">
-                  <PaginatedProductsClient
-                    products={products}
-                    region={region}
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                  />
+            <div className="w-full max-w-[1440px] mx-auto px-4">
+              <div className="mb-6">
+                <div className="flex gap-2 w-full">
+                  <button
+                    onClick={() => {
+                      setActiveRefinementTab("refine")
+                      setIsMobileRefinementOpen(true)
+                    }}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
+                  >
+                    Refine
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveRefinementTab("sort")
+                      setIsMobileRefinementOpen(true)
+                    }}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
+                  >
+                    Sort
+                  </button>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Tablet Layout - 767px - 1022px */}
-          <div className="hidden md:block small:hidden">
-            <div className="flex justify-center w-full">
-              <div className="max-w-[768px] px-4">
-                <div className="mb-6">
-                  <div className="flex gap-2 w-full">
-                    <button
-                      onClick={() => {
-                        setActiveRefinementTab("refine")
-                        setIsMobileRefinementOpen(true)
-                      }}
-                      className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
-                    >
-                      Refine
-                    </button>
-                    <button
-                      onClick={() => {
-                        setActiveRefinementTab("sort")
-                        setIsMobileRefinementOpen(true)
-                      }}
-                      className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
-                    >
-                      Sort
-                    </button>
-                  </div>
-                </div>
+              
+              <div className="w-full">
                 <PaginatedProductsClient
                   products={products}
                   region={region}
@@ -126,39 +88,17 @@ const CategoryTemplate = ({
             </div>
           </div>
 
-          {/* Small Desktop Layout - 1023px - 1725px */}
-          <div className="hidden small:block large:hidden">
-            <div className="flex justify-center w-full">
-              <div className="max-w-[1200px] px-6">
-                <div className="flex gap-8">
-                  {/* Compact Sidebar */}
-                  <div className="w-64 flex-shrink-0">
-                    <RefinementList sortBy={sort} selectedBrand={selectedBrand} />
-                  </div>
-                  {/* Product Grid */}
-                  <div className="flex-1">
-                    <PaginatedProductsClient
-                      products={products}
-                      region={region}
-                      totalPages={totalPages}
-                      currentPage={currentPage}
-                    />
-                  </div>
+          {/* Desktop Layout - Unified flex layout */}
+          <div className="hidden md:block">
+            <div className="w-full max-w-[1440px] mx-auto px-4 md:px-6">
+              <div className="flex gap-8 w-full">
+                {/* Sidebar - Fixed width, positioned on left */}
+                <div className="w-64 flex-shrink-0">
+                  <RefinementList sortBy={sort} selectedBrand={selectedBrand} />
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Large Desktop Layout - > 1725px (Original Layout) */}
-          <div className="hidden large:block">
-            <div className="relative">
-              {/* Desktop Refinement List - Original positioning */}
-              <div className="absolute left-9 top-0 z-10">
-                <RefinementList sortBy={sort} selectedBrand={selectedBrand} />
-              </div>
-              
-              <div className="flex justify-center w-full">
-                <div className="max-w-[1200px] px-4 md:px-6">
+                
+                {/* Product Grid - Takes remaining space (flex-1) */}
+                <div className="flex-1 w-full">
                   <PaginatedProductsClient
                     products={products}
                     region={region}

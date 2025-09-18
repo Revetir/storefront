@@ -71,19 +71,18 @@
   }
 
   .product-grid-fixed-cols {
-    /* CSS Grid with fixed column structure - always maintains full width */
+    /* CSS Grid with explicit column structure - always fills flex-1 container */
     display: grid;
     width: 100%;
     gap: 1rem;
     /* Mobile: 2 columns - always show 2 columns */
     grid-template-columns: 1fr 1fr;
     grid-auto-rows: minmax(400px, auto);
-    /* Ensure proper grid flow and full width usage */
+    /* Ensure products fill left-to-right, top-to-bottom */
     grid-auto-flow: row;
+    /* Use full width of flex-1 container */
     justify-content: stretch;
     align-content: start;
-    /* Prevent grid from shrinking below its content */
-    min-width: 0;
   }
 
   /* Very small screens - ensure single column for better UX */
@@ -101,23 +100,15 @@
     }
   }
 
-  @media (min-width: 1024px) { /* Small desktop: 3 columns */
+  @media (min-width: 1024px) { /* Desktop: 3 columns */
     .product-grid-fixed-cols {
       grid-template-columns: 1fr 1fr 1fr;
-      /* Maintain consistent grid behavior */
-      grid-auto-flow: row;
-      justify-content: stretch;
-      align-content: start;
     }
   }
 
-  @media (min-width: 1280px) { /* Medium desktop: 4 columns */
+  @media (min-width: 1280px) { /* Large desktop: 4 columns */
     .product-grid-fixed-cols {
       grid-template-columns: 1fr 1fr 1fr 1fr;
-      /* Maintain consistent grid behavior */
-      grid-auto-flow: row;
-      justify-content: stretch;
-      align-content: start;
     }
   }
 
@@ -142,6 +133,7 @@
     margin: 0;
     padding: 0;
   }
+
 
   .contrast-btn {
     @apply px-4 py-2 border border-black rounded-full hover:bg-black hover:text-white transition-colors duration-200 ease-in;
