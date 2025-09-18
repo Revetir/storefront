@@ -97,7 +97,7 @@ const CategoryTemplate = ({
               </div>
               
               {/* Center Container - Products grid with healthy margins */}
-              <div className="flex-1 px-6">
+              <div className="flex-1 px-6 pl-12">
                 <PaginatedProductsClient
                   products={products}
                   region={region}
@@ -106,8 +106,8 @@ const CategoryTemplate = ({
                 />
               </div>
               
-              {/* Right Sidebar - Empty whitespace for future refinements */}
-              <div className="w-64 flex-shrink-0 px-4">
+              {/* Right Sidebar - Smaller width since it's only whitespace and looks visually weird until we add content */}
+              <div className="w-32 flex-shrink-0 px-4">
                 {/* Empty for now - future refinements can go here */}
               </div>
             </div>
