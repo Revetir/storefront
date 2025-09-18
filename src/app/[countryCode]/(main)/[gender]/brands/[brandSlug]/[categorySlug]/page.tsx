@@ -131,6 +131,10 @@ export default async function BrandCategoryPage(props: Props) {
     }
   }
 
+  // For brand+category pages, use brand name and blurb (brand takes priority)
+  const editorialTitle = brand.name
+  const editorialBlurb = brand.blurb
+
   return (
     <CategoryTemplate
       category={brandCategoryTemplate}
@@ -141,6 +145,8 @@ export default async function BrandCategoryPage(props: Props) {
       region={region}
       totalPages={totalPages}
       currentPage={currentPage}
+      editorialTitle={editorialTitle}
+      editorialBlurb={editorialBlurb}
     />
   )
 }

@@ -3,19 +3,24 @@
 import { HttpTypes } from "@medusajs/types"
 import ProductPreview from "@modules/products/components/product-preview"
 import { Pagination } from "@modules/store/components/pagination"
+import EditorialIntro from "@modules/store/components/editorial-intro"
 
 interface PaginatedProductsClientProps {
   products: HttpTypes.StoreProduct[]
   region: HttpTypes.StoreRegion
   totalPages: number
   currentPage: number
+  editorialTitle?: string
+  editorialBlurb?: string
 }
 
 export default function PaginatedProductsClient({ 
   products, 
   region, 
   totalPages, 
-  currentPage 
+  currentPage,
+  editorialTitle,
+  editorialBlurb
 }: PaginatedProductsClientProps) {
   // Handle empty products case
   if (!products || products.length === 0) {
@@ -28,6 +33,10 @@ export default function PaginatedProductsClient({
 
   return (
     <div className="w-full">
+      <EditorialIntro 
+        title={editorialTitle || ""} 
+        blurb={editorialBlurb} 
+      />
       <ul
         className="product-grid-fixed-cols"
         data-testid="products-list"

@@ -5,6 +5,7 @@ import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
 import { searchProductsWithAlgolia, convertAlgoliaProductsToMedusaFormat } from "@lib/util/algolia-filters"
+import { getCategoryBlurb } from "@lib/util/metadata"
 
 type Props = {
   params: Promise<{ countryCode: string; gender: string; categorySlug: string }>
@@ -49,10 +50,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
   const genderDisplay = gender === "men" ? "Men" : "Women"
   const title = `Designer ${category.name} for ${genderDisplay}`
+  const blurbText = getCategoryBlurb(category.metadata)
   const description: string =
-    typeof category.metadata?.intro_blurb === "string"
-      ? category.metadata.intro_blurb
-      : `Shop ${genderDisplay.toLowerCase()} ${category.name.toLowerCase()} at REVETIR. Premium fashion with free shipping and returns.`
+    blurbText || `Shop ${genderDisplay.toLowerCase()} ${category.name.toLowerCase()} at REVETIR. Premium fashion with free shipping and returns.`
 
   return {
     title,
@@ -100,6 +100,11 @@ export default async function CategoryPage(props: Props) {
   const totalPages = algoliaResult.nbPages
   const currentPage = algoliaResult.page
 
+  // For category pages, use category name with gender and metadata blurb
+  const genderDisplay = gender === "men" ? "Men's" : "Women's"
+  const editorialTitle = `${genderDisplay} ${category.name}`
+  const editorialBlurb = getCategoryBlurb(category.metadata)
+
   return (
     <CategoryTemplate
       category={category}
@@ -110,6 +115,8 @@ export default async function CategoryPage(props: Props) {
       region={region}
       totalPages={totalPages}
       currentPage={currentPage}
+      editorialTitle={editorialTitle}
+      editorialBlurb={editorialBlurb}
     />
   )
 }

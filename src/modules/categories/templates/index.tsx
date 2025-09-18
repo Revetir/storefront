@@ -19,6 +19,8 @@ const CategoryTemplate = ({
   region,
   totalPages,
   currentPage,
+  editorialTitle,
+  editorialBlurb,
 }: {
   category: any
   sortBy?: SortOptions
@@ -28,6 +30,8 @@ const CategoryTemplate = ({
   region: any
   totalPages: number
   currentPage: number
+  editorialTitle?: string
+  editorialBlurb?: string
 }) => {
   // Detect if this is a brand page by checking the URL path structure
   const pathname = usePathname()
@@ -83,6 +87,8 @@ const CategoryTemplate = ({
                   region={region}
                   totalPages={totalPages}
                   currentPage={currentPage}
+                  editorialTitle={editorialTitle}
+                  editorialBlurb={editorialBlurb}
                 />
               </div>
             </div>
@@ -103,6 +109,8 @@ const CategoryTemplate = ({
                   region={region}
                   totalPages={totalPages}
                   currentPage={currentPage}
+                  editorialTitle={editorialTitle}
+                  editorialBlurb={editorialBlurb}
                 />
               </div>
               

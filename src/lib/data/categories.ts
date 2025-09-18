@@ -2,9 +2,18 @@ import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
 import { getCacheOptions } from "./cookies"
 
-export interface Category extends HttpTypes.StoreProductCategory {
+export interface BlurbMetadata {
+  text: string
+}
+
+export interface CategoryMetadata {
+  blurb?: BlurbMetadata
+}
+
+export interface Category extends Omit<HttpTypes.StoreProductCategory, 'metadata'> {
   gender: "menswear" | "womenswear" | "unisex"
   children?: Category[]
+  metadata?: CategoryMetadata
 }
 
 /**
@@ -21,6 +30,7 @@ function tagGender(cat: HttpTypes.StoreProductCategory): Category {
   return {
     ...cat,
     gender,
+    metadata: cat.metadata as CategoryMetadata | undefined,
     children: (cat.category_children || []).map(tagGender),
   }
 }
