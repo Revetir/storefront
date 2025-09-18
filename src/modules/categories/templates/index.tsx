@@ -9,6 +9,7 @@ import MobileRefinementPanel from "@modules/store/components/mobile-refinement-p
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
 import PaginatedProductsClient from "@modules/store/templates/paginated-products-client"
+import EditorialIntro from "@modules/store/components/editorial-intro"
 
 const CategoryTemplate = ({
   category,
@@ -58,6 +59,12 @@ const CategoryTemplate = ({
           {/* Mobile/Tablet Layout - Show mobile refinement buttons when grid is 2 columns */}
           <div className="lg:hidden">
             <div className="w-full max-w-[1440px] mx-auto px-4">
+              {/* Editorial Intro - Show above refinement bar on mobile */}
+              <EditorialIntro 
+                title={editorialTitle || ""} 
+                blurb={editorialBlurb} 
+              />
+              
               <div className="mb-6">
                 <div className="flex gap-2 w-full">
                   <button
@@ -89,6 +96,7 @@ const CategoryTemplate = ({
                   currentPage={currentPage}
                   editorialTitle={editorialTitle}
                   editorialBlurb={editorialBlurb}
+                  showEditorialIntro={false}
                 />
               </div>
             </div>

@@ -12,6 +12,7 @@ interface PaginatedProductsClientProps {
   currentPage: number
   editorialTitle?: string
   editorialBlurb?: string
+  showEditorialIntro?: boolean
 }
 
 export default function PaginatedProductsClient({ 
@@ -20,7 +21,8 @@ export default function PaginatedProductsClient({
   totalPages, 
   currentPage,
   editorialTitle,
-  editorialBlurb
+  editorialBlurb,
+  showEditorialIntro = true
 }: PaginatedProductsClientProps) {
   // Handle empty products case
   if (!products || products.length === 0) {
@@ -33,10 +35,12 @@ export default function PaginatedProductsClient({
 
   return (
     <div className="w-full">
-      <EditorialIntro 
-        title={editorialTitle || ""} 
-        blurb={editorialBlurb} 
-      />
+      {showEditorialIntro && (
+        <EditorialIntro 
+          title={editorialTitle || ""} 
+          blurb={editorialBlurb} 
+        />
+      )}
       <ul
         className="product-grid-fixed-cols"
         data-testid="products-list"

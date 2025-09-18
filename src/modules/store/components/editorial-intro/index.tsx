@@ -10,7 +10,7 @@ export default function EditorialIntro({ title, blurb }: EditorialIntroProps) {
 
   return (
     <div className="mb-6">
-      <h1 className="text-sm font-medium text-[#333] uppercase tracking-wide">
+      <h1 className="text-sm font-bold text-[#333] uppercase tracking-wide">
         {title}
       </h1>
       <p className="text-sm text-[#333] mt-0 leading-relaxed">

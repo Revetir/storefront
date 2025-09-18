@@ -27,19 +27,15 @@ export const listBrands = async (): Promise<Brand[]> => {
 }
 
 export const getBrandBySlug = async (slug: string): Promise<Brand | null> => {
-  console.log(`[DEBUG] Fetching brand: ${slug} - CACHE DISABLED FOR TESTING`)
   
   try {
-    // TEMPORARILY DISABLE ALL CACHING FOR TESTING
+    // TEMPORARILY DISABLE ALL CACHING FOR UPDATES
     const { brand } = await sdk.client.fetch<{
       brand: Brand
     }>(`/store/brands/${slug}?t=${Date.now()}`, {
       cache: "no-store", // Force fresh data every time
     })
 
-    console.log(`[DEBUG] Brand data:`, brand)
-    console.log(`[DEBUG] Brand blurb:`, brand?.blurb)
-    
     return brand || null
   } catch (error) {
     console.error("Error fetching brand by slug:", error)

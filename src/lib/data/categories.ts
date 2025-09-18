@@ -71,7 +71,7 @@ export const listCategories = async (): Promise<Category[]> => {
       limit: 1000, // Get everything
     },
     next,
-    cache: "force-cache",
+    cache: "no-store",
   })
 
   const map = new Map<string, Category>()
@@ -132,7 +132,7 @@ export const getCategoryByHandle = async (
     query: {
       handle,
     },
-    cache: "force-cache",
+    cache: "no-store",
   })
 
   const raw = product_categories[0]
