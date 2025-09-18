@@ -54,7 +54,7 @@ export default async function RelatedProducts({
         </p>
       </div>
 
-      <ul className="grid gap-x-6 gap-y-8 items-stretch product-grid-fixed-cols">
+      <ul className="product-grid-fixed-cols">
         {products.map((product) => (
           <li key={product.id}>
             <Product region={region} product={product} />

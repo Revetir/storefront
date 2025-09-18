@@ -136,7 +136,7 @@ const CategoryTemplate = ({
                     <RefinementList sortBy={sort} selectedBrand={selectedBrand} />
                   </div>
                   {/* Product Grid */}
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1">
                     <PaginatedProductsClient
                       products={products}
                       region={region}

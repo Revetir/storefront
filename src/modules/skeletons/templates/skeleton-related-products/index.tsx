@@ -11,7 +11,7 @@ const SkeletonRelatedProducts = () => {
           <div className="w-48 h-10 animate-pulse bg-gray-100"></div>
         </div>
       </div>
-      <ul className="grid gap-x-6 gap-y-8 flex-1 product-grid-fixed-cols">
+      <ul className="flex-1 product-grid-fixed-cols">
         {repeat(3).map((index) => (
           <li key={index}>
             <SkeletonProductPreview />
