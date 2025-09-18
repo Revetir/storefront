@@ -133,13 +133,14 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
   // Generate meta description using the new format
   const productType = product.type?.value || "Product"
+  const brandName = (product as any).brand?.name || "Unknown Brand"
   const metaDescription = `Buy ${productType} ${product.title} on sale at REVETIR.com. Free Shipping & Returns in the US.`
 
   return {
-    title: `${productType} ${product.title} | REVETIR`,
+    title: `${brandName} ${product.title}`,
     description: metaDescription,
     openGraph: {
-      title: `${product.title} | REVETIR`,
+      title: `${brandName} ${product.title}`,
       description: metaDescription,
       images: product.thumbnail ? [product.thumbnail] : [],
     },

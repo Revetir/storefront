@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | REVETIR",
+  title: "Privacy Policy",
   description: "Learn how REVETIR collects, uses, and protects your personal information in accordance with GDPR and CCPA.",
 }
 

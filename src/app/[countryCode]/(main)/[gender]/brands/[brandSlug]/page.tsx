@@ -26,9 +26,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     
     if (!brand) {
       // Return fallback metadata instead of calling notFound()
-      const genderDisplay = gender === "men" ? "Men's" : "Women's"
+      const genderDisplay = gender === "men" ? "Men" : "Women"
       return {
-        title: `${brandSlug} ${genderDisplay} | REVETIR`,
+        title: `${brandSlug} for ${genderDisplay}`,
         description: `Shop ${brandSlug} ${genderDisplay.toLowerCase()} clothing at REVETIR.`,
         alternates: {
           canonical: `/${params.countryCode}/${gender}/brands/${brandSlug}`,
@@ -36,8 +36,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       }
     }
 
-    const genderDisplay = gender === "men" ? "Men's" : "Women's"
-    const title = `${brand.name} ${genderDisplay} | REVETIR`
+    const genderDisplay = gender === "men" ? "Men" : "Women"
+    const title = `${brand.name} for ${genderDisplay}`
     const description = brand.blurb || `Shop ${brand.name} ${genderDisplay.toLowerCase()} clothing at REVETIR. Premium fashion with free shipping and returns.`
 
     return {
@@ -49,9 +49,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     }
   } catch (error) {
     // Return fallback metadata if there's an error
-    const genderDisplay = gender === "men" ? "Men's" : "Women's"
+    const genderDisplay = gender === "men" ? "Men" : "Women"
     return {
-      title: `${brandSlug} ${genderDisplay} | REVETIR`,
+      title: `${brandSlug} for ${genderDisplay}`,
       description: `Shop ${brandSlug} ${genderDisplay.toLowerCase()} clothing at REVETIR.`,
       alternates: {
         canonical: `/${params.countryCode}/${gender}/brands/${brandSlug}`,

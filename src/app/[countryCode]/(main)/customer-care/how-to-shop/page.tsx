@@ -2,7 +2,7 @@ import { Metadata } from "next"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export const metadata: Metadata = {
-  title: "How to Shop | REVETIR",
+  title: "How to Shop",
   description: "Learn how to shop effectively on REVETIR.",
 }
 

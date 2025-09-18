@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Partnerships | REVETIR",
+  title: "Partnerships",
   description: "Partner with REVETIR to create sustainable fashion solutions and grow together.",
 }
 

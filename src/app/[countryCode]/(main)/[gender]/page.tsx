@@ -30,8 +30,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
   const { gender } = params
 
-  const genderDisplay = gender === "men" ? "Men's" : "Women's"
-  const title = `${genderDisplay} Fashion | REVETIR`
+  const genderDisplay = gender === "men" ? "Men" : "Women"
+  const title = `Designer Clothes, Shoes & Accessories for ${genderDisplay}`
   const description = `Shop the latest ${genderDisplay.toLowerCase()} fashion at REVETIR. Premium brands, curated collections, and free shipping.`
 
   return {

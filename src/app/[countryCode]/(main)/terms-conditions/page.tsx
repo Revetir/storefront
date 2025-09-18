@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions | REVETIR",
+  title: "Terms & Conditions",
   description: "Read REVETIR's terms and conditions for using our website and services.",
 }
 

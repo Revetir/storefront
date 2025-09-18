@@ -47,8 +47,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
-  const genderDisplay = gender === "men" ? "Men's" : "Women's"
-  const title = `${genderDisplay} ${category.name} | REVETIR`
+  const genderDisplay = gender === "men" ? "Men" : "Women"
+  const title = `Designer ${category.name} for ${genderDisplay}`
   const description: string =
     typeof category.metadata?.intro_blurb === "string"
       ? category.metadata.intro_blurb

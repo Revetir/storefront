@@ -60,8 +60,24 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
+  // Define specific titles for each collection
+  const getCollectionTitle = (handle: string, title: string) => {
+    switch (handle) {
+      case 'retro-americana':
+        return 'Retro Americana – Timeless Vintage Fashion'
+      case 'streetwear':
+        return 'Streetwear – Elevated Urban Fashion'
+      case 'dark-luxury':
+        return 'Dark Luxury – Avant-Garde Fashion'
+      case 'minimalist':
+        return 'Minimalist – Quiet Luxury Fashion'
+      default:
+        return title
+    }
+  }
+
   const metadata = {
-    title: `${collection.title} | REVETIR`,
+    title: getCollectionTitle(collection.handle, collection.title),
     description: `${collection.title} collection`,
   } as Metadata
 

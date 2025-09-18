@@ -21,12 +21,12 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   
   try {
     const brand = await getBrandBySlug(brandSlug)
-    const genderDisplay = gender === "men" ? "Men's" : "Women's"
+    const genderDisplay = gender === "men" ? "Men" : "Women"
     const categoryDisplay = categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1)
     
     if (!brand) {
       return {
-        title: `${brandSlug} ${genderDisplay} ${categoryDisplay} | REVETIR`,
+        title: `${brandSlug} ${categoryDisplay} for ${genderDisplay}`,
         description: `Shop ${brandSlug} ${genderDisplay.toLowerCase()} ${categorySlug} at REVETIR.`,
         alternates: {
           canonical: `/${params.countryCode}/${gender}/brands/${brandSlug}/${categorySlug}`,
@@ -34,7 +34,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       }
     }
 
-    const title = `${brand.name} ${genderDisplay} ${categoryDisplay} | REVETIR`
+    const title = `${brand.name} ${categoryDisplay} for ${genderDisplay}`
     const description = `Shop ${brand.name} ${genderDisplay.toLowerCase()} ${categorySlug} at REVETIR. Premium fashion with free shipping and returns.`
 
     return {
@@ -45,10 +45,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       },
     }
   } catch (error) {
-    const genderDisplay = gender === "men" ? "Men's" : "Women's"
+    const genderDisplay = gender === "men" ? "Men" : "Women"
     const categoryDisplay = categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1)
     return {
-      title: `${brandSlug} ${genderDisplay} ${categoryDisplay} | REVETIR`,
+      title: `${brandSlug} ${categoryDisplay} for ${genderDisplay}`,
       description: `Shop ${brandSlug} ${genderDisplay.toLowerCase()} ${categorySlug} at REVETIR.`,
       alternates: {
         canonical: `/${params.countryCode}/${gender}/brands/${brandSlug}/${categorySlug}`,
