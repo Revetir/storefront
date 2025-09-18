@@ -71,6 +71,25 @@
     @apply max-w-[1440px] w-full mx-auto px-6;
   }
 
+  .product-grid-fixed-cols {
+    /* Default for mobile/tablet: 2 columns */
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) { /* Corresponds to Tailwind's 'small' breakpoint */
+    .product-grid-fixed-cols {
+      /* Small desktop: 3 columns */
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 1280px) { /* Corresponds to Tailwind's 'medium' breakpoint */
+    .product-grid-fixed-cols {
+      /* Medium desktop and larger: 4 columns */
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
   .contrast-btn {
     @apply px-4 py-2 border border-black rounded-full hover:bg-black hover:text-white transition-colors duration-200 ease-in;
   }

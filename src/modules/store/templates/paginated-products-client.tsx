@@ -27,13 +27,13 @@ export default function PaginatedProductsClient({
   }
 
   return (
-    <div className="w-full min-w-0">
+    <div className="w-full">
       <ul
-        className="grid w-full gap-x-4 gap-y-6 small:gap-x-6 small:gap-y-8 items-stretch grid-cols-2 small:grid-cols-3 medium:grid-cols-4"
+        className="grid w-full gap-x-4 gap-y-6 md:gap-x-6 md:gap-y-8 items-stretch product-grid-fixed-cols"
         data-testid="products-list"
       >
         {products.map((p, index) => (
-          <li key={p.id} className="h-full w-full min-w-0">
+          <li key={p.id} className="h-full w-full">
             <ProductPreview 
               product={p} 
               region={region} 
