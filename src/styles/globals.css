@@ -85,11 +85,11 @@
     align-content: start;
   }
 
-  /* Very small screens - ensure single column for better UX */
+  /* Very small screens - ensure minimum 2 columns */
   @media (max-width: 480px) {
     .product-grid-fixed-cols {
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
     }
   }
 
@@ -100,7 +100,15 @@
     }
   }
 
-  @media (min-width: 1024px) { /* Desktop: 3 columns - matches layout breakpoint */
+  /* Tablet - 3 columns with mobile refinement buttons */
+  @media (min-width: 641px) and (max-width: 1023px) {
+    .product-grid-fixed-cols {
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+  }
+
+  @media (min-width: 1024px) { /* Desktop: 3 columns with sidebars */
     .product-grid-fixed-cols {
       grid-template-columns: 1fr 1fr 1fr;
     }

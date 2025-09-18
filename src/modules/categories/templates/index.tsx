@@ -97,7 +97,7 @@ const CategoryTemplate = ({
               </div>
               
               {/* Center Container - Products grid with healthy margins */}
-              <div className="flex-1 max-w-4xl mx-auto px-6">
+              <div className="flex-1 px-6">
                 <PaginatedProductsClient
                   products={products}
                   region={region}
