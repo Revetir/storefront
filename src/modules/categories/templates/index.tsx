@@ -51,8 +51,8 @@ const CategoryTemplate = ({
     <>
       <div className="py-6" data-testid="category-container">
         <div className="w-full">
-          {/* Mobile/Tablet Layout - Show mobile refinement buttons */}
-          <div className="md:hidden">
+          {/* Mobile/Tablet Layout - Show mobile refinement buttons when grid is 2 columns */}
+          <div className="lg:hidden">
             <div className="w-full max-w-[1440px] mx-auto px-4">
               <div className="mb-6">
                 <div className="flex gap-2 w-full">
@@ -88,24 +88,27 @@ const CategoryTemplate = ({
             </div>
           </div>
 
-          {/* Desktop Layout - Unified flex layout */}
-          <div className="hidden md:block">
-            <div className="w-full max-w-[1440px] mx-auto px-4 md:px-6">
-              <div className="flex gap-8 w-full">
-                {/* Sidebar - Fixed width, positioned on left */}
-                <div className="w-64 flex-shrink-0">
-                  <RefinementList sortBy={sort} selectedBrand={selectedBrand} />
-                </div>
-                
-                {/* Product Grid - Takes remaining space (flex-1) */}
-                <div className="flex-1 w-full">
-                  <PaginatedProductsClient
-                    products={products}
-                    region={region}
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                  />
-                </div>
+          {/* Desktop Layout - Three-part layout: left sidebar + centered products + right sidebar */}
+          <div className="hidden lg:block">
+            <div className="w-full flex">
+              {/* Left Sidebar - Fixed width, positioned close to left edge */}
+              <div className="w-64 flex-shrink-0 px-4">
+                <RefinementList sortBy={sort} selectedBrand={selectedBrand} />
+              </div>
+              
+              {/* Center Container - Products grid with healthy margins */}
+              <div className="flex-1 max-w-4xl mx-auto px-6">
+                <PaginatedProductsClient
+                  products={products}
+                  region={region}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                />
+              </div>
+              
+              {/* Right Sidebar - Empty whitespace for future refinements */}
+              <div className="w-64 flex-shrink-0 px-4">
+                {/* Empty for now - future refinements can go here */}
               </div>
             </div>
           </div>

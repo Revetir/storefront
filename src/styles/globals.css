@@ -100,7 +100,7 @@
     }
   }
 
-  @media (min-width: 1024px) { /* Desktop: 3 columns */
+  @media (min-width: 1024px) { /* Desktop: 3 columns - matches layout breakpoint */
     .product-grid-fixed-cols {
       grid-template-columns: 1fr 1fr 1fr;
     }
