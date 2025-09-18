@@ -58,7 +58,7 @@ const ImageOrPlaceholder = ({
 }) => {
   const getAltText = () => {
     if (!product) return "Thumbnail"
-    const brand = product.type?.value || "Product"
+    const brand = (product as any).brand?.name || "Product"
     const title = product.title || ""
     return `${brand} ${title}`.trim()
   }

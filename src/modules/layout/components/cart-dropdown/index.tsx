@@ -140,8 +140,8 @@ const CartDropdown = ({
                           data-testid="cart-item"
                         >
                           <LocalizedClientLink
-                            href={item.variant?.product?.brand?.slug 
-                              ? `/products/${item.variant.product.brand.slug}-${item.product_handle}`
+                            href={(item.variant?.product as any)?.brand?.slug 
+                              ? `/products/${(item.variant?.product as any).brand.slug}-${item.product_handle}`
                               : `/products/${item.product_handle}`}
                             className="w-24"
                           >
@@ -150,7 +150,7 @@ const CartDropdown = ({
                               images={item.variant?.product?.images}
                               size="square"
                               product={{
-                                type: { value: item.variant?.product?.type?.value || "Product" },
+                                brand: { name: (item.variant?.product as any)?.brand?.name || "Product" },
                                 title: item.title || ""
                               } as any}
                             />
@@ -161,8 +161,8 @@ const CartDropdown = ({
                                 <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
                                   <h3 className="text-base-regular overflow-hidden text-ellipsis">
                                     <LocalizedClientLink
-                                      href={item.variant?.product?.brand?.slug 
-                                        ? `/products/${item.variant.product.brand.slug}-${item.product_handle}`
+                                      href={(item.variant?.product as any)?.brand?.slug 
+                                        ? `/products/${(item.variant?.product as any).brand.slug}-${item.product_handle}`
                                         : `/products/${item.product_handle}`}
                                       data-testid="product-link"
                                     >

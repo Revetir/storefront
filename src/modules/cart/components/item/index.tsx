@@ -48,8 +48,8 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
     <Table.Row className="w-full" data-testid="product-row">
       <Table.Cell className="!pl-0 p-4 w-24">
         <LocalizedClientLink
-          href={item.variant?.product?.brand?.slug 
-            ? `/products/${item.variant.product.brand.slug}-${item.product_handle}`
+          href={(item.variant?.product as any)?.brand?.slug 
+            ? `/products/${(item.variant?.product as any).brand.slug}-${item.product_handle}`
             : `/products/${item.product_handle}`}
           className={clx("flex", {
             "w-16": type === "preview",
@@ -61,7 +61,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             images={item.variant?.product?.images}
             size="square"
             product={{
-              type: { value: item.variant?.product?.type?.value || "Product" },
+              brand: { name: (item.variant?.product as any)?.brand?.name || "Product" },
               title: item.product_title || ""
             } as any}
           />

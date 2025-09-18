@@ -132,9 +132,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   }
 
   // Generate meta description using the new format
-  const productType = product.type?.value || "Product"
-  const brandName = (product as any).brand?.name || "Unknown Brand"
-  const metaDescription = `Buy ${productType} ${product.title} on sale at REVETIR.com. Free Shipping & Returns in the US.`
+  const brandName = (product as any).brand?.name
+  const metaDescription = `Buy ${brandName} ${product.title} on sale at REVETIR.com. Free Shipping & Returns in the US.`
 
   return {
     title: `${brandName} ${product.title}`,

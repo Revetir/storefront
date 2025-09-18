@@ -110,7 +110,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                     <div className="aspect-square relative mb-4">
                       <Image
                         src={product.thumbnail || "/images/imgi_1_elementor-placeholder-image.png"}
-                        alt={`${product.type?.value || 'Product'} ${product.title}`}
+                        alt={`${(product as any).brand?.name || 'Product'} ${product.title}`}
                         fill
                         className="rounded-md object-cover"
                         priority={index < 3} // Priority loading for first 3 visible products
