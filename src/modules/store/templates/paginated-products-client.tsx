@@ -29,7 +29,7 @@ export default function PaginatedProductsClient({
   return (
     <div className="w-full">
       <ul
-        className="w-full product-grid-fixed-cols"
+        className="product-grid-fixed-cols"
         data-testid="products-list"
       >
         {products.map((p, index) => (

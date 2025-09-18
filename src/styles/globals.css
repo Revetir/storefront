@@ -78,17 +78,46 @@
     /* Mobile: 2 columns - always show 2 columns */
     grid-template-columns: 1fr 1fr;
     grid-auto-rows: minmax(400px, auto);
+    /* Ensure proper grid flow and full width usage */
+    grid-auto-flow: row;
+    justify-content: stretch;
+    align-content: start;
+    /* Prevent grid from shrinking below its content */
+    min-width: 0;
+  }
+
+  /* Very small screens - ensure single column for better UX */
+  @media (max-width: 480px) {
+    .product-grid-fixed-cols {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+  }
+
+  /* Small mobile screens - 2 columns with smaller gap */
+  @media (min-width: 481px) and (max-width: 640px) {
+    .product-grid-fixed-cols {
+      gap: 0.75rem;
+    }
   }
 
   @media (min-width: 1024px) { /* Small desktop: 3 columns */
     .product-grid-fixed-cols {
       grid-template-columns: 1fr 1fr 1fr;
+      /* Maintain consistent grid behavior */
+      grid-auto-flow: row;
+      justify-content: stretch;
+      align-content: start;
     }
   }
 
   @media (min-width: 1280px) { /* Medium desktop: 4 columns */
     .product-grid-fixed-cols {
       grid-template-columns: 1fr 1fr 1fr 1fr;
+      /* Maintain consistent grid behavior */
+      grid-auto-flow: row;
+      justify-content: stretch;
+      align-content: start;
     }
   }
 
@@ -97,6 +126,21 @@
     width: 100%;
     height: 100%;
     min-height: 400px;
+    /* Ensure proper grid item behavior */
+    display: flex;
+    flex-direction: column;
+    /* Prevent overflow issues */
+    overflow: hidden;
+    /* Ensure consistent sizing */
+    box-sizing: border-box;
+  }
+
+  /* Ensure the grid container itself doesn't have any conflicting styles */
+  .product-grid-fixed-cols {
+    /* Override any potential conflicting styles */
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
   .contrast-btn {
