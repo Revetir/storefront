@@ -33,7 +33,7 @@ export default function PaginatedProductsClient({
         data-testid="products-list"
       >
         {products.map((p, index) => (
-          <li key={p.id} className="h-full w-full">
+          <li key={p.id}>
             <ProductPreview 
               product={p} 
               region={region} 
