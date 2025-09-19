@@ -18,7 +18,7 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       countryCode,
       queryParams: {
         handle: brandAndHandle,
-        fields: "handle,+brand.*",
+        fields: "handle,title,+brand.*",
         limit: 1,
       },
     }).then(({ response }) => response.products[0])
@@ -41,7 +41,7 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       queryParams: {
         handle: handleCandidate,
         // ensure brand is included to validate
-        fields: "handle,+brand.*",
+        fields: "handle,title,+brand.*",
         limit: 1,
       },
     }).then(({ response }) => response.products[0])
