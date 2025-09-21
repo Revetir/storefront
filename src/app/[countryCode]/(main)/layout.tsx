@@ -14,7 +14,7 @@ import ScrollToTopOnRoute from "@modules/common/components/scroll-to-top-on-rout
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
   title: {
-    default: "Curated Luxury Fashion",
+    default: "REVETIR - Luxury Fashion & Independent Designers",
     template: "%s | REVETIR"
   },
   description: "Discover luxury fashion and independent Asian designers. Free shipping & returns in the US.",
@@ -32,14 +32,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://revetir.com",
     siteName: "REVETIR",
-    title: "Curated Luxury Fashion",
+    title: "Luxury Fashion & Independent Designers",
     description: "Discover luxury fashion and independent Asian designers. Free shipping & returns in the US.",
     images: [
       {
         url: "/images/open_graph_image.png",
         width: 1200,
         height: 630,
-        alt: "REVETIR - Curated Luxury Fashion",
+        alt: "REVETIR - Luxury Fashion & Independent Designers",
       },
     ],
   },
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@revetir",
     creator: "@revetir",
-    title: "Curated Luxury Fashion",
+    title: "Luxury Fashion & Independent Designers",
     description: "Discover luxury fashion and independent Asian designers. Free shipping & returns in the US.",
     images: ["/images/open_graph_image.png"],
   },
