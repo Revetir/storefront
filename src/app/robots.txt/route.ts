@@ -11,11 +11,15 @@ Disallow: /_next/
 Disallow: /checkout/
 Disallow: /account/
 Disallow: /cart/
+Disallow: /order/
+Disallow: /test-page/
+Disallow: /test-routing/
 
 # Sitemaps
 Sitemap: ${baseUrl}/sitemap.xml
 Sitemap: ${baseUrl}/sitemap_main.xml
-Sitemap: ${baseUrl}/sitemap_products_list_0.xml`;
+Sitemap: ${baseUrl}/sitemap_brand_categories.xml
+Sitemap: ${baseUrl}/sitemap_products.xml`;
 
   return new NextResponse(robotsTxt, {
     headers: {
