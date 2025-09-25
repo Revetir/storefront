@@ -5,11 +5,17 @@ async function getProductsForPage(page: number, limit: number = 100) {
     const backendUrl = process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
     const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
     
+    console.log(`🔍 Fetching products: page=${page}, limit=${limit}, backendUrl=${backendUrl}`)
+    
     if (!publishableKey) {
+      console.log('❌ No publishable key found')
       return { products: [], count: 0 }
     }
     
-    const rawResponse = await fetch(`${backendUrl}/store/products?limit=${limit}&offset=${(page - 1) * limit}&fields=handle,brand.*`, {
+    const apiUrl = `${backendUrl}/store/products?limit=${limit}&offset=${(page - 1) * limit}&fields=handle,brand.*,updated_at,created_at,status`
+    console.log(`🔍 API URL: ${apiUrl}`)
+    
+    const rawResponse = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'x-publishable-api-key': publishableKey,
@@ -19,9 +25,10 @@ async function getProductsForPage(page: number, limit: number = 100) {
     
     if (rawResponse.ok) {
       const response = await rawResponse.json()
+      console.log(`✅ API response: ${response.products?.length || 0} products found`)
       return response
     } else {
-      console.error('❌ Products fetch failed:', rawResponse.status)
+      console.error('❌ Products fetch failed:', rawResponse.status, rawResponse.statusText)
       return { products: [], count: 0 }
     }
   } catch (error) {
@@ -39,7 +46,7 @@ export async function GET(
     const pageNumber = parseInt(page, 10) || 0
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://revetir.com'
     
-    console.log(`📄 Generating sitemap for products, page ${pageNumber}`)
+    console.log(`📄 Generating sitemap for products, page ${pageNumber} (URL: ${request.url})`)
     
     const { products, count } = await getProductsForPage(pageNumber + 1, 100)
     

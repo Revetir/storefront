@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     
     for (let i = 0; i < 10; i++) {
       sitemapEntries.push({
-        url: `${baseUrl}/sitemap_products_${i}`,
+        url: `${baseUrl}/sitemap_products_${i}.xml`,
         lastModified: currentDate,
       })
     }
