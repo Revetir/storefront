@@ -9,7 +9,7 @@ async function getProductsForPage(page: number, limit: number = 100) {
       return { products: [], count: 0 }
     }
     
-    const rawResponse = await fetch(`${backendUrl}/store/products?limit=${limit}&offset=${(page - 1) * limit}&fields=handle,brand.*,updated_at,created_at,status`, {
+    const rawResponse = await fetch(`${backendUrl}/store/products?limit=${limit}&offset=${(page - 1) * limit}&fields=handle,brand.*`, {
       method: 'GET',
       headers: {
         'x-publishable-api-key': publishableKey,
@@ -39,7 +39,7 @@ export async function GET(
     const pageNumber = parseInt(page, 10) || 0
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://revetir.com'
     
-    console.log(`📄 Generating XML sitemap for products, page ${pageNumber}`)
+    console.log(`📄 Generating sitemap for products, page ${pageNumber}`)
     
     const { products, count } = await getProductsForPage(pageNumber + 1, 100)
     
@@ -65,34 +65,18 @@ export async function GET(
       return hasHandle && hasBrand && (!hasStatus || isPublished)
     })
     
-    // Generate XML sitemap with proper metadata and SEO optimization
+    // Generate XML sitemap with canonical product URLs
     const productPages: Array<{
       url: string;
       lastModified: string;
       changeFrequency: string;
       priority: number;
     }> = filteredProducts.map((product: any) => {
-      // Determine priority based on brand popularity and product age
-      let priority = 0.6 // Default priority
-      
-      // Higher priority for popular brands
-      const popularBrands = ['chrome-hearts', 'maison-margiela', 'rick-owens', 'gentle-monster', 'acne-studios']
-      if (popularBrands.includes(product.brand?.slug)) {
-        priority = 0.8
-      }
-      
-      // Higher priority for recently updated products
-      const updatedAt = product.updated_at ? new Date(product.updated_at) : new Date(product.created_at)
-      const daysSinceUpdate = (new Date().getTime() - updatedAt.getTime()) / (1000 * 60 * 60 * 24)
-      if (daysSinceUpdate < 30) {
-        priority = Math.min(priority + 0.1, 0.9)
-      }
-      
       return {
         url: `${baseUrl}/us/products/${product.brand.slug}-${product.handle}`,
-        lastModified: updatedAt.toISOString().split('T')[0],
+        lastModified: new Date().toISOString().split('T')[0],
         changeFrequency: 'weekly',
-        priority: priority,
+        priority: 0.6,
       }
     })
     
@@ -106,7 +90,7 @@ ${productPages.map(productPage => `  <url>
   </url>`).join('\n')}
 </urlset>`
     
-    console.log('✅ XML sitemap generated with optimized product URLs')
+    console.log('✅ XML sitemap generated with canonical brand-product URLs')
     
     return new NextResponse(xml, {
       headers: {

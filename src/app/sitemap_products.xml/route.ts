@@ -35,18 +35,12 @@ export async function GET(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://revetir.com'
     const currentDate = new Date().toISOString().split('T')[0]
     
-    console.log('📄 Generating comprehensive product sitemap...')
+    console.log('📄 Generating product sitemap index...')
     
-    // Get total product count first
-    const { count: totalCount } = await getProductsForPage(1, 1)
-    const totalPages = Math.ceil(totalCount / 100)
-    
-    console.log(`📊 Found ${totalCount} total products across ${totalPages} pages`)
-    
-    // Generate sitemap index that references individual product sitemaps
+    // Generate sitemap index with a reasonable number of pages (assuming up to 1000 products = 10 pages)
     const sitemapEntries = []
     
-    for (let i = 0; i < totalPages; i++) {
+    for (let i = 0; i < 10; i++) {
       sitemapEntries.push({
         url: `${baseUrl}/sitemap_products_${i}`,
         lastModified: currentDate,
