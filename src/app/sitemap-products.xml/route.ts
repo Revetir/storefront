@@ -1,57 +1,68 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-async function getProductsForPage(page: number, limit: number = 100) {
+async function getAllProducts() {
   try {
     const backendUrl = process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
     const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
     
-    console.log(`🔍 Fetching products: page=${page}, limit=${limit}, backendUrl=${backendUrl}`)
-    
     if (!publishableKey) {
-      console.log('❌ No publishable key found')
-      return { products: [], count: 0 }
+      return { products: [] }
     }
     
-    const apiUrl = `${backendUrl}/store/products?limit=${limit}&offset=${(page - 1) * limit}&fields=handle,brand.*,updated_at,created_at,status`
-    console.log(`🔍 API URL: ${apiUrl}`)
+    // Fetch all products in batches
+    const allProducts = []
+    let offset = 0
+    const limit = 100
     
-    const rawResponse = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'x-publishable-api-key': publishableKey,
-        'Content-Type': 'application/json'
+    while (true) {
+      const response = await fetch(
+        `${backendUrl}/store/products?limit=${limit}&offset=${offset}&fields=handle,brand.*,updated_at,created_at,status`,
+        {
+          method: 'GET',
+          headers: {
+            'x-publishable-api-key': publishableKey,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      
+      if (!response.ok) {
+        console.error('❌ Products fetch failed:', response.status)
+        break
       }
-    })
-    
-    if (rawResponse.ok) {
-      const response = await rawResponse.json()
-      console.log(`✅ API response: ${response.products?.length || 0} products found`)
-      return response
-    } else {
-      console.error('❌ Products fetch failed:', rawResponse.status, rawResponse.statusText)
-      return { products: [], count: 0 }
+      
+      const data = await response.json()
+      if (!data.products || data.products.length === 0) {
+        break
+      }
+      
+      allProducts.push(...data.products)
+      offset += limit
+      
+      // Safety break to prevent infinite loops
+      if (data.products.length < limit) {
+        break
+      }
     }
+    
+    return { products: allProducts }
   } catch (error) {
     console.error('❌ Error fetching products:', error)
-    return { products: [], count: 0 }
+    return { products: [] }
   }
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ page: string }> }
-) {
+export async function GET(request: NextRequest) {
   try {
-    const { page } = await params
-    const pageNumber = parseInt(page, 10) || 0
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://revetir.com'
+    const currentDate = new Date().toISOString().split('T')[0]
     
-    console.log(`📄 Generating sitemap for products, page ${pageNumber} (URL: ${request.url})`)
+    console.log('📄 Generating products sitemap...')
     
-    const { products, count } = await getProductsForPage(pageNumber + 1, 100)
+    const { products } = await getAllProducts()
     
     if (!products || products.length === 0) {
-      console.log('⚠️ No products found for this page')
+      console.log('⚠️ No products found')
       return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </urlset>`, {
@@ -62,7 +73,7 @@ export async function GET(
       })
     }
     
-    console.log(`✅ Found ${products.length} products for page ${pageNumber}`)
+    console.log(`✅ Found ${products.length} products`)
     
     const filteredProducts = products.filter((product: any) => {
       const hasHandle = !!product.handle
@@ -72,16 +83,10 @@ export async function GET(
       return hasHandle && hasBrand && (!hasStatus || isPublished)
     })
     
-    // Generate XML sitemap with canonical product URLs
-    const productPages: Array<{
-      url: string;
-      lastModified: string;
-      changeFrequency: string;
-      priority: number;
-    }> = filteredProducts.map((product: any) => {
+    const productPages = filteredProducts.map((product: any) => {
       return {
         url: `${baseUrl}/us/products/${product.brand.slug}-${product.handle}`,
-        lastModified: new Date().toISOString().split('T')[0],
+        lastModified: product.updated_at ? new Date(product.updated_at).toISOString().split('T')[0] : currentDate,
         changeFrequency: 'weekly',
         priority: 0.6,
       }
@@ -97,7 +102,7 @@ ${productPages.map(productPage => `  <url>
   </url>`).join('\n')}
 </urlset>`
     
-    console.log('✅ XML sitemap generated with canonical brand-product URLs')
+    console.log('✅ Products sitemap generated')
     
     return new NextResponse(xml, {
       headers: {
@@ -107,7 +112,7 @@ ${productPages.map(productPage => `  <url>
     })
     
   } catch (error) {
-    console.error('❌ Critical error in sitemap generation:', error)
+    console.error('❌ Critical error in products sitemap generation:', error)
     return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </urlset>`, {

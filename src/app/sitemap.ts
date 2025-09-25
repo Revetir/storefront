@@ -14,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
     },
     {
-      url: `${baseUrl}/sitemap_products.xml`,
+      url: `${baseUrl}/sitemap-products.xml`,
       lastModified: new Date(),
     }
   ]
