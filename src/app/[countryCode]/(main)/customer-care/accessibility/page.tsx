@@ -32,7 +32,7 @@ export default function AccessibilityPage() {
             
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
               <p className="text-gray-700 mb-3">
-                Write to us at <a href="mailto:support@revetir.com" className="text-blue-600 hover:underline">support@revetir.com</a>
+                Write to us at <a href="mailto:care@revetir.com" className="text-blue-600 hover:underline">care@revetir.com</a>
               </p>
               <p className="text-gray-700">
                 Use "Accessibility Barriers" in the subject line so that we may address the issue as soon as possible. 

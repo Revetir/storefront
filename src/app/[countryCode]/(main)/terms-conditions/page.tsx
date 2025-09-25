@@ -64,7 +64,7 @@ export default function TermsConditionsPage() {
               You are not obligated to register with us in order to access the Services. However, certain sections and features of the Services are available only to visitors of the Services who have registered with a username and password ("Registered Users"). You agree you will not sell, transfer, license, or assign your account, credentials, or any account rights. You may only have one active Registered User account on the Services and only you may use your credentials to access the Services. You agree that you are responsible for all activities that occur under your Registered User account.
             </p>
             <p className="text-gray-600 mb-4">
-              As a Registered User, you are responsible for keeping your password secret and secure. You also agree to promptly notify us if you become aware of any unauthorized use of your credentials, or any other breach of security involving or relating to the Services by emailing us at support@revetir.com. Without prejudice to our rights, we may suspend or terminate your access to the Services if you fail to comply with this section. WE EXPLICITLY DISCLAIM LIABILITY FOR ANY AND ALL LOSSES AND DAMAGES ARISING FROM YOUR FAILURE TO COMPLY WITH THIS SECTION.
+              As a Registered User, you are responsible for keeping your password secret and secure. You also agree to promptly notify us if you become aware of any unauthorized use of your credentials, or any other breach of security involving or relating to the Services by emailing us at care@revetir.com. Without prejudice to our rights, we may suspend or terminate your access to the Services if you fail to comply with this section. WE EXPLICITLY DISCLAIM LIABILITY FOR ANY AND ALL LOSSES AND DAMAGES ARISING FROM YOUR FAILURE TO COMPLY WITH THIS SECTION.
             </p>
           </section>
           
@@ -90,7 +90,7 @@ export default function TermsConditionsPage() {
             
             <h3 className="text-xl font-semibold mb-3">5.3 Third-Party Content.</h3>
             <p className="text-gray-600 mb-4">
-              Portions of the Site Content may include content, imagery, or materials provided by third-party sources, including but not limited to media outlets, designers, or public archives. Revetir does not claim ownership of such third-party content and endeavors to respect all intellectual property rights applicable thereto. If you are a rights holder or an authorized representative of a rights holder and believe that any content appearing on the Services infringes upon your intellectual property or other proprietary rights, you may request removal by contacting us at support@revetir.com. Please include sufficient detail to identify the allegedly infringing material and provide evidence of your ownership or authorization to act on behalf of the rights holder.
+              Portions of the Site Content may include content, imagery, or materials provided by third-party sources, including but not limited to media outlets, designers, or public archives. Revetir does not claim ownership of such third-party content and endeavors to respect all intellectual property rights applicable thereto. If you are a rights holder or an authorized representative of a rights holder and believe that any content appearing on the Services infringes upon your intellectual property or other proprietary rights, you may request removal by contacting us at care@revetir.com. Please include sufficient detail to identify the allegedly infringing material and provide evidence of your ownership or authorization to act on behalf of the rights holder.
             </p>
           </section>
           
@@ -344,7 +344,7 @@ export default function TermsConditionsPage() {
             
             <h3 className="text-xl font-semibold mb-3">22.1 Initial Dispute Resolution.</h3>
             <p className="text-gray-600 mb-4">
-              To give us an opportunity to informally resolve any disputes, claim or controversy between you and us arising out of or relating to your use of the Services and these Terms, including our U.S. Privacy Policy ("Disputes"), you agree to first communicate your Dispute to us at support@revetir.com. Most concerns can be quickly resolved in this manner, and you agree not to bring any lawsuit or to initiate arbitration proceedings until 60 days after the date on which you communicated your Dispute to customer care have elapsed. The parties shall use their best efforts to settle your Dispute directly through consultation and good faith negotiations, which shall be a precondition to initiating a lawsuit or arbitration. If we are unable to resolve your Dispute within 60 days, you may seek relief through arbitration or in small claims court as set forth below. Any action to enjoin the actual or threatened infringement, misappropriation or violation of a party's intellectual property rights shall not be subject to the requirements of this Initial Dispute Resolution paragraph.
+              To give us an opportunity to informally resolve any disputes, claim or controversy between you and us arising out of or relating to your use of the Services and these Terms, including our U.S. Privacy Policy ("Disputes"), you agree to first communicate your Dispute to us at care@revetir.com. Most concerns can be quickly resolved in this manner, and you agree not to bring any lawsuit or to initiate arbitration proceedings until 60 days after the date on which you communicated your Dispute to customer care have elapsed. The parties shall use their best efforts to settle your Dispute directly through consultation and good faith negotiations, which shall be a precondition to initiating a lawsuit or arbitration. If we are unable to resolve your Dispute within 60 days, you may seek relief through arbitration or in small claims court as set forth below. Any action to enjoin the actual or threatened infringement, misappropriation or violation of a party's intellectual property rights shall not be subject to the requirements of this Initial Dispute Resolution paragraph.
             </p>
             
             <h3 className="text-xl font-semibold mb-3">22.2 Arbitration.</h3>
@@ -381,7 +381,7 @@ export default function TermsConditionsPage() {
           <section>
             <h2 className="text-2xl font-semibold mb-4">23. Contact Information</h2>
             <p className="text-gray-600">
-              If you have any questions about these Terms, or if you have technical questions about the operation of the Services, please contact us via support@revetir.com. Please do not include any sensitive information in your correspondence as emails may not be encrypted.
+              If you have any questions about these Terms, or if you have technical questions about the operation of the Services, please contact us via care@revetir.com. Please do not include any sensitive information in your correspondence as emails may not be encrypted.
             </p>
           </section>
         </div>

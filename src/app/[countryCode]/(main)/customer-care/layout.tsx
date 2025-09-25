@@ -127,7 +127,7 @@ export default function CustomerCareLayout({
         <h3 className="text-lg font-semibold mb-4">Customer Care</h3>
         <div className="space-y-1 text-sm">
           <div>
-            <span className="font-medium">Email:</span> support@revetir.com
+            <span className="font-medium">Email:</span> care@revetir.com
           </div>
             <div>
               <span className="italic">Monday to Saturday, 9 AM to 11 PM (EST)</span>

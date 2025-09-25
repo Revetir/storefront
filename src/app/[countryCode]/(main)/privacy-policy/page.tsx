@@ -123,7 +123,7 @@ export default function PrivacyPage() {
             </ul>
             <br></br>
             <p className="text-gray-600 mb-4">
-              We provide at least two methods for you to exercise these rights. You can manage much of your data yourself by logging into your account. Alternatively, you may email us at <a href="mailto:support@revetir.com" className="text-blue-600 hover:underline"><strong>support@revetir.com</strong></a> (with "Privacy" in the subject line) to make requests. We will respond to your request within the time frame required by law (typically 30 days for GDPR) and will not charge you a fee for exercising any of these rights. If you make a request, we will verify your identity before fulfilling it.
+              We provide at least two methods for you to exercise these rights. You can manage much of your data yourself by logging into your account. Alternatively, you may email us at <a href="mailto:care@revetir.com" className="text-blue-600 hover:underline"><strong>care@revetir.com</strong></a> (with "Privacy" in the subject line) to make requests. We will respond to your request within the time frame required by law (typically 30 days for GDPR) and will not charge you a fee for exercising any of these rights. If you make a request, we will verify your identity before fulfilling it.
             </p>
             
             <h3 className="text-xl font-semibold mb-3">California Privacy Rights</h3>
@@ -158,7 +158,7 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-2xl font-semibold mb-4">How to Contact Us</h2>
               <p className="text-gray-600 mb-4">
-                If you have any questions about this Privacy Policy, or if you would like to exercise your privacy rights, please contact us by email at <a href="mailto:support@revetir.com" className="text-blue-600 hover:underline"><strong>support@revetir.com</strong></a> (use the subject line "Privacy"). We will respond to your inquiries or requests as promptly as possible.
+                If you have any questions about this Privacy Policy, or if you would like to exercise your privacy rights, please contact us by email at <a href="mailto:care@revetir.com" className="text-blue-600 hover:underline"><strong>care@revetir.com</strong></a> (use the subject line "Privacy"). We will respond to your inquiries or requests as promptly as possible.
               </p>
               <p className="text-gray-600 mb-4">
                 Thank you for trusting Revetir with your personal information. We are committed to keeping that information secure and using it responsibly.

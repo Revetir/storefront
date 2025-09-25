@@ -58,7 +58,7 @@ const faqData: FAQCategory[] = [
         question: "Do you accept returns?",
         answer: (
           <>
-            Yes, we offer free returns on most orders within 7 days of delivery for items in their original condition and packaging. For more information, consult our return policy{" "}
+            Yes, we offer free returns on most orders within 7 days of delivery for items in their original condition and packaging. For more information, please consult our return policy{" "}
             <LocalizedClientLink href="/customer-care/return-policy" className="text-gray-900 hover:text-black font-semibold underline">
               here
             </LocalizedClientLink>.
@@ -82,15 +82,14 @@ const faqData: FAQCategory[] = [
         question: "How do I find the right size?",
         answer: (
           <>
-            We understand that every body is unique and 'standard' sizes can vary drastically. As a general guide, we recommend following our sizing information available{" "}
+            Item-specific measurements can be found by clicking the Size Guide link on each product page. If measurements aren't listed or you would like additional guidance, please contact us{" "}
+            <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
+              here
+            </LocalizedClientLink>. You can also refer to our general size chart{" "}
             <LocalizedClientLink href="/customer-care/product-information" className="text-gray-900 hover:text-black font-semibold underline">
               here
             </LocalizedClientLink>{" "}
-            or contacting us{" "}
-            <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
-              here
-            </LocalizedClientLink>{" "}
-            for any product's specific measurements.
+            for standardized sizing guidelines across categories.
           </>
         )
       },
@@ -169,7 +168,7 @@ const faqData: FAQCategory[] = [
           question: "How can I contact customer service?",
           answer: (
             <>
-              You can reach our customer care team via email at support@revetir.com or through our contact form{" "}
+              You can reach our customer care team via email at care@revetir.com or through our contact form{" "}
               <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
                 here
               </LocalizedClientLink>. We're available Monday-Saturday, 9AM-11PM EST.

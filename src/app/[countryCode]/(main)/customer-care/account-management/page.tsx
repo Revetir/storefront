@@ -55,7 +55,7 @@ export default function ManageAccountPage() {
       <div>
         <h2 className="text-xl font-bold mb-4">Contact Us</h2>
         <p>
-          To exercise your rights pursuant to the present section, please contact us via e-mail at support@revetir.com.
+          To exercise your rights pursuant to the present section, please contact us via e-mail at care@revetir.com.
         </p>
       </div>
     </div>

@@ -138,7 +138,7 @@ const PrivacyChoicesModal: React.FC<PrivacyChoicesModalProps> = ({
               If you do not have a Revetir account or if you are not logged into your Revetir account, your request to opt-out of sale/sharing will be linked to your browser identifier only and not linked to any Revetir account information because the connection between your browser and your account will not be known to us. You can choose to opt-out by selecting the link "Your Privacy Choices" in the Preference Center in the following section.
             </p>
             <p className="text-gray-600 mb-6">
-              If you have a Revetir account, and you want to opt-out of sharing your personal information such as email address and purchase history, please contact us via email at <a href="mailto:support@revetir.com" className="text-blue-600 hover:underline">support@revetir.com</a>.
+              If you have a Revetir account, and you want to opt-out of sharing your personal information such as email address and purchase history, please contact us via email at <a href="mailto:care@revetir.com" className="text-blue-600 hover:underline">care@revetir.com</a>.
             </p>
           </div>
 
