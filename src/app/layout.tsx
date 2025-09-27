@@ -1,6 +1,7 @@
 import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
 import Script from "next/script"
+import { Analytics } from "@vercel/analytics/next"
 import "styles/globals.css"
 
 export const metadata: Metadata = {
@@ -65,6 +66,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
       </head>
       <body>
         <main className="relative">{props.children}</main>
+        <Analytics />
       </body>
     </html>
   )
