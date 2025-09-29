@@ -18,7 +18,7 @@ export interface RegionConfig {
 
 /**
  * Get all supported regions for sitemap generation
- * Based on your actual regions: US and Europe (DK, FR, DE, IT, ES, SE, GB)
+ * Currently only US region active - other regions commented out until proper localization is implemented
  */
 export async function getSupportedRegions(): Promise<RegionConfig[]> {
   return [
@@ -29,67 +29,74 @@ export async function getSupportedRegions(): Promise<RegionConfig[]> {
       hreflang: 'en-us',
       isDefault: true
     },
-    {
-      code: 'dk',
-      currency: 'EUR',
-      language: 'da',
-      hreflang: 'da-dk',
-      isDefault: false
-    },
-    {
-      code: 'fr',
-      currency: 'EUR',
-      language: 'fr',
-      hreflang: 'fr-fr',
-      isDefault: false
-    },
-    {
-      code: 'de',
-      currency: 'EUR',
-      language: 'de',
-      hreflang: 'de-de',
-      isDefault: false
-    },
-    {
-      code: 'it',
-      currency: 'EUR',
-      language: 'it',
-      hreflang: 'it-it',
-      isDefault: false
-    },
-    {
-      code: 'es',
-      currency: 'EUR',
-      language: 'es',
-      hreflang: 'es-es',
-      isDefault: false
-    },
-    {
-      code: 'se',
-      currency: 'EUR',
-      language: 'sv',
-      hreflang: 'sv-se',
-      isDefault: false
-    },
-    {
-      code: 'gb',
-      currency: 'EUR',
-      language: 'en',
-      hreflang: 'en-gb',
-      isDefault: false
-    }
+    // TODO: Uncomment these regions when proper localization is implemented
+    // {
+    //   code: 'dk',
+    //   currency: 'EUR',
+    //   language: 'da',
+    //   hreflang: 'da-dk',
+    //   isDefault: false
+    // },
+    // {
+    //   code: 'fr',
+    //   currency: 'EUR',
+    //   language: 'fr',
+    //   hreflang: 'fr-fr',
+    //   isDefault: false
+    // },
+    // {
+    //   code: 'de',
+    //   currency: 'EUR',
+    //   language: 'de',
+    //   hreflang: 'de-de',
+    //   isDefault: false
+    // },
+    // {
+    //   code: 'it',
+    //   currency: 'EUR',
+    //   language: 'it',
+    //   hreflang: 'it-it',
+    //   isDefault: false
+    // },
+    // {
+    //   code: 'es',
+    //   currency: 'EUR',
+    //   language: 'es',
+    //   hreflang: 'es-es',
+    //   isDefault: false
+    // },
+    // {
+    //   code: 'se',
+    //   currency: 'EUR',
+    //   language: 'sv',
+    //   hreflang: 'sv-se',
+    //   isDefault: false
+    // },
+    // {
+    //   code: 'gb',
+    //   currency: 'EUR',
+    //   language: 'en',
+    //   hreflang: 'en-gb',
+    //   isDefault: false
+    // }
   ]
 }
 
 /**
  * Generate hreflang annotations for a page across all regions
  * Following Google's guidelines for proper hreflang implementation
+ * When only one region is active, no hreflang annotations are needed
  */
 export function generateHreflangAnnotations(
   baseUrl: string,
   path: string,
   regions: RegionConfig[]
-): { [lang: string]: string } {
+): { [lang: string]: string } | undefined {
+  // If only one region, no hreflang annotations needed
+  if (regions.length <= 1) {
+    return undefined
+  }
+  
   const hreflang: { [lang: string]: string } = {}
   
   regions.forEach(region => {
@@ -141,11 +148,18 @@ export function generateMultiRegionPages(
 /**
  * Generate XML sitemap with proper hreflang support
  * Following Google's XML sitemap format with hreflang annotations
+ * When only one region is active, uses standard sitemap format without hreflang
  */
 export function generateSitemapXML(pages: SitemapPage[]): string {
+  // Check if any page has hreflang annotations
+  const hasHreflang = pages.some(page => page.hreflang)
+  
+  const namespace = hasHreflang 
+    ? 'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n        xmlns:xhtml="http://www.w3.org/1999/xhtml"'
+    : 'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+  
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset ${namespace}>
 ${pages.map(page => {
   const hreflangTags = page.hreflang 
     ? Object.entries(page.hreflang)
