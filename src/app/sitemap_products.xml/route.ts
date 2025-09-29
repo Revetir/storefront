@@ -3,7 +3,7 @@ import {
   getSupportedRegions, 
   generateSitemapXML,
   SitemapPage 
-} from '@lib/sitemap-utils'
+} from '../../lib/sitemap-utils'
 
 async function getAllProducts() {
   try {

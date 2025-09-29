@@ -18,9 +18,9 @@ export interface RegionConfig {
 
 /**
  * Get all supported regions for sitemap generation
+ * Based on your actual regions: US and Europe (DK, FR, DE, IT, ES, SE, GB)
  */
 export async function getSupportedRegions(): Promise<RegionConfig[]> {
-  // Based on your actual regions: US and Europe (DK, FR, DE, IT, ES, SE, GB)
   return [
     {
       code: 'us',
@@ -83,6 +83,7 @@ export async function getSupportedRegions(): Promise<RegionConfig[]> {
 
 /**
  * Generate hreflang annotations for a page across all regions
+ * Following Google's guidelines for proper hreflang implementation
  */
 export function generateHreflangAnnotations(
   baseUrl: string,
@@ -96,11 +97,17 @@ export function generateHreflangAnnotations(
     hreflang[region.hreflang] = url
   })
   
+  // Add x-default pointing to the default region (US)
+  const defaultRegion = regions.find(r => r.isDefault)
+  if (defaultRegion) {
+    hreflang['x-default'] = `${baseUrl}/${defaultRegion.code}${path}`
+  }
+  
   return hreflang
 }
 
 /**
- * Generate sitemap pages for all regions
+ * Generate sitemap pages for all regions with proper hreflang annotations
  */
 export function generateMultiRegionPages(
   baseUrl: string,
@@ -132,7 +139,8 @@ export function generateMultiRegionPages(
 }
 
 /**
- * Generate XML sitemap with hreflang support
+ * Generate XML sitemap with proper hreflang support
+ * Following Google's XML sitemap format with hreflang annotations
  */
 export function generateSitemapXML(pages: SitemapPage[]): string {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

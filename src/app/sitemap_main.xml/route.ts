@@ -4,7 +4,7 @@ import {
   generateMultiRegionPages, 
   generateSitemapXML,
   SitemapPage 
-} from '@lib/sitemap-utils'
+} from '../../lib/sitemap-utils'
 
 export async function GET(request: NextRequest) {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://revetir.com'
