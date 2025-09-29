@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { 
+  getSupportedRegions, 
+  generateSitemapXML,
+  SitemapPage 
+} from '@lib/sitemap-utils'
 
 async function getAllProducts() {
   try {
@@ -57,7 +62,7 @@ export async function GET(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://revetir.com'
     const currentDate = new Date().toISOString().split('T')[0]
     
-    console.log('📄 Generating products sitemap...')
+    console.log('📄 Generating multi-region products sitemap...')
     
     const { products } = await getAllProducts()
     
@@ -83,26 +88,41 @@ export async function GET(request: NextRequest) {
       return hasHandle && hasBrand && (!hasStatus || isPublished)
     })
     
-    const productPages = filteredProducts.map((product: any) => {
-      return {
-        url: `${baseUrl}/us/products/${product.brand.slug}-${product.handle}`,
-        lastModified: product.updated_at ? new Date(product.updated_at).toISOString().split('T')[0] : currentDate,
-        changeFrequency: 'weekly',
-        priority: 0.6,
-      }
+    // Get all supported regions
+    const regions = await getSupportedRegions()
+    
+    // Generate product pages for all regions
+    const productPages: SitemapPage[] = []
+    
+    filteredProducts.forEach((product: any) => {
+      const productPath = `/products/${product.brand.slug}-${product.handle}`
+      const lastModified = product.updated_at 
+        ? new Date(product.updated_at).toISOString().split('T')[0] 
+        : currentDate
+      
+      // Generate hreflang annotations for this product across all regions
+      const hreflang: { [lang: string]: string } = {}
+      regions.forEach(region => {
+        const url = `${baseUrl}/${region.code}${productPath}`
+        hreflang[region.hreflang] = url
+      })
+      
+      // Create page entries for each region
+      regions.forEach(region => {
+        productPages.push({
+          url: `${baseUrl}/${region.code}${productPath}`,
+          lastModified,
+          changeFrequency: 'weekly',
+          priority: 0.6,
+          hreflang
+        })
+      })
     })
     
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${productPages.map(productPage => `  <url>
-    <loc>${productPage.url}</loc>
-    <lastmod>${productPage.lastModified}</lastmod>
-    <changefreq>${productPage.changeFrequency}</changefreq>
-    <priority>${productPage.priority}</priority>
-  </url>`).join('\n')}
-</urlset>`
+    // Generate XML with hreflang support
+    const xml = generateSitemapXML(productPages)
     
-    console.log('✅ Products sitemap generated')
+    console.log('✅ Multi-region products sitemap generated')
     
     return new NextResponse(xml, {
       headers: {

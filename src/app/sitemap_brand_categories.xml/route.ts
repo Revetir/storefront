@@ -1,296 +1,257 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { 
+  getSupportedRegions, 
+  generateMultiRegionPages, 
+  generateSitemapXML,
+  SitemapPage 
+} from '@lib/sitemap-utils'
 
 export async function GET(request: NextRequest) {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://revetir.com'
   const currentDate = new Date().toISOString().split('T')[0]
   
-  // Hardcoded brand + category combinations
+  // Get all supported regions
+  const regions = await getSupportedRegions()
+  
+  // Define brand + category combinations (without region prefix)
   const brandCategoryPages = [
     // Chrome Hearts combinations
     {
-      url: `${baseUrl}/men/brands/chrome-hearts/jewelry`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/chrome-hearts/jewelry',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/men/brands/chrome-hearts/rings`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/chrome-hearts/rings',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/men/brands/chrome-hearts/pendants-charms`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/chrome-hearts/pendants-charms',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/men/brands/chrome-hearts/necklaces`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/chrome-hearts/necklaces',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/men/brands/chrome-hearts/earrings`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/chrome-hearts/earrings',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/men/brands/chrome-hearts/bracelets`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/chrome-hearts/bracelets',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/men/brands/chrome-hearts/hats`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/chrome-hearts/hats',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/men/brands/chrome-hearts/glasses`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/chrome-hearts/glasses',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/men/brands/chrome-hearts/t-shirts`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/chrome-hearts/t-shirts',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     // Chrome Hearts - Women's versions
     {
-      url: `${baseUrl}/women/brands/chrome-hearts/jewelry`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/chrome-hearts/jewelry',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/women/brands/chrome-hearts/rings`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/chrome-hearts/rings',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/chrome-hearts/pendants-charms`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/chrome-hearts/pendants-charms',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/chrome-hearts/necklaces`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/chrome-hearts/necklaces',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/chrome-hearts/earrings`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/chrome-hearts/earrings',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/chrome-hearts/bracelets`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/chrome-hearts/bracelets',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/chrome-hearts/hats`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/chrome-hearts/hats',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/chrome-hearts/glasses`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/chrome-hearts/glasses',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/chrome-hearts/t-shirts`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/chrome-hearts/t-shirts',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     
     // Maison Margiela combinations
     {
-      url: `${baseUrl}/men/brands/maison-margiela/shoes`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/maison-margiela/shoes',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/men/brands/maison-margiela/sneakers`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/maison-margiela/sneakers',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/women/brands/maison-margiela/shoes`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/maison-margiela/shoes',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/women/brands/maison-margiela/sneakers`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/maison-margiela/sneakers',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     
     // Rick Owens combinations
     {
-      url: `${baseUrl}/men/brands/rick-owens/clothing`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/rick-owens/clothing',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/men/brands/rick-owens/t-shirts`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/rick-owens/t-shirts',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/men/brands/rick-owens/pants`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/rick-owens/pants',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/men/brands/rick-owens/sneakers`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/rick-owens/sneakers',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/men/brands/rick-owens/shoes`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/rick-owens/shoes',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/women/brands/rick-owens/clothing`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/rick-owens/clothing',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/women/brands/rick-owens/t-shirts`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/rick-owens/t-shirts',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/rick-owens/pants`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/rick-owens/pants',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/rick-owens/sneakers`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/rick-owens/sneakers',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/women/brands/rick-owens/shoes`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/rick-owens/shoes',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     
     // Gentle Monster combinations
     {
-      url: `${baseUrl}/men/brands/gentle-monster/sunglasses`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/gentle-monster/sunglasses',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/men/brands/gentle-monster/eyewear`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/gentle-monster/eyewear',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/gentle-monster/sunglasses`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/gentle-monster/sunglasses',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/gentle-monster/eyewear`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/gentle-monster/eyewear',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     
     // Acne Studios combinations
     {
-      url: `${baseUrl}/men/brands/acne-studios/scarves`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/acne-studios/scarves',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/men/brands/acne-studios/jeans`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/acne-studios/jeans',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/men/brands/acne-studios/clothing`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/acne-studios/clothing',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/men/brands/acne-studios/accessories`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/men/brands/acne-studios/accessories',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/acne-studios/scarves`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/acne-studios/scarves',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/acne-studios/jeans`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/acne-studios/jeans',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/women/brands/acne-studios/clothing`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/acne-studios/clothing',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/women/brands/acne-studios/accessories`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
+      path: '/women/brands/acne-studios/accessories',
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
   ]
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${brandCategoryPages.map(page => `  <url>
-    <loc>${page.url}</loc>
-    <lastmod>${page.lastModified}</lastmod>
-    <changefreq>${page.changeFrequency}</changefreq>
-    <priority>${page.priority}</priority>
-  </url>`).join('\n')}
-</urlset>`
+  // Generate pages for all regions with hreflang annotations
+  const pages = generateMultiRegionPages(baseUrl, brandCategoryPages, regions)
+  
+  // Generate XML with hreflang support
+  const xml = generateSitemapXML(pages)
 
   return new NextResponse(xml, {
     headers: {

@@ -30,7 +30,7 @@ export default async function Footer() {
               Partnerships
             </LocalizedClientLink>
             <a
-              href="https://instagram.com/"
+              href="https://instagram.com/youcouldbewearingthis"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-ui-fg-base"
@@ -38,7 +38,7 @@ export default async function Footer() {
               Instagram
             </a>
             <a
-              href="https://tiktok.com/"
+              href="https://tiktok.com/@youcouldbewearingthis"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-ui-fg-base"
