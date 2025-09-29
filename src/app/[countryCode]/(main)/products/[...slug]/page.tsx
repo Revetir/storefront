@@ -4,6 +4,7 @@ import { listProducts } from "@lib/data/products"
 import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
+import { generateProductJsonLd } from "@lib/util/json-ld"
 
 type Props = {
   params: Promise<{ countryCode: string; slug: string[] }>
@@ -135,6 +136,13 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const brandName = (product as any).brand?.name
   const metaDescription = `Buy ${brandName} ${product.title} on sale at REVETIR.com. Free Shipping & Returns in the US.`
 
+  // Generate JSON-LD structured data
+  const jsonLd = generateProductJsonLd({
+    product,
+    region,
+    countryCode: params.countryCode
+  })
+
   return {
     title: `${brandName} ${product.title}`,
     description: metaDescription,
@@ -145,6 +153,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     },
     alternates: {
       canonical: `/${params.countryCode}/products/${brandAndHandle}`,
+    },
+    other: {
+      'application/ld+json': jsonLd,
     },
   }
 }
