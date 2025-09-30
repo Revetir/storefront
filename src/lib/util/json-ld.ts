@@ -119,8 +119,11 @@ function generateVariantId(sku: string, variantName: string): string {
 
 // Get global identifier (EAN, UPC, or Barcode) from variant metadata
 function getVariantIdentifier(variant: any): string | undefined {
-  // Check for EAN, UPC, or Barcode in metadata or direct fields
-  return variant?.ean ||
+  // Check for EAN, UPC, or Barcode in metadata first, then direct fields
+  return variant?.metadata?.ean ||
+         variant?.metadata?.upc ||
+         variant?.metadata?.barcode ||
+         variant?.ean ||
          variant?.upc ||
          variant?.barcode ||
          undefined
@@ -183,14 +186,13 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     const offer: any = {
       "@type": "Offer",
       "price": calculatedPrice?.calculated_amount,
-      "priceCurrency": calculatedPrice?.currency_code || region?.currency_code || "USD",
+      "priceCurrency": formatCurrencyCode(calculatedPrice?.currency_code || region?.currency_code || "USD"),
       "availability": availability,
       "seller": {
         "@type": "Organization",
         "name": "REVETIR",
         "url": "https://revetir.com"
       },
-      "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     }
 
     // Add priceSpecification if on sale to show both original and sale prices
@@ -270,19 +272,8 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     const isSale = calculatedPrice?.original_amount && 
                    calculatedPrice.original_amount !== calculatedPrice.calculated_amount
     
-    // Get variant name (size) from product options
-    // In Medusa V2, variant names are stored in product.options[].values[].value
-    // We need to find the option value that matches this variant
-    let variantName = variant.title || `Variant ${index + 1}`
-    
-    // Try to find the variant name from product options
-    if (product.options && product.options.length > 0) {
-      // Get the first option's values (typically size)
-      const optionValues = product.options[0]?.values || []
-      if (optionValues.length > index) {
-        variantName = optionValues[index].value
-      }
-    }
+    // Get variant name (size) from product options using variant index
+    const variantName = product.options?.[0]?.values?.[index]?.value || `variant-${index}`
     const variantId = productSku ? generateVariantId(productSku, variantName) : `${product.id}-${variantName}`
     
     // Get global identifier if available
@@ -291,14 +282,13 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     const offer: any = {
       "@type": "Offer",
       "price": calculatedPrice?.calculated_amount,
-      "priceCurrency": calculatedPrice?.currency_code || region?.currency_code || "USD",
+      "priceCurrency": formatCurrencyCode(calculatedPrice?.currency_code || region?.currency_code || "USD"),
       "availability": availability,
       "seller": {
         "@type": "Organization",
         "name": "REVETIR",
         "url": "https://revetir.com"
       },
-      "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     }
 
     // Add priceSpecification if on sale to show both original and sale prices
