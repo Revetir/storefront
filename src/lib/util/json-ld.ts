@@ -193,7 +193,7 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     const jsonLd = {
       "@context": "https://schema.org",
       "@type": "Product",
-      "id": productSku,
+      "id": productSku || product.id,
       "name": product.title,
       "description": product.description || "",
       "gtin": gtin || "",
@@ -248,7 +248,7 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     
     // Get variant name (size) from options
     const variantName = variant.options?.[0]?.value || variant.title || `Variant ${index + 1}`
-    const variantId = generateVariantId(productSku, variantName)
+    const variantId = productSku ? generateVariantId(productSku, variantName) : `${product.id}-${variantName}`
     
     // Get GTIN if available
     const gtin = getVariantUPC(variant)
