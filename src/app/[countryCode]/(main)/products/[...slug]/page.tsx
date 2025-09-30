@@ -5,6 +5,7 @@ import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 import { generateProductJsonLd } from "@lib/util/json-ld"
+import OptionSelect from "@modules/products/components/product-actions/option-select"
 
 type Props = {
   params: Promise<{ countryCode: string; slug: string[] }>
@@ -194,7 +195,7 @@ export default async function ProductPage(props: Props) {
       handle: resolvedProduct.handle,
       // Ensure all relations needed by the template are present
       fields:
-        "*images,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.title,*variants.options.*,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,+metadata,+tags,*categories,+product_sku.*,+brand.*,*options.*",
+        "*images,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.title,*variants.options.*,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,+metadata,+tags,*categories,+product_sku.*,+brand.*,*options.*,+options.*",
     },
   }).then(({ response }) => response.products[0])
 

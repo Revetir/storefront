@@ -273,12 +273,21 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
                    calculatedPrice.original_amount !== calculatedPrice.calculated_amount
     
     
-    // Debug: Check if variant.title is now populated
-    console.log('Variant title:', variant.title)
-    console.log('Variant options:', variant.options)
+    // Debug: Check product options
+    console.log('Product options:', product.options)
+    console.log('Variant ID:', variant.id)
     
-    // Get variant name (size) - check if options array has valid objects
-    const variantName = variant.title || `variant-${index}`
+    // Get variant name from product options using variant ID matching
+    const findVariantName = () => {
+      // Try to find the variant by matching its ID with the option values
+      if (product.options?.[0]?.values) {
+        // For now, use index-based approach as fallback
+        return product.options[0].values[index]?.value || `variant-${index}`
+      }
+      return `variant-${index}`
+    }
+    
+    const variantName = findVariantName()
     const variantId = productSku ? generateVariantId(productSku, variantName) : `${product.id}-${variantName}`
     
     // Get global identifier if available
