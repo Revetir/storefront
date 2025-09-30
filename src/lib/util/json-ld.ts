@@ -273,7 +273,7 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
                    calculatedPrice.original_amount !== calculatedPrice.calculated_amount
     
     // Get variant name (size) from product options using variant index
-    const variantName = variant.title || `variant-${index}`
+    const variantName = variant.options?.[0]?.value || `variant-${index}`
     const variantId = productSku ? generateVariantId(productSku, variantName) : `${product.id}-${variantName}`
     
     // Get global identifier if available
