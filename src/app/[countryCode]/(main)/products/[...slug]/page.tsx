@@ -19,7 +19,7 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       countryCode,
       queryParams: {
         handle: brandAndHandle,
-        fields: "handle,title,description,thumbnail,*images,*categories,+product_sku.*,+brand.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder",
+        fields: "handle,title,description,thumbnail,*images,*categories,+product_sku.*,+brand.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*options.*",
         limit: 1,
       },
     }).then(({ response }) => response.products[0])
@@ -42,7 +42,7 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       queryParams: {
         handle: handleCandidate,
         // ensure brand is included to validate
-        fields: "handle,title,description,thumbnail,*images,*categories,+product_sku.*,+brand.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder",
+        fields: "handle,title,description,thumbnail,*images,*categories,+product_sku.*,+brand.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*options.*",
         limit: 1,
       },
     }).then(({ response }) => response.products[0])

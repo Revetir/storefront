@@ -117,9 +117,23 @@ function generateVariantId(sku: string, variantName: string): string {
   return `${sku}${variantName}`
 }
 
-// Get UPC from variant metadata
-function getVariantUPC(variant: any): string | undefined {
-  return variant?.metadata?.upc || variant?.upc || undefined
+// Get global identifier (EAN, UPC, or Barcode) from variant metadata
+function getVariantIdentifier(variant: any): string | undefined {
+  // Check for EAN, UPC, or Barcode in metadata or direct fields
+  return variant?.ean ||
+         variant?.upc ||
+         variant?.barcode ||
+         undefined
+}
+
+// Format currency code to ISO 4217 standard (uppercase)
+function formatCurrencyCode(currencyCode: string): string {
+  return currencyCode?.toUpperCase() || "USD"
+}
+
+// Format price to have exactly 2 decimal places
+function formatPrice(price: number): string {
+  return price?.toFixed(2)
 }
 
 export function generateProductJsonLd({ product, region, countryCode }: ProductJsonLdProps): string {
@@ -130,18 +144,6 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
   const thumbnail = product.thumbnail
   const allImages = images.length > 0 ? images : (thumbnail ? [thumbnail] : [])
   
-  // Debug logging
-  console.log('JSON-LD Debug - Product:', {
-    productId: product.id,
-    title: product.title,
-    description: product.description,
-    material: parseMaterial(product.description || ''),
-    images: product.images,
-    thumbnail: product.thumbnail,
-    allImages,
-    productSku,
-    variants: product.variants?.length
-  })
   const categories = product.categories?.map(cat => cat.name) || []
   
   // Parse product attributes
@@ -175,8 +177,8 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     const isSale = calculatedPrice?.original_amount && 
                    calculatedPrice.original_amount !== calculatedPrice.calculated_amount
     
-    // Get GTIN if available
-    const gtin = getVariantUPC(variant)
+    // Get global identifier if available
+    const globalIdentifier = getVariantIdentifier(variant)
     
     const offer: any = {
       "@type": "Offer",
@@ -195,17 +197,17 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     if (isSale && calculatedPrice?.original_amount && calculatedPrice?.calculated_amount) {
       offer.priceSpecification = {
         "@type": "CompoundPriceSpecification",
-        "priceCurrency": calculatedPrice?.currency_code || region?.currency_code || "USD",
+        "priceCurrency": formatCurrencyCode(calculatedPrice?.currency_code || region?.currency_code || "USD"),
         "priceComponent": [
           {
             "@type": "UnitPriceSpecification",
             "name": "Original price",
-            "price": calculatedPrice.original_amount
+            "price": formatPrice(calculatedPrice.original_amount)
           },
           {
             "@type": "UnitPriceSpecification",
             "name": "Sale price",
-            "price": calculatedPrice.calculated_amount
+            "price": formatPrice(calculatedPrice.calculated_amount)
           }
         ]
       }
@@ -214,11 +216,16 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     const jsonLd = {
       "@context": "https://schema.org",
       "@type": "Product",
-      "id": productSku || product.id,
+      "sku": productSku || product.id,
       "name": product.title,
       "description": product.description || "",
-      "gtin": gtin || "",
-      "identifierExists": !!gtin,
+      ...(globalIdentifier && {
+        "identifier": {
+          "@type": "PropertyValue",
+          "propertyID": "GTIN",
+          "value": globalIdentifier
+        }
+      }),
       "brand": {
         "@type": "Brand",
         "name": brandName
@@ -258,28 +265,28 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
       ? "https://schema.org/InStock" 
       : "https://schema.org/OutOfStock"
     
-    // Debug logging for variants
-    console.log('JSON-LD Debug - Variant:', {
-      index,
-      variantId: variant.id,
-      title: variant.title,
-      options: variant.options,
-      inventoryQuantity,
-      manageInventory,
-      availability,
-      calculatedPrice
-    })
     
     // Check if variant is on sale by comparing calculated vs original price
     const isSale = calculatedPrice?.original_amount && 
                    calculatedPrice.original_amount !== calculatedPrice.calculated_amount
     
-    // Get variant name (size) from options
-    const variantName = variant.options?.[0]?.value || variant.title || `Variant ${index + 1}`
+    // Get variant name (size) from product options
+    // In Medusa V2, variant names are stored in product.options[].values[].value
+    // We need to find the option value that matches this variant
+    let variantName = variant.title || `Variant ${index + 1}`
+    
+    // Try to find the variant name from product options
+    if (product.options && product.options.length > 0) {
+      // Get the first option's values (typically size)
+      const optionValues = product.options[0]?.values || []
+      if (optionValues.length > index) {
+        variantName = optionValues[index].value
+      }
+    }
     const variantId = productSku ? generateVariantId(productSku, variantName) : `${product.id}-${variantName}`
     
-    // Get GTIN if available
-    const gtin = getVariantUPC(variant)
+    // Get global identifier if available
+    const globalIdentifier = getVariantIdentifier(variant)
     
     const offer: any = {
       "@type": "Offer",
@@ -298,17 +305,17 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     if (isSale && calculatedPrice?.original_amount && calculatedPrice?.calculated_amount) {
       offer.priceSpecification = {
         "@type": "CompoundPriceSpecification",
-        "priceCurrency": calculatedPrice?.currency_code || region?.currency_code || "USD",
+        "priceCurrency": formatCurrencyCode(calculatedPrice?.currency_code || region?.currency_code || "USD"),
         "priceComponent": [
           {
             "@type": "UnitPriceSpecification",
             "name": "Original price",
-            "price": calculatedPrice.original_amount
+            "price": formatPrice(calculatedPrice.original_amount)
           },
           {
             "@type": "UnitPriceSpecification",
             "name": "Sale price",
-            "price": calculatedPrice.calculated_amount
+            "price": formatPrice(calculatedPrice.calculated_amount)
           }
         ]
       }
@@ -317,11 +324,16 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     const variantJsonLd = {
       "@context": "https://schema.org",
       "@type": "Product",
-      "id": variantId,
+      "sku": variantId,
       "name": product.title,
       "description": product.description || "",
-      "gtin": gtin || "",
-      "identifierExists": !!gtin,
+      ...(globalIdentifier && {
+        "identifier": {
+          "@type": "PropertyValue",
+          "propertyID": "GTIN",
+          "value": globalIdentifier
+        }
+      }),
       "brand": {
         "@type": "Brand",
         "name": brandName
