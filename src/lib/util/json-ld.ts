@@ -117,12 +117,18 @@ function generateVariantId(sku: string, variantName: string): string {
   return `${sku}${variantName}`
 }
 
+// Get UPC from variant metadata
+function getVariantUPC(variant: any): string | undefined {
+  return variant?.metadata?.upc || variant?.upc || undefined
+}
+
 export function generateProductJsonLd({ product, region, countryCode }: ProductJsonLdProps): string {
   const brand = (product as any)?.brand
   const brandName = brand?.name
   const productSku = (product as any)?.product_sku?.sku
   const images = product.images?.map(img => img.url) || []
   const thumbnail = product.thumbnail
+  const allImages = images.length > 0 ? images : (thumbnail ? [thumbnail] : [])
   const categories = product.categories?.map(cat => cat.name) || []
   
   // Parse product attributes
@@ -145,11 +151,11 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
                    calculatedPrice.original_amount !== calculatedPrice.calculated_amount
     
     // Get GTIN if available
-    const gtin = (variant as any)?.gtin || (variant as any)?.upc
+    const gtin = getVariantUPC(variant)
     
     const offer: any = {
       "@type": "Offer",
-      "price": calculatedPrice?.calculated_amount ? (calculatedPrice.calculated_amount / 100).toFixed(2) : undefined,
+      "price": calculatedPrice?.calculated_amount,
       "priceCurrency": calculatedPrice?.currency_code || region?.currency_code || "USD",
       "availability": availability,
       "seller": {
@@ -161,8 +167,9 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     }
 
     // Add sale price if on sale
-    if (isSale && calculatedPrice?.original_amount) {
-      offer.salePrice = (calculatedPrice.original_amount / 100).toFixed(2)
+    if (isSale && calculatedPrice?.original_amount && calculatedPrice?.calculated_amount) {
+      offer.price = calculatedPrice.original_amount
+      offer.salePrice = calculatedPrice.calculated_amount
     }
 
     const jsonLd = {
@@ -170,20 +177,18 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
       "@type": "Product",
       "id": productSku,
       "name": product.title,
-      "description": product.description,
-      "sku": productSku,
-      "mpn": productSku,
-      "gtin": gtin || undefined,
+      "description": product.description || "",
+      "gtin": gtin || "",
       "identifierExists": !!gtin,
       "brand": {
         "@type": "Brand",
         "name": brandName
       },
       "category": categories.length > 0 ? categories[0] : undefined,
-      "image": images.length > 0 ? images : (thumbnail ? [thumbnail] : []),
+      "image": allImages,
       "url": `https://revetir.com/${countryCode}/products/${brand?.slug ? `${brand.slug}-` : ''}${product.handle}`,
       "color": color || undefined,
-      "material": material || undefined,
+      "material": material || "",
       "gender": gender,
       "ageGroup": "adult",
       "condition": "https://schema.org/NewCondition",
@@ -211,11 +216,11 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     const variantId = generateVariantId(productSku, variantName)
     
     // Get GTIN if available
-    const gtin = (variant as any)?.gtin || (variant as any)?.upc
+    const gtin = getVariantUPC(variant)
     
     const offer: any = {
       "@type": "Offer",
-      "price": calculatedPrice?.calculated_amount ? (calculatedPrice.calculated_amount / 100).toFixed(2) : undefined,
+      "price": calculatedPrice?.calculated_amount,
       "priceCurrency": calculatedPrice?.currency_code || region?.currency_code || "USD",
       "availability": availability,
       "seller": {
@@ -227,8 +232,9 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     }
 
     // Add sale price if on sale
-    if (isSale && calculatedPrice?.original_amount) {
-      offer.salePrice = (calculatedPrice.original_amount / 100).toFixed(2)
+    if (isSale && calculatedPrice?.original_amount && calculatedPrice?.calculated_amount) {
+      offer.price = calculatedPrice.original_amount
+      offer.salePrice = calculatedPrice.calculated_amount
     }
 
     const variantJsonLd = {
@@ -236,20 +242,18 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
       "@type": "Product",
       "id": variantId,
       "name": product.title,
-      "description": product.description,
-      "sku": variantId,
-      "mpn": variantId,
-      "gtin": gtin || undefined,
+      "description": product.description || "",
+      "gtin": gtin || "",
       "identifierExists": !!gtin,
       "brand": {
         "@type": "Brand",
         "name": brandName
       },
       "category": categories.length > 0 ? categories[0] : undefined,
-      "image": images.length > 0 ? images : (thumbnail ? [thumbnail] : []),
+      "image": allImages,
       "url": `https://revetir.com/${countryCode}/products/${brand?.slug ? `${brand.slug}-` : ''}${product.handle}`,
       "color": color || undefined,
-      "material": material || undefined,
+      "material": material || "",
       "gender": gender,
       "ageGroup": "adult",
       "condition": "https://schema.org/NewCondition",
