@@ -19,7 +19,7 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       countryCode,
       queryParams: {
         handle: brandAndHandle,
-        fields: "handle,title,description,thumbnail,*images,*categories,+product_sku.*,+brand.*,*variants.calculated_price,+variants.inventory_quantity",
+        fields: "handle,title,description,thumbnail,*images,*categories,+product_sku.*,+brand.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder",
         limit: 1,
       },
     }).then(({ response }) => response.products[0])
@@ -42,7 +42,7 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       queryParams: {
         handle: handleCandidate,
         // ensure brand is included to validate
-        fields: "handle,title,description,thumbnail,*images,*categories,+product_sku.*,+brand.*,*variants.calculated_price,+variants.inventory_quantity",
+        fields: "handle,title,description,thumbnail,*images,*categories,+product_sku.*,+brand.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder",
         limit: 1,
       },
     }).then(({ response }) => response.products[0])
@@ -194,7 +194,7 @@ export default async function ProductPage(props: Props) {
       handle: resolvedProduct.handle,
       // Ensure all relations needed by the template are present
       fields:
-        "*images,*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,*categories,+product_sku.*,+brand.*",
+        "*images,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+metadata,+tags,*categories,+product_sku.*,+brand.*",
     },
   }).then(({ response }) => response.products[0])
 

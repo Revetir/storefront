@@ -158,9 +158,16 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     const calculatedPrice = variant.calculated_price
     const inventoryQuantity = variant.inventory_quantity
     const manageInventory = variant.manage_inventory
-    // If inventory is not managed, always in stock
-    // If inventory is managed, check quantity
-    const availability = !manageInventory
+    const allowBackorder = (variant as any).allow_backorder
+    
+    // Determine availability based on Medusa V2 logic:
+    // 1. If backorders are allowed, always in stock
+    // 2. If inventory is managed and quantity > 0, in stock
+    // 3. If inventory is not managed, in stock
+    // 4. Otherwise, out of stock
+    const availability = allowBackorder || 
+                        !manageInventory || 
+                        (manageInventory && inventoryQuantity && inventoryQuantity > 0)
       ? "https://schema.org/InStock" 
       : "https://schema.org/OutOfStock"
     
@@ -184,10 +191,24 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
       "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     }
 
-    // Add sale price if on sale
+    // Add priceSpecification if on sale to show both original and sale prices
     if (isSale && calculatedPrice?.original_amount && calculatedPrice?.calculated_amount) {
-      offer.price = calculatedPrice.original_amount
-      offer.salePrice = calculatedPrice.calculated_amount
+      offer.priceSpecification = {
+        "@type": "CompoundPriceSpecification",
+        "priceCurrency": calculatedPrice?.currency_code || region?.currency_code || "USD",
+        "priceComponent": [
+          {
+            "@type": "UnitPriceSpecification",
+            "name": "Original price",
+            "price": calculatedPrice.original_amount
+          },
+          {
+            "@type": "UnitPriceSpecification",
+            "name": "Sale price",
+            "price": calculatedPrice.calculated_amount
+          }
+        ]
+      }
     }
 
     const jsonLd = {
@@ -224,9 +245,16 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
     const calculatedPrice = variant.calculated_price
     const inventoryQuantity = variant.inventory_quantity
     const manageInventory = variant.manage_inventory
-    // If inventory is not managed, always in stock
-    // If inventory is managed, check quantity
-    const availability = !manageInventory || (inventoryQuantity && inventoryQuantity > 0)
+    const allowBackorder = (variant as any).allow_backorder
+    
+    // Determine availability based on Medusa V2 logic:
+    // 1. If backorders are allowed, always in stock
+    // 2. If inventory is managed and quantity > 0, in stock
+    // 3. If inventory is not managed, in stock
+    // 4. Otherwise, out of stock
+    const availability = allowBackorder || 
+                        !manageInventory || 
+                        (manageInventory && inventoryQuantity && inventoryQuantity > 0)
       ? "https://schema.org/InStock" 
       : "https://schema.org/OutOfStock"
     
@@ -266,10 +294,24 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
       "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     }
 
-    // Add sale price if on sale
+    // Add priceSpecification if on sale to show both original and sale prices
     if (isSale && calculatedPrice?.original_amount && calculatedPrice?.calculated_amount) {
-      offer.price = calculatedPrice.original_amount
-      offer.salePrice = calculatedPrice.calculated_amount
+      offer.priceSpecification = {
+        "@type": "CompoundPriceSpecification",
+        "priceCurrency": calculatedPrice?.currency_code || region?.currency_code || "USD",
+        "priceComponent": [
+          {
+            "@type": "UnitPriceSpecification",
+            "name": "Original price",
+            "price": calculatedPrice.original_amount
+          },
+          {
+            "@type": "UnitPriceSpecification",
+            "name": "Sale price",
+            "price": calculatedPrice.calculated_amount
+          }
+        ]
+      }
     }
 
     const variantJsonLd = {
