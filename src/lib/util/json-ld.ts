@@ -273,48 +273,24 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
                    calculatedPrice.original_amount !== calculatedPrice.calculated_amount
     
     
-    // Debug: Log variant and product structure for testing
-    console.log('=== VARIANT DEBUG INFO ===')
-    console.log('Variant Index:', index)
-    console.log('Variant ID:', variant.id)
-    console.log('Variant Title:', variant.title)
-    console.log('Variant Options:', variant.options)
-    console.log('Product Options:', product.options)
-    console.log('Variant Object Keys:', Object.keys(variant))
-    
     // Get variant name from variant.options relationship (Medusa V2 approach)
     const findVariantName = () => {
-      console.log('--- Finding Variant Name ---')
-      
       // Check if variant has options and extract the option values
       if (variant.options && variant.options.length > 0) {
-        console.log('Variant has options:', variant.options.length)
-        const optionValues = variant.options.map(option => {
-          console.log('Option:', option)
-          return option.value
-        })
-        const joinedName = optionValues.join(' / ')
-        console.log('Option values:', optionValues)
-        console.log('Joined variant name:', joinedName)
-        return joinedName
+        // Join all option values to create the variant name
+        return variant.options.map(option => option.value).join(' / ')
       }
-      
-      console.log('No variant.options found, checking variant.title')
       
       // Fallback to variant.title if available
       if (variant.title) {
-        console.log('Using variant.title:', variant.title)
         return variant.title
       }
       
-      console.log('No variant.title, using fallback')
       // Final fallback
       return `variant-${index}`
     }
     
     const variantName = findVariantName()
-    console.log('Final variant name:', variantName)
-    console.log('=== END VARIANT DEBUG ===')
     const variantId = productSku ? generateVariantId(productSku, variantName) : `${product.id}-${variantName}`
     
     // Get global identifier if available
