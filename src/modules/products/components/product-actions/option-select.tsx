@@ -19,7 +19,41 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
   "data-testid": dataTestId,
   disabled,
 }) => {
-  const filteredOptions = (option.values ?? []).map((v) => v.value)
+  // Universal sort function that handles predefined sizes and numeric/alphanumeric values
+  const sizeOrder = [
+    "xxxs", "xxs", "xs", "s", "sm", "small", 
+    "m", "med", "medium", "l", "large", 
+    "xl", "xxl", "xxxl", "xxxxl"
+  ]
+
+  const universalSort = (a: string, b: string) => {
+    const aLower = a.toLowerCase()
+    const bLower = b.toLowerCase()
+
+    const aIndex = sizeOrder.indexOf(aLower)
+    const bIndex = sizeOrder.indexOf(bLower)
+
+    if (aIndex !== -1 && bIndex !== -1) {
+      // Both are in the sizeOrder list
+      return aIndex - bIndex
+    } else if (aIndex !== -1) {
+      // Only a is in the list -> a comes first
+      return -1
+    } else if (bIndex !== -1) {
+      // Only b is in the list -> b comes first
+      return 1
+    }
+
+    // Fallback: numeric/alphanumeric natural sort
+    return a.localeCompare(b, undefined, { 
+      numeric: true, 
+      sensitivity: 'base' 
+    })
+  }
+
+  const sortedOptions = (option.values ?? [])
+    .map((v) => v.value)
+    .sort(universalSort)
 
   return (
     <div className="flex flex-col gap-y-3">
@@ -28,7 +62,7 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
         className="flex flex-wrap justify-between gap-2"
         data-testid={dataTestId}
       >
-        {filteredOptions.map((v) => {
+        {sortedOptions.map((v) => {
           return (
             <button
               onClick={() => updateOption(option.id, v)}
