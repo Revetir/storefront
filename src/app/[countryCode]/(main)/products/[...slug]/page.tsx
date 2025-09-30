@@ -194,7 +194,7 @@ export default async function ProductPage(props: Props) {
       handle: resolvedProduct.handle,
       // Ensure all relations needed by the template are present
       fields:
-        "*images,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+variants.title,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,+metadata,+tags,*categories,+product_sku.*,+brand.*,*options.*",
+        "*images,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.title,*variants.options.*,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,+metadata,+tags,*categories,+product_sku.*,+brand.*,*options.*",
     },
   }).then(({ response }) => response.products[0])
 

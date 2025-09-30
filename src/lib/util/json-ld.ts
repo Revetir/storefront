@@ -273,6 +273,10 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
                    calculatedPrice.original_amount !== calculatedPrice.calculated_amount
     
     
+    // Debug: Check if variant.title is now populated
+    console.log('Variant title:', variant.title)
+    console.log('Variant options:', variant.options)
+    
     // Get variant name (size) - check if options array has valid objects
     const variantName = variant.title || `variant-${index}`
     const variantId = productSku ? generateVariantId(productSku, variantName) : `${product.id}-${variantName}`
