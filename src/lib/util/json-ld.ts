@@ -153,7 +153,7 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
   const color = parseColor(product.title)
   const material = parseMaterial(product.description || '')
   const gender = parseGender(productSku || '')
-  const itemGroupId = generateItemGroupId(productSku || '')
+  const inProductGroupWithID = generateItemGroupId(productSku || '')
   const category = categories.length > 0 ? categories[0] : ''
   const pattern = parsePattern(product.title, category)
   
@@ -215,12 +215,12 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
       }
     }
 
-    const jsonLd = {
+    const jsonLd: any = {
       "@context": "https://schema.org",
       "@type": "Product",
       "sku": productSku || product.id,
       "name": product.title,
-      "description": product.description || "",
+      ...(product.description && { "description": product.description }),
       ...(globalIdentifier && {
         "identifier": {
           "@type": "PropertyValue",
@@ -228,21 +228,26 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
           "value": globalIdentifier
         }
       }),
-      "brand": {
-        "@type": "Brand",
-        "name": brandName
-      },
-      "category": categories.length > 0 ? categories[0] : undefined,
-      "image": allImages,
+      ...(brandName && {
+        "brand": {
+          "@type": "Brand",
+          "name": brandName
+        }
+      }),
+      ...(categories.length > 0 && { "category": categories[0] }),
+      ...(allImages.length > 0 && { "image": allImages }),
       "url": `https://revetir.com/${countryCode}/products/${brand?.slug ? `${brand.slug}-` : ''}${product.handle}`,
-      "color": color || undefined,
-      "material": material || "",
-      "gender": gender,
-      "ageGroup": "adult",
-      "condition": "https://schema.org/NewCondition",
-      "itemGroupId": itemGroupId,
+      ...(color && { "color": color }),
+      ...(material && { "material": material }),
+      ...(gender && { "gender": gender }),
+      "audience": {
+        "@type": "PeopleAudience",
+        "suggestedMinAge": 13
+      },
+      "itemCondition": "https://schema.org/NewCondition",
+      ...(inProductGroupWithID && { "inProductGroupWithID": inProductGroupWithID }),
       "size": "OS",
-      "pattern": pattern || undefined,
+      ...(pattern && { "pattern": pattern }),
       "offers": offer
     }
 
@@ -328,12 +333,12 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
       }
     }
 
-    const variantJsonLd = {
+    const variantJsonLd: any = {
       "@context": "https://schema.org",
       "@type": "Product",
       "sku": variantId,
       "name": product.title,
-      "description": product.description || "",
+      ...(product.description && { "description": product.description }),
       ...(globalIdentifier && {
         "identifier": {
           "@type": "PropertyValue",
@@ -341,21 +346,26 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
           "value": globalIdentifier
         }
       }),
-      "brand": {
-        "@type": "Brand",
-        "name": brandName
-      },
-      "category": categories.length > 0 ? categories[0] : undefined,
-      "image": allImages,
+      ...(brandName && {
+        "brand": {
+          "@type": "Brand",
+          "name": brandName
+        }
+      }),
+      ...(categories.length > 0 && { "category": categories[0] }),
+      ...(allImages.length > 0 && { "image": allImages }),
       "url": `https://revetir.com/${countryCode}/products/${brand?.slug ? `${brand.slug}-` : ''}${product.handle}`,
-      "color": color || undefined,
-      "material": material || "",
-      "gender": gender,
-      "ageGroup": "adult",
-      "condition": "https://schema.org/NewCondition",
-      "itemGroupId": itemGroupId,
+      ...(color && { "color": color }),
+      ...(material && { "material": material }),
+      ...(gender && { "gender": gender }),
+      "audience": {
+        "@type": "PeopleAudience",
+        "suggestedMinAge": 13
+      },
+      "itemCondition": "https://schema.org/NewCondition",
+      ...(inProductGroupWithID && { "inProductGroupWithID": inProductGroupWithID }),
       "size": variantName,
-      "pattern": pattern || undefined,
+      ...(pattern && { "pattern": pattern }),
       "offers": offer
     }
 
