@@ -6,6 +6,7 @@ import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 import { generateProductJsonLd } from "@lib/util/json-ld"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
+import Script from "next/script"
 
 type Props = {
   params: Promise<{ countryCode: string; slug: string[] }>
@@ -155,9 +156,6 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     alternates: {
       canonical: `/${params.countryCode}/products/${brandAndHandle}`,
     },
-    other: {
-      'application/ld+json': jsonLd,
-    },
   }
 }
 
@@ -235,12 +233,28 @@ export default async function ProductPage(props: Props) {
     )
   })
 
+  // Generate JSON-LD structured data for this product
+  const jsonLd = generateProductJsonLd({
+    product: pricedProduct,
+    region,
+    countryCode: params.countryCode
+  })
+
   return (
-    <ProductTemplate
-      product={pricedProduct}
-      region={region}
-      countryCode={params.countryCode}
-      relatedProducts={relatedProducts}
-    />
+    <>
+      <Script
+        id="product-json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd,
+        }}
+      />
+      <ProductTemplate
+        product={pricedProduct}
+        region={region}
+        countryCode={params.countryCode}
+        relatedProducts={relatedProducts}
+      />
+    </>
   )
 }
