@@ -5,7 +5,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 
 const Hero = () => {
   const imageUrl =
-    "/images/opening_sale_banner.gif";
+    "/images/sale_banner_80_off.png";
 
   return (
     <section
@@ -31,7 +31,7 @@ const Hero = () => {
         <div style={{ width: "100%", position: "relative" }}>
           <img
             src={imageUrl}
-            alt="Grand Opening Sale Up To 80% Off"
+            alt="Designer Fashion Sale Up To 80% Off - Men's & Women's Luxury Clothing"
             style={{
               width: "100%",
               height: "auto",

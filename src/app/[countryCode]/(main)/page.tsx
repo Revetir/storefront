@@ -11,11 +11,12 @@ import NewArrivals from "@modules/home/components/new-arrivals/new-arrivals"
 import { getNewestProducts } from "@lib/data/products"
 
 export const metadata: Metadata = {
-  description:
-    "Luxury fashion & independent Asian designers",
+  title: "Authentic Designer Fashion & Luxury Accessories",
+  description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
+  keywords: "designer fashion sale, luxury clothing, men's designer clothes, women's designer clothes, luxury accessories, fashion sale, designer sale",
   openGraph: {
-    title: "Luxury Fashion & Independent Designers",
-    description: "Discover luxury fashion and independent Asian designers. Free shipping & returns in the US.",
+    title: "Authentic Designer Fashion & Luxury Accessories",
+    description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
     url: "https://revetir.com",
     siteName: "REVETIR",
     images: [
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
         url: "/images/open_graph_image.png",
         width: 1200,
         height: 630,
-        alt: "REVETIR - Luxury Fashion & Independent Designers",
+        alt: "REVETIR - Authentic Designer Fashion & Luxury Accessories",
       },
     ],
     locale: "en_US",
@@ -31,9 +32,20 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Luxury Fashion & Independent Designers",
-    description: "Discover luxury fashion and independent Asian designers. Free shipping & returns in the US.",
+    title: "Authentic Designer Fashion & Luxury Accessories",
+    description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
     images: ["/images/open_graph_image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 }
 
