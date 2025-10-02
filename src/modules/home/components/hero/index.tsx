@@ -31,7 +31,7 @@ const Hero = () => {
         <div style={{ width: "100%", position: "relative" }}>
           <img
             src={imageUrl}
-            alt="Designer Fashion Sale Up To 80% Off - Men's & Women's Luxury Clothing"
+            alt="Designer Fashion Sale - Up To 80% Off Men and Women's Styles"
             style={{
               width: "100%",
               height: "auto",
