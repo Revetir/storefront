@@ -24,20 +24,20 @@ const NewsSection = () => {
             </div>
           </div>
         </Link>
-        <Link href="https://www.nytimes.com/2025/09/25/style/jil-sander-simone-bellotti-debut.html" className="block">
+        <Link href="https://www.bbc.com/news/articles/cy4ydxlm9n9o" className="block">
           <div className="w-full">
             <div className="w-full h-[400px] relative mb-4">
               <Image
-                src="/images/jil_sander_model.jpeg"
-                alt="Power Dressing in an Age of Influencers News Article"
+                src="/images/labubu_hermes_bag_charm.png"
+                alt="How Labubu Conquered Fashion News Article"
                 layout="fill"
                 objectFit="cover"
                 className="rounded-md"
               />
             </div>
             <div className="text-left">
-              <h3 className="text-lg font-semibold mb-2">Power Dressing in an Age of Influencers</h3>
-              <p className="text-sm text-gray-600">September 25, 2025</p>
+              <h3 className="text-lg font-semibold mb-2">Labubu: How the Pop Mart dolls conquered the world</h3>
+              <p className="text-sm text-gray-600">September 27, 2025</p>
             </div>
           </div>
         </Link>
