@@ -6,8 +6,8 @@ import "styles/globals.css"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
-  title: "REVETIR - Luxury Fashion & Independent Designers",
-  description: "Discover luxury fashion and independent Asian designers on sale. Free shipping & returns in the US.",
+  title: "REVETIR: Luxury Fashion & Independent Designers",
+  description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
   icons: {
     icon: [
       { url: '/favicon.ico' },
