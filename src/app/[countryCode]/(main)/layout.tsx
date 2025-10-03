@@ -18,7 +18,6 @@ export const metadata: Metadata = {
     template: "%s | REVETIR"
   },
   description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
-  keywords: ["luxury fashion", "Asian designers", "independent fashion", "curated fashion", "REVETIR"],
   authors: [{ name: "REVETIR" }],
   creator: "REVETIR",
   publisher: "REVETIR",
