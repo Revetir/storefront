@@ -89,6 +89,13 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
     units: "cm",
     measurement_points: {},
     size_chart: {}
+  },
+  {
+    category: "Generic",
+    diagram_component: "GenericDiagram",
+    units: "cm",
+    measurement_points: {},
+    size_chart: {}
   }
 ]
 
@@ -97,18 +104,25 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
 export const mapCategoryToTemplate = (categoryName: string, categoryId?: string): string => {
   // Delegates to CategoryMaster for O(1) mapping (id/handle/name)
   // Note: keep signature for backward compatibility
+  console.log('  🔎 mapCategoryToTemplate - Input:', { categoryName, categoryId })
   try {
     // Lazy import to avoid circular deps
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { CategoryMaster } = require("@lib/data/category-master") as typeof import("@lib/data/category-master")
     const byId = categoryId ? CategoryMaster.getById(categoryId) : undefined
+    console.log('    CategoryMaster.getById result:', byId)
     const template = CategoryMaster.getTemplateForCategory({ id: categoryId, name: categoryName })
+    console.log('    CategoryMaster.getTemplateForCategory result:', template)
     if (template) return template
     if (byId) {
       const byIdTemplate = CategoryMaster.getTemplateForCategory({ id: byId.id })
+      console.log('    byIdTemplate:', byIdTemplate)
       if (byIdTemplate) return byIdTemplate
     }
-  } catch {}
+  } catch (e) {
+    console.log('    Error in mapCategoryToTemplate:', e)
+  }
+  console.log('    Falling back to Generic')
   return "Generic"
 }
 

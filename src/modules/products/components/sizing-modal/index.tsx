@@ -5,6 +5,7 @@ import { HttpTypes } from "@medusajs/types"
 import Modal from "@modules/common/components/modal"
 import { getSizingTemplate, SizingTemplate } from "@lib/data/sizing-templates"
 import { getProductCategory, getBestSizingCategory, getProductTemplateCategory } from "@lib/util/sizing-utils"
+import { GenericDiagram } from "@modules/common/icons/sizing-diagrams"
 
 interface SizingModalProps {
   isOpen: boolean
@@ -16,14 +17,22 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   // Get the product category and template category
   const productCategory = getProductCategory(product)
   const templateCategory = getProductTemplateCategory(product)
-  
+
+  console.log('🔍 SIZING MODAL DEBUG:')
+  console.log('  Product:', product.title)
+  console.log('  Product categories:', product.categories)
+  console.log('  Product category (first):', productCategory)
+  console.log('  Template category:', templateCategory)
+
   // State for size and unit toggles
   const [selectedSize, setSelectedSize] = useState<string>("S")
   const [useInches, setUseInches] = useState<boolean>(false)
-  
+
   // Get the sizing template for this category
   const sizingTemplate = useMemo(() => {
-    return getSizingTemplate(templateCategory)
+    const template = getSizingTemplate(templateCategory)
+    console.log('  Sizing template found:', template?.category, '(diagram:', template?.diagram_component, ')')
+    return template
   }, [templateCategory])
 
   // Get product measurements from metadata
@@ -79,8 +88,8 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
   // Render the appropriate diagram component
   const renderDiagram = () => {
-    if (!sizingTemplate) return <div className="w-64 h-64 bg-gray-200 flex items-center justify-center">No diagram available</div>
-    
+    if (!sizingTemplate) return <GenericDiagram className="w-64 h-auto" />
+
     switch (sizingTemplate.diagram_component) {
       case "Shoes":
         // Shoes use a conversion table only, no diagram
@@ -95,9 +104,9 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         )
       case "TrousersDiagram":
         return (
-          <img 
-            src="/images/pants_sizing_diagram.png" 
-            alt="Pants sizing diagram" 
+          <img
+            src="/images/pants_sizing_diagram.png"
+            alt="Pants sizing diagram"
             className="w-64 h-auto"
           />
         )
@@ -109,9 +118,11 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             className="w-64 h-auto"
           />
         )
-      
+      case "GenericDiagram":
+        return <GenericDiagram className="w-64 h-auto" />
+
       default:
-        return <div className="w-64 h-64 bg-gray-200 flex items-center justify-center">No diagram available</div>
+        return <GenericDiagram className="w-64 h-auto" />
     }
   }
 
