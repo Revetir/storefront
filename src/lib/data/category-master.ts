@@ -471,8 +471,60 @@ export type { CategoryMasterState }
   CategoryMaster.upsertCategories(records)
 
   // Template assignments for O(1) sizing template lookup
+  // Parent shoe categories
   CategoryMaster.setTemplateForCategoryHandle("mens-shoes", "Shoes Men")
   CategoryMaster.setTemplateForCategoryHandle("womens-shoes", "Shoes Women")
+
+  // Men's shoe subcategories
+  CategoryMaster.setTemplateForCategoryHandle("mens-boat-shoes-moccasins", "Shoes Men")
+  CategoryMaster.setTemplateForCategoryHandle("mens-boots", "Shoes Men")
+  CategoryMaster.setTemplateForCategoryHandle("mens-espadrilles", "Shoes Men")
+  CategoryMaster.setTemplateForCategoryHandle("mens-lace-ups-oxfords", "Shoes Men")
+  CategoryMaster.setTemplateForCategoryHandle("mens-monkstraps", "Shoes Men")
+  CategoryMaster.setTemplateForCategoryHandle("mens-sandals", "Shoes Men")
+  CategoryMaster.setTemplateForCategoryHandle("mens-slippers-loafers", "Shoes Men")
+  CategoryMaster.setTemplateForCategoryHandle("mens-sneakers", "Shoes Men")
+
+  // Men's boot subcategories
+  CategoryMaster.setTemplateForCategoryHandle("mens-biker-combat-boots", "Shoes Men")
+  CategoryMaster.setTemplateForCategoryHandle("mens-chelsea-boots", "Shoes Men")
+  CategoryMaster.setTemplateForCategoryHandle("mens-desert-boots", "Shoes Men")
+  CategoryMaster.setTemplateForCategoryHandle("mens-lace-up-boots", "Shoes Men")
+  CategoryMaster.setTemplateForCategoryHandle("mens-zip-up-buckled-boots", "Shoes Men")
+
+  // Men's sandal subcategories
+  CategoryMaster.setTemplateForCategoryHandle("mens-flip-flops", "Shoes Men")
+  CategoryMaster.setTemplateForCategoryHandle("mens-slides", "Shoes Men")
+
+  // Men's sneaker subcategories
+  CategoryMaster.setTemplateForCategoryHandle("mens-high-top-sneakers", "Shoes Men")
+  CategoryMaster.setTemplateForCategoryHandle("mens-low-top-sneakers", "Shoes Men")
+
+  // Women's shoe subcategories
+  CategoryMaster.setTemplateForCategoryHandle("womens-boots", "Shoes Women")
+  CategoryMaster.setTemplateForCategoryHandle("womens-flats", "Shoes Women")
+  CategoryMaster.setTemplateForCategoryHandle("womens-lace-ups-oxfords", "Shoes Women")
+  CategoryMaster.setTemplateForCategoryHandle("womens-slippers-loafers", "Shoes Women")
+  CategoryMaster.setTemplateForCategoryHandle("womens-heels", "Shoes Women")
+  CategoryMaster.setTemplateForCategoryHandle("womens-sandals", "Shoes Women")
+  CategoryMaster.setTemplateForCategoryHandle("womens-sneakers", "Shoes Women")
+
+  // Women's boot subcategories
+  CategoryMaster.setTemplateForCategoryHandle("womens-ankle-boots", "Shoes Women")
+  CategoryMaster.setTemplateForCategoryHandle("womens-mid-calf-boots", "Shoes Women")
+  CategoryMaster.setTemplateForCategoryHandle("womens-tall-boots", "Shoes Women")
+
+  // Women's flat subcategories
+  CategoryMaster.setTemplateForCategoryHandle("womens-ballerina-flats", "Shoes Women")
+  CategoryMaster.setTemplateForCategoryHandle("womens-espadrilles", "Shoes Women")
+
+  // Women's sandal subcategories
+  CategoryMaster.setTemplateForCategoryHandle("womens-flat-sandals", "Shoes Women")
+  CategoryMaster.setTemplateForCategoryHandle("womens-heeled-sandals", "Shoes Women")
+
+  // Women's sneaker subcategories
+  CategoryMaster.setTemplateForCategoryHandle("womens-high-top-sneakers", "Shoes Women")
+  CategoryMaster.setTemplateForCategoryHandle("womens-low-top-sneakers", "Shoes Women")
 })()
 
 
