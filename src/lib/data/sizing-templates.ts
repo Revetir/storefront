@@ -67,47 +67,48 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
       XL: { waist: 38, hip: 42, inseam: 33, hem: 19 },
     }
   },
+  // Shoes categories render a conversion chart (EU/US/UK/JP) in the modal
+  // The modal provides a custom renderer; size_chart remains empty
   {
-    category: "Merch",
-    diagram_component: "GenericDiagram",
+    category: "Shoes Unisex",
+    diagram_component: "Shoes",
     units: "cm",
-    measurement_points: {
-      width: { x_percent: 50, y_percent: 37.5, offset_x: 0, offset_y: -10, label: "Width" },
-      height: { x_percent: 50, y_percent: 62.5, offset_x: 0, offset_y: 10, label: "Height" },
-    },
-    size_chart: {
-      S: { width: 20, height: 25 },
-      M: { width: 22, height: 27 },
-      L: { width: 24, height: 29 },
-      XL: { width: 26, height: 31 },
-    }
+    measurement_points: {},
+    size_chart: {}
+  },
+  {
+    category: "Shoes Men",
+    diagram_component: "Shoes",
+    units: "cm",
+    measurement_points: {},
+    size_chart: {}
+  },
+  {
+    category: "Shoes Women",
+    diagram_component: "Shoes",
+    units: "cm",
+    measurement_points: {},
+    size_chart: {}
   }
 ]
 
 
 // Simple helper function to map category to sizing template
 export const mapCategoryToTemplate = (categoryName: string, categoryId?: string): string => {
-  
-  const lowerCaseName = categoryName.toLowerCase()
-  
-  // Simple word-based matching
-  if (lowerCaseName.includes("pants") || 
-      lowerCaseName.includes("pant") || 
-      lowerCaseName.includes("jean") || 
-      lowerCaseName.includes("trouser") ||
-      lowerCaseName.includes("legging")) {
-    return "Pants"
-  }
-  
-  if (lowerCaseName.includes("shirt") && !lowerCaseName.includes("sweatshirts")) {
-    return "Shirts"
-  }
-  
-  if (lowerCaseName.includes("sweatshirt") || lowerCaseName.includes("hoodie") || lowerCaseName.includes("crewneck")){
-    return "Sweatshirts"
-  }
-  
-  // Default fallback
+  // Delegates to CategoryMaster for O(1) mapping (id/handle/name)
+  // Note: keep signature for backward compatibility
+  try {
+    // Lazy import to avoid circular deps
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { CategoryMaster } = require("@lib/data/category-master") as typeof import("@lib/data/category-master")
+    const byId = categoryId ? CategoryMaster.getById(categoryId) : undefined
+    const template = CategoryMaster.getTemplateForCategory({ id: categoryId, name: categoryName })
+    if (template) return template
+    if (byId) {
+      const byIdTemplate = CategoryMaster.getTemplateForCategory({ id: byId.id })
+      if (byIdTemplate) return byIdTemplate
+    }
+  } catch {}
   return "Generic"
 }
 

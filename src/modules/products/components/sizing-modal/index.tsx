@@ -5,7 +5,6 @@ import { HttpTypes } from "@medusajs/types"
 import Modal from "@modules/common/components/modal"
 import { getSizingTemplate, SizingTemplate } from "@lib/data/sizing-templates"
 import { getProductCategory, getBestSizingCategory, getProductTemplateCategory } from "@lib/util/sizing-utils"
-import { TShirtDiagram, TrousersDiagram, NecklaceDiagram, GenericDiagram } from "@modules/common/icons/sizing-diagrams"
 
 interface SizingModalProps {
   isOpen: boolean
@@ -83,6 +82,9 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     if (!sizingTemplate) return <div className="w-64 h-64 bg-gray-200 flex items-center justify-center">No diagram available</div>
     
     switch (sizingTemplate.diagram_component) {
+      case "Shoes":
+        // Shoes use a conversion table only, no diagram
+        return null
       case "TShirtDiagram":
         return (
           <img
@@ -113,9 +115,106 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     }
   }
 
+  // --- Shoes conversion data and rendering ---
+  type ShoeRow = { eu: number, us: number, uk: number, jpCm: number }
+
+  const SHOES_MEN: ShoeRow[] = [
+    { eu: 39,   us: 6.0,  uk: 5.0,  jpCm: 24.0 },
+    { eu: 39.5, us: 6.5,  uk: 5.5,  jpCm: 24.5 },
+    { eu: 40,   us: 7.0,  uk: 6.0,  jpCm: 25.0 },
+    { eu: 40.5, us: 7.5,  uk: 6.5,  jpCm: 25.5 },
+    { eu: 41,   us: 8.0,  uk: 7.0,  jpCm: 26.0 },
+    { eu: 41.5, us: 8.5,  uk: 7.5,  jpCm: 26.5 },
+    { eu: 42,   us: 9.0,  uk: 8.0,  jpCm: 27.0 },
+    { eu: 42.5, us: 9.5,  uk: 8.5,  jpCm: 27.5 },
+    { eu: 43,   us: 10.0, uk: 9.0,  jpCm: 28.0 },
+    { eu: 43.5, us: 10.5, uk: 9.5,  jpCm: 28.5 },
+    { eu: 44,   us: 11.0, uk: 10.0, jpCm: 29.0 },
+    { eu: 44.5, us: 11.5, uk: 10.5, jpCm: 29.5 },
+    { eu: 45,   us: 12.0, uk: 11.0, jpCm: 30.0 },
+    { eu: 45.5, us: 12.5, uk: 11.5, jpCm: 30.5 },
+    { eu: 46,   us: 13.0, uk: 12.0, jpCm: 31.0 },
+  ]
+
+  // Women's mapping per requirement: 39 EU => US 4.5; include half sizes 35–42 EU
+  const buildWomenRows = (): ShoeRow[] => {
+    const rows: ShoeRow[] = []
+    const jpBaseAt39 = 25.5 // cm around EU39 women's typical foot length; used for JP baseline
+    for (let eu = 35; eu <= 42; eu++) {
+      const delta = eu - 39
+      const us = 4.5 + delta
+      const uk = us - 2.5 // typical women's US-UK offset
+      const jp = jpBaseAt39 + delta * 0.5 // 0.5 cm per EU step
+      rows.push({ eu, us: Number(us.toFixed(1)), uk: Number(uk.toFixed(1)), jpCm: Number(jp.toFixed(1)) })
+      if (eu !== 42) {
+        const euHalf = eu + 0.5
+        const usHalf = us + 0.5
+        const ukHalf = uk + 0.5
+        const jpHalf = jp + 0.25
+        rows.push({ eu: Number(euHalf.toFixed(1)), us: Number(usHalf.toFixed(1)), uk: Number(ukHalf.toFixed(1)), jpCm: Number(jpHalf.toFixed(2)) })
+      }
+    }
+    return rows
+  }
+
+  const SHOES_WOMEN: ShoeRow[] = buildWomenRows()
+
+  const SHOES_UNISEX: ShoeRow[] = [
+    ...SHOES_WOMEN,
+    ...SHOES_MEN,
+  ].filter((row, idx, arr) => arr.findIndex(r => r.eu === row.eu && r.us === row.us && r.uk === row.uk) === idx)
+   .sort((a, b) => a.eu - b.eu)
+
+  const isShoes = sizingTemplate?.diagram_component === "Shoes"
+
+  const renderShoesTable = () => {
+    if (!isShoes) return null
+    const heading = templateCategory
+    const rows = heading === "Shoes Men" ? SHOES_MEN : heading === "Shoes Women" ? SHOES_WOMEN : SHOES_UNISEX
+
+    const formatJp = (cm: number) => {
+      if (useInches) {
+        const inches = Math.round((cm / 2.54) * 10) / 10
+        return `${inches}\"`
+      }
+      return `${cm}cm`
+    }
+
+    return (
+      <div className="mt-6 w-full">
+        <h3 className="text-lg font-semibold mb-3">Shoe Size Conversion</h3>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border border-gray-200">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border border-gray-200 px-4 py-2 text-left">EU</th>
+                <th className="border border-gray-200 px-4 py-2 text-left">US</th>
+                <th className="border border-gray-200 px-4 py-2 text-left">UK</th>
+                <th className="border border-gray-200 px-4 py-2 text-left">Japan</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={`${heading}-${r.eu}-${r.us}`} className="hover:bg-gray-50">
+                  <td className="border border-gray-200 px-4 py-2 font-medium">{r.eu}</td>
+                  <td className="border border-gray-200 px-4 py-2">{r.us}</td>
+                  <td className="border border-gray-200 px-4 py-2">{r.uk}</td>
+                  <td className="border border-gray-200 px-4 py-2">{formatJp(r.jpCm)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
+
   // Render measurement overlays
   const renderMeasurementOverlays = () => {
     if (!sizingTemplate) return null
+
+    // Shoes do not render measurement overlays on a diagram
+    if (sizingTemplate.diagram_component === "Shoes") return null
 
     console.log('🎯 Rendering overlays for template:', templateCategory)
     console.log('📏 Template measurement points:', Object.keys(sizingTemplate.measurement_points))
@@ -163,6 +262,9 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   const renderSizeChart = () => {
     if (!sizingTemplate) return null
 
+    // Shoes use a conversion table instead
+    if (sizingTemplate.diagram_component === "Shoes") return null
+
     const sizes = Object.keys(sizingTemplate.size_chart)
     const measurements = Object.keys(sizingTemplate.size_chart[sizes[0]] || {})
 
@@ -205,7 +307,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         <div className="flex flex-col h-full min-h-[500px] p-12">
         {/* Header row - title on left, unit toggle on right */}
         <div className="absolute top-8 left-8 right-8 flex justify-between items-center">
-          <h2 className="text-base uppercase">Product Measurements</h2>
+          <h2 className="text-base uppercase">{isShoes ? "Shoe Sizes" : "Product Measurements"}</h2>
           <div className="flex gap-0">
             <button
               onClick={() => setUseInches(false)}
@@ -241,7 +343,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             </div>
 
             {/* Right side - Controls */}
-            {productMeasurements && (
+            {!isShoes && productMeasurements && (
               <div className="flex-1 flex flex-col gap-8 max-w-sm">
                 {/* Size selector */}
                 <div className="flex flex-col gap-4">
@@ -268,6 +370,13 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               </div>
             )}
           </div>
+
+          {/* Shoes conversion table (full-width below) */}
+          {isShoes && (
+            <div className="mt-4">
+              {renderShoesTable()}
+            </div>
+          )}
         </div>
       </Modal.Body>
     </Modal>

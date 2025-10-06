@@ -79,7 +79,14 @@ export const getProductTemplateCategory = (product: HttpTypes.StoreProduct): str
  */
 export const isSizingSupported = (categoryName: string): boolean => {
   const mappedCategory = mapCategoryToTemplate(categoryName)
-  const supportedCategories = ["Shirts", "Sweatshirts", "Pants", "Merch"]
+  const supportedCategories = [
+    "Shirts",
+    "Sweatshirts",
+    "Pants",
+    "Shoes Unisex",
+    "Shoes Men",
+    "Shoes Women",
+  ]
   return supportedCategories.some(cat => 
     cat.toLowerCase() === mappedCategory.toLowerCase()
   )
