@@ -88,7 +88,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
   // Render the appropriate diagram component
   const renderDiagram = () => {
-    if (!sizingTemplate) return <GenericDiagram className="w-full h-auto" />
+    if (!sizingTemplate) return <GenericDiagram className="" />
 
     switch (sizingTemplate.diagram_component) {
       case "ShoesMen":
@@ -121,10 +121,10 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           />
         )
       case "GenericDiagram":
-        return <GenericDiagram className="w-full h-auto" />
+        return <GenericDiagram className="w-96 h-auto" />
 
       default:
-        return <GenericDiagram className="w-full h-auto" />
+        return <GenericDiagram className="w-96 h-auto" />
     }
   }
 
