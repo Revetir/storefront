@@ -346,18 +346,19 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           </div>
         </div>
 
-          {/* Main content - two column layout with increased spacing */}
-          <div className="flex gap-12 flex-1 items-center justify-center pt-2">
-            {/* Left side - Diagram with measurements */}
-            <div className="flex justify-center items-center flex-grow">
-              <div className="relative w-full">
-                {renderDiagram()}
-                {renderMeasurementOverlays()}
+          {/* Main content - conditional layout based on whether controls are shown */}
+          {!isShoes && productMeasurements ? (
+            // Two column layout when controls are present
+            <div className="flex gap-12 flex-1 items-center justify-center pt-2">
+              {/* Left side - Diagram with measurements */}
+              <div className="flex justify-center items-center flex-grow">
+                <div className="relative w-full">
+                  {renderDiagram()}
+                  {renderMeasurementOverlays()}
+                </div>
               </div>
-            </div>
 
-            {/* Right side - Controls */}
-            {!isShoes && productMeasurements && (
+              {/* Right side - Controls */}
               <div className="flex flex-col gap-8 w-64 flex-shrink-0">
                 {/* Size selector */}
                 <div className="flex flex-col gap-4">
@@ -382,8 +383,16 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                 {/* Unit toggle */}
 
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            // Single column centered layout when no controls
+            <div className="flex flex-1 items-center justify-center pt-2">
+              <div className="relative w-full max-w-2xl">
+                {renderDiagram()}
+                {renderMeasurementOverlays()}
+              </div>
+            </div>
+          )}
 
           {/* Shoes conversion table (full-width below) */}
           {isShoes && (
