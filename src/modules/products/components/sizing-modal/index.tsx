@@ -88,7 +88,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
   // Render the appropriate diagram component
   const renderDiagram = () => {
-    if (!sizingTemplate) return <GenericDiagram className="w-64 h-auto" />
+    if (!sizingTemplate) return <GenericDiagram className="w-full max-w-2xl h-auto" />
 
     switch (sizingTemplate.diagram_component) {
       case "ShoesMen":
@@ -121,62 +121,34 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           />
         )
       case "GenericDiagram":
-        return <GenericDiagram className="w-128 h-auto" />
+        return <GenericDiagram className="w-full max-w-2xl h-auto" />
 
       default:
-        return <GenericDiagram className="w-128 h-auto" />
+        return <GenericDiagram className="w-full max-w-2xl h-auto" />
     }
   }
 
   // --- Shoes conversion data and rendering ---
-  type ShoeRow = { eu: number, us: number, uk: number, jpCm: number }
+  type ShoeRow = { eu: number, usMen: number | null, usWomen: number | null, uk: number, jpCm: number }
 
-  const SHOES_MEN: ShoeRow[] = [
-    { eu: 39,   us: 6.0,  uk: 5.0,  jpCm: 24.0 },
-    { eu: 39.5, us: 6.5,  uk: 5.5,  jpCm: 24.5 },
-    { eu: 40,   us: 7.0,  uk: 6.0,  jpCm: 25.0 },
-    { eu: 40.5, us: 7.5,  uk: 6.5,  jpCm: 25.5 },
-    { eu: 41,   us: 8.0,  uk: 7.0,  jpCm: 26.0 },
-    { eu: 41.5, us: 8.5,  uk: 7.5,  jpCm: 26.5 },
-    { eu: 42,   us: 9.0,  uk: 8.0,  jpCm: 27.0 },
-    { eu: 42.5, us: 9.5,  uk: 8.5,  jpCm: 27.5 },
-    { eu: 43,   us: 10.0, uk: 9.0,  jpCm: 28.0 },
-    { eu: 43.5, us: 10.5, uk: 9.5,  jpCm: 28.5 },
-    { eu: 44,   us: 11.0, uk: 10.0, jpCm: 29.0 },
-    { eu: 44.5, us: 11.5, uk: 10.5, jpCm: 29.5 },
-    { eu: 45,   us: 12.0, uk: 11.0, jpCm: 30.0 },
-    { eu: 45.5, us: 12.5, uk: 11.5, jpCm: 30.5 },
-    { eu: 46,   us: 13.0, uk: 12.0, jpCm: 31.0 },
+  const SHOES_DATA: ShoeRow[] = [
+    { eu: 35,   usMen: null, usWomen: 4.5,  uk: 2,  jpCm: 21.5},
+    { eu: 36,   usMen: null,  usWomen: 5.5,  uk: 3,  jpCm: 22.5 },
+    { eu: 37,   usMen: null,  usWomen: 6.5,  uk: 4,  jpCm: 23 },
+    { eu: 38,   usMen: null,  usWomen: 7.5,  uk: 4.5,  jpCm: 24 },
+    { eu: 39,   usMen: 6,  usWomen: 8.5,  uk: 5.5,    jpCm: 24.5 },
+    { eu: 40,   usMen: 7,    usWomen: 9.5,    uk: 6.5,  jpCm: 25 },
+    { eu: 41,   usMen: 8,    usWomen: 10.5,   uk: 7.5,  jpCm: 26 },
+    { eu: 42,   usMen: 9,  usWomen: 11.5, uk: 8,    jpCm: 27 },
+    { eu: 43,   usMen: 10,  usWomen: null, uk: 9,    jpCm: 28 },
+    { eu: 44,   usMen: 11,   usWomen: null,   uk: 10,  jpCm: 29 },
+    { eu: 45,   usMen: 12,   usWomen: null,   uk: 11, jpCm: 30 },
+    { eu: 46,   usMen: 13,   usWomen: null,   uk: 12, jpCm: 31 },
   ]
 
-  // Women's mapping per requirement: 39 EU => US 4.5; include half sizes 35–42 EU
-  const buildWomenRows = (): ShoeRow[] => {
-    const rows: ShoeRow[] = []
-    const jpBaseAt39 = 25.5 // cm around EU39 women's typical foot length; used for JP baseline
-    for (let eu = 35; eu <= 42; eu++) {
-      const delta = eu - 39
-      const us = 4.5 + delta
-      const uk = us - 2.5 // typical women's US-UK offset
-      const jp = jpBaseAt39 + delta * 0.5 // 0.5 cm per EU step
-      rows.push({ eu, us: Number(us.toFixed(1)), uk: Number(uk.toFixed(1)), jpCm: Number(jp.toFixed(1)) })
-      if (eu !== 42) {
-        const euHalf = eu + 0.5
-        const usHalf = us + 0.5
-        const ukHalf = uk + 0.5
-        const jpHalf = jp + 0.25
-        rows.push({ eu: Number(euHalf.toFixed(1)), us: Number(usHalf.toFixed(1)), uk: Number(ukHalf.toFixed(1)), jpCm: Number(jpHalf.toFixed(2)) })
-      }
-    }
-    return rows
-  }
-
-  const SHOES_WOMEN: ShoeRow[] = buildWomenRows()
-
-  const SHOES_UNISEX: ShoeRow[] = [
-    ...SHOES_WOMEN,
-    ...SHOES_MEN,
-  ].filter((row, idx, arr) => arr.findIndex(r => r.eu === row.eu && r.us === row.us && r.uk === row.uk) === idx)
-   .sort((a, b) => a.eu - b.eu)
+  const SHOES_MEN = SHOES_DATA.filter(row => row.usMen !== null && row.eu >= 39 && row.eu <= 46.5)
+  const SHOES_WOMEN = SHOES_DATA.filter(row => row.usWomen !== null && row.eu >= 35 && row.eu <= 42)
+  const SHOES_UNISEX = SHOES_DATA.filter(row => row.eu >= 35 && row.eu <= 46.5)
 
   const isShoes = sizingTemplate?.diagram_component === "ShoesMen" ||
                   sizingTemplate?.diagram_component === "ShoesWomen" ||
@@ -186,11 +158,12 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     if (!isShoes) return null
     const heading = templateCategory
     const rows = heading === "Shoes Men" ? SHOES_MEN : heading === "Shoes Women" ? SHOES_WOMEN : SHOES_UNISEX
+    const isUnisex = heading === "Shoes Unisex"
 
     const formatJp = (cm: number) => {
       if (useInches) {
         const inches = Math.round((cm / 2.54) * 10) / 10
-        return `${inches}\"`
+        return `${inches}"`
       }
       return `${cm}cm`
     }
@@ -198,21 +171,37 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     return (
       <div className="mt-6 w-full">
         <h3 className="text-lg font-semibold mb-3">Shoe Size Conversion</h3>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
           <table className="min-w-full border border-gray-200">
-            <thead>
-              <tr className="bg-gray-50">
+            <thead className="sticky top-0 bg-gray-50 z-10">
+              <tr>
                 <th className="border border-gray-200 px-4 py-2 text-left">EU</th>
-                <th className="border border-gray-200 px-4 py-2 text-left">US</th>
+                {isUnisex ? (
+                  <>
+                    <th className="border border-gray-200 px-4 py-2 text-left">US Men&apos;s</th>
+                    <th className="border border-gray-200 px-4 py-2 text-left">US Women&apos;s</th>
+                  </>
+                ) : (
+                  <th className="border border-gray-200 px-4 py-2 text-left">US</th>
+                )}
                 <th className="border border-gray-200 px-4 py-2 text-left">UK</th>
                 <th className="border border-gray-200 px-4 py-2 text-left">Japan</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={`${heading}-${r.eu}-${r.us}`} className="hover:bg-gray-50">
+                <tr key={`${heading}-${r.eu}`} className="hover:bg-gray-50">
                   <td className="border border-gray-200 px-4 py-2 font-medium">{r.eu}</td>
-                  <td className="border border-gray-200 px-4 py-2">{r.us}</td>
+                  {isUnisex ? (
+                    <>
+                      <td className="border border-gray-200 px-4 py-2">{r.usMen ?? '-'}</td>
+                      <td className="border border-gray-200 px-4 py-2">{r.usWomen ?? '-'}</td>
+                    </>
+                  ) : (
+                    <td className="border border-gray-200 px-4 py-2">
+                      {heading === "Shoes Men" ? r.usMen : r.usWomen}
+                    </td>
+                  )}
                   <td className="border border-gray-200 px-4 py-2">{r.uk}</td>
                   <td className="border border-gray-200 px-4 py-2">{formatJp(r.jpCm)}</td>
                 </tr>
