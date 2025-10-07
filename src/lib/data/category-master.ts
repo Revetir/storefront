@@ -20,8 +20,7 @@ interface CategoryMasterState {
   byId: Record<string, CategoryRecord>
   byHandle: Record<string, string> // handle -> id
   byName: Record<string, string> // normalized name -> id
-  templateById: Record<string, TemplateCategory>
-  templateByHandle: Record<string, TemplateCategory>
+  templateById: Record<string, TemplateCategory> // Only store by ID - use hierarchy for lookups
 }
 
 const state: CategoryMasterState = {
@@ -29,7 +28,6 @@ const state: CategoryMasterState = {
   byHandle: {},
   byName: {},
   templateById: {},
-  templateByHandle: {},
 }
 
 const normalizeName = (name: string) => name.trim().toLowerCase()
@@ -48,14 +46,25 @@ export const CategoryMaster = {
     return id ? state.byId[id] : undefined
   },
 
-  // Template lookups
+  // Template lookups - uses hierarchical lookup by default
   getTemplateForCategory(input: { id?: string; handle?: string; name?: string }): TemplateCategory | undefined {
-    if (input.id && state.templateById[input.id]) return state.templateById[input.id]
-    if (input.handle && state.templateByHandle[input.handle]) return state.templateByHandle[input.handle]
-    if (input.name) {
+    // Get the category ID from any input format
+    let categoryId: string | undefined
+
+    if (input.id) {
+      categoryId = input.id
+    } else if (input.handle) {
+      categoryId = state.byHandle[input.handle]
+    } else if (input.name) {
       const rec = this.getByName(input.name)
-      if (rec && state.templateById[rec.id]) return state.templateById[rec.id]
+      categoryId = rec?.id
     }
+
+    // Use hierarchical lookup if we have an ID
+    if (categoryId) {
+      return this.getTemplateForCategoryHierarchical(categoryId)
+    }
+
     return undefined
   },
 
@@ -68,31 +77,47 @@ export const CategoryMaster = {
     }
   },
 
-  // Assign a sizing template for a category
-  setTemplateForCategoryId(id: string, template: TemplateCategory) {
-    state.templateById[id] = template
-  },
-  setTemplateForCategoryHandle(handle: string, template: TemplateCategory) {
-    state.templateByHandle[handle] = template
+  // Assign a sizing template for a category (by ID or handle)
+  setTemplate(input: { id?: string; handle?: string }, template: TemplateCategory) {
+    let categoryId: string | undefined
+
+    if (input.id) {
+      categoryId = input.id
+    } else if (input.handle) {
+      categoryId = state.byHandle[input.handle]
+    }
+
+    if (categoryId) {
+      state.templateById[categoryId] = template
+    } else {
+      console.warn(`⚠️  Could not set template - category not found:`, input)
+    }
   },
 
   // Hierarchical lookup: traverse up parent chain to find a template
   getTemplateForCategoryHierarchical(categoryId: string): TemplateCategory | undefined {
     let currentId: string | undefined = categoryId
     const visited = new Set<string>() // prevent infinite loops
+    const path: string[] = []
 
     while (currentId && !visited.has(currentId)) {
       visited.add(currentId)
+      const category = state.byId[currentId]
+      path.push(`${category?.name || currentId} (${currentId})`)
 
       // Check if current category has a template
       const template = state.templateById[currentId]
-      if (template) return template
+      if (template) {
+        console.log(`    ✅ Hierarchical lookup found template "${template}" at: ${category?.name}`)
+        console.log(`    📍 Traversal path:`, path.join(' → '))
+        return template
+      }
 
       // Move up to parent
-      const category = state.byId[currentId]
       currentId = category?.parentId
     }
 
+    console.log(`    ❌ Hierarchical lookup failed. Traversal path:`, path.join(' → '))
     return undefined
   },
 
@@ -509,61 +534,15 @@ export type { CategoryMasterState }
 
   CategoryMaster.upsertCategories(records)
 
-  // Template assignments for O(1) sizing template lookup
-  // Parent shoe categories
-  CategoryMaster.setTemplateForCategoryHandle("mens-shoes", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("womens-shoes", "Shoes Women")
+  // Template assignments - only set on parent categories, hierarchy will cascade down
+  // Shoe categories
+  CategoryMaster.setTemplate({ handle: "mens-shoes" }, "Shoes Men")
+  CategoryMaster.setTemplate({ handle: "womens-shoes" }, "Shoes Women")
 
-  // Men's shoe subcategories
-  CategoryMaster.setTemplateForCategoryHandle("mens-boat-shoes-moccasins", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("mens-boots", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("mens-espadrilles", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("mens-lace-ups-oxfords", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("mens-monkstraps", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("mens-sandals", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("mens-slippers-loafers", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("mens-sneakers", "Shoes Men")
-
-  // Men's boot subcategories
-  CategoryMaster.setTemplateForCategoryHandle("mens-biker-combat-boots", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("mens-chelsea-boots", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("mens-desert-boots", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("mens-lace-up-boots", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("mens-zip-up-buckled-boots", "Shoes Men")
-
-  // Men's sandal subcategories
-  CategoryMaster.setTemplateForCategoryHandle("mens-flip-flops", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("mens-slides", "Shoes Men")
-
-  // Men's sneaker subcategories
-  CategoryMaster.setTemplateForCategoryHandle("mens-high-top-sneakers", "Shoes Men")
-  CategoryMaster.setTemplateForCategoryHandle("mens-low-top-sneakers", "Shoes Men")
-
-  // Women's shoe subcategories
-  CategoryMaster.setTemplateForCategoryHandle("womens-boots", "Shoes Women")
-  CategoryMaster.setTemplateForCategoryHandle("womens-flats", "Shoes Women")
-  CategoryMaster.setTemplateForCategoryHandle("womens-lace-ups-oxfords", "Shoes Women")
-  CategoryMaster.setTemplateForCategoryHandle("womens-slippers-loafers", "Shoes Women")
-  CategoryMaster.setTemplateForCategoryHandle("womens-heels", "Shoes Women")
-  CategoryMaster.setTemplateForCategoryHandle("womens-sandals", "Shoes Women")
-  CategoryMaster.setTemplateForCategoryHandle("womens-sneakers", "Shoes Women")
-
-  // Women's boot subcategories
-  CategoryMaster.setTemplateForCategoryHandle("womens-ankle-boots", "Shoes Women")
-  CategoryMaster.setTemplateForCategoryHandle("womens-mid-calf-boots", "Shoes Women")
-  CategoryMaster.setTemplateForCategoryHandle("womens-tall-boots", "Shoes Women")
-
-  // Women's flat subcategories
-  CategoryMaster.setTemplateForCategoryHandle("womens-ballerina-flats", "Shoes Women")
-  CategoryMaster.setTemplateForCategoryHandle("womens-espadrilles", "Shoes Women")
-
-  // Women's sandal subcategories
-  CategoryMaster.setTemplateForCategoryHandle("womens-flat-sandals", "Shoes Women")
-  CategoryMaster.setTemplateForCategoryHandle("womens-heeled-sandals", "Shoes Women")
-
-  // Women's sneaker subcategories
-  CategoryMaster.setTemplateForCategoryHandle("womens-high-top-sneakers", "Shoes Women")
-  CategoryMaster.setTemplateForCategoryHandle("womens-low-top-sneakers", "Shoes Women")
+  // Other top-level product categories can be added here as needed
+  // CategoryMaster.setTemplate({ handle: "mens-shirts" }, "Shirts")
+  // CategoryMaster.setTemplate({ handle: "mens-pants" }, "Pants")
+  // etc.
 })()
 
 

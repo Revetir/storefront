@@ -60,36 +60,16 @@ export const getProductTemplateCategory = (product: HttpTypes.StoreProduct): str
     return "Generic"
   }
 
-  try {
-    // Use CategoryMaster for hierarchical lookup
-    const { CategoryMaster } = require("@lib/data/category-master") as typeof import("@lib/data/category-master")
-
-    // Try each category in the product's categories array with hierarchical lookup
-    for (const category of product.categories) {
-      if (!category.id) continue
-
-      // First try hierarchical lookup (checks category and all ancestors)
-      const hierarchicalTemplate = CategoryMaster.getTemplateForCategoryHierarchical(category.id)
-      if (hierarchicalTemplate) {
-        console.log(`✅ Found template via hierarchy for ${category.name}: ${hierarchicalTemplate}`)
-        return hierarchicalTemplate
-      }
+  // Try each category - mapCategoryToTemplate now uses hierarchical lookup automatically
+  for (const category of product.categories) {
+    const mappedCategory = mapCategoryToTemplate(category.name, category.id)
+    if (mappedCategory !== "Generic") {
+      return mappedCategory
     }
-
-    // Fallback: try direct template lookup for each category
-    for (const category of product.categories) {
-      const mappedCategory = mapCategoryToTemplate(category.name, category.id)
-      if (mappedCategory !== "Generic") {
-        return mappedCategory
-      }
-    }
-  } catch (e) {
-    console.error('Error in getProductTemplateCategory:', e)
   }
 
   // Final fallback
-  const categoryName = product.categories[0].name
-  return mapCategoryToTemplate(categoryName)
+  return "Generic"
 }
 
 /**
