@@ -59,11 +59,12 @@ const Modal = ({
               <Dialog.Panel
                 data-testid={dataTestId}
                 className={clx(
-                  "flex flex-col justify-start w-full transform p-5 text-left align-middle transition-all max-h-[75vh] h-fit",
+                  "flex flex-col justify-start w-full transform p-5 text-left align-middle transition-all",
                   {
                     "max-w-md": size === "small",
                     "max-w-xl": size === "medium",
-                    "max-w-3xl": size === "large",
+                    "max-w-[1300px] max-h-[75vh] h-fit small:block": size === "large", // ~30% wider than max-w-3xl (1024px -> 1300px)
+                    "!max-w-full !max-h-full !h-screen !w-screen !p-0 xsmall:!max-w-full xsmall:!max-h-full xsmall:!h-screen xsmall:!w-screen xsmall:!p-0 small:!max-w-[1300px] small:!max-h-[75vh] small:!h-fit small:!p-5": size === "large",
                     // For search modals, sharp and rectangular, no shadow, no border-radius
                     "bg-white": search,
                     "bg-white shadow-xl border rounded-rounded": !search,

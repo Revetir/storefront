@@ -423,49 +423,64 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     const rows = heading === "Shoes Men" ? SHOES_MEN : heading === "Shoes Women" ? SHOES_WOMEN : SHOES_UNISEX
     const isUnisex = heading === "Shoes Unisex"
 
+    // Calculate responsive padding based on number of columns (sizes)
+    const numSizes = rows.length
+    const cellPadding = numSizes > 10 ? 'px-2 py-2' : numSizes > 8 ? 'px-3 py-2' : 'px-4 py-3'
+
     return (
       <div className="flex flex-col gap-6 w-full">
-        {/* Desktop/Laptop: Horizontal table */}
-        <div className="hidden small:block w-full">
+        {/* Desktop/Laptop: VERTICAL table - EU/US/UK/JP as ROW headers, sizes as COLUMNS */}
+        <div className="hidden small:block w-full overflow-x-auto">
           <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="px-4 py-3 text-left font-medium">EU</th>
-                {isUnisex ? (
-                  <>
-                    <th className="px-4 py-3 text-left font-medium">US Men&apos;s</th>
-                    <th className="px-4 py-3 text-left font-medium">US Women&apos;s</th>
-                  </>
-                ) : (
-                  <th className="px-4 py-3 text-left font-medium">US</th>
-                )}
-                <th className="px-4 py-3 text-left font-medium">UK</th>
-                <th className="px-4 py-3 text-left font-medium">Japan</th>
-              </tr>
-            </thead>
             <tbody>
-              {rows.map((r, idx) => (
-                <tr key={`${heading}-${r.eu}`} className={idx !== rows.length - 1 ? 'border-b border-gray-200' : ''}>
-                  <td className="px-4 py-3">{r.eu}</td>
-                  {isUnisex ? (
-                    <>
-                      <td className="px-4 py-3">{r.usMen ?? '-'}</td>
-                      <td className="px-4 py-3">{r.usWomen ?? '-'}</td>
-                    </>
-                  ) : (
-                    <td className="px-4 py-3">
+              <tr>
+                <th className={`${cellPadding} text-left font-medium border-r border-gray-200`}>EU</th>
+                {rows.map((r) => (
+                  <td key={`eu-${r.eu}`} className={cellPadding}>{r.eu}</td>
+                ))}
+              </tr>
+              {isUnisex ? (
+                <>
+                  <tr>
+                    <th className={`${cellPadding} text-left font-medium border-r border-gray-200`}>US Men&apos;s</th>
+                    {rows.map((r) => (
+                      <td key={`usmen-${r.eu}`} className={cellPadding}>{r.usMen ?? '-'}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <th className={`${cellPadding} text-left font-medium border-r border-gray-200`}>US Women&apos;s</th>
+                    {rows.map((r) => (
+                      <td key={`uswomen-${r.eu}`} className={cellPadding}>{r.usWomen ?? '-'}</td>
+                    ))}
+                  </tr>
+                </>
+              ) : (
+                <tr>
+                  <th className={`${cellPadding} text-left font-medium border-r border-gray-200`}>US</th>
+                  {rows.map((r) => (
+                    <td key={`us-${r.eu}`} className={cellPadding}>
                       {heading === "Shoes Men" ? r.usMen : r.usWomen}
                     </td>
-                  )}
-                  <td className="px-4 py-3">{r.uk}</td>
-                  <td className="px-4 py-3">{formatJp(r.jpCm)}</td>
+                  ))}
                 </tr>
-              ))}
+              )}
+              <tr>
+                <th className={`${cellPadding} text-left font-medium border-r border-gray-200`}>UK</th>
+                {rows.map((r) => (
+                  <td key={`uk-${r.eu}`} className={cellPadding}>{r.uk}</td>
+                ))}
+              </tr>
+              <tr>
+                <th className={`${cellPadding} text-left font-medium border-r border-gray-200`}>Japan</th>
+                {rows.map((r) => (
+                  <td key={`jp-${r.eu}`} className={cellPadding}>{formatJp(r.jpCm)}</td>
+                ))}
+              </tr>
             </tbody>
           </table>
 
           {/* Disclaimer */}
-          <p className="text-xs text-gray-600 mt-6">
+          <p className="text-xs text-gray-600 mt-6 text-left">
             Size conversions vary per brand and may deviate from the conversions shown above. If you are not sure about your size, please contact us{' '}
             <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
               here
@@ -474,58 +489,47 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           </p>
         </div>
 
-        {/* Tablet/Phone: Vertical/Transposed table */}
-        <div className="block small:hidden w-full">
+        {/* Tablet/Phone: HORIZONTAL table - EU/US/UK/JP as COLUMN headers, sizes as ROWS */}
+        <div className="block small:hidden w-full overflow-x-auto">
           <table className="w-full">
-            <tbody>
-              <tr>
-                <th className="px-4 py-3 text-left font-medium border-r border-gray-200">EU</th>
-                {rows.map((r) => (
-                  <td key={`eu-${r.eu}`} className="px-4 py-3">{r.eu}</td>
-                ))}
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className={`${cellPadding} text-left font-medium`}>EU</th>
+                {isUnisex ? (
+                  <>
+                    <th className={`${cellPadding} text-left font-medium`}>US Men&apos;s</th>
+                    <th className={`${cellPadding} text-left font-medium`}>US Women&apos;s</th>
+                  </>
+                ) : (
+                  <th className={`${cellPadding} text-left font-medium`}>US</th>
+                )}
+                <th className={`${cellPadding} text-left font-medium`}>UK</th>
+                <th className={`${cellPadding} text-left font-medium`}>Japan</th>
               </tr>
-              {isUnisex ? (
-                <>
-                  <tr>
-                    <th className="px-4 py-3 text-left font-medium border-r border-gray-200">US Men&apos;s</th>
-                    {rows.map((r) => (
-                      <td key={`usmen-${r.eu}`} className="px-4 py-3">{r.usMen ?? '-'}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <th className="px-4 py-3 text-left font-medium border-r border-gray-200">US Women&apos;s</th>
-                    {rows.map((r) => (
-                      <td key={`uswomen-${r.eu}`} className="px-4 py-3">{r.usWomen ?? '-'}</td>
-                    ))}
-                  </tr>
-                </>
-              ) : (
-                <tr>
-                  <th className="px-4 py-3 text-left font-medium border-r border-gray-200">US</th>
-                  {rows.map((r) => (
-                    <td key={`us-${r.eu}`} className="px-4 py-3">
+            </thead>
+            <tbody>
+              {rows.map((r, idx) => (
+                <tr key={`${heading}-${r.eu}`} className={idx !== rows.length - 1 ? 'border-b border-gray-200' : ''}>
+                  <td className={cellPadding}>{r.eu}</td>
+                  {isUnisex ? (
+                    <>
+                      <td className={cellPadding}>{r.usMen ?? '-'}</td>
+                      <td className={cellPadding}>{r.usWomen ?? '-'}</td>
+                    </>
+                  ) : (
+                    <td className={cellPadding}>
                       {heading === "Shoes Men" ? r.usMen : r.usWomen}
                     </td>
-                  ))}
+                  )}
+                  <td className={cellPadding}>{r.uk}</td>
+                  <td className={cellPadding}>{formatJp(r.jpCm)}</td>
                 </tr>
-              )}
-              <tr>
-                <th className="px-4 py-3 text-left font-medium border-r border-gray-200">UK</th>
-                {rows.map((r) => (
-                  <td key={`uk-${r.eu}`} className="px-4 py-3">{r.uk}</td>
-                ))}
-              </tr>
-              <tr>
-                <th className="px-4 py-3 text-left font-medium border-r border-gray-200">Japan</th>
-                {rows.map((r) => (
-                  <td key={`jp-${r.eu}`} className="px-4 py-3">{formatJp(r.jpCm)}</td>
-                ))}
-              </tr>
+              ))}
             </tbody>
           </table>
 
           {/* Disclaimer */}
-          <p className="text-xs text-gray-600 mt-6">
+          <p className="text-xs text-gray-600 mt-6 text-left">
             Size conversions vary per brand and may deviate from the conversions shown above. If you are not sure about your size, please contact us{' '}
             <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
               here
@@ -551,9 +555,9 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   return (
     <Modal isOpen={isOpen} close={close} size="large">
       <Modal.Body>
-        <div className="flex flex-col h-full min-h-[500px] px-8 py-8 relative">
+        <div className="flex flex-col h-full min-h-[500px] small:px-8 small:py-6 px-6 py-6 relative">
           {/* Header */}
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-6 small:mb-8">
             {/* Page titles/toggle - Desktop/Tablet: Text buttons */}
             {!hasNoPages && (
               <>
@@ -617,10 +621,10 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           </div>
 
           {/* Close button - Tablet/Phone only */}
-          <div className="block small:hidden mt-8">
+          <div className="block small:hidden mt-8 flex justify-center">
             <button
               onClick={close}
-              className="w-full py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
+              className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
             >
               Close
             </button>
