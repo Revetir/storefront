@@ -175,7 +175,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     }
 
     return (
-      <div className="mt-6 w-full border-t border-gray-300 pt-6">
+      <div className="mt-6 w-full">
         <h3 className="text-lg font-semibold mb-3">{getTitle()}</h3>
         <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
           <table className="min-w-full border border-gray-200">
@@ -196,7 +196,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             </thead>
             <tbody>
               {rows.map((r, idx) => (
-                <tr key={`${heading}-${r.eu}`} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-100' : 'bg-gray-50 hover:bg-gray-100'}>
+                <tr key={`${heading}-${r.eu}`} className="hover:bg-gray-100">
                   <td className="border border-gray-200 px-4 py-2 font-medium">{r.eu}</td>
                   {isUnisex ? (
                     <>
@@ -321,7 +321,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         <div className="flex flex-col h-full min-h-[500px] p-12">
         {/* Header row - title on left, unit toggle on right */}
         <div className="absolute top-8 left-8 right-8 flex justify-between items-center">
-          <h2 className="text-base uppercase">{isShoes ? "Shoe Sizes" : "Product Measurements"}</h2>
+          <h2 className="text-base uppercase">{isShoes ? "Shoe Sizing" : "Product Measurements"}</h2>
           <div className="flex sm:flex-row flex-col gap-0">
             <button
               onClick={() => setUseInches(false)}
@@ -347,10 +347,10 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         </div>
 
           {/* Main content - two column layout with increased spacing */}
-          <div className="flex gap-24 flex-1 items-center justify-center pt-2">
+          <div className="flex gap-12 flex-1 items-center justify-center pt-2">
             {/* Left side - Diagram with measurements */}
-            <div className="flex-1 flex justify-center items-center">
-              <div className="relative w-full max-w-3xl">
+            <div className="flex justify-center items-center flex-grow">
+              <div className="relative w-full">
                 {renderDiagram()}
                 {renderMeasurementOverlays()}
               </div>
@@ -358,11 +358,11 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
             {/* Right side - Controls */}
             {!isShoes && productMeasurements && (
-              <div className="flex-1 flex flex-col gap-8 max-w-sm">
+              <div className="flex flex-col gap-8 w-64 flex-shrink-0">
                 {/* Size selector */}
                 <div className="flex flex-col gap-4">
                   <span className="text-xs">Displaying measurements for size:</span>
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 flex-wrap">
                     {availableSizes.map((size) => (
                       <button
                         key={size}
@@ -380,7 +380,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                 </div>
 
                 {/* Unit toggle */}
-                
+
               </div>
             )}
           </div>
