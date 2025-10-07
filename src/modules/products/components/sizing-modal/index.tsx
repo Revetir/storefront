@@ -242,8 +242,8 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
     return (
       <>
-        {/* Desktop/Laptop: Horizontal layout - diagram left, controls right */}
-        <div className="hidden small:flex gap-12 flex-1 items-center justify-center">
+        {/* Desktop/Laptop: Horizontal layout */}
+        <div className="hidden small:flex gap-8 items-center justify-center h-full w-full">
           {/* Left side - Diagram with measurements */}
           <div className="flex justify-center items-center flex-1">
             <div className="relative w-full flex justify-center">
@@ -300,65 +300,8 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           </div>
         </div>
 
-        {/* Tablet: Vertical split - diagram left half, controls right half */}
-        <div className="hidden xsmall:flex small:hidden flex-1 items-center justify-center gap-8">
-          {/* Left half - Diagram */}
-          <div className="flex-1 flex justify-center items-center">
-            <div className="relative w-full flex justify-center">
-              {renderDiagram()}
-              {renderMeasurementOverlays()}
-            </div>
-          </div>
-
-          {/* Right half - Controls */}
-          <div className="flex-1 flex flex-col gap-6 justify-center">
-            <div className="flex flex-col gap-3">
-              <span className="text-xs">Displaying measurements for size:</span>
-              <div className="flex gap-2 flex-wrap">
-                {availableSizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-2 text-sm font-medium border transition-colors ${
-                      selectedSize === size
-                        ? 'bg-black text-white border-black'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Unit toggle */}
-            <div className="flex gap-0">
-              <button
-                onClick={() => setUseInches(false)}
-                className={`px-4 py-2 text-sm font-medium border transition-colors ${
-                  !useInches
-                    ? 'bg-black text-white border-black'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                Metric
-              </button>
-              <button
-                onClick={() => setUseInches(true)}
-                className={`px-4 py-2 text-sm font-medium border transition-colors ${
-                  useInches
-                    ? 'bg-black text-white border-black'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                Imperial
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Phone: Vertically stacked */}
-        <div className="flex xsmall:hidden flex-col gap-6 flex-1 items-center justify-center">
+        {/* Tablet/Phone: Vertically stacked */}
+        <div className="flex small:hidden flex-col gap-6 w-full">
           {/* Diagram */}
           <div className="relative w-full flex justify-center">
             {renderDiagram()}
@@ -544,7 +487,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   // Render fallback when no pages available
   const renderFallback = () => {
     return (
-      <div className="flex flex-1 items-center justify-center">
+      <div className="flex items-center justify-center h-full w-full">
         <div className="w-1/2">
           <SizingMissingDiagram className="w-full h-auto" />
         </div>
@@ -555,14 +498,14 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   return (
     <Modal isOpen={isOpen} close={close} size="large">
       <Modal.Body>
-        <div className="flex flex-col h-full min-h-[500px] small:px-8 small:py-6 px-6 py-6 relative">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-6 small:mb-8">
-            {/* Page titles/toggle - Desktop/Tablet: Text buttons */}
-            {!hasNoPages && (
-              <>
-                {/* Desktop/Tablet: Text buttons */}
-                <div className="hidden xsmall:flex gap-6">
+        <div className="flex flex-col h-full relative">
+          {/* Desktop/Laptop Layout */}
+          <div className="hidden small:flex small:flex-col small:h-full small:px-4 small:py-3">
+            {/* Header - title and X button in top corners */}
+            <div className="flex justify-between items-start mb-4">
+              {/* Page titles/toggle */}
+              {!hasNoPages && (
+                <div className="flex gap-6">
                   {showPMPage && (
                     <button
                       onClick={() => setCurrentPage("PM")}
@@ -588,46 +531,68 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                     </button>
                   )}
                 </div>
+              )}
 
-                {/* Phone: Dropdown */}
-                <div className="flex xsmall:hidden w-full">
-                  <select
-                    value={currentPage}
-                    onChange={(e) => setCurrentPage(e.target.value as PageType)}
-                    className="w-full px-4 py-2 border border-gray-300 text-sm uppercase font-medium"
-                  >
-                    {showPMPage && <option value="PM">Product Measurements</option>}
-                    {showSCCPage && <option value="SCC">Size Conversion Chart</option>}
-                  </select>
-                </div>
-              </>
-            )}
+              {/* X close button */}
+              <button
+                onClick={close}
+                className="p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1"
+                aria-label="Close modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
 
-            {/* X close button - Desktop/Laptop only */}
-            <button
-              onClick={close}
-              className="hidden small:block p-2 hover:bg-gray-100 rounded-full transition-colors"
-              aria-label="Close modal"
-            >
-              <X size={20} />
-            </button>
+            {/* Main content - 90% width */}
+            <div className="flex-1 flex flex-col w-[90%] mx-auto overflow-y-auto">
+              {hasNoPages && renderFallback()}
+              {currentPage === "PM" && renderPMPage()}
+              {currentPage === "SCC" && renderSCCPage()}
+            </div>
           </div>
 
-          {/* Main content */}
-          <div className="flex-1 flex flex-col">
-            {hasNoPages && renderFallback()}
-            {currentPage === "PM" && renderPMPage()}
-            {currentPage === "SCC" && renderSCCPage()}
-          </div>
+          {/* Tablet/Phone Layout */}
+          <div className="flex small:hidden flex-col h-screen">
+            {/* Header - title at top */}
+            <div className="px-6 py-4 flex-shrink-0">
+              {!hasNoPages && (
+                <>
+                  {/* Show dropdown only if both pages exist */}
+                  {hasMultiplePages ? (
+                    <select
+                      value={currentPage}
+                      onChange={(e) => setCurrentPage(e.target.value as PageType)}
+                      className="w-full px-4 py-2 border border-gray-300 text-sm uppercase font-medium"
+                    >
+                      {showPMPage && <option value="PM">Product Measurements</option>}
+                      {showSCCPage && <option value="SCC">Size Conversion Chart</option>}
+                    </select>
+                  ) : (
+                    /* Show underlined text if only one page exists */
+                    <div className="text-sm uppercase font-medium border-b-2 border-black pb-1 inline-block">
+                      {showPMPage ? "Product Measurements" : "Size Conversion Chart"}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
 
-          {/* Close button - Tablet/Phone only */}
-          <div className="block small:hidden mt-8 flex justify-center">
-            <button
-              onClick={close}
-              className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
-            >
-              Close
-            </button>
+            {/* Main content - scrollable */}
+            <div className="flex-1 overflow-y-auto px-6">
+              {hasNoPages && renderFallback()}
+              {currentPage === "PM" && renderPMPage()}
+              {currentPage === "SCC" && renderSCCPage()}
+            </div>
+
+            {/* Close button - Fixed at bottom */}
+            <div className="flex-shrink-0 py-4 px-6 flex justify-center">
+              <button
+                onClick={close}
+                className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       </Modal.Body>
