@@ -384,8 +384,15 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
               </div>
             </div>
+          ) : sizingTemplate?.diagram_component === "GenericDiagram" || !sizingTemplate ? (
+            // Special layout for GenericDiagram - centered with no restrictions
+            <div className="flex flex-1 items-center justify-center pt-2">
+              <div className="w-[600px]">
+                <GenericDiagram className="w-full h-auto" />
+              </div>
+            </div>
           ) : (
-            // Single column centered layout when no controls
+            // Single column centered layout for other diagrams without product measurements
             <div className="flex flex-1 items-center justify-center pt-2 -mx-8">
               <div className="relative w-full max-w-3xl px-8">
                 {renderDiagram()}
