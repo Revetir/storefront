@@ -3,7 +3,7 @@ import React from "react"
 // T-Shirt sizing diagram
 //pants and necklace diagrams deleted
 
-export const GenericDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
+export const SizingMissingDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
   <svg
     viewBox="0 0 300 150"
     className={`w-full h-auto ${className}`}
@@ -51,6 +51,9 @@ export const GenericDiagram: React.FC<{ className?: string }> = ({ className = "
     </text>
   </svg>
 );
+
+// Keep GenericDiagram as alias for backward compatibility
+export const GenericDiagram = SizingMissingDiagram;
 
 
 
