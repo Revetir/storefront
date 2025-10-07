@@ -177,8 +177,8 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     return (
       <div className="mt-6 w-full">
         <h3 className="text-lg font-semibold mb-3">{getTitle()}</h3>
-        <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
-          <table className="min-w-full border border-gray-200">
+        <div className="overflow-x-auto max-h-[400px] overflow-y-auto border-t border-gray-200">
+          <table className="min-w-full border-l border-r border-b border-gray-200">
             <thead className="sticky top-0 bg-gray-50 z-10">
               <tr>
                 <th className="border border-gray-200 px-4 py-2 text-left">EU</th>
@@ -318,7 +318,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   return (
     <Modal isOpen={isOpen} close={close} size="large">
       <Modal.Body>
-        <div className="flex flex-col h-full min-h-[500px] p-12">
+        <div className="flex flex-col h-full min-h-[500px] px-8 py-12">
         {/* Header row - title on left, unit toggle on right */}
         <div className="absolute top-8 left-8 right-8 flex justify-between items-center">
           <h2 className="text-base uppercase">{isShoes ? "Shoe Sizing" : "Product Measurements"}</h2>
@@ -386,8 +386,8 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             </div>
           ) : (
             // Single column centered layout when no controls
-            <div className="flex flex-1 items-center justify-center pt-2">
-              <div className="relative w-full max-w-2xl">
+            <div className="flex flex-1 items-center justify-center pt-2 -mx-8">
+              <div className="relative w-full max-w-3xl px-8">
                 {renderDiagram()}
                 {renderMeasurementOverlays()}
               </div>
