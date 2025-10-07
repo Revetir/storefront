@@ -75,45 +75,6 @@ export const CategoryMaster = {
   setTemplateForCategoryHandle(handle: string, template: TemplateCategory) {
     state.templateByHandle[handle] = template
   },
-
-  // Hierarchical lookup: traverse up parent chain to find a template
-  getTemplateForCategoryHierarchical(categoryId: string): TemplateCategory | undefined {
-    let currentId: string | undefined = categoryId
-    const visited = new Set<string>() // prevent infinite loops
-
-    while (currentId && !visited.has(currentId)) {
-      visited.add(currentId)
-
-      // Check if current category has a template
-      const template = state.templateById[currentId]
-      if (template) return template
-
-      // Move up to parent
-      const category = state.byId[currentId]
-      currentId = category?.parentId
-    }
-
-    return undefined
-  },
-
-  // Check if a category or any of its ancestors matches a target category ID
-  isDescendantOf(categoryId: string, targetCategoryId: string): boolean {
-    if (categoryId === targetCategoryId) return true
-
-    let currentId: string | undefined = categoryId
-    const visited = new Set<string>()
-
-    while (currentId && !visited.has(currentId)) {
-      visited.add(currentId)
-
-      if (currentId === targetCategoryId) return true
-
-      const category = state.byId[currentId]
-      currentId = category?.parentId
-    }
-
-    return false
-  },
 }
 
 export type { CategoryMasterState }

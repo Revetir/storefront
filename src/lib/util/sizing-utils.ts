@@ -53,23 +53,41 @@ export const getBestSizingCategory = (product: HttpTypes.StoreProduct): string =
 }
 
 /**
- * Get the mapped template category for a product
+ * Get the mapped template category for a product using hierarchical lookup
  */
 export const getProductTemplateCategory = (product: HttpTypes.StoreProduct): string => {
   if (!product.categories || product.categories.length === 0) {
     return "Generic"
   }
 
-  // Try each category in the product's categories array
-  for (const category of product.categories) {
-    const mappedCategory = mapCategoryToTemplate(category.name, category.id)
-    // If we get a specific template (not Generic), use it
-    if (mappedCategory !== "Generic") {
-      return mappedCategory
+  try {
+    // Use CategoryMaster for hierarchical lookup
+    const { CategoryMaster } = require("@lib/data/category-master") as typeof import("@lib/data/category-master")
+
+    // Try each category in the product's categories array with hierarchical lookup
+    for (const category of product.categories) {
+      if (!category.id) continue
+
+      // First try hierarchical lookup (checks category and all ancestors)
+      const hierarchicalTemplate = CategoryMaster.getTemplateForCategoryHierarchical(category.id)
+      if (hierarchicalTemplate) {
+        console.log(`✅ Found template via hierarchy for ${category.name}: ${hierarchicalTemplate}`)
+        return hierarchicalTemplate
+      }
     }
+
+    // Fallback: try direct template lookup for each category
+    for (const category of product.categories) {
+      const mappedCategory = mapCategoryToTemplate(category.name, category.id)
+      if (mappedCategory !== "Generic") {
+        return mappedCategory
+      }
+    }
+  } catch (e) {
+    console.error('Error in getProductTemplateCategory:', e)
   }
 
-  // If no specific mapping found, try the first category without ID
+  // Final fallback
   const categoryName = product.categories[0].name
   return mapCategoryToTemplate(categoryName)
 }
