@@ -88,7 +88,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
   // Render the appropriate diagram component
   const renderDiagram = () => {
-    if (!sizingTemplate) return <GenericDiagram className="w-full max-w-2xl h-auto" />
+    if (!sizingTemplate) return <GenericDiagram className="w-full h-auto" />
 
     switch (sizingTemplate.diagram_component) {
       case "ShoesMen":
@@ -121,10 +121,10 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           />
         )
       case "GenericDiagram":
-        return <GenericDiagram className="w-full max-w-2xl h-auto" />
+        return <GenericDiagram className="w-full h-auto" />
 
       default:
-        return <GenericDiagram className="w-full max-w-2xl h-auto" />
+        return <GenericDiagram className="w-full h-auto" />
     }
   }
 
@@ -168,9 +168,15 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
       return `${cm}cm`
     }
 
+    const getTitle = () => {
+      if (heading === "Shoes Men") return "Men's Shoe Size Conversion"
+      if (heading === "Shoes Women") return "Women's Shoe Size Conversion"
+      return "Unisex Shoe Size Conversion"
+    }
+
     return (
-      <div className="mt-6 w-full">
-        <h3 className="text-lg font-semibold mb-3">Shoe Size Conversion</h3>
+      <div className="mt-6 w-full border-t border-gray-300 pt-6">
+        <h3 className="text-lg font-semibold mb-3">{getTitle()}</h3>
         <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
           <table className="min-w-full border border-gray-200">
             <thead className="sticky top-0 bg-gray-50 z-10">
@@ -189,8 +195,8 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
-                <tr key={`${heading}-${r.eu}`} className="hover:bg-gray-50">
+              {rows.map((r, idx) => (
+                <tr key={`${heading}-${r.eu}`} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-100' : 'bg-gray-50 hover:bg-gray-100'}>
                   <td className="border border-gray-200 px-4 py-2 font-medium">{r.eu}</td>
                   {isUnisex ? (
                     <>
@@ -343,8 +349,8 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           {/* Main content - two column layout with increased spacing */}
           <div className="flex gap-24 flex-1 items-center justify-center pt-2">
             {/* Left side - Diagram with measurements */}
-            <div className="flex-1 flex justify-center">
-              <div className="relative">
+            <div className="flex-1 flex justify-center items-center">
+              <div className="relative w-full max-w-3xl">
                 {renderDiagram()}
                 {renderMeasurementOverlays()}
               </div>
