@@ -122,14 +122,17 @@ export const mapCategoryToTemplate = (categoryName: string, categoryId?: string)
   }
 }
 
-// Helper function to get sizing template by category (updated to use mapping)
-export const getSizingTemplate = (categoryName: string): SizingTemplate | null => {
-  const mappedCategory = mapCategoryToTemplate(categoryName)
-  console.log(`  📋 getSizingTemplate: looking for "${mappedCategory}" in templates`)
+// Helper function to get sizing template by category
+// NOTE: categoryName should already be a mapped template category from getProductTemplateCategory
+export const getSizingTemplate = (templateCategory: string): SizingTemplate | null => {
+  console.log(`  📋 getSizingTemplate: looking for "${templateCategory}" in templates`)
+
+  // templateCategory is already mapped, so just find the matching template
   const found = SIZING_TEMPLATES.find(template =>
-    template.category.toLowerCase() === mappedCategory.toLowerCase()
+    template.category.toLowerCase() === templateCategory.toLowerCase()
   ) || null
-  console.log(`  📋 getSizingTemplate: ${found ? `found ${found.category} (${found.diagram_component})` : 'NOT FOUND, using null'}`)
+
+  console.log(`  📋 getSizingTemplate: ${found ? `found ${found.category} (${found.diagram_component})` : 'NOT FOUND, returning null'}`)
   return found
 }
 
