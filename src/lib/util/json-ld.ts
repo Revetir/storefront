@@ -147,7 +147,7 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
   const thumbnail = product.thumbnail
   const allImages = images.length > 0 ? images : (thumbnail ? [thumbnail] : [])
   
-  const categories = product.categories?.map(cat => cat.name) || []
+  const categories = product.categories?.filter(cat => cat !== null).map(cat => cat.name) || []
   
   // Parse product attributes
   const color = parseColor(product.title)

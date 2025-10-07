@@ -119,10 +119,10 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           />
         )
       case "GenericDiagram":
-        return <GenericDiagram className="w-64 h-auto" />
+        return <GenericDiagram className="w-128 h-auto" />
 
       default:
-        return <GenericDiagram className="w-64 h-auto" />
+        return <GenericDiagram className="w-128 h-auto" />
     }
   }
 
@@ -319,7 +319,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         {/* Header row - title on left, unit toggle on right */}
         <div className="absolute top-8 left-8 right-8 flex justify-between items-center">
           <h2 className="text-base uppercase">{isShoes ? "Shoe Sizes" : "Product Measurements"}</h2>
-          <div className="flex gap-0">
+          <div className="flex sm:flex-row flex-col gap-0">
             <button
               onClick={() => setUseInches(false)}
               className={`px-4 py-2 text-sm font-medium border transition-colors ${
