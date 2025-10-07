@@ -71,21 +71,21 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
   // The modal provides a custom renderer; size_chart remains empty
   {
     category: "Shoes Unisex",
-    diagram_component: "Shoes",
+    diagram_component: "ShoesUnisex",
     units: "cm",
     measurement_points: {},
     size_chart: {}
   },
   {
     category: "Shoes Men",
-    diagram_component: "Shoes",
+    diagram_component: "ShoesMen",
     units: "cm",
     measurement_points: {},
     size_chart: {}
   },
   {
     category: "Shoes Women",
-    diagram_component: "Shoes",
+    diagram_component: "ShoesWomen",
     units: "cm",
     measurement_points: {},
     size_chart: {}
@@ -125,9 +125,12 @@ export const mapCategoryToTemplate = (categoryName: string, categoryId?: string)
 // Helper function to get sizing template by category (updated to use mapping)
 export const getSizingTemplate = (categoryName: string): SizingTemplate | null => {
   const mappedCategory = mapCategoryToTemplate(categoryName)
-  return SIZING_TEMPLATES.find(template => 
+  console.log(`  📋 getSizingTemplate: looking for "${mappedCategory}" in templates`)
+  const found = SIZING_TEMPLATES.find(template =>
     template.category.toLowerCase() === mappedCategory.toLowerCase()
   ) || null
+  console.log(`  📋 getSizingTemplate: ${found ? `found ${found.category} (${found.diagram_component})` : 'NOT FOUND, using null'}`)
+  return found
 }
 
 // Helper function to get all available categories

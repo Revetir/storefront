@@ -91,7 +91,9 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     if (!sizingTemplate) return <GenericDiagram className="w-64 h-auto" />
 
     switch (sizingTemplate.diagram_component) {
-      case "Shoes":
+      case "ShoesMen":
+      case "ShoesWomen":
+      case "ShoesUnisex":
         // Shoes use a conversion table only, no diagram
         return null
       case "TShirtDiagram":
@@ -176,7 +178,9 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   ].filter((row, idx, arr) => arr.findIndex(r => r.eu === row.eu && r.us === row.us && r.uk === row.uk) === idx)
    .sort((a, b) => a.eu - b.eu)
 
-  const isShoes = sizingTemplate?.diagram_component === "Shoes"
+  const isShoes = sizingTemplate?.diagram_component === "ShoesMen" ||
+                  sizingTemplate?.diagram_component === "ShoesWomen" ||
+                  sizingTemplate?.diagram_component === "ShoesUnisex"
 
   const renderShoesTable = () => {
     if (!isShoes) return null
@@ -225,7 +229,9 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     if (!sizingTemplate) return null
 
     // Shoes do not render measurement overlays on a diagram
-    if (sizingTemplate.diagram_component === "Shoes") return null
+    if (sizingTemplate.diagram_component === "ShoesMen" ||
+        sizingTemplate.diagram_component === "ShoesWomen" ||
+        sizingTemplate.diagram_component === "ShoesUnisex") return null
 
     console.log('🎯 Rendering overlays for template:', templateCategory)
     console.log('📏 Template measurement points:', Object.keys(sizingTemplate.measurement_points))
@@ -274,7 +280,9 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     if (!sizingTemplate) return null
 
     // Shoes use a conversion table instead
-    if (sizingTemplate.diagram_component === "Shoes") return null
+    if (sizingTemplate.diagram_component === "ShoesMen" ||
+        sizingTemplate.diagram_component === "ShoesWomen" ||
+        sizingTemplate.diagram_component === "ShoesUnisex") return null
 
     const sizes = Object.keys(sizingTemplate.size_chart)
     const measurements = Object.keys(sizingTemplate.size_chart[sizes[0]] || {})

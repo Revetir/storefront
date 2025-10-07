@@ -54,18 +54,36 @@ export const getBestSizingCategory = (product: HttpTypes.StoreProduct): string =
 
 /**
  * Get the mapped template category for a product using hierarchical lookup
+ * Special handling for unisex shoes (products in both mens-shoes and womens-shoes)
  */
 export const getProductTemplateCategory = (product: HttpTypes.StoreProduct): string => {
   if (!product.categories || product.categories.length === 0) {
     return "Generic"
   }
 
-  // Try each category - mapCategoryToTemplate now uses hierarchical lookup automatically
+  // Collect all template mappings from all categories
+  const templateCategories = new Set<string>()
+
   for (const category of product.categories) {
     const mappedCategory = mapCategoryToTemplate(category.name, category.id)
     if (mappedCategory !== "Generic") {
-      return mappedCategory
+      templateCategories.add(mappedCategory)
     }
+  }
+
+  // Check if product has both Shoes Men and Shoes Women -> it's unisex
+  if (templateCategories.has("Shoes Men") && templateCategories.has("Shoes Women")) {
+    return "Shoes Unisex"
+  }
+
+  // If we have exactly one specific template, use it
+  if (templateCategories.size === 1) {
+    return Array.from(templateCategories)[0]
+  }
+
+  // If we have multiple different templates (not shoes), use the first one
+  if (templateCategories.size > 1) {
+    return Array.from(templateCategories)[0]
   }
 
   // Final fallback
