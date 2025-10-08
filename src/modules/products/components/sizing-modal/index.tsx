@@ -367,56 +367,71 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     const isUnisex = heading === "Shoes Unisex"
 
     // Calculate responsive padding based on number of columns (sizes)
+    // Dynamic spacing: more sizes = tighter spacing, fewer sizes = looser spacing (capped)
     const numSizes = rows.length
-    const cellPadding = numSizes > 10 ? 'px-2 py-2' : numSizes > 8 ? 'px-3 py-2' : 'px-4 py-3'
+    let cellPaddingX = 'px-6' // default/max
+    let cellPaddingY = 'py-3'
+
+    if (numSizes > 10) {
+      cellPaddingX = 'px-2'
+      cellPaddingY = 'py-2'
+    } else if (numSizes > 8) {
+      cellPaddingX = 'px-3'
+      cellPaddingY = 'py-2'
+    } else if (numSizes > 6) {
+      cellPaddingX = 'px-4'
+      cellPaddingY = 'py-3'
+    }
+
+    const cellPadding = `${cellPaddingX} ${cellPaddingY}`
 
     return (
-      <div className="flex flex-col gap-6 w-full">
+      <div className="flex flex-col gap-6 w-full h-full">
         {/* Desktop/Laptop: VERTICAL table - EU/US/UK/JP as ROW headers, sizes as COLUMNS */}
-        <div className="hidden small:block w-full overflow-x-auto">
-          <table className="w-full">
+        <div className="hidden small:flex small:flex-col w-full h-full">
+          <table className="w-full table-fixed">
             <tbody>
               <tr>
-                <th className={`${cellPadding} text-left font-medium border-r border-gray-200`}>EU</th>
+                <th className={`${cellPadding} text-left font-medium border-r border-gray-200 w-24`}>EU</th>
                 {rows.map((r) => (
-                  <td key={`eu-${r.eu}`} className={cellPadding}>{r.eu}</td>
+                  <td key={`eu-${r.eu}`} className={`${cellPadding} text-center`}>{r.eu}</td>
                 ))}
               </tr>
               {isUnisex ? (
                 <>
                   <tr>
-                    <th className={`${cellPadding} text-left font-medium border-r border-gray-200`}>US Men&apos;s</th>
+                    <th className={`${cellPadding} text-left font-medium border-r border-gray-200 w-24`}>US Men&apos;s</th>
                     {rows.map((r) => (
-                      <td key={`usmen-${r.eu}`} className={cellPadding}>{r.usMen ?? '-'}</td>
+                      <td key={`usmen-${r.eu}`} className={`${cellPadding} text-center`}>{r.usMen ?? '-'}</td>
                     ))}
                   </tr>
                   <tr>
-                    <th className={`${cellPadding} text-left font-medium border-r border-gray-200`}>US Women&apos;s</th>
+                    <th className={`${cellPadding} text-left font-medium border-r border-gray-200 w-24`}>US Women&apos;s</th>
                     {rows.map((r) => (
-                      <td key={`uswomen-${r.eu}`} className={cellPadding}>{r.usWomen ?? '-'}</td>
+                      <td key={`uswomen-${r.eu}`} className={`${cellPadding} text-center`}>{r.usWomen ?? '-'}</td>
                     ))}
                   </tr>
                 </>
               ) : (
                 <tr>
-                  <th className={`${cellPadding} text-left font-medium border-r border-gray-200`}>US</th>
+                  <th className={`${cellPadding} text-left font-medium border-r border-gray-200 w-24`}>US</th>
                   {rows.map((r) => (
-                    <td key={`us-${r.eu}`} className={cellPadding}>
+                    <td key={`us-${r.eu}`} className={`${cellPadding} text-center`}>
                       {heading === "Shoes Men" ? r.usMen : r.usWomen}
                     </td>
                   ))}
                 </tr>
               )}
               <tr>
-                <th className={`${cellPadding} text-left font-medium border-r border-gray-200`}>UK</th>
+                <th className={`${cellPadding} text-left font-medium border-r border-gray-200 w-24`}>UK</th>
                 {rows.map((r) => (
-                  <td key={`uk-${r.eu}`} className={cellPadding}>{r.uk}</td>
+                  <td key={`uk-${r.eu}`} className={`${cellPadding} text-center`}>{r.uk}</td>
                 ))}
               </tr>
               <tr>
-                <th className={`${cellPadding} text-left font-medium border-r border-gray-200`}>Japan</th>
+                <th className={`${cellPadding} text-left font-medium border-r border-gray-200 w-24`}>Japan</th>
                 {rows.map((r) => (
-                  <td key={`jp-${r.eu}`} className={cellPadding}>{formatJp(r.jpCm)}</td>
+                  <td key={`jp-${r.eu}`} className={`${cellPadding} text-center`}>{formatJp(r.jpCm)}</td>
                 ))}
               </tr>
             </tbody>
@@ -484,17 +499,6 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     )
   }
 
-  // Render fallback when no pages available
-  const renderFallback = () => {
-    return (
-      <div className="flex items-center justify-center h-full w-full">
-        <div className="w-1/2">
-          <SizingMissingDiagram className="w-full h-auto" />
-        </div>
-      </div>
-    )
-  }
-
   return (
     <Modal isOpen={isOpen} close={close} size="large">
       <Modal.Body>
@@ -503,8 +507,8 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           <div className="hidden small:flex small:flex-col small:h-full small:px-4 small:py-3">
             {/* Header - title and X button in top corners */}
             <div className="flex justify-between items-start mb-4">
-              {/* Page titles/toggle */}
-              {!hasNoPages && (
+              {/* Page titles/toggle - only show if pages exist */}
+              {!hasNoPages ? (
                 <div className="flex gap-6">
                   {showPMPage && (
                     <button
@@ -531,6 +535,8 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                     </button>
                   )}
                 </div>
+              ) : (
+                <div></div>
               )}
 
               {/* X close button */}
@@ -543,49 +549,65 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               </button>
             </div>
 
-            {/* Main content - 90% width */}
-            <div className="flex-1 flex flex-col w-[90%] mx-auto overflow-y-auto">
-              {hasNoPages && renderFallback()}
-              {currentPage === "PM" && renderPMPage()}
-              {currentPage === "SCC" && renderSCCPage()}
-            </div>
+            {/* Main content */}
+            {hasNoPages ? (
+              /* Fallback - full width, centered */
+              <div className="flex-1 flex items-center justify-center">
+                <div className="w-1/2">
+                  <SizingMissingDiagram className="w-full h-auto" />
+                </div>
+              </div>
+            ) : (
+              /* Regular content - 90% width */
+              <div className="flex-1 flex flex-col w-[90%] mx-auto overflow-y-auto">
+                {currentPage === "PM" && renderPMPage()}
+                {currentPage === "SCC" && renderSCCPage()}
+              </div>
+            )}
           </div>
 
           {/* Tablet/Phone Layout */}
-          <div className="flex small:hidden flex-col h-screen">
-            {/* Header - title at top */}
-            <div className="px-6 py-4 flex-shrink-0">
-              {!hasNoPages && (
-                <>
-                  {/* Show dropdown only if both pages exist */}
-                  {hasMultiplePages ? (
-                    <select
-                      value={currentPage}
-                      onChange={(e) => setCurrentPage(e.target.value as PageType)}
-                      className="w-full px-4 py-2 border border-gray-300 text-sm uppercase font-medium"
-                    >
-                      {showPMPage && <option value="PM">Product Measurements</option>}
-                      {showSCCPage && <option value="SCC">Size Conversion Chart</option>}
-                    </select>
-                  ) : (
-                    /* Show underlined text if only one page exists */
-                    <div className="text-sm uppercase font-medium border-b-2 border-black pb-1 inline-block">
-                      {showPMPage ? "Product Measurements" : "Size Conversion Chart"}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+          <div className="flex small:hidden flex-col h-screen relative">
+            {/* Header - title at top, only if pages exist */}
+            {!hasNoPages && (
+              <div className="px-6 py-4 flex-shrink-0">
+                {/* Show dropdown only if both pages exist */}
+                {hasMultiplePages ? (
+                  <select
+                    value={currentPage}
+                    onChange={(e) => setCurrentPage(e.target.value as PageType)}
+                    className="w-full px-4 py-2 border border-gray-300 text-sm uppercase font-medium"
+                  >
+                    {showPMPage && <option value="PM">Product Measurements</option>}
+                    {showSCCPage && <option value="SCC">Size Conversion Chart</option>}
+                  </select>
+                ) : (
+                  /* Show underlined text if only one page exists */
+                  <div className="text-sm uppercase font-medium border-b-2 border-black pb-1 inline-block">
+                    {showPMPage ? "Product Measurements" : "Size Conversion Chart"}
+                  </div>
+                )}
+              </div>
+            )}
 
-            {/* Main content - scrollable */}
-            <div className="flex-1 overflow-y-auto px-6">
-              {hasNoPages && renderFallback()}
-              {currentPage === "PM" && renderPMPage()}
-              {currentPage === "SCC" && renderSCCPage()}
-            </div>
+            {/* Main content */}
+            {hasNoPages ? (
+              /* Fallback - full height, centered */
+              <div className="flex-1 flex items-center justify-center px-6">
+                <div className="w-1/2">
+                  <SizingMissingDiagram className="w-full h-auto" />
+                </div>
+              </div>
+            ) : (
+              /* Regular content - scrollable with bottom padding for fixed button */
+              <div className="flex-1 overflow-y-auto px-6 pb-20">
+                {currentPage === "PM" && renderPMPage()}
+                {currentPage === "SCC" && renderSCCPage()}
+              </div>
+            )}
 
-            {/* Close button - Fixed at bottom */}
-            <div className="flex-shrink-0 py-4 px-6 flex justify-center">
+            {/* Close button - Fixed at bottom of modal */}
+            <div className="absolute bottom-0 left-0 right-0 pb-2 px-6 flex justify-center bg-white">
               <button
                 onClick={close}
                 className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
