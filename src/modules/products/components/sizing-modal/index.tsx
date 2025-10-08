@@ -160,34 +160,26 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   }
 
   // --- Shoes conversion data ---
-  type ShoeRow = { eu: number, usMen: number | null, usWomen: number | null, uk: number, jpCm: number }
+  type ShoeRow = { eu: number, usMen: number | null, usWomen: number | null, uk: number, jp: number }
 
   const SHOES_DATA: ShoeRow[] = [
-    { eu: 35,   usMen: null, usWomen: 4.5,  uk: 2,  jpCm: 21.5},
-    { eu: 36,   usMen: null,  usWomen: 5.5,  uk: 3,  jpCm: 22.5 },
-    { eu: 37,   usMen: null,  usWomen: 6.5,  uk: 4,  jpCm: 23 },
-    { eu: 38,   usMen: null,  usWomen: 7.5,  uk: 4.5,  jpCm: 24 },
-    { eu: 39,   usMen: 6,  usWomen: 8.5,  uk: 5.5,    jpCm: 24.5 },
-    { eu: 40,   usMen: 7,    usWomen: 9.5,    uk: 6.5,  jpCm: 25 },
-    { eu: 41,   usMen: 8,    usWomen: 10.5,   uk: 7.5,  jpCm: 26 },
-    { eu: 42,   usMen: 9,  usWomen: 11.5, uk: 8,    jpCm: 27 },
-    { eu: 43,   usMen: 10,  usWomen: null, uk: 9,    jpCm: 28 },
-    { eu: 44,   usMen: 11,   usWomen: null,   uk: 10,  jpCm: 29 },
-    { eu: 45,   usMen: 12,   usWomen: null,   uk: 11, jpCm: 30 },
-    { eu: 46,   usMen: 13,   usWomen: null,   uk: 12, jpCm: 31 },
+    { eu: 35,   usMen: null, usWomen: 4.5,  uk: 2,  jp: 22.5 },
+    { eu: 36,   usMen: null,  usWomen: 5.5,  uk: 3,  jp: 23 },
+    { eu: 37,   usMen: null,  usWomen: 6.5,  uk: 4,  jp: 23.5 },
+    { eu: 38,   usMen: null,  usWomen: 7.5,  uk: 4.5,  jp: 24 },
+    { eu: 39,   usMen: 6,  usWomen: 8.5,  uk: 5.5,    jp: 24.5 },
+    { eu: 40,   usMen: 7,    usWomen: 9.5,    uk: 6.5,  jp: 25 },
+    { eu: 41,   usMen: 8,    usWomen: 10.5,   uk: 7.5,  jp: 26 },
+    { eu: 42,   usMen: 9,  usWomen: 11.5, uk: 8,    jp: 27 },
+    { eu: 43,   usMen: 10,  usWomen: null, uk: 9,    jp: 28 },
+    { eu: 44,   usMen: 11,   usWomen: null,   uk: 10,  jp: 29 },
+    { eu: 45,   usMen: 12,   usWomen: null,   uk: 11, jp: 30 },
+    { eu: 46,   usMen: 13,   usWomen: null,   uk: 12, jp: 31 },
   ]
 
   const SHOES_MEN = SHOES_DATA.filter(row => row.usMen !== null && row.eu >= 39 && row.eu <= 46.5)
   const SHOES_WOMEN = SHOES_DATA.filter(row => row.usWomen !== null && row.eu >= 35 && row.eu <= 42)
   const SHOES_UNISEX = SHOES_DATA.filter(row => row.eu >= 35 && row.eu <= 46.5)
-
-  const formatJp = (cm: number) => {
-    if (useInches) {
-      const inches = Math.round((cm / 2.54) * 10) / 10
-      return `${inches}"`
-    }
-    return `${cm}cm`
-  }
 
   // Render measurement overlays
   const renderMeasurementOverlays = () => {
@@ -431,7 +423,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               <tr>
                 <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>Japan</th>
                 {rows.map((r, idx) => (
-                  <td key={`jp-${r.eu}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>{formatJp(r.jpCm)}</td>
+                  <td key={`jp-${r.eu}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>{r.jp}</td>
                 ))}
               </tr>
             </tbody>
@@ -480,7 +472,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                     </td>
                   )}
                   <td className={`${cellPadding} text-center`}>{r.uk}</td>
-                  <td className={`${cellPadding} text-center`}>{formatJp(r.jpCm)}</td>
+                  <td className={`${cellPadding} text-center`}>{r.jp}</td>
                 </tr>
               ))}
             </tbody>
