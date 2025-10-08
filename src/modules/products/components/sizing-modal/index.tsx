@@ -506,28 +506,35 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           {/* Desktop/Laptop Layout */}
           <div className="hidden small:flex small:flex-col small:h-full small:px-4 small:py-3">
             {hasNoPages ? (
-              /* Sizing Missing Layout - Complete separation */
-              <div className="relative flex-1 flex items-center justify-center">
-                {/* X close button - absolutely positioned */}
+              /* Sizing Missing Layout - Use absolute positioning to fill parent modal */
+              <>
+                {/* X close button - positioned in the top-right corner of the modal */}
                 <button
                   onClick={close}
-                  className="absolute top-0 right-0 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  className="absolute top-3 right-4 p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1"
                   aria-label="Close modal"
                 >
                   <X size={20} />
                 </button>
 
-                {/* Centered content */}
-                <div className="text-center">
-                  <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
-                  <p className="text-sm text-gray-500">
-                    For dedicated assistance with sizing, please contact us{' '}
-                    <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
-                      here
-                    </a>
-                  </p>
+                {/* Centered content container */}
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <p className="text-base text-gray-700 mb-2">
+                      Measurements for this product will be available soon
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      For dedicated assistance with sizing, please contact us{' '}
+                      <a
+                        href="https://revetir.com/us/customer-care/contact-us"
+                        className="underline hover:text-gray-800"
+                      >
+                        here
+                      </a>
+                    </p>
+                  </div>
                 </div>
-              </div>
+              </>
             ) : (
               /* SCC/PM Layout - Unchanged */
               <>
