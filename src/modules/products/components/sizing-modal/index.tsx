@@ -502,147 +502,162 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   return (
     <Modal isOpen={isOpen} close={close} size="large">
       <Modal.Body>
-        <div className="flex flex-col h-full relative">
-          {/* Desktop/Laptop Layout */}
-          <div className="hidden small:flex small:flex-col small:h-full small:px-4 small:py-3">
-            {hasNoPages ? (
-              /* Sizing Missing Layout - Use absolute positioning to fill parent modal */
-              <>
-                {/* X close button - positioned in the top-right corner of the modal */}
+        {hasNoPages ? (
+          /* Sizing Missing - Complete custom layout at Modal.Body level */
+          <div className="relative h-full w-full">
+            {/* X close button - positioned at modal level */}
+            <button
+              onClick={close}
+              className="absolute top-4 right-4 p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1 z-10"
+              aria-label="Close modal"
+            >
+              <X size={20} />
+            </button>
+
+            {/* Desktop: Centered content */}
+            <div className="hidden small:flex h-full items-center justify-center">
+              <div className="text-center">
+                <p className="text-base text-gray-700 mb-2">
+                  Measurements for this product will be available soon
+                </p>
+                <p className="text-sm text-gray-500">
+                  For dedicated assistance with sizing, please contact us{' '}
+                  <a
+                    href="https://revetir.com/us/customer-care/contact-us"
+                    className="underline hover:text-gray-800"
+                  >
+                    here
+                  </a>
+                </p>
+              </div>
+            </div>
+
+            {/* Mobile: Centered content */}
+            <div className="flex small:hidden h-full items-center justify-center px-6">
+              <div className="text-center">
+                <p className="text-base text-gray-700 mb-2">
+                  Measurements for this product will be available soon
+                </p>
+                <p className="text-sm text-gray-500">
+                  For dedicated assistance with sizing, please contact us{' '}
+                  <a
+                    href="https://revetir.com/us/customer-care/contact-us"
+                    className="underline hover:text-gray-800"
+                  >
+                    here
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col h-full relative">
+            {/* Desktop/Laptop Layout */}
+            <div className="hidden small:flex small:flex-col small:h-full small:px-4 small:py-3">
+              {/* Header - title and X button in top corners */}
+              <div className="flex justify-between items-start mb-4">
+                {/* Page titles/toggle */}
+                <div className="flex gap-6">
+                  {showPMPage && (
+                    <button
+                      onClick={() => setCurrentPage("PM")}
+                      className={`text-sm uppercase font-medium pb-1 transition-all ${
+                        currentPage === "PM"
+                          ? 'border-b-2 border-black'
+                          : 'text-gray-500 hover:text-gray-800'
+                      }`}
+                    >
+                      Product Measurements
+                    </button>
+                  )}
+                  {showSCCPage && (
+                    <button
+                      onClick={() => setCurrentPage("SCC")}
+                      className={`text-sm uppercase font-medium pb-1 transition-all ${
+                        currentPage === "SCC"
+                          ? 'border-b-2 border-black'
+                          : 'text-gray-500 hover:text-gray-800'
+                      }`}
+                    >
+                      Size Conversion Chart
+                    </button>
+                  )}
+                </div>
+
+                {/* X close button */}
                 <button
                   onClick={close}
-                  className="absolute top-3 right-4 p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1"
+                  className="p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1"
                   aria-label="Close modal"
                 >
                   <X size={20} />
                 </button>
+              </div>
 
-                {/* Centered content container */}
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-base text-gray-700 mb-2">
-                      Measurements for this product will be available soon
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      For dedicated assistance with sizing, please contact us{' '}
-                      <a
-                        href="https://revetir.com/us/customer-care/contact-us"
-                        className="underline hover:text-gray-800"
-                      >
-                        here
-                      </a>
-                    </p>
-                  </div>
+              {/* Main content */}
+              <div className={`flex-1 flex flex-col overflow-y-auto ${currentPage === "SCC" ? "mr-8" : ""}`}>
+                {currentPage === "PM" && renderPMPage()}
+                {currentPage === "SCC" && renderSCCPage()}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tablet/Phone Layout */}
+        <div className="flex small:hidden flex-col h-screen">
+          {/* Header - title at top, only if pages exist */}
+          {!hasNoPages && (
+            <div className="px-6 py-4 flex-shrink-0 text-center">
+              {/* Show dropdown only if both pages exist */}
+              {hasMultiplePages ? (
+                <select
+                  value={currentPage}
+                  onChange={(e) => setCurrentPage(e.target.value as PageType)}
+                  className="w-full px-4 py-2 border border-gray-300 text-sm uppercase font-medium text-center"
+                >
+                  {showPMPage && <option value="PM">Product Measurements</option>}
+                  {showSCCPage && <option value="SCC">Size Conversion Chart</option>}
+                </select>
+              ) : (
+                /* Show underlined text if only one page exists */
+                <div className="text-sm uppercase font-medium border-b-2 border-black pb-1 inline-block">
+                  {showPMPage ? "Product Measurements" : "Size Conversion Chart"}
                 </div>
-              </>
+              )}
+            </div>
+          )}
+
+          {/* Main content - scrollable with padding for fixed button */}
+          <div className="flex-1 overflow-y-auto px-6 pb-20">
+            {hasNoPages ? (
+              /* Fallback - centered text */
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center">
+                  <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
+                  <p className="text-sm text-gray-500">
+                    For dedicated assistance with sizing, please contact us{' '}
+                    <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
+                      here
+                    </a>
+                  </p>
+                </div>
+              </div>
             ) : (
-              /* SCC/PM Layout - Unchanged */
               <>
-                {/* Header - title and X button in top corners */}
-                <div className="flex justify-between items-start mb-4">
-                  {/* Page titles/toggle */}
-                  <div className="flex gap-6">
-                    {showPMPage && (
-                      <button
-                        onClick={() => setCurrentPage("PM")}
-                        className={`text-sm uppercase font-medium pb-1 transition-all ${
-                          currentPage === "PM"
-                            ? 'border-b-2 border-black'
-                            : 'text-gray-500 hover:text-gray-800'
-                        }`}
-                      >
-                        Product Measurements
-                      </button>
-                    )}
-                    {showSCCPage && (
-                      <button
-                        onClick={() => setCurrentPage("SCC")}
-                        className={`text-sm uppercase font-medium pb-1 transition-all ${
-                          currentPage === "SCC"
-                            ? 'border-b-2 border-black'
-                            : 'text-gray-500 hover:text-gray-800'
-                        }`}
-                      >
-                        Size Conversion Chart
-                      </button>
-                    )}
-                  </div>
-
-                  {/* X close button */}
-                  <button
-                    onClick={close}
-                    className="p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1"
-                    aria-label="Close modal"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-
-                {/* Main content */}
-                <div className={`flex-1 flex flex-col overflow-y-auto ${currentPage === "SCC" ? "mr-8" : ""}`}>
-                  {currentPage === "PM" && renderPMPage()}
-                  {currentPage === "SCC" && renderSCCPage()}
-                </div>
+                {currentPage === "PM" && renderPMPage()}
+                {currentPage === "SCC" && renderSCCPage()}
               </>
             )}
           </div>
 
-          {/* Tablet/Phone Layout */}
-          <div className="flex small:hidden flex-col h-screen">
-            {/* Header - title at top, only if pages exist */}
-            {!hasNoPages && (
-              <div className="px-6 py-4 flex-shrink-0 text-center">
-                {/* Show dropdown only if both pages exist */}
-                {hasMultiplePages ? (
-                  <select
-                    value={currentPage}
-                    onChange={(e) => setCurrentPage(e.target.value as PageType)}
-                    className="w-full px-4 py-2 border border-gray-300 text-sm uppercase font-medium text-center"
-                  >
-                    {showPMPage && <option value="PM">Product Measurements</option>}
-                    {showSCCPage && <option value="SCC">Size Conversion Chart</option>}
-                  </select>
-                ) : (
-                  /* Show underlined text if only one page exists */
-                  <div className="text-sm uppercase font-medium border-b-2 border-black pb-1 inline-block">
-                    {showPMPage ? "Product Measurements" : "Size Conversion Chart"}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Main content - scrollable with padding for fixed button */}
-            <div className="flex-1 overflow-y-auto px-6 pb-20">
-              {hasNoPages ? (
-                /* Fallback - centered text */
-                <div className="h-full flex items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
-                    <p className="text-sm text-gray-500">
-                      If you&apos;re not sure about your size, please contact us{' '}
-                      <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
-                        here
-                      </a>
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {currentPage === "PM" && renderPMPage()}
-                  {currentPage === "SCC" && renderSCCPage()}
-                </>
-              )}
-            </div>
-
-            {/* Close button - Fixed at bottom of modal */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 flex justify-center bg-white">
-              <button
-                onClick={close}
-                className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
-              >
-                Close
-              </button>
-            </div>
+          {/* Close button - Fixed at bottom of modal */}
+          <div className="fixed bottom-0 left-0 right-0 p-4 flex justify-center bg-white">
+            <button
+              onClick={close}
+              className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
+            >
+              Close
+            </button>
           </div>
         </div>
       </Modal.Body>
