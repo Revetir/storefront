@@ -392,13 +392,13 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               {isUnisex ? (
                 <>
                   <tr>
-                    <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>US Men&apos;s</th>
+                    <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>US Men</th>
                     {rows.map((r, idx) => (
                       <td key={`usmen-${r.eu}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>{r.usMen ?? '-'}</td>
                     ))}
                   </tr>
                   <tr>
-                    <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>US Women&apos;s</th>
+                    <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>US Women</th>
                     {rows.map((r, idx) => (
                       <td key={`uswomen-${r.eu}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>{r.usWomen ?? '-'}</td>
                     ))}
@@ -511,6 +511,11 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               {/* Centered content */}
               <div className="h-full flex items-center justify-center">
                 <div className="text-center">
+                  <img
+                    src="/images/sizing_information_placeholder.png"
+                    alt="Sizing information notice"
+                    className="w-auto h-auto max-w-md mx-auto mb-6"
+                  />
                   <p className="text-base text-gray-700 mb-2">
                     Measurements for this product will be available soon
                   </p>
@@ -531,6 +536,11 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             <div className="flex small:hidden flex-col h-screen">
               <div className="flex-1 flex items-center justify-center px-6">
                 <div className="text-center">
+                  <img
+                    src="/images/sizing_information_placeholder.png"
+                    alt="Sizing information notice"
+                    className="w-auto h-auto max-w-xs mx-auto mb-6"
+                  />
                   <p className="text-base text-gray-700 mb-2">
                     Measurements for this product will be available soon
                   </p>
