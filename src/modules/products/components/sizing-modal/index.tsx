@@ -392,7 +392,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           <table className="w-full table-fixed">
             <tbody>
               <tr>
-                <th className={`${cellPadding} text-left font-medium border-r border-gray-200 w-24`}>EU</th>
+                <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>EU</th>
                 {rows.map((r) => (
                   <td key={`eu-${r.eu}`} className={`${cellPadding} text-center`}>{r.eu}</td>
                 ))}
@@ -400,13 +400,13 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               {isUnisex ? (
                 <>
                   <tr>
-                    <th className={`${cellPadding} text-left font-medium border-r border-gray-200 w-24`}>US Men&apos;s</th>
+                    <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>US Men&apos;s</th>
                     {rows.map((r) => (
                       <td key={`usmen-${r.eu}`} className={`${cellPadding} text-center`}>{r.usMen ?? '-'}</td>
                     ))}
                   </tr>
                   <tr>
-                    <th className={`${cellPadding} text-left font-medium border-r border-gray-200 w-24`}>US Women&apos;s</th>
+                    <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>US Women&apos;s</th>
                     {rows.map((r) => (
                       <td key={`uswomen-${r.eu}`} className={`${cellPadding} text-center`}>{r.usWomen ?? '-'}</td>
                     ))}
@@ -414,7 +414,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                 </>
               ) : (
                 <tr>
-                  <th className={`${cellPadding} text-left font-medium border-r border-gray-200 w-24`}>US</th>
+                  <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>US</th>
                   {rows.map((r) => (
                     <td key={`us-${r.eu}`} className={`${cellPadding} text-center`}>
                       {heading === "Shoes Men" ? r.usMen : r.usWomen}
@@ -423,13 +423,13 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                 </tr>
               )}
               <tr>
-                <th className={`${cellPadding} text-left font-medium border-r border-gray-200 w-24`}>UK</th>
+                <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>UK</th>
                 {rows.map((r) => (
                   <td key={`uk-${r.eu}`} className={`${cellPadding} text-center`}>{r.uk}</td>
                 ))}
               </tr>
               <tr>
-                <th className={`${cellPadding} text-left font-medium border-r border-gray-200 w-24`}>Japan</th>
+                <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>Japan</th>
                 {rows.map((r) => (
                   <td key={`jp-${r.eu}`} className={`${cellPadding} text-center`}>{formatJp(r.jpCm)}</td>
                 ))}
@@ -439,7 +439,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
           {/* Disclaimer */}
           <p className="text-xs text-gray-600 mt-6 text-left">
-            Size conversions vary per brand and may deviate from the conversions shown above. If you are not sure about your size, please contact us{' '}
+            Size conversions vary per brand and may deviate from the conversions shown above. For assistance with sizing, please contact us{' '}
             <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
               here
             </a>
@@ -452,17 +452,17 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className={`${cellPadding} text-left font-medium`}>EU</th>
+                <th className={`${cellPadding} text-center font-medium`}>EU</th>
                 {isUnisex ? (
                   <>
-                    <th className={`${cellPadding} text-left font-medium`}>US Men&apos;s</th>
-                    <th className={`${cellPadding} text-left font-medium`}>US Women&apos;s</th>
+                    <th className={`${cellPadding} text-center font-medium`}>US Men&apos;s</th>
+                    <th className={`${cellPadding} text-center font-medium`}>US Women&apos;s</th>
                   </>
                 ) : (
-                  <th className={`${cellPadding} text-left font-medium`}>US</th>
+                  <th className={`${cellPadding} text-center font-medium`}>US</th>
                 )}
-                <th className={`${cellPadding} text-left font-medium`}>UK</th>
-                <th className={`${cellPadding} text-left font-medium`}>Japan</th>
+                <th className={`${cellPadding} text-center font-medium`}>UK</th>
+                <th className={`${cellPadding} text-center font-medium`}>Japan</th>
               </tr>
             </thead>
             <tbody>
@@ -488,7 +488,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
           {/* Disclaimer */}
           <p className="text-xs text-gray-600 mt-6 text-left">
-            Size conversions vary per brand and may deviate from the conversions shown above. If you are not sure about your size, please contact us{' '}
+            Size conversions vary per brand and may deviate from the conversions shown above. For assistance with sizing, please contact us{' '}
             <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
               here
             </a>
@@ -554,7 +554,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                 <div className="text-center">
                   <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
                   <p className="text-sm text-gray-500">
-                    If you&apos;re not sure about your size, please contact us{' '}
+                    For assistance with sizing, please contact us{' '}
                     <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
                       here
                     </a>
@@ -573,13 +573,13 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           <div className="flex small:hidden flex-col h-screen">
             {/* Header - title at top, only if pages exist */}
             {!hasNoPages && (
-              <div className="px-6 py-4 flex-shrink-0">
+              <div className="px-6 py-4 flex-shrink-0 text-center">
                 {/* Show dropdown only if both pages exist */}
                 {hasMultiplePages ? (
                   <select
                     value={currentPage}
                     onChange={(e) => setCurrentPage(e.target.value as PageType)}
-                    className="w-full px-4 py-2 border border-gray-300 text-sm uppercase font-medium"
+                    className="w-full px-4 py-2 border border-gray-300 text-sm uppercase font-medium text-center"
                   >
                     {showPMPage && <option value="PM">Product Measurements</option>}
                     {showSCCPage && <option value="SCC">Size Conversion Chart</option>}
