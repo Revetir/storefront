@@ -506,7 +506,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           /* Sizing Missing - Complete custom layout at Modal.Body level */
           <>
             {/* Desktop: Full height centered layout with X button */}
-            <div className="hidden small:block small:h-full small:relative">
+            <div className="hidden small:block small:h-full small:w-full small:relative">
               {/* X close button */}
               <button
                 onClick={close}
