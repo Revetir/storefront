@@ -506,10 +506,10 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           {/* Desktop/Laptop Layout */}
           <div className="hidden small:flex small:flex-col small:h-full small:px-4 small:py-3">
             {/* Header - title and X button in top corners */}
-            <div className="flex items-start mb-4">
+            <div className="flex justify-end items-start mb-4">
               {/* Page titles/toggle - only show if pages exist */}
               {!hasNoPages && (
-                <div className="flex gap-6">
+                <div className="flex gap-6 mr-auto">
                   {showPMPage && (
                     <button
                       onClick={() => setCurrentPage("PM")}
@@ -540,7 +540,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               {/* X close button */}
               <button
                 onClick={close}
-                className="p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1 ml-auto"
+                className="p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1"
                 aria-label="Close modal"
               >
                 <X size={20} />
@@ -550,7 +550,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             {/* Main content */}
             {hasNoPages ? (
               /* Fallback - centered text */
-              <div className="flex-1 flex items-center justify-center">
+              <div className="flex-1 flex items-center justify-center -mt-4">
                 <div className="text-center">
                   <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
                   <p className="text-sm text-gray-500">
