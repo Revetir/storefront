@@ -507,7 +507,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           <div className="hidden small:flex small:flex-col small:h-full small:px-4 small:py-3">
             {hasNoPages ? (
               /* Sizing Missing Layout - Complete separation */
-              <div className="relative h-full">
+              <div className="relative flex-1 flex items-center justify-center">
                 {/* X close button - absolutely positioned */}
                 <button
                   onClick={close}
@@ -518,16 +518,14 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                 </button>
 
                 {/* Centered content */}
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center">
-                    <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
-                    <p className="text-sm text-gray-500">
-                      For dedicated assistance with sizing, please contact us{' '}
-                      <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
-                        here
-                      </a>
-                    </p>
-                  </div>
+                <div className="text-center">
+                  <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
+                  <p className="text-sm text-gray-500">
+                    For dedicated assistance with sizing, please contact us{' '}
+                    <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
+                      here
+                    </a>
+                  </p>
                 </div>
               </div>
             ) : (
