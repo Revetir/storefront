@@ -551,15 +551,16 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
             {/* Main content */}
             {hasNoPages ? (
-              /* Fallback - full width, centered */
+              /* Fallback - centered text */
               <div className="flex-1 flex items-center justify-center">
-                <div className="w-1/2">
-                  <SizingMissingDiagram className="w-full h-auto" />
+                <div className="text-center">
+                  <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
+                  <p className="text-sm text-gray-500">For urgent sizing assistance, please contact our Customer Care team</p>
                 </div>
               </div>
             ) : (
-              /* Regular content - 90% width */
-              <div className="flex-1 flex flex-col w-[90%] mx-auto overflow-y-auto">
+              /* Regular content - full width with right margin */
+              <div className="flex-1 flex flex-col mr-8 overflow-y-auto">
                 {currentPage === "PM" && renderPMPage()}
                 {currentPage === "SCC" && renderSCCPage()}
               </div>
@@ -592,22 +593,23 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
             {/* Main content */}
             {hasNoPages ? (
-              /* Fallback - full height, centered */
+              /* Fallback - centered text */
               <div className="flex-1 flex items-center justify-center px-6">
-                <div className="w-1/2">
-                  <SizingMissingDiagram className="w-full h-auto" />
+                <div className="text-center">
+                  <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
+                  <p className="text-sm text-gray-500">For urgent sizing assistance, please contact our Customer Care team</p>
                 </div>
               </div>
             ) : (
-              /* Regular content - scrollable with bottom padding for fixed button */
-              <div className="flex-1 overflow-y-auto px-6 pb-20">
+              /* Regular content - scrollable */
+              <div className="flex-1 overflow-y-auto px-6">
                 {currentPage === "PM" && renderPMPage()}
                 {currentPage === "SCC" && renderSCCPage()}
               </div>
             )}
 
             {/* Close button - Fixed at bottom of modal */}
-            <div className="absolute bottom-0 left-0 right-0 pb-2 px-6 flex justify-center bg-white">
+            <div className="flex-shrink-0 pb-2 px-6 flex justify-center bg-white">
               <button
                 onClick={close}
                 className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
