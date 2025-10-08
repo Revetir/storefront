@@ -510,7 +510,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               {/* X close button */}
               <button
                 onClick={close}
-                className="absolute top-4 right-4 p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1 z-10"
+                className="absolute top-4 right-4 p-1 text-gray-700 hover:text-black transition-colors -mt-1 z-10"
                 aria-label="Close modal"
               >
                 <X size={20} />
@@ -602,7 +602,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                 {/* X close button */}
                 <button
                   onClick={close}
-                  className="p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1"
+                  className="p-1 text-gray-700 hover:text-black transition-colors -mt-1"
                   aria-label="Close modal"
                 >
                   <X size={20} />
