@@ -388,7 +388,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     return (
       <div className="flex flex-col gap-6 w-full h-full">
         {/* Desktop/Laptop: VERTICAL table - EU/US/UK/JP as ROW headers, sizes as COLUMNS */}
-        <div className="hidden small:flex small:flex-col w-full h-full">
+        <div className="hidden small:flex small:flex-col w-full h-full pt-4">
           <table className="w-full table-fixed">
             <tbody>
               <tr>
@@ -550,25 +550,31 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             </div>
 
             {/* Main content */}
-            {hasNoPages ? (
-              /* Fallback - centered text */
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
-                  <p className="text-sm text-gray-500">For urgent sizing assistance, please contact our Customer Care team</p>
+            <div className="flex-1 flex flex-col mr-8 overflow-y-auto">
+              {hasNoPages ? (
+                /* Fallback - centered text */
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
+                    <p className="text-sm text-gray-500">
+                      If you&apos;re not sure about your size, please contact us{' '}
+                      <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
+                        here
+                      </a>
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              /* Regular content - full width with right margin */
-              <div className="flex-1 flex flex-col mr-8 overflow-y-auto">
-                {currentPage === "PM" && renderPMPage()}
-                {currentPage === "SCC" && renderSCCPage()}
-              </div>
-            )}
+              ) : (
+                <>
+                  {currentPage === "PM" && renderPMPage()}
+                  {currentPage === "SCC" && renderSCCPage()}
+                </>
+              )}
+            </div>
           </div>
 
           {/* Tablet/Phone Layout */}
-          <div className="flex small:hidden flex-col h-screen relative">
+          <div className="flex small:hidden flex-col h-screen">
             {/* Header - title at top, only if pages exist */}
             {!hasNoPages && (
               <div className="px-6 py-4 flex-shrink-0">
@@ -591,25 +597,31 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               </div>
             )}
 
-            {/* Main content */}
-            {hasNoPages ? (
-              /* Fallback - centered text */
-              <div className="flex-1 flex items-center justify-center px-6">
-                <div className="text-center">
-                  <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
-                  <p className="text-sm text-gray-500">For urgent sizing assistance, please contact our Customer Care team</p>
+            {/* Main content - scrollable with padding for fixed button */}
+            <div className="flex-1 overflow-y-auto px-6 pb-20">
+              {hasNoPages ? (
+                /* Fallback - centered text */
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
+                    <p className="text-sm text-gray-500">
+                      If you&apos;re not sure about your size, please contact us{' '}
+                      <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
+                        here
+                      </a>
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              /* Regular content - scrollable */
-              <div className="flex-1 overflow-y-auto px-6">
-                {currentPage === "PM" && renderPMPage()}
-                {currentPage === "SCC" && renderSCCPage()}
-              </div>
-            )}
+              ) : (
+                <>
+                  {currentPage === "PM" && renderPMPage()}
+                  {currentPage === "SCC" && renderSCCPage()}
+                </>
+              )}
+            </div>
 
             {/* Close button - Fixed at bottom of modal */}
-            <div className="flex-shrink-0 pb-2 px-6 flex justify-center bg-white">
+            <div className="absolute bottom-0 left-0 right-0 pb-3 px-6 flex justify-center bg-white">
               <button
                 onClick={close}
                 className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
