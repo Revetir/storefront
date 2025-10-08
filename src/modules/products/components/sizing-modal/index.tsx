@@ -516,20 +516,22 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                 <X size={20} />
               </button>
 
-              {/* Centered content - absolutely positioned in the center */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                <p className="text-base text-gray-700 mb-2">
-                  Measurements for this product will be available soon
-                </p>
-                <p className="text-sm text-gray-500">
-                  For dedicated assistance with sizing, please contact us{' '}
-                  <a
-                    href="https://revetir.com/us/customer-care/contact-us"
-                    className="underline hover:text-gray-800"
-                  >
-                    here
-                  </a>
-                </p>
+              {/* Centered content */}
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <p className="text-base text-gray-700 mb-2">
+                    Measurements for this product will be available soon
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    For dedicated assistance with sizing, please contact us{' '}
+                    <a
+                      href="https://revetir.com/us/customer-care/contact-us"
+                      className="underline hover:text-gray-800"
+                    >
+                      here
+                    </a>
+                  </p>
+                </div>
               </div>
             </div>
 
