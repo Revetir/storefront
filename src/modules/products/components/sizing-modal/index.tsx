@@ -504,19 +504,20 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
       <Modal.Body>
         {hasNoPages ? (
           /* Sizing Missing - Complete custom layout at Modal.Body level */
-          <div className="relative h-full w-full">
-            {/* X close button - positioned at modal level */}
-            <button
-              onClick={close}
-              className="absolute top-4 right-4 p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1 z-10"
-              aria-label="Close modal"
-            >
-              <X size={20} />
-            </button>
+          <>
+            {/* Desktop: Full height centered layout with X button */}
+            <div className="hidden small:flex small:flex-col small:h-full small:relative">
+              {/* X close button */}
+              <button
+                onClick={close}
+                className="absolute top-4 right-4 p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1 z-10"
+                aria-label="Close modal"
+              >
+                <X size={20} />
+              </button>
 
-            {/* Desktop: Centered content */}
-            <div className="hidden small:flex h-full items-center justify-center">
-              <div className="text-center">
+              {/* Centered content - absolutely positioned in the center */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
                 <p className="text-base text-gray-700 mb-2">
                   Measurements for this product will be available soon
                 </p>
@@ -532,24 +533,36 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               </div>
             </div>
 
-            {/* Mobile: Centered content */}
-            <div className="flex small:hidden h-full items-center justify-center px-6">
-              <div className="text-center">
-                <p className="text-base text-gray-700 mb-2">
-                  Measurements for this product will be available soon
-                </p>
-                <p className="text-sm text-gray-500">
-                  For dedicated assistance with sizing, please contact us{' '}
-                  <a
-                    href="https://revetir.com/us/customer-care/contact-us"
-                    className="underline hover:text-gray-800"
-                  >
-                    here
-                  </a>
-                </p>
+            {/* Mobile: Full height centered layout with close button */}
+            <div className="flex small:hidden flex-col h-screen">
+              <div className="flex-1 flex items-center justify-center px-6">
+                <div className="text-center">
+                  <p className="text-base text-gray-700 mb-2">
+                    Measurements for this product will be available soon
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    For dedicated assistance with sizing, please contact us{' '}
+                    <a
+                      href="https://revetir.com/us/customer-care/contact-us"
+                      className="underline hover:text-gray-800"
+                    >
+                      here
+                    </a>
+                  </p>
+                </div>
+              </div>
+
+              {/* Close button - Fixed at bottom */}
+              <div className="fixed bottom-0 left-0 right-0 p-4 flex justify-center bg-white">
+                <button
+                  onClick={close}
+                  className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
+                >
+                  Close
+                </button>
               </div>
             </div>
-          </div>
+          </>
         ) : (
           <div className="flex flex-col h-full relative">
             {/* Desktop/Laptop Layout */}
@@ -600,66 +613,47 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                 {currentPage === "SCC" && renderSCCPage()}
               </div>
             </div>
-          </div>
-        )}
 
-        {/* Tablet/Phone Layout */}
-        <div className="flex small:hidden flex-col h-screen">
-          {/* Header - title at top, only if pages exist */}
-          {!hasNoPages && (
-            <div className="px-6 py-4 flex-shrink-0 text-center">
-              {/* Show dropdown only if both pages exist */}
-              {hasMultiplePages ? (
-                <select
-                  value={currentPage}
-                  onChange={(e) => setCurrentPage(e.target.value as PageType)}
-                  className="w-full px-4 py-2 border border-gray-300 text-sm uppercase font-medium text-center"
-                >
-                  {showPMPage && <option value="PM">Product Measurements</option>}
-                  {showSCCPage && <option value="SCC">Size Conversion Chart</option>}
-                </select>
-              ) : (
-                /* Show underlined text if only one page exists */
-                <div className="text-sm uppercase font-medium border-b-2 border-black pb-1 inline-block">
-                  {showPMPage ? "Product Measurements" : "Size Conversion Chart"}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Main content - scrollable with padding for fixed button */}
-          <div className="flex-1 overflow-y-auto px-6 pb-20">
-            {hasNoPages ? (
-              /* Fallback - centered text */
-              <div className="h-full flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
-                  <p className="text-sm text-gray-500">
-                    For dedicated assistance with sizing, please contact us{' '}
-                    <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
-                      here
-                    </a>
-                  </p>
-                </div>
+            {/* Tablet/Phone Layout */}
+            <div className="flex small:hidden flex-col h-screen">
+              {/* Header - title at top, only if pages exist */}
+              <div className="px-6 py-4 flex-shrink-0 text-center">
+                {/* Show dropdown only if both pages exist */}
+                {hasMultiplePages ? (
+                  <select
+                    value={currentPage}
+                    onChange={(e) => setCurrentPage(e.target.value as PageType)}
+                    className="w-full px-4 py-2 border border-gray-300 text-sm uppercase font-medium text-center"
+                  >
+                    {showPMPage && <option value="PM">Product Measurements</option>}
+                    {showSCCPage && <option value="SCC">Size Conversion Chart</option>}
+                  </select>
+                ) : (
+                  /* Show underlined text if only one page exists */
+                  <div className="text-sm uppercase font-medium border-b-2 border-black pb-1 inline-block">
+                    {showPMPage ? "Product Measurements" : "Size Conversion Chart"}
+                  </div>
+                )}
               </div>
-            ) : (
-              <>
+
+              {/* Main content - scrollable with padding for fixed button */}
+              <div className="flex-1 overflow-y-auto px-6 pb-20">
                 {currentPage === "PM" && renderPMPage()}
                 {currentPage === "SCC" && renderSCCPage()}
-              </>
-            )}
-          </div>
+              </div>
 
-          {/* Close button - Fixed at bottom of modal */}
-          <div className="fixed bottom-0 left-0 right-0 p-4 flex justify-center bg-white">
-            <button
-              onClick={close}
-              className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
-            >
-              Close
-            </button>
+              {/* Close button - Fixed at bottom of modal */}
+              <div className="fixed bottom-0 left-0 right-0 p-4 flex justify-center bg-white">
+                <button
+                  onClick={close}
+                  className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </Modal.Body>
     </Modal>
   )
