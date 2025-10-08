@@ -1,9 +1,48 @@
 import React from "react";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 import { editorials, Editorial } from "@/lib/data/editorials";
 
 interface EditorialPageProps {
   params: { slug: string };
+}
+
+export async function generateMetadata({ params }: EditorialPageProps): Promise<Metadata> {
+  const article = editorials.find((e: Editorial) => e.slug === params.slug);
+
+  if (!article) {
+    return {
+      title: "Editorial Not Found",
+      description: "The requested editorial could not be found.",
+    };
+  }
+
+  return {
+    title: `${article.title} | REVETIR`,
+    description: article.subtitle || article.title,
+    authors: [{ name: article.author }],
+    openGraph: {
+      title: article.title,
+      description: article.subtitle || article.title,
+      type: "article",
+      publishedTime: article.date,
+      authors: [article.author],
+      images: article.image ? [
+        {
+          url: article.image,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.subtitle || article.title,
+      images: article.image ? [article.image] : undefined,
+    },
+  };
 }
 
 export default function EditorialPage({ params }: EditorialPageProps) {

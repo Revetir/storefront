@@ -9,6 +9,7 @@ import Menu from "@modules/common/icons/menu"
 import User from "@modules/common/icons/user"
 import MobileSidePanel from "@modules/layout/components/mobile-side-panel"
 import { Category } from "@lib/data/categories"
+import Image from "next/image"
 
 interface NavClientProps {
   regions: StoreRegion[]
@@ -50,11 +51,15 @@ export default function NavClient({ regions, customer, categories, cart }: NavCl
 
           {/* Center Logo */}
           <div className="absolute left-1/2 transform -translate-x-1/2">
-            <LocalizedClientLink
-              href="/"
-              className="text-lg font-medium uppercase tracking-wide text-black select-none"
-            >
-              REVETIR
+            <LocalizedClientLink href="/" className="block">
+              <Image
+                src="/images/logo.svg"
+                alt="REVETIR"
+                width={120}
+                height={24}
+                className="h-6 w-auto"
+                priority
+              />
             </LocalizedClientLink>
           </div>
 
