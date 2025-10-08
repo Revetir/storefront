@@ -468,19 +468,19 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             <tbody>
               {rows.map((r, idx) => (
                 <tr key={`${heading}-${r.eu}`} className={idx !== rows.length - 1 ? 'border-b border-gray-200' : ''}>
-                  <td className={cellPadding}>{r.eu}</td>
+                  <td className={`${cellPadding} text-center`}>{r.eu}</td>
                   {isUnisex ? (
                     <>
-                      <td className={cellPadding}>{r.usMen ?? '-'}</td>
-                      <td className={cellPadding}>{r.usWomen ?? '-'}</td>
+                      <td className={`${cellPadding} text-center`}>{r.usMen ?? '-'}</td>
+                      <td className={`${cellPadding} text-center`}>{r.usWomen ?? '-'}</td>
                     </>
                   ) : (
-                    <td className={cellPadding}>
+                    <td className={`${cellPadding} text-center`}>
                       {heading === "Shoes Men" ? r.usMen : r.usWomen}
                     </td>
                   )}
-                  <td className={cellPadding}>{r.uk}</td>
-                  <td className={cellPadding}>{formatJp(r.jpCm)}</td>
+                  <td className={`${cellPadding} text-center`}>{r.uk}</td>
+                  <td className={`${cellPadding} text-center`}>{formatJp(r.jpCm)}</td>
                 </tr>
               ))}
             </tbody>
@@ -506,9 +506,9 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           {/* Desktop/Laptop Layout */}
           <div className="hidden small:flex small:flex-col small:h-full small:px-4 small:py-3">
             {/* Header - title and X button in top corners */}
-            <div className="flex justify-between items-start mb-4">
+            <div className="flex items-start mb-4">
               {/* Page titles/toggle - only show if pages exist */}
-              {!hasNoPages ? (
+              {!hasNoPages && (
                 <div className="flex gap-6">
                   {showPMPage && (
                     <button
@@ -535,14 +535,12 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                     </button>
                   )}
                 </div>
-              ) : (
-                <div></div>
               )}
 
               {/* X close button */}
               <button
                 onClick={close}
-                className="p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1"
+                className="p-1 hover:bg-gray-100 rounded-full transition-colors -mt-1 ml-auto"
                 aria-label="Close modal"
               >
                 <X size={20} />
@@ -550,27 +548,25 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             </div>
 
             {/* Main content */}
-            <div className="flex-1 flex flex-col mr-8 overflow-y-auto">
-              {hasNoPages ? (
-                /* Fallback - centered text */
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
-                    <p className="text-sm text-gray-500">
-                      If you&apos;re not sure about your size, please contact us{' '}
-                      <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
-                        here
-                      </a>
-                    </p>
-                  </div>
+            {hasNoPages ? (
+              /* Fallback - centered text */
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <p className="text-base text-gray-700 mb-2">Measurements for this product will be available soon</p>
+                  <p className="text-sm text-gray-500">
+                    If you&apos;re not sure about your size, please contact us{' '}
+                    <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
+                      here
+                    </a>
+                  </p>
                 </div>
-              ) : (
-                <>
-                  {currentPage === "PM" && renderPMPage()}
-                  {currentPage === "SCC" && renderSCCPage()}
-                </>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className={`flex-1 flex flex-col overflow-y-auto ${currentPage === "SCC" ? "mr-8" : ""}`}>
+                {currentPage === "PM" && renderPMPage()}
+                {currentPage === "SCC" && renderSCCPage()}
+              </div>
+            )}
           </div>
 
           {/* Tablet/Phone Layout */}
@@ -621,7 +617,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             </div>
 
             {/* Close button - Fixed at bottom of modal */}
-            <div className="absolute bottom-0 left-0 right-0 pb-3 px-6 flex justify-center bg-white">
+            <div className="fixed bottom-0 left-0 right-0 p-4 flex justify-center bg-white">
               <button
                 onClick={close}
                 className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
