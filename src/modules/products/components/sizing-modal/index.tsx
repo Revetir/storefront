@@ -512,7 +512,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               <div className="h-full flex items-center justify-center">
                 <div className="text-center">
                   <img
-                    src="/images/sizing_information_missing.png"
+                    src="/images/sizing_information_missing.svg"
                     alt="Sizing information notice"
                     className="w-auto h-auto max-w-md mx-auto mb-6"
                   />
@@ -537,7 +537,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               <div className="flex-1 flex items-center justify-center px-6">
                 <div className="text-center">
                   <img
-                    src="/images/sizing_information_missing.png"
+                    src="/images/sizing_information_missing.svg"
                     alt="Sizing information notice"
                     className="w-auto h-auto max-w-xs mx-auto mb-6"
                   />

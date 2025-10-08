@@ -26,19 +26,19 @@ export default function NavClient({ regions, customer, categories, cart }: NavCl
       <header className="sticky top-0 z-50 bg-transparent">
         <nav className="flex items-center justify-between px-4 sm:px-6 md:px-8 h-16 w-full relative">
           {/* Left Section - Mobile Menu Button */}
-          <div className="flex items-center gap-x-4 md:hidden">
+          <div className="flex items-center gap-x-4 lg:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               className="p-2 hover:bg-gray-100 rounded-full"
             >
               <Menu className="w-5 h-5 text-gray-700" />
             </button>
-            
+
             <SearchModal />
           </div>
 
           {/* Left Section - Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-x-8 text-xs uppercase text-gray-700">
+          <div className="hidden lg:flex items-center gap-x-8 text-xs uppercase text-gray-700">
             <LocalizedClientLink href="/men" className="hover:text-black">
               Menswear
             </LocalizedClientLink>
@@ -50,10 +50,10 @@ export default function NavClient({ regions, customer, categories, cart }: NavCl
           </div>
 
           {/* Center Logo */}
-          <div className="absolute left-1/2 transform -translate-x-1/2">
+          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <LocalizedClientLink href="/" className="block">
               <Image
-                src="/images/logo.svg"
+                src="/images/logo_transparent.svg"
                 alt="REVETIR"
                 width={120}
                 height={24}
@@ -64,7 +64,7 @@ export default function NavClient({ regions, customer, categories, cart }: NavCl
           </div>
 
           {/* Right Section - Desktop */}
-          <div className="hidden md:flex items-center gap-x-8 text-xs uppercase text-gray-700">
+          <div className="hidden lg:flex items-center gap-x-8 text-xs uppercase text-gray-700">
             <div className="relative group">
               <button className="hover:text-black cursor-pointer">ENGLISH</button>
               <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-26 bg-white border border-gray-200 !rounded-none shadow-lg z-50 flex flex-col items-center text-xs text-gray-400 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-opacity duration-200">
@@ -81,7 +81,7 @@ export default function NavClient({ regions, customer, categories, cart }: NavCl
           </div>
 
           {/* Right Section - Mobile Icons */}
-          <div className="flex md:hidden items-center gap-x-4">
+          <div className="flex lg:hidden items-center gap-x-4">
             <LocalizedClientLink href="/account" className="p-2 hover:bg-gray-100 rounded-full">
               <User className="w-5 h-5 text-gray-700" />
             </LocalizedClientLink>
