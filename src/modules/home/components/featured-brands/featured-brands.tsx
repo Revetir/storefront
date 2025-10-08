@@ -10,6 +10,7 @@ const FeaturedBrands = () => {
             src="/images/rebel_wave_cover.png"
             alt="Featured Brand: Rebel Wave"
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover rounded-md"
           />
           <div className="absolute bottom-6 left-6 text-white">

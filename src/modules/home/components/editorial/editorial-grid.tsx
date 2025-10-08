@@ -18,9 +18,9 @@ const EditorialSection = () => {
                 <Image
                   src={editorial.image || ""}
                   alt={editorial.title}
-                  layout="fill"
-                  objectFit="cover"
-                  className="rounded-md"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="rounded-md object-cover"
                 />
               </Link>
             </div>

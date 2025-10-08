@@ -13,9 +13,9 @@ const NewsSection = () => {
               <Image
                 src="/images/margiela_ballerina_shoes.jpeg"
                 alt="MM6 Maison Margiela Taking It to the Streets News Article"
-                layout="fill"
-                objectFit="cover"
-                className="rounded-md"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+                className="rounded-md object-cover"
               />
             </div>
             <div className="text-left">
@@ -30,9 +30,9 @@ const NewsSection = () => {
               <Image
                 src="/images/labubu_hermes_bag_charm.png"
                 alt="How Labubu Conquered Fashion News Article"
-                layout="fill"
-                objectFit="cover"
-                className="rounded-md"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+                className="rounded-md object-cover"
               />
             </div>
             <div className="text-left">
@@ -47,9 +47,9 @@ const NewsSection = () => {
               <Image
                 src="/images/demna_final_show_goodbye.png"
                 alt="Demna Leaves Balenciaga News Article"
-                layout="fill"
-                objectFit="cover"
-                className="rounded-md"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+                className="rounded-md object-cover"
               />
             </div>
             <div className="text-left">

@@ -81,7 +81,7 @@ const CartDropdown = ({
       onMouseLeave={close}
     >
       {/* Mobile: Direct link to cart page */}
-      <div className="md:hidden relative">
+      <div className="lg:hidden relative">
         <LocalizedClientLink
           href="/cart"
           className="flex items-center justify-center h-full px-2"
@@ -97,7 +97,7 @@ const CartDropdown = ({
       </div>
 
       {/* Desktop: Popover dropdown */}
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         <Popover className="relative h-full">
           <PopoverButton className="h-full">
             <LocalizedClientLink
