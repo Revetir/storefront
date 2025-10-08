@@ -393,30 +393,30 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             <tbody>
               <tr>
                 <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>EU</th>
-                {rows.map((r) => (
-                  <td key={`eu-${r.eu}`} className={`${cellPadding} text-center`}>{r.eu}</td>
+                {rows.map((r, idx) => (
+                  <td key={`eu-${r.eu}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>{r.eu}</td>
                 ))}
               </tr>
               {isUnisex ? (
                 <>
                   <tr>
                     <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>US Men&apos;s</th>
-                    {rows.map((r) => (
-                      <td key={`usmen-${r.eu}`} className={`${cellPadding} text-center`}>{r.usMen ?? '-'}</td>
+                    {rows.map((r, idx) => (
+                      <td key={`usmen-${r.eu}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>{r.usMen ?? '-'}</td>
                     ))}
                   </tr>
                   <tr>
                     <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>US Women&apos;s</th>
-                    {rows.map((r) => (
-                      <td key={`uswomen-${r.eu}`} className={`${cellPadding} text-center`}>{r.usWomen ?? '-'}</td>
+                    {rows.map((r, idx) => (
+                      <td key={`uswomen-${r.eu}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>{r.usWomen ?? '-'}</td>
                     ))}
                   </tr>
                 </>
               ) : (
                 <tr>
                   <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>US</th>
-                  {rows.map((r) => (
-                    <td key={`us-${r.eu}`} className={`${cellPadding} text-center`}>
+                  {rows.map((r, idx) => (
+                    <td key={`us-${r.eu}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>
                       {heading === "Shoes Men" ? r.usMen : r.usWomen}
                     </td>
                   ))}
@@ -424,14 +424,14 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               )}
               <tr>
                 <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>UK</th>
-                {rows.map((r) => (
-                  <td key={`uk-${r.eu}`} className={`${cellPadding} text-center`}>{r.uk}</td>
+                {rows.map((r, idx) => (
+                  <td key={`uk-${r.eu}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>{r.uk}</td>
                 ))}
               </tr>
               <tr>
                 <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>Japan</th>
-                {rows.map((r) => (
-                  <td key={`jp-${r.eu}`} className={`${cellPadding} text-center`}>{formatJp(r.jpCm)}</td>
+                {rows.map((r, idx) => (
+                  <td key={`jp-${r.eu}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>{formatJp(r.jpCm)}</td>
                 ))}
               </tr>
             </tbody>
