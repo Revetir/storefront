@@ -32,7 +32,6 @@ async function getAllProducts() {
       )
       
       if (!response.ok) {
-        console.error('❌ Products fetch failed:', response.status)
         break
       }
       
@@ -52,7 +51,6 @@ async function getAllProducts() {
     
     return { products: allProducts }
   } catch (error) {
-    console.error('❌ Error fetching products:', error)
     return { products: [] }
   }
 }
@@ -61,13 +59,10 @@ export async function GET(request: NextRequest) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://revetir.com'
     const currentDate = new Date().toISOString().split('T')[0]
-    
-    console.log('📄 Generating multi-region products sitemap...')
-    
+
     const { products } = await getAllProducts()
-    
+
     if (!products || products.length === 0) {
-      console.log('⚠️ No products found')
       return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </urlset>`, {
@@ -77,8 +72,6 @@ export async function GET(request: NextRequest) {
         },
       })
     }
-    
-    console.log(`✅ Found ${products.length} products`)
     
     const filteredProducts = products.filter((product: any) => {
       const hasHandle = !!product.handle
@@ -121,18 +114,15 @@ export async function GET(request: NextRequest) {
     
     // Generate XML with hreflang support
     const xml = generateSitemapXML(productPages)
-    
-    console.log('✅ Multi-region products sitemap generated')
-    
+
     return new NextResponse(xml, {
       headers: {
         'Content-Type': 'application/xml',
         'Cache-Control': 'public, max-age=3600, s-maxage=3600',
       },
     })
-    
+
   } catch (error) {
-    console.error('❌ Critical error in products sitemap generation:', error)
     return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </urlset>`, {

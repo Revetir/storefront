@@ -18,7 +18,7 @@ export const getPrivacyPreferences = (): PrivacyPreferences | null => {
       return JSON.parse(stored) as PrivacyPreferences
     }
   } catch (error) {
-    console.error('Error reading privacy preferences:', error)
+    // Silent error handling
   }
 
   return null
@@ -32,7 +32,7 @@ export const savePrivacyPreferences = (preferences: PrivacyPreferences): void =>
   try {
     localStorage.setItem(PRIVACY_PREFERENCES_KEY, JSON.stringify(preferences))
   } catch (error) {
-    console.error('Error saving privacy preferences:', error)
+    // Silent error handling
   }
 }
 
@@ -60,21 +60,8 @@ export const applyPrivacyPreferences = (preferences: PrivacyPreferences): void =
   }
 
   // Essential cookies are always enabled (handled by Medusa)
-  
+
   // Search cookies (Algolia) - handled by search-privacy.ts
-  if (!preferences.search) {
-    console.log('Search cookies disabled - search functionality will be limited')
-  }
-
   // Analytics cookies (future implementation)
-  if (!preferences.analytics) {
-    // Disable analytics tracking
-    console.log('Analytics cookies disabled')
-  }
-
   // Marketing cookies (future implementation)
-  if (!preferences.marketing) {
-    // Disable marketing tracking
-    console.log('Marketing cookies disabled')
-  }
 } 

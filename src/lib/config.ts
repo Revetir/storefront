@@ -7,21 +7,10 @@ import {
 // Get backend URL from environment variables with fallback logic
 const getBackendUrl = (): string => {
   // Try different environment variable names
-  const backendUrl = process.env.MEDUSA_BACKEND_URL || 
+  const backendUrl = process.env.MEDUSA_BACKEND_URL ||
                     process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
 
-  // Debug logging (only in development)
-  if (process.env.NODE_ENV === "development") {
-    console.log("Environment variables check:", {
-      MEDUSA_BACKEND_URL: process.env.MEDUSA_BACKEND_URL ? "SET" : "MISSING",
-      NEXT_PUBLIC_MEDUSA_BACKEND_URL: process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ? "SET" : "MISSING",
-      NODE_ENV: process.env.NODE_ENV,
-      resolved: backendUrl
-    })
-  }
-
   if (!backendUrl) {
-    console.error("No backend URL found in environment variables")
     // For production, we know the URL, so let's hardcode it as a fallback
     return "https://application-production-0ced.up.railway.app"
   }

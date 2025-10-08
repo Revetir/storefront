@@ -107,19 +107,6 @@ export default async function BrandCategoryPage(props: Props) {
   const totalPages = algoliaResult.nbPages
   const currentPage = algoliaResult.page
 
-  // Debug logging for products
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[Brand+Category Page] ${gender}/${brandSlug}/${categorySlug}`)
-    console.log(`[Brand+Category Page] Brand: ${brand.name} (${brand.slug})`)
-    console.log(`[Brand+Category Page] Category: ${category.name} (${fullCategoryHandle})`)
-    console.log(`[Brand+Category Page] Found ${products.length} products (${count} total)`)
-    if (products.length > 0) {
-      console.log(`[Brand+Category Page] First product: ${products[0].title}`)
-      console.log(`[Brand+Category Page] First product brand: ${(products[0] as any)?.brand?.name}`)
-      console.log(`[Brand+Category Page] First product categories: ${(products[0] as any)?.categories?.map((c: any) => c.name).join(', ') || 'none'}`)
-    }
-  }
-
   // Create a category object for the template
   const brandCategoryTemplate = {
     id: `${brand.id}-${category.id}`,

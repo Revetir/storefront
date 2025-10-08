@@ -99,16 +99,6 @@ export default async function BrandPage(props: Props) {
   const totalPages = algoliaResult.nbPages
   const currentPage = algoliaResult.page
 
-  // Log for debugging if needed
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[Brand Page] ${gender}/${brandSlug}: ${products.length} products found (${count} total)`)
-    console.log(`[Brand Page] Brand ID: ${brand.id}`)
-    if (products.length > 0) {
-      console.log(`[Brand Page] First product brand data:`, (products[0] as any)?.brand)
-      console.log(`[Brand Page] First product has variants:`, products[0]?.variants?.length)
-    }
-  }
-
   // Create a category object for the template that represents the brand + gender combination
   const brandCategory = {
     id: brand.id,

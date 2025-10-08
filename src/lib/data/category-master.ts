@@ -89,8 +89,6 @@ export const CategoryMaster = {
 
     if (categoryId) {
       state.templateById[categoryId] = template
-    } else {
-      console.warn(`⚠️  Could not set template - category not found:`, input)
     }
   },
 
@@ -108,8 +106,6 @@ export const CategoryMaster = {
       // Check if current category has a template
       const template = state.templateById[currentId]
       if (template) {
-        console.log(`    ✅ Hierarchical lookup found template "${template}" at: ${category?.name}`)
-        console.log(`    📍 Traversal path:`, path.join(' → '))
         return template
       }
 
@@ -117,7 +113,6 @@ export const CategoryMaster = {
       currentId = category?.parentId
     }
 
-    console.log(`    ❌ Hierarchical lookup failed. Traversal path:`, path.join(' → '))
     return undefined
   },
 
@@ -534,15 +529,54 @@ export type { CategoryMasterState }
 
   CategoryMaster.upsertCategories(records)
 
-  // Template assignments - only set on parent categories, hierarchy will cascade down
-  // Shoe categories
+  // ===========================================================================================
+  // SIZING TEMPLATE ASSIGNMENTS
+  // ===========================================================================================
+  //
+  // Template assignment enables the Product Measurements (PM) page in the sizing modal.
+  // ONLY assign templates after:
+  //   1. Template is created in sizing-templates.ts with diagram and coordinates
+  //   2. Diagram image is added to /public/images/
+  //   3. Testing confirms measurements display correctly on all viewports
+  //
+  // Assignment syntax:
+  //   CategoryMaster.setTemplate({ handle: "category-handle" }, "Template Name")
+  //
+  // Template names must EXACTLY match the "category" field in SIZING_TEMPLATES array.
+  // Assign to parent categories - children automatically inherit via hierarchical lookup.
+  //
+  // ===========================================================================================
+
+  // SHOES - Fully implemented (uses size conversion tables, not diagrams)
   CategoryMaster.setTemplate({ handle: "mens-shoes" }, "Shoes Men")
   CategoryMaster.setTemplate({ handle: "womens-shoes" }, "Shoes Women")
 
-  // Other top-level product categories can be added here as needed
+  // ===========================================================================================
+  // TODO: Add template assignments for apparel categories after templates are designed
+  // ===========================================================================================
+  //
+  // Examples (uncomment when corresponding templates are ready in sizing-templates.ts):
+  //
+  // SHIRTS & TOPS
   // CategoryMaster.setTemplate({ handle: "mens-shirts" }, "Shirts")
+  // CategoryMaster.setTemplate({ handle: "womens-shirts" }, "Shirts")
+  // CategoryMaster.setTemplate({ handle: "mens-tops" }, "Shirts")
+  // CategoryMaster.setTemplate({ handle: "womens-tops" }, "Shirts")
+  //
+  // PANTS, JEANS & SHORTS
   // CategoryMaster.setTemplate({ handle: "mens-pants" }, "Pants")
-  // etc.
+  // CategoryMaster.setTemplate({ handle: "womens-pants" }, "Pants")
+  // CategoryMaster.setTemplate({ handle: "mens-jeans" }, "Pants")
+  // CategoryMaster.setTemplate({ handle: "mens-shorts" }, "Shorts")
+  //
+  // SWEATERS & HOODIES
+  // CategoryMaster.setTemplate({ handle: "mens-sweaters" }, "Sweaters")
+  // CategoryMaster.setTemplate({ handle: "womens-sweaters" }, "Sweaters")
+  //
+  // JACKETS & COATS
+  // CategoryMaster.setTemplate({ handle: "mens-jackets-coats" }, "Jackets")
+  //
+  // ===========================================================================================
 })()
 
 

@@ -16,57 +16,42 @@ export interface SizingTemplate {
 
 // Sizing templates for different product categories
 export const SIZING_TEMPLATES: SizingTemplate[] = [
-  {
-    category: "Shirts",
-    diagram_component: "TShirtDiagram",
-    units: "cm",
-    measurement_points: {
-      chest: { x_percent: 50, y_percent: 27, offset_x: 0, offset_y: -10, label: "Chest" },
-      waist: { x_percent: 50, y_percent: 40, offset_x: 0, offset_y: -10, label: "Waist" },
-      length: { x_percent: 50, y_percent: 67, offset_x: 0, offset_y: 10, label: "Length" },
-      shoulder: { x_percent: 30, y_percent: 47, offset_x: -10, offset_y: 0, label: "Shoulder" },
-    },
-    size_chart: {
-      S: { chest: 36, waist: 32, length: 26, shoulder: 16 },
-      M: { chest: 38, waist: 34, length: 27, shoulder: 17 },
-      L: { chest: 40, waist: 36, length: 28, shoulder: 18 },
-      XL: { chest: 42, waist: 38, length: 29, shoulder: 19 },
-    }
-  },
-  {
-    category: "Sweatshirts",
-    diagram_component: "SweatshirtsDiagram",
-    units: "cm",
-    measurement_points: {
-      chest: { x_percent: 50, y_percent: 27, offset_x: 0, offset_y: -10, label: "Chest" },
-      waist: { x_percent: 50, y_percent: 40, offset_x: 0, offset_y: -10, label: "Waist" },
-      length: { x_percent: 50, y_percent: 67, offset_x: 0, offset_y: 10, label: "Length" },
-      shoulder: { x_percent: 30, y_percent: 47, offset_x: -10, offset_y: 0, label: "Shoulder" },
-    },
-    size_chart: {
-      S: { chest: 38, waist: 34, length: 27, shoulder: 17 },
-      M: { chest: 40, waist: 36, length: 28, shoulder: 18 },
-      L: { chest: 42, waist: 38, length: 29, shoulder: 19 },
-      XL: { chest: 44, waist: 40, length: 30, shoulder: 20 },
-    }
-  },
-  {
-    category: "Pants",
-    diagram_component: "TrousersDiagram",
-    units: "cm",
-    measurement_points: {
-      waist: { x_percent: 46, y_percent: 8, offset_x: 0, offset_y: -15, label: "Waist" },
-      hip: { x_percent: 69, y_percent: 27, offset_x: 0, offset_y: -15, label: "Rise" },
-      inseam: { x_percent: 44, y_percent: 53, offset_x: 15, offset_y: 0, label: "Inseam" },
-      hem: { x_percent: 38, y_percent: 82, offset_x: 0, offset_y: 15, label: "Hem" },
-    },
-    size_chart: {
-      S: { waist: 32, hip: 36, inseam: 30, hem: 16 },
-      M: { waist: 34, hip: 38, inseam: 31, hem: 17 },
-      L: { waist: 36, hip: 40, inseam: 32, hem: 18 },
-      XL: { waist: 38, hip: 42, inseam: 33, hem: 19 },
-    }
-  },
+  // TODO: Add category templates here after designing visual diagrams and coordinate systems
+  //
+  // Each template requires the following before implementation:
+  // 1. High-resolution diagram image saved to /public/images/{category}_sizing_diagram.png
+  // 2. Accurate x_percent/y_percent coordinates for each measurement point (tested on all viewports)
+  // 3. Offset adjustments (offset_x, offset_y) to prevent text overlap on diagram
+  // 4. Category assignment in category-master.ts via CategoryMaster.setTemplate()
+  //
+  // Template structure:
+  // {
+  //   category: "CategoryName",              // Must match assignment in category-master.ts
+  //   diagram_component: "DiagramName",      // Used to identify which diagram image to load
+  //   units: "cm",                           // All measurements stored in centimeters
+  //   measurement_points: {
+  //     measurementKey: {
+  //       x_percent: 50,                     // Horizontal position (0-100)
+  //       y_percent: 30,                     // Vertical position (0-100)
+  //       offset_x: 0,                       // Pixel adjustment for fine-tuning
+  //       offset_y: -10,                     // Pixel adjustment for fine-tuning
+  //       label: "Display Name"              // User-facing label
+  //     }
+  //   },
+  //   size_chart: {                          // Optional: fallback if product has no metadata
+  //     S: { measurementKey: valueInCm },
+  //     M: { measurementKey: valueInCm },
+  //     // ... etc
+  //   }
+  // }
+  //
+  // Common measurement keys by category:
+  // - Shirts/Tops: chest, waist, length, shoulder
+  // - Pants/Jeans/Shorts: waist, hip, inseam, hem
+  // - Jackets/Coats: chest, sleeve, length, shoulder
+  // - Sweaters: chest, waist, length, shoulder
+  //
+
   // Shoes categories render a conversion chart (EU/US/UK/JP) in the modal
   // The modal provides a custom renderer; size_chart remains empty
   {
@@ -102,7 +87,6 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
 
 // Map category to sizing template using hierarchical lookup
 export const mapCategoryToTemplate = (categoryName: string, categoryId?: string): string => {
-  console.log('  🔎 mapCategoryToTemplate - Input:', { categoryName, categoryId })
   try {
     // Lazy import to avoid circular deps
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -114,10 +98,8 @@ export const mapCategoryToTemplate = (categoryName: string, categoryId?: string)
       name: categoryName
     })
 
-    console.log('    Template result:', template || 'Generic (fallback)')
     return template || "Generic"
   } catch (e) {
-    console.log('    Error in mapCategoryToTemplate:', e)
     return "Generic"
   }
 }
@@ -125,14 +107,11 @@ export const mapCategoryToTemplate = (categoryName: string, categoryId?: string)
 // Helper function to get sizing template by category
 // NOTE: categoryName should already be a mapped template category from getProductTemplateCategory
 export const getSizingTemplate = (templateCategory: string): SizingTemplate | null => {
-  console.log(`  📋 getSizingTemplate: looking for "${templateCategory}" in templates`)
-
   // templateCategory is already mapped, so just find the matching template
   const found = SIZING_TEMPLATES.find(template =>
     template.category.toLowerCase() === templateCategory.toLowerCase()
   ) || null
 
-  console.log(`  📋 getSizingTemplate: ${found ? `found ${found.category} (${found.diagram_component})` : 'NOT FOUND, returning null'}`)
   return found
 }
 
