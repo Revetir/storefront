@@ -31,16 +31,8 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://revetir.com",
     siteName: "REVETIR",
-    title: "Luxury Fashion & Independent Designers",
+    title: "REVETIR — Designer clothing, shoes and accessories",
     description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
-    images: [
-      {
-        url: "/images/open_graph_image.png",
-        width: 1200,
-        height: 630,
-        alt: "REVETIR - Luxury Fashion & Independent Designers",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -48,7 +40,6 @@ export const metadata: Metadata = {
     creator: "@revetir",
     title: "Luxury Fashion & Independent Designers",
     description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
-    images: ["/images/open_graph_image.png"],
   },
   robots: {
     index: true,
