@@ -11,11 +11,11 @@ import NewArrivals from "@modules/home/components/new-arrivals/new-arrivals"
 import { getNewestProducts } from "@lib/data/products"
 
 export const metadata: Metadata = {
-  title: "REVETIR — Luxury Fashion & Independent Designers",
-  description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
+  title: "REVETIR: Luxury Fashion & Independent Designers",
+  description: "Discover curated designer clothing, shoes and accessories for men and women on sale. Free shipping & returns in the US.",
   keywords: "designer fashion sale, luxury clothing, men's designer clothes, women's designer clothes, luxury accessories, fashion sale, designer sale",
   openGraph: {
-    title: "REVETIR — Designer clothing, shoes and accessories",
+    title: "REVETIR — Designer Clothing, Shoes and Accessories",
     description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
     url: "https://revetir.com",
     siteName: "REVETIR",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: {
-    title: "REVETIR — Designer clothing, shoes and accessories",
+    title: "REVETIR — Designer Clothing, Shoes and Accessories",
     description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
   },
   robots: {

@@ -4,8 +4,8 @@ import Link from "next/link"
 import { editorials } from "@/lib/data/editorials"
 
 const EditorialSection = () => {
-  // Get the first two editorials for display
-  const featuredEditorials = editorials.slice(0, 2)
+  // Get the first two editorials for display (in reverse order)
+  const featuredEditorials = [editorials[1], editorials[0]]
 
   return (
     <section className="w-full px-6 md:px-12 lg:px-24 py-12 space-y-12">
