@@ -8,18 +8,18 @@ const EmptyCartMessage = () => {
         level="h1"
         className="flex flex-row text-3xl-regular gap-x-2 items-baseline"
       >
-        Bag
+        Shopping Bag
       </Heading>
       <Text className="text-base-regular mt-4 mb-6 max-w-[32rem]">
         Your shopping bag is empty.
       </Text>
       <div className="flex gap-4">
-        <LocalizedClientLink href="/categories/men">
+        <LocalizedClientLink href="/men">
           <button className="px-8 py-3 border border-gray-900 text-gray-900 text-sm font-medium tracking-wide hover:bg-gray-900 hover:text-white transition-colors">
             SHOP MENSWEAR
           </button>
         </LocalizedClientLink>
-        <LocalizedClientLink href="/categories/women">
+        <LocalizedClientLink href="/women">
           <button className="px-8 py-3 border border-gray-900 text-gray-900 text-sm font-medium tracking-wide hover:bg-gray-900 hover:text-white transition-colors">
             SHOP WOMENSWEAR
           </button>

@@ -16,7 +16,7 @@ export default async function Footer() {
       <div className="content-container flex flex-col w-full">
         {/* Top basic links section */}
         <div className="no-border pt-6 pb-1 hidden md:block">
-          <nav className="flex flex-wrap justify-center gap-x-9 gap-y-4 text-black txt-xsmall uppercase text-center">
+          <nav className="flex flex-nowrap justify-between text-black txt-xsmall uppercase text-center">
             <LocalizedClientLink href="/customer-care/contact-us" className="hover:text-ui-fg-base">
               Customer Care
             </LocalizedClientLink>
