@@ -69,6 +69,11 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       </Table.Cell>
 
       <Table.Cell className="text-left">
+        {(item.variant?.product as any)?.brand?.name && (
+          <Text className="text-ui-fg-muted text-small font-medium uppercase mb-1">
+            {(item.variant?.product as any).brand.name}
+          </Text>
+        )}
         <Text
           className="txt-medium-plus text-ui-fg-base"
           data-testid="product-title"
