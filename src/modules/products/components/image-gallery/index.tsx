@@ -71,7 +71,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
             return (
               <Container
                 key={image.id}
-                className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden shadow-none bg-ui-bg-subtle"
+                className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden shadow-none bg-ui-bg-subtle px-0 py-0"
                 id={image.id}
               >
                 {!!image.url && (
@@ -125,7 +125,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
             return (
               <Container
                 key={image.id}
-                className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden shadow-none bg-ui-bg-subtle"
+                className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden shadow-none bg-ui-bg-subtle px-0 py-0"
                 id={image.id}
               >
                 {!!image.url && (
@@ -181,7 +181,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
             return (
               <Container
                 key={image.id}
-                className="relative aspect-square w-full overflow-hidden shadow-none bg-ui-bg-subtle"
+                className="relative aspect-square w-full overflow-hidden shadow-none bg-ui-bg-subtle px-0 py-0"
                 id={image.id}
               >
                 {!!image.url && (

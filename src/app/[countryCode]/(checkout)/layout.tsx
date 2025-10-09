@@ -1,6 +1,7 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
 import MedusaCTA from "@modules/layout/components/medusa-cta"
+import Image from "next/image"
 
 export default function CheckoutLayout({
   children,
@@ -26,10 +27,17 @@ export default function CheckoutLayout({
           </LocalizedClientLink>
           <LocalizedClientLink
             href="/"
-            className="text-lg font-medium uppercase tracking-wide text-black"
+            className="block"
             data-testid="store-link"
           >
-            REVETIR
+            <Image
+              src="/images/logo_transparent.svg"
+              alt="REVETIR"
+              width={120}
+              height={24}
+              className="h-6 w-auto"
+              priority
+            />
           </LocalizedClientLink>
           <div className="flex-1 basis-0" />
         </nav>
