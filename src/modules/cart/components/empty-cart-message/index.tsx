@@ -1,6 +1,5 @@
 import { Heading, Text } from "@medusajs/ui"
-
-import InteractiveLink from "@modules/common/components/interactive-link"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 const EmptyCartMessage = () => {
   return (
@@ -9,13 +8,22 @@ const EmptyCartMessage = () => {
         level="h1"
         className="flex flex-row text-3xl-regular gap-x-2 items-baseline"
       >
-        Cart
+        Bag
       </Heading>
       <Text className="text-base-regular mt-4 mb-6 max-w-[32rem]">
-        You don&apos;t have anything in your cart, but we can change that.
+        Your shopping bag is empty.
       </Text>
-      <div>
-        <InteractiveLink href="/store">Explore products</InteractiveLink>
+      <div className="flex gap-4">
+        <LocalizedClientLink href="/categories/men">
+          <button className="px-8 py-3 border border-gray-900 text-gray-900 text-sm font-medium tracking-wide hover:bg-gray-900 hover:text-white transition-colors">
+            SHOP MENSWEAR
+          </button>
+        </LocalizedClientLink>
+        <LocalizedClientLink href="/categories/women">
+          <button className="px-8 py-3 border border-gray-900 text-gray-900 text-sm font-medium tracking-wide hover:bg-gray-900 hover:text-white transition-colors">
+            SHOP WOMENSWEAR
+          </button>
+        </LocalizedClientLink>
       </div>
     </div>
   )

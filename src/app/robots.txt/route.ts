@@ -10,7 +10,7 @@ Disallow: /admin/
 Disallow: /_next/
 Disallow: /checkout/
 Disallow: /account/
-Disallow: /cart/
+Disallow: /bag/
 Disallow: /order/
 Disallow: /test-page/
 Disallow: /test-routing/

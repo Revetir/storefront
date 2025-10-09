@@ -83,7 +83,7 @@ const CartDropdown = ({
       {/* Mobile: Direct link to cart page */}
       <div className="lg:hidden relative">
         <LocalizedClientLink
-          href="/cart"
+          href="/bag"
           className="flex items-center justify-center h-full p-1 sm:px-2"
           data-testid="mobile-cart-link"
         >
@@ -102,7 +102,7 @@ const CartDropdown = ({
           <PopoverButton className="h-full">
             <LocalizedClientLink
               className="hover:text-ui-fg-base"
-              href="/cart"
+              href="/bag"
               data-testid="nav-cart-link"
             >{`BAG (${totalItems})`}</LocalizedClientLink>
           </PopoverButton>
@@ -159,6 +159,11 @@ const CartDropdown = ({
                             <div className="flex flex-col flex-1">
                               <div className="flex items-start justify-between">
                                 <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
+                                  {(item.product as any)?.brand?.name && (
+                                    <span className="text-ui-fg-muted text-xs font-medium uppercase mb-0.5">
+                                      {(item.product as any).brand.name}
+                                    </span>
+                                  )}
                                   <h3 className="text-base-regular overflow-hidden text-ellipsis">
                                     <LocalizedClientLink
                                       href={(item.product as any)?.brand?.slug
@@ -218,7 +223,7 @@ const CartDropdown = ({
                         })}
                       </span>
                     </div>
-                    <LocalizedClientLink href="/cart" passHref>
+                    <LocalizedClientLink href="/bag" passHref>
                       <Button
                         className="w-full"
                         size="large"

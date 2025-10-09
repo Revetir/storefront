@@ -187,8 +187,8 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                 >
                   Account
                 </LocalizedClientLink>
-                <LocalizedClientLink 
-                  href="/cart" 
+                <LocalizedClientLink
+                  href="/bag"
                   className="block text-sm uppercase text-gray-700 hover:text-black"
                   onClick={onClose}
                 >
