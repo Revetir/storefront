@@ -67,7 +67,7 @@ const CollectionTemplate = ({
           </div>
 
           {/* Tablet Layout - 767px - 1022px */}
-          <div className="hidden md:block small:hidden">
+          <div className="hidden md:block lg:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[768px] px-4">
                 <div className="mb-6">
@@ -93,8 +93,8 @@ const CollectionTemplate = ({
             </div>
           </div>
 
-          {/* Small Desktop Layout - 1023px - 1725px */}
-          <div className="hidden small:block large:hidden">
+          {/* Desktop Layout - 1024px and up */}
+          <div className="hidden lg:block 2xl:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[1200px] px-6">
                 <div className="flex gap-8">
@@ -112,8 +112,8 @@ const CollectionTemplate = ({
             </div>
           </div>
 
-          {/* Large Desktop Layout - > 1725px */}
-          <div className="hidden large:block">
+          {/* Large Desktop Layout - 1536px and up */}
+          <div className="hidden 2xl:block">
             <div className="relative">
               <div className="flex justify-center w-full">
                 <div className="max-w-[1200px] px-4 md:px-6">

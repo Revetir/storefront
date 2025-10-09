@@ -122,7 +122,7 @@ const AccountInfo = ({
             <div className="flex items-center justify-end mt-2">
               <Button
                 isLoading={pending}
-                className="w-full small:max-w-[140px]"
+                className="w-full lg:max-w-[140px]"
                 type="submit"
                 data-testid="save-button"
               >

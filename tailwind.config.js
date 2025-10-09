@@ -47,13 +47,11 @@ module.exports = {
         "8xl": "100rem",
       },
       screens: {
-        "2xsmall": "320px",
-        xsmall: "512px",
-        small: "1024px",
-        medium: "1280px",
-        large: "1725px",
-        xlarge: "1680px",
-        "2xlarge": "1920px",
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
+        "2xl": "1536px",
       },
       fontSize: {
         "3xl": "2rem",

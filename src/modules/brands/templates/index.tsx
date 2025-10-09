@@ -45,8 +45,8 @@ const BrandTemplate = ({
         )}
       </div>
 
-      <div className="flex flex-col small:flex-row gap-x-8">
-        <div className="mt-2 small:mt-0">
+      <div className="flex flex-col lg:flex-row gap-x-8">
+        <div className="mt-2 lg:mt-0">
           <RefinementList
             sortBy={sortBy || "created_at"}
           />

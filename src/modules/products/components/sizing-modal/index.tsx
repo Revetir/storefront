@@ -201,7 +201,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     return (
       <>
         {/* Desktop/Laptop: Horizontal layout */}
-        <div className="hidden small:flex gap-8 items-center justify-center h-full w-full">
+        <div className="hidden lg:flex gap-8 items-center justify-center h-full w-full">
           {/* Left side - Diagram with measurements */}
           <div className="flex justify-center items-center flex-1">
             <div className="relative w-full flex justify-center">
@@ -259,7 +259,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         </div>
 
         {/* Tablet/Phone: Vertically stacked */}
-        <div className="flex small:hidden flex-col gap-6 w-full">
+        <div className="flex lg:hidden flex-col gap-6 w-full">
           {/* Diagram */}
           <div className="relative w-full flex justify-center">
             {renderDiagram()}
@@ -346,7 +346,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     return (
       <div className="flex flex-col gap-6 w-full h-full">
         {/* Desktop/Laptop: VERTICAL table - EU/US/UK/JP as ROW headers, sizes as COLUMNS */}
-        <div className="hidden small:flex small:flex-col w-full h-full pt-4">
+        <div className="hidden lg:flex lg:flex-col w-full h-full pt-4">
           <table className="w-full table-fixed">
             <tbody>
               <tr>
@@ -406,7 +406,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         </div>
 
         {/* Tablet/Phone: HORIZONTAL table - EU/US/UK/JP as COLUMN headers, sizes as ROWS */}
-        <div className="block small:hidden w-full overflow-x-auto">
+        <div className="block lg:hidden w-full overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
@@ -464,7 +464,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           /* Sizing Missing - Complete custom layout at Modal.Body level */
           <>
             {/* Desktop: Full height centered layout with X button */}
-            <div className="hidden small:block small:h-full small:w-full small:relative">
+            <div className="hidden lg:block lg:h-full lg:w-full lg:relative">
               {/* X close button */}
               <button
                 onClick={close}
@@ -499,7 +499,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             </div>
 
             {/* Mobile: Full height centered layout with close button */}
-            <div className="flex small:hidden flex-col h-screen">
+            <div className="flex lg:hidden flex-col h-screen">
               <div className="flex-1 flex items-center justify-center px-6">
                 <div className="text-center">
                   <img
@@ -536,7 +536,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         ) : (
           <div className="flex flex-col h-full relative">
             {/* Desktop/Laptop Layout */}
-            <div className="hidden small:flex small:flex-col small:h-full small:px-4 small:py-3">
+            <div className="hidden lg:flex lg:flex-col lg:h-full lg:px-4 lg:py-3">
               {/* Header - title and X button in top corners */}
               <div className="flex justify-between items-start mb-4">
                 {/* Page titles/toggle */}
@@ -585,7 +585,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             </div>
 
             {/* Tablet/Phone Layout */}
-            <div className="flex small:hidden flex-col h-screen">
+            <div className="flex lg:hidden flex-col h-screen">
               {/* Header - title at top, only if pages exist */}
               <div className="px-6 py-4 flex-shrink-0 text-center">
                 {/* Show dropdown only if both pages exist */}

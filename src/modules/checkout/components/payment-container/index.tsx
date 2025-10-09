@@ -48,7 +48,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
             {paymentInfoMap[paymentProviderId]?.title || paymentProviderId}
           </Text>
           {isManual(paymentProviderId) && isDevelopment && (
-            <PaymentTest className="hidden small:block" />
+            <PaymentTest className="hidden lg:block" />
           )}
         </div>
         <span className="justify-self-end text-ui-fg-base">
@@ -56,7 +56,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
         </span>
       </div>
       {isManual(paymentProviderId) && isDevelopment && (
-        <PaymentTest className="small:hidden text-[10px]" />
+        <PaymentTest className="lg:hidden text-[10px]" />
       )}
       {children}
     </RadioGroupOption>

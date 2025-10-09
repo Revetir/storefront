@@ -81,8 +81,8 @@ const StoreTemplate = ({
             </div>
           </div>
 
-          {/* Tablet Layout - 768px - 1023px */}
-          <div className="hidden md:block small:hidden">
+          {/* Tablet Layout - md to lg (768px - 1024px) */}
+          <div className="hidden md:block lg:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[768px] px-4">
                 <div className="mb-6">
@@ -119,8 +119,8 @@ const StoreTemplate = ({
             </div>
           </div>
 
-          {/* Small Desktop Layout - 1024px - 1724px */}
-          <div className="hidden small:block large:hidden">
+          {/* Small Desktop Layout - lg to 2xl (1024px - 1536px) */}
+          <div className="hidden lg:block 2xl:hidden">
             <div className="flex justify-center w-full">
               <div className="max-w-[1200px] px-6">
                 <div className="flex gap-8">
@@ -142,8 +142,8 @@ const StoreTemplate = ({
             </div>
           </div>
 
-          {/* Large Desktop Layout - >= 1725px */}
-          <div className="hidden large:block">
+          {/* Large Desktop Layout - 2xl+ (>= 1536px) */}
+          <div className="hidden 2xl:block">
             <div className="relative">
               {/* Desktop Refinement List - Original positioning */}
               <div className="absolute left-9 top-0 z-10">

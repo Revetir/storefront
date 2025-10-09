@@ -28,8 +28,8 @@ export default async function ProductRail({
   }
 
   return (
-    <div className="content-container py-12 small:py-24">
-      <ul className="grid grid-cols-2 small:grid-cols-3 gap-x-6 gap-y-24 small:gap-y-36">
+    <div className="content-container py-12 lg:py-24">
+      <ul className="grid grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-24 lg:gap-y-36">
         {pricedProducts &&
           pricedProducts.map((product, index) => (
             <li key={product.id}>
