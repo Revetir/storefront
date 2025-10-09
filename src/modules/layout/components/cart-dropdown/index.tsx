@@ -84,7 +84,7 @@ const CartDropdown = ({
       <div className="lg:hidden relative">
         <LocalizedClientLink
           href="/cart"
-          className="flex items-center justify-center h-full px-2"
+          className="flex items-center justify-center h-full p-1 sm:px-2"
           data-testid="mobile-cart-link"
         >
           <ShoppingBag className="w-5 h-5 text-gray-700" />
@@ -140,8 +140,8 @@ const CartDropdown = ({
                           data-testid="cart-item"
                         >
                           <LocalizedClientLink
-                            href={(item.variant?.product as any)?.brand?.slug 
-                              ? `/products/${(item.variant?.product as any).brand.slug}-${item.product_handle}`
+                            href={(item.product as any)?.brand?.slug
+                              ? `/products/${(item.product as any).brand.slug}-${item.product_handle}`
                               : `/products/${item.product_handle}`}
                             className="w-24"
                           >
@@ -150,7 +150,7 @@ const CartDropdown = ({
                               images={item.variant?.product?.images}
                               size="square"
                               product={{
-                                brand: { name: (item.variant?.product as any)?.brand?.name || "Product" },
+                                brand: { name: (item.product as any)?.brand?.name || "Product" },
                                 title: item.title || ""
                               } as any}
                             />
@@ -161,8 +161,8 @@ const CartDropdown = ({
                                 <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
                                   <h3 className="text-base-regular overflow-hidden text-ellipsis">
                                     <LocalizedClientLink
-                                      href={(item.variant?.product as any)?.brand?.slug 
-                                        ? `/products/${(item.variant?.product as any).brand.slug}-${item.product_handle}`
+                                      href={(item.product as any)?.brand?.slug
+                                        ? `/products/${(item.product as any).brand.slug}-${item.product_handle}`
                                         : `/products/${item.product_handle}`}
                                       data-testid="product-link"
                                     >

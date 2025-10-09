@@ -24,12 +24,12 @@ export default function NavClient({ regions, customer, categories, cart }: NavCl
   return (
     <>
       <header className="sticky top-0 z-50 bg-transparent">
-        <nav className="flex items-center justify-between px-4 sm:px-6 md:px-8 h-16 w-full relative">
+        <nav className="flex items-center justify-between px-2 sm:px-6 md:px-8 h-16 w-full relative">
           {/* Left Section - Mobile Menu Button */}
-          <div className="flex items-center gap-x-4 lg:hidden">
+          <div className="flex items-center gap-x-1.5 sm:gap-x-4 lg:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="p-2 hover:bg-gray-100 rounded-full"
+              className="p-1 sm:p-2 hover:bg-gray-100 rounded-full"
             >
               <Menu className="w-5 h-5 text-gray-700" />
             </button>
@@ -81,8 +81,8 @@ export default function NavClient({ regions, customer, categories, cart }: NavCl
           </div>
 
           {/* Right Section - Mobile Icons */}
-          <div className="flex lg:hidden items-center gap-x-4">
-            <LocalizedClientLink href="/account" className="p-2 hover:bg-gray-100 rounded-full">
+          <div className="flex lg:hidden items-center gap-x-1.5 sm:gap-x-4">
+            <LocalizedClientLink href="/account" className="p-1 sm:p-2 hover:bg-gray-100 rounded-full">
               <User className="w-5 h-5 text-gray-700" />
             </LocalizedClientLink>
 
