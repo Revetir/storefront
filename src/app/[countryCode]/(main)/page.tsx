@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   keywords: "designer fashion sale, luxury clothing, men's designer clothes, women's designer clothes, luxury accessories, fashion sale, designer sale",
   openGraph: {
     title: "REVETIR — Designer Clothing, Shoes and Accessories",
-    description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
+    description: "Discover curated designer fashion from luxury brands and emerging labels. Shop clothing, shoes, and accessories on sale with free U.S. shipping and returns.",
     url: "https://revetir.com",
     siteName: "REVETIR",
     locale: "en_US",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     title: "REVETIR — Designer Clothing, Shoes and Accessories",
-    description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
+    description: "Discover curated designer fashion from luxury brands and emerging labels. Shop clothing, shoes, and accessories on sale with free U.S. shipping and returns.",
   },
   robots: {
     index: true,

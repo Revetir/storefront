@@ -131,7 +131,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       <div className="hidden xl:block">
         <div className="flex w-full min-h-screen">
           {/* Left column - Product Info (sticky) */}
-          <div className="w-1/4 pl-6">
+          <div className="w-1/4">
             <div className="sticky top-0 h-screen flex items-center">
               <ProductInfo product={product} />
             </div>
@@ -168,7 +168,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
       {/* Related products section (within container) */}
       <div
-        className="content-container my-16 lg:my-32"
+        className="content-container lg:my-16"
         data-testid="related-products-container"
       >
         <RelatedProductsClient products={relatedProducts} region={region} />

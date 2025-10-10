@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     default: "Luxury Fashion & Independent Designers",
     template: "%s | REVETIR"
   },
-  description: "Discover curated designer clothing, shoes and accessories for men and women on sale. Free shipping & returns in the US.",
+  description: "Discover curated designer fashion from luxury brands and emerging labels. Shop clothing, shoes, and accessories on sale with free U.S. shipping and returns.",
   authors: [{ name: "REVETIR" }],
   creator: "REVETIR",
   publisher: "REVETIR",
@@ -32,14 +32,14 @@ export const metadata: Metadata = {
     url: "https://revetir.com",
     siteName: "REVETIR",
     title: "REVETIR — Designer Clothing, Shoes and Accessories",
-    description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
+    description: "Discover curated designer fashion from luxury brands and emerging labels. Shop clothing, shoes, and accessories on sale with free U.S. shipping and returns.",
   },
   twitter: {
     card: "summary_large_image",
     site: "@revetir",
     creator: "@revetir",
     title: "Luxury Fashion & Independent Designers",
-    description: "Discover curated designer fashion for men and women on sale. Free shipping & returns in the US.",
+    description: "Discover curated designer fashion from luxury brands and emerging labels. Shop clothing, shoes, and accessories on sale with free U.S. shipping and returns.",
   },
   robots: {
     index: true,

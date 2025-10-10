@@ -8,14 +8,14 @@ type ProductInfoProps = {
 
 const ProductInfo = ({ product }: ProductInfoProps) => {
   return (
-    <div id="product-info" className="relative flex lg:items-center lg:min-h-[80vh] px-8">
+    <div id="product-info" className="relative flex lg:items-center lg:min-h-[80vh]">
       <div className="flex flex-col gap-y-4 lg:max-w-[500px]">
-        {product.brand?.name && (product as any)?.brand?.slug && (
+        {(product as any).brand?.name && (product as any)?.brand?.slug && (
           <LocalizedClientLink
             href={`/men/brands/${(product as any).brand.slug}`}
             className="text-medium text-ui-fg-base hover:text-ui-fg-subtle hover:underline"
           >
-            {product.brand.name.toUpperCase()}
+            {(product as any).brand.name.toUpperCase()}
           </LocalizedClientLink>
         )}
         <Heading
