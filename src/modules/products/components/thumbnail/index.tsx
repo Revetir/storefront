@@ -73,7 +73,6 @@ const ImageOrPlaceholder = ({
       sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, (max-width: 1200px) 600px, 800px"
       fill
       priority={priority || size === "full" || size === "large"}
-      unoptimized={true}
     />
   ) : (
     <div className="w-full h-full absolute inset-0 flex items-center justify-center">

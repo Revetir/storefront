@@ -81,7 +81,6 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     className="absolute inset-0 rounded-rounded"
                     alt={getAltText(index)}
                     fill
-                    unoptimized={true}
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 800px"
                     style={{
                       objectFit: "cover",
@@ -135,7 +134,6 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     className="absolute inset-0 rounded-rounded"
                     alt={getAltText(index)}
                     fill
-                    unoptimized={true}
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 800px"
                     style={{
                       objectFit: "cover",
@@ -191,7 +189,6 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     className="absolute inset-0 rounded-rounded"
                     alt={getAltText(index)}
                     fill
-                    unoptimized={true}
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 800px"
                     style={{
                       objectFit: "cover",

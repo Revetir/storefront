@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 
 const Hero = () => {
@@ -28,21 +29,21 @@ const Hero = () => {
         }}
       >
         {/* Sale Image with Split Clickable Areas */}
-        <div style={{ width: "100%", position: "relative" }}>
-          <img
-            src={imageUrl}
-            alt="Designer Fashion Sale - Up To 80% Off Men and Women's Styles"
-            style={{
-              width: "100%",
-              maxWidth: "1240px",
-              height: "auto",
-              display: "block",
-              margin: "0 auto",
-              borderRadius: 8,
-            }}
-            loading="lazy"
-          />
-          
+        <div style={{ width: "100%", position: "relative", maxWidth: "1240px", margin: "0 auto" }}>
+          <div style={{ position: "relative", width: "100%", aspectRatio: "1240/620" }}>
+            <Image
+              src={imageUrl}
+              alt="Designer Fashion Sale - Up To 80% Off Men and Women's Styles"
+              fill
+              sizes="(max-width: 1280px) 100vw, 1240px"
+              style={{
+                objectFit: "contain",
+                borderRadius: 8,
+              }}
+              priority
+            />
+          </div>
+
           {/* Left Clickable Area - Men's */}
           <LocalizedClientLink href="/men">
             <div
