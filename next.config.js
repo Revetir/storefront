@@ -44,6 +44,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "fscswsaqnvpbvpoijecn.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "media.revetir.com",
+      },
     ],
   },
   // Add headers for better caching and iOS compatibility
