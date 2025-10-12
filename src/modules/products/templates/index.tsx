@@ -131,14 +131,14 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       <div className="hidden xl:block">
         <div className="flex w-full min-h-screen">
           {/* Left column - Product Info (sticky) */}
-          <div className="w-1/4">
+          <div className="w-1/5 pl-6">
             <div className="sticky top-0 h-screen flex items-center">
               <ProductInfo product={product} />
             </div>
           </div>
 
           {/* Center column - Image Gallery */}
-          <div className="w-2/4 flex justify-center">
+          <div className="w-[55%] flex justify-center">
             <div className="w-full">
               <ImageGallery images={product?.images || []} product={product} />
             </div>

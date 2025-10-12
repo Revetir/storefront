@@ -9,7 +9,7 @@ type ProductInfoProps = {
 const ProductInfo = ({ product }: ProductInfoProps) => {
   return (
     <div id="product-info" className="relative flex lg:items-center lg:min-h-[80vh]">
-      <div className="flex flex-col gap-y-4 lg:max-w-[500px]">
+      <div className="flex flex-col gap-y-4">
         {(product as any).brand?.name && (product as any)?.brand?.slug && (
           <LocalizedClientLink
             href={`/men/brands/${(product as any).brand.slug}`}
