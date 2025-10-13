@@ -7,37 +7,37 @@ const NewsSection = () => {
     <section className="w-full px-6 md:px-12 lg:px-24 py-12 space-y-20">
       {/* Bottom row: 3 vertical images */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Link href="https://wwd.com/runway/spring-2026/milan/mm6-maison-martin-margiela/review/" className="block">
+        <Link href="https://www.youtube.com/watch?v=9UGXQ4K5VtQ" className="block">
           <div className="w-full">
             <div className="w-full h-[400px] relative mb-4">
               <Image
-                src="/images/margiela_ballerina_shoes.jpeg"
-                alt="MM6 Maison Margiela Taking It to the Streets News Article"
+                src="/images/lemaire_nine_frames.png"
+                alt="Lemaire Nine Frames Video Thumbnail"
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
                 className="rounded-md object-cover"
               />
             </div>
             <div className="text-left">
-              <h3 className="text-lg font-semibold mb-2">MM6 Maison Margiela: Taking It to the Streets</h3>
-              <p className="text-sm text-gray-600">October 1, 2025</p>
+              <h3 className="text-lg font-semibold mb-2">NINE FRAMES, a LEMAIRE homage to cinema</h3>
+              <p className="text-sm text-gray-600">October 13, 2025</p>
             </div>
           </div>
         </Link>
-        <Link href="https://www.bbc.com/news/articles/cy4ydxlm9n9o" className="block">
+        <Link href="https://www.yahoo.com/lifestyle/articles/gentle-monster-enchants-futuristic-tea-213000143.html" className="block">
           <div className="w-full">
             <div className="w-full h-[400px] relative mb-4">
               <Image
-                src="/images/labubu_hermes_bag_charm.png"
-                alt="How Labubu Conquered Fashion News Article"
+                src="/images/gentle_monster_tea_house.png"
+                alt="Gentle Monster Tea House Article"
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
                 className="rounded-md object-cover"
               />
             </div>
             <div className="text-left">
-              <h3 className="text-lg font-semibold mb-2">Labubu: How the Pop Mart dolls conquered the world</h3>
-              <p className="text-sm text-gray-600">September 27, 2025</p>
+              <h3 className="text-lg font-semibold mb-2">Gentle Monster Enchants With Futuristic Tea House</h3>
+              <p className="text-sm text-gray-600">October 12, 2025</p>
             </div>
           </div>
         </Link>
@@ -53,8 +53,8 @@ const NewsSection = () => {
               />
             </div>
             <div className="text-left">
-              <h3 className="text-lg font-semibold mb-2">The End Of An Era: Demna's Last Balenciaga Show</h3>
-              <p className="text-sm text-gray-600">August 7, 2025</p>
+              <h3 className="text-lg font-semibold mb-2">The End Of An Era: Demna at Balenciaga</h3>
+              <p className="text-sm text-gray-600">October 10, 2025</p>
             </div>
           </div>
         </Link>

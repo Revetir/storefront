@@ -4,7 +4,7 @@ import { Text, clx } from "@medusajs/ui"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import PrivacyChoicesTrigger from "@modules/common/components/privacy-choices-trigger"
-import { trackSocialClick } from "@lib/util/analytics"
+import SocialLinks from "./social-links"
 
 export default async function Footer() {
   const { collections } = await listCollections({
@@ -30,24 +30,7 @@ export default async function Footer() {
             <LocalizedClientLink href="/partnerships" className="hover:text-ui-fg-base">
               Partnerships
             </LocalizedClientLink>
-            <a
-              href="https://instagram.com/youcouldbewearingthis"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-ui-fg-base"
-              onClick={() => trackSocialClick({ platform: 'instagram' })}
-            >
-              Instagram
-            </a>
-            <a
-              href="https://tiktok.com/@youcouldbewearingthis"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-ui-fg-base"
-              onClick={() => trackSocialClick({ platform: 'tiktok' })}
-            >
-              TikTok
-            </a>
+            <SocialLinks />
             <LocalizedClientLink href="/editorial/archive" className="hover:text-ui-fg-base">
               Editorial Archive
             </LocalizedClientLink>
