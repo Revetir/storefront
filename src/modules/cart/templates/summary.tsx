@@ -29,10 +29,18 @@ const Summary = ({ cart }: SummaryProps) => {
   const step = getCheckoutStep(cart)
 
   const handleCheckoutClick = () => {
-    // Track checkout initiation
+    // Track checkout initiation with item details
     trackCheckoutInitiated({
       cart_value: cart.total,
       item_count: cart.items?.length || 0,
+      items: cart.items?.map(item => ({
+        product_id: item.product_id,
+        product_name: item.product_title,
+        brand: (item.product as any)?.brand?.name,
+        variant_id: item.variant_id,
+        quantity: item.quantity,
+        price: item.unit_price,
+      })),
     })
   }
 

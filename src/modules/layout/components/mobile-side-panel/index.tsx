@@ -140,12 +140,17 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                   
                   return (
                     <div key={category.id} className="flex items-center justify-between">
-                      <LocalizedClientLink 
+                      <LocalizedClientLink
                         href={(() => {
+                          // Handle top-level gender categories (men/women)
+                          if (category.handle === "men" || category.handle === "women") {
+                            return `/${category.handle}`
+                          }
+
                           // Extract gender and category slug from handle
                           let gender: string
                           let categorySlug: string
-                          
+
                           if (category.handle.startsWith("mens-")) {
                             gender = "men"
                             categorySlug = category.handle.replace("mens-", "")
@@ -157,7 +162,7 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                             gender = "men"
                             categorySlug = category.handle
                           }
-                          
+
                           return `/${gender}/${categorySlug}`
                         })()}
                         className="text-sm uppercase text-gray-700 hover:text-black font-medium"
@@ -341,10 +346,15 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                               <div key={childCategory.id} className="flex items-center justify-between">
                                 <LocalizedClientLink
                                   href={(() => {
+                                    // Handle top-level gender categories (men/women)
+                                    if (childCategory.handle === "men" || childCategory.handle === "women") {
+                                      return `/${childCategory.handle}`
+                                    }
+
                                     // Extract gender and category slug from handle
                                     let gender: string
                                     let categorySlug: string
-                                    
+
                                     if (childCategory.handle.startsWith("mens-")) {
                                       gender = "men"
                                       categorySlug = childCategory.handle.replace("mens-", "")
@@ -356,7 +366,7 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                                       gender = "men"
                                       categorySlug = childCategory.handle
                                     }
-                                    
+
                                     return `/${gender}/${categorySlug}`
                                   })()}
                                   className="text-sm uppercase text-gray-700 hover:text-black py-2"

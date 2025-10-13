@@ -24,6 +24,14 @@ export interface CheckoutEventData {
   shipping_method?: string
   payment_provider?: string
   order_value?: number
+  items?: Array<{
+    product_id?: string
+    product_name?: string
+    brand?: string
+    variant_id?: string
+    quantity?: number
+    price?: number
+  }>
 }
 
 export interface DiscoveryEventData {
