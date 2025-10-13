@@ -57,6 +57,9 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
   return null
 }
 
+// Revalidate product pages every hour (3600 seconds)
+export const revalidate = 3600
+
 export async function generateStaticParams() {
   try {
     const countryCodes = await listRegions().then((regions) =>

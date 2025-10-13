@@ -30,6 +30,30 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en" data-mode="light">
       <head>
+        {/* Font preloads for critical fonts */}
+        <link
+          rel="preload"
+          href="/fonts/satoshi/Satoshi-Regular.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/satoshi/Satoshi-Bold.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+
+        {/* DNS prefetch for external domains */}
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://connect.facebook.net" />
+        <link rel="dns-prefetch" href="https://media.revetir.com" />
+
+        {/* Preconnect for critical third-party origins */}
+        <link rel="preconnect" href="https://media.revetir.com" crossOrigin="anonymous" />
+
         {/* Google tag (gtag.js) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-PBQWGZXCMG"
@@ -43,7 +67,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
             gtag('config', 'G-PBQWGZXCMG');
           `}
         </Script>
-        
+
         {/* Meta Pixel Code */}
         <Script id="meta-pixel" strategy="afterInteractive">
           {`
@@ -60,9 +84,9 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           `}
         </Script>
         <noscript>
-          <img 
-            height="1" 
-            width="1" 
+          <img
+            height="1"
+            width="1"
             style={{display: 'none'}}
             src="https://www.facebook.com/tr?id=1157756346271206&ev=PageView&noscript=1"
             alt=""

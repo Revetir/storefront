@@ -1,15 +1,18 @@
 import { Metadata } from "next"
+import dynamic from "next/dynamic"
 
 import { listCartOptions, retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
 import { getBaseURL } from "@lib/util/env"
 import { StoreCartShippingOption } from "@medusajs/types"
 import { PrivacyChoicesProvider } from "@lib/context/privacy-choices-context"
-import CartMismatchBanner from "@modules/layout/components/cart-mismatch-banner"
-import Footer from "@modules/layout/templates/footer"
 import Nav from "@modules/layout/templates/nav"
-import FreeShippingPriceNudge from "@modules/shipping/components/free-shipping-price-nudge"
 import ScrollToTopOnRoute from "@modules/common/components/scroll-to-top-on-route"
+
+// Dynamic imports for components that aren't immediately critical
+const CartMismatchBanner = dynamic(() => import("@modules/layout/components/cart-mismatch-banner"))
+const Footer = dynamic(() => import("@modules/layout/templates/footer"))
+const FreeShippingPriceNudge = dynamic(() => import("@modules/shipping/components/free-shipping-price-nudge"))
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),

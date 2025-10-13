@@ -1,10 +1,13 @@
 import { retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
-import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
-import CheckoutForm from "@modules/checkout/templates/checkout-form"
-import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import dynamic from "next/dynamic"
+
+// Dynamic imports for heavy checkout components
+const PaymentWrapper = dynamic(() => import("@modules/checkout/components/payment-wrapper"))
+const CheckoutForm = dynamic(() => import("@modules/checkout/templates/checkout-form"))
+const CheckoutSummary = dynamic(() => import("@modules/checkout/templates/checkout-summary"))
 
 export const metadata: Metadata = {
   title: "Checkout",

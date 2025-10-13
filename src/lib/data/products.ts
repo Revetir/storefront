@@ -55,14 +55,15 @@ export const listProducts = async ({
     limit,
     offset,
     region_id: region.id,
-    fields: "id,title,handle,status,thumbnail,created_at,updated_at,deleted_at,is_giftcard,discountable,description,subtitle,material,weight,length,height,width,hs_code,origin_country,mid_code,metadata,+brand.*,+categories.*",
+    // Optimized fields - only fetch what's needed by default
+    fields: queryParams?.fields || "id,title,handle,thumbnail,+brand.*",
     ...queryParams,
   }
 
   const next = {
     ...(await getCacheOptions("products")),
-    revalidate: 7200, // Increase to 2 hours for better cache hit rates
-    tags: [`products-${region.id}`, `products-${JSON.stringify(finalQuery)}`], // Add specific cache tags
+    revalidate: 3600, // 1 hour revalidation for better performance
+    tags: [`products-${region.id}`], // Simplified cache tags
   }
   
   return sdk.client

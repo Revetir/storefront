@@ -9,8 +9,9 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
 import { useParams, useRouter } from "next/navigation"
+import React, { useCallback, useRef } from "react"
 
-export default function ProductPreview({
+function ProductPreview({
   product,
   isFeatured,
   region,
@@ -24,6 +25,7 @@ export default function ProductPreview({
   const router = useRouter()
   const params = useParams()
   const countryCode = (params?.countryCode as string) || ""
+  const prefetchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // const pricedProduct = await listProducts({
   //   regionId: region.id,
@@ -45,19 +47,34 @@ export default function ProductPreview({
     cheapestPrice = priceResult.cheapestPrice
   }
 
-  const handleMouseEnter = () => {
-    // Prefetch the product page on hover
-    const brandSlug = ((product as any)?.brand?.slug as string)
-    const productUrl = `/products/${brandSlug}-${product.handle}`
-    const localizedUrl = countryCode ? `/${countryCode}${productUrl}` : productUrl
-    router.prefetch(localizedUrl)
-  }
+  const handleMouseEnter = useCallback(() => {
+    // Debounce prefetch by 300ms to avoid excessive prefetching
+    if (prefetchTimeoutRef.current) {
+      clearTimeout(prefetchTimeoutRef.current)
+    }
+
+    prefetchTimeoutRef.current = setTimeout(() => {
+      const brandSlug = ((product as any)?.brand?.slug as string)
+      const productUrl = `/products/${brandSlug}-${product.handle}`
+      const localizedUrl = countryCode ? `/${countryCode}${productUrl}` : productUrl
+      router.prefetch(localizedUrl)
+    }, 300)
+  }, [product, countryCode, router])
+
+  const handleMouseLeave = useCallback(() => {
+    // Cancel prefetch if user leaves before timeout
+    if (prefetchTimeoutRef.current) {
+      clearTimeout(prefetchTimeoutRef.current)
+      prefetchTimeoutRef.current = null
+    }
+  }, [])
 
   return (
-    <LocalizedClientLink 
-      href={`/products/${((product as any)?.brand?.slug as string)}-${product.handle}`} 
+    <LocalizedClientLink
+      href={`/products/${((product as any)?.brand?.slug as string)}-${product.handle}`}
       className="group"
       onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
 
       <div data-testid="product-wrapper" className="h-full w-full flex flex-col">
@@ -105,3 +122,5 @@ export default function ProductPreview({
     </LocalizedClientLink>
   )
 }
+
+export default React.memo(ProductPreview)

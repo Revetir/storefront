@@ -70,9 +70,14 @@ const ImageOrPlaceholder = ({
       className="absolute inset-0 object-cover object-center"
       draggable={false}
       quality={80}
-      sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, (max-width: 1200px) 600px, 800px"
+      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
       fill
       priority={priority || size === "full" || size === "large"}
+      loading={priority || size === "full" || size === "large" ? undefined : "lazy"}
+      placeholder="blur"
+      blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><filter id="b"><feGaussianBlur stdDeviation="12" /></filter><rect width="100%" height="100%" fill="#f3f4f6" filter="url(#b)"/></svg>`
+      ).toString('base64')}`}
     />
   ) : (
     <div className="w-full h-full absolute inset-0 flex items-center justify-center">

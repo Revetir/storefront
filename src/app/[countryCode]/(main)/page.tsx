@@ -1,14 +1,25 @@
 import { Metadata } from "next"
+import dynamic from "next/dynamic"
 import Hero from "@modules/home/components/hero"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import EditorialGrid from "@modules/home/components/editorial/editorial-grid"
-import NewsSection from "@modules/home/components/news/news"
-import FeaturedBrands from "@modules/home/components/featured-brands/featured-brands"
-import CuratedProducts from "@modules/home/components/curated/curated-products"
-import NewArrivals from "@modules/home/components/new-arrivals/new-arrivals"
 import { getNewestProducts } from "@lib/data/products"
+
+// Dynamic imports for below-the-fold components
+const NewsSection = dynamic(() => import("@modules/home/components/news/news"), {
+  loading: () => <div className="h-96" />,
+})
+const FeaturedBrands = dynamic(() => import("@modules/home/components/featured-brands/featured-brands"), {
+  loading: () => <div className="h-96" />,
+})
+const CuratedProducts = dynamic(() => import("@modules/home/components/curated/curated-products"), {
+  loading: () => <div className="h-96" />,
+})
+const NewArrivals = dynamic(() => import("@modules/home/components/new-arrivals/new-arrivals"), {
+  loading: () => <div className="h-96" />,
+})
 
 export const metadata: Metadata = {
   title: "REVETIR: Luxury Fashion & Independent Designers",
