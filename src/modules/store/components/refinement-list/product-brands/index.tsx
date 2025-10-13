@@ -12,7 +12,15 @@ export default function BrandRefinementList({ selectedBrand: propSelectedBrand }
   const selectedBrand = propSelectedBrand || ""
 
   useEffect(() => {
-    listBrands().then(setBrands).finally(() => setLoading(false))
+    listBrands()
+      .then((fetchedBrands) => {
+        // Sort brands alphabetically by name
+        const sortedBrands = [...fetchedBrands].sort((a, b) =>
+          a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+        )
+        setBrands(sortedBrands)
+      })
+      .finally(() => setLoading(false))
   }, [])
 
   const handleSelect = (slug: string) => {

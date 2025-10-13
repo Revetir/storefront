@@ -1,17 +1,11 @@
-import { listCategories } from "@lib/data/categories"
-import { listCollections } from "@lib/data/collections"
-import { Text, clx } from "@medusajs/ui"
+"use client"
 
+import { Text } from "@medusajs/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import PrivacyChoicesTrigger from "@modules/common/components/privacy-choices-trigger"
-import SocialLinks from "./social-links"
+import { trackSocialClick } from "@lib/util/analytics"
 
-export default async function Footer() {
-  const { collections } = await listCollections({
-    fields: "*products",
-  })
-  const productCategories = await listCategories()
-
+export default function Footer() {
   return (
     <footer className="no-border w-full bg-white pt-8 pb-4 mt-5">
       <div className="content-container flex flex-col w-full">
@@ -30,7 +24,24 @@ export default async function Footer() {
             <LocalizedClientLink href="/partnerships" className="hover:text-ui-fg-base">
               Partnerships
             </LocalizedClientLink>
-            <SocialLinks />
+            <a
+              href="https://instagram.com/youcouldbewearingthis"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-ui-fg-base"
+              onClick={() => trackSocialClick({ platform: 'instagram' })}
+            >
+              Instagram
+            </a>
+            <a
+              href="https://tiktok.com/@youcouldbewearingthis"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-ui-fg-base"
+              onClick={() => trackSocialClick({ platform: 'tiktok' })}
+            >
+              TikTok
+            </a>
             <LocalizedClientLink href="/editorial/archive" className="hover:text-ui-fg-base">
               Editorial Archive
             </LocalizedClientLink>
@@ -57,4 +68,3 @@ export default async function Footer() {
     </footer>
   )
 }
-

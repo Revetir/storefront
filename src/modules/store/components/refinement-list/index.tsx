@@ -5,7 +5,6 @@ import { useCallback, useTransition } from "react"
 
 import SortProducts, { SortOptions } from "./sort-products"
 import CategorySidebar from "@modules/layout/components/category-sidebar"
-import TypeRefinementList from "./product-types"
 import BrandRefinementList from "./product-brands"
 
 type RefinementListProps = {
