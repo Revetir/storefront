@@ -8,11 +8,12 @@ import { Heading, Text, useToggleState } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
 import Spinner from "@modules/common/icons/spinner"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useActionState } from "react"
+import { useActionState, useEffect, useRef } from "react"
 import BillingAddress from "../billing_address"
 import ErrorMessage from "../error-message"
 import ShippingAddress from "../shipping-address"
 import { SubmitButton } from "../submit-button"
+import { trackCheckoutStepCompleted, trackEditAction } from "@lib/util/analytics"
 
 const Addresses = ({
   cart,
@@ -34,10 +35,24 @@ const Addresses = ({
   )
 
   const handleEdit = () => {
+    trackEditAction({ section: 'address', step: 'address' })
     router.push(pathname + "?step=address")
   }
 
   const [message, formAction] = useActionState(setAddresses, null)
+  const prevIsOpenRef = useRef(isOpen)
+
+  // Track when address step is completed (when user moves away from address step)
+  useEffect(() => {
+    if (prevIsOpenRef.current && !isOpen && cart?.shipping_address) {
+      trackCheckoutStepCompleted({
+        step: 'address',
+        cart_value: cart.total,
+        item_count: cart.items?.length || 0,
+      })
+    }
+    prevIsOpenRef.current = isOpen
+  }, [isOpen, cart])
 
   return (
     <div className="bg-white">

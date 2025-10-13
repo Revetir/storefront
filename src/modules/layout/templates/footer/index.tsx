@@ -4,6 +4,7 @@ import { Text, clx } from "@medusajs/ui"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import PrivacyChoicesTrigger from "@modules/common/components/privacy-choices-trigger"
+import { trackSocialClick } from "@lib/util/analytics"
 
 export default async function Footer() {
   const { collections } = await listCollections({
@@ -34,6 +35,7 @@ export default async function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-ui-fg-base"
+              onClick={() => trackSocialClick({ platform: 'instagram' })}
             >
               Instagram
             </a>
@@ -42,6 +44,7 @@ export default async function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-ui-fg-base"
+              onClick={() => trackSocialClick({ platform: 'tiktok' })}
             >
               TikTok
             </a>

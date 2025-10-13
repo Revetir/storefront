@@ -11,6 +11,7 @@ import { useCallback, useContext, useEffect, useState } from "react"
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { StripePaymentElementChangeEvent } from "@stripe/stripe-js"
 import { StripeContext } from "../payment-wrapper/stripe-wrapper"
+import { trackCheckoutStepCompleted } from "@lib/util/analytics"
 
 const Payment = ({
   cart,
@@ -103,6 +104,12 @@ const Payment = ({
         console.error(err)
         setError(err.message || "An error occurred with the payment")
         return
+      })
+
+      // Track payment step completion
+      trackCheckoutStepCompleted({
+        step: 'payment',
+        payment_provider: selectedPaymentMethod,
       })
 
       // Navigate to the final checkout step

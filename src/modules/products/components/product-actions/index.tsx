@@ -12,6 +12,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
 import SizeGuideLink from "@modules/products/components/size-guide-link"
+import { trackAddToBag, trackVariantSelected } from "@lib/util/analytics"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -60,6 +61,18 @@ export default function ProductActions({
       ...prev,
       [optionId]: value,
     }))
+
+    // Track variant selection
+    const option = product.options?.find(opt => opt.id === optionId)
+    if (option) {
+      trackVariantSelected({
+        product_id: product.id || '',
+        product_name: product.title,
+        brand: (product as any)?.brand?.name,
+        option_type: option.title || 'unknown',
+        option_value: value,
+      })
+    }
   }
 
   // check if the selected options produce a valid variant
@@ -107,12 +120,24 @@ export default function ProductActions({
     if (!selectedVariant?.id) return null
 
     setIsAdding(true)
-    
+
     try {
       await addToCart({
         variantId: selectedVariant.id,
         quantity: 1,
         countryCode,
+      })
+
+      // Track successful add to bag
+      trackAddToBag({
+        product_id: product.id || '',
+        product_name: product.title,
+        brand: (product as any)?.brand?.name,
+        variant_id: selectedVariant.id,
+        variant_name: selectedVariant.title,
+        price: selectedVariant.calculated_price?.calculated_amount,
+        currency: selectedVariant.calculated_price?.currency_code,
+        quantity: 1,
       })
     } catch (error) {
       console.error('Error adding to cart:', error)

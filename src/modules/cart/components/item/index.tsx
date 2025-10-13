@@ -13,6 +13,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Spinner from "@modules/common/icons/spinner"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { useState } from "react"
+import { trackQuantityChange } from "@lib/util/analytics"
 
 type ItemProps = {
   item: HttpTypes.StoreCartLineItem
@@ -28,16 +29,29 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
     setError(null)
     setUpdating(true)
 
-    await updateLineItem({
-      lineId: item.id,
-      quantity,
-    })
-      .catch((err) => {
-        setError(err.message)
+    const oldQuantity = item.quantity
+
+    try {
+      await updateLineItem({
+        lineId: item.id,
+        quantity,
       })
-      .finally(() => {
-        setUpdating(false)
+
+      // Track quantity change
+      trackQuantityChange({
+        product_id: item.product_id || '',
+        product_name: item.product_title,
+        brand: (item.product as any)?.brand?.name,
+        variant_id: item.variant_id,
+        variant_name: item.variant?.title,
+        old_quantity: oldQuantity,
+        new_quantity: quantity,
       })
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setUpdating(false)
+    }
   }
 
   // TODO: Update this to grab the actual max inventory
@@ -86,7 +100,18 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       {type === "full" && (
         <Table.Cell>
           <div className="flex gap-2 items-center w-28">
-            <DeleteButton id={item.id} data-testid="product-delete-button" />
+            <DeleteButton
+              id={item.id}
+              data-testid="product-delete-button"
+              trackingData={{
+                product_id: item.product_id,
+                product_name: item.product_title,
+                brand: (item.product as any)?.brand?.name,
+                variant_id: item.variant_id,
+                variant_name: item.variant?.title,
+                quantity: item.quantity,
+              }}
+            />
             <CartItemSelect
               value={item.quantity}
               onChange={(value) => changeQuantity(parseInt(value.target.value))}

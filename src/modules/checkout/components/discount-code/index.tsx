@@ -10,6 +10,7 @@ import { HttpTypes } from "@medusajs/types"
 import Trash from "@modules/common/icons/trash"
 import ErrorMessage from "../error-message"
 import { SubmitButton } from "../submit-button"
+import { trackDiscountApplied } from "@lib/util/analytics"
 
 type DiscountCodeProps = {
   cart: HttpTypes.StoreCart & {
@@ -43,6 +44,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
     codes.push(code.toString())
 
     await applyPromotions(codes)
+
+    trackDiscountApplied({ discount_code: code.toString(), success: true })
 
     if (input) {
       input.value = ""
@@ -128,7 +131,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                               "percentage"
                                 ? `${promotion.application_method.value}%`
                                 : convertToLocale({
-                                    amount: promotion.application_method.value,
+                                    amount: Number(promotion.application_method.value),
                                     currency_code:
                                       promotion.application_method
                                         .currency_code,

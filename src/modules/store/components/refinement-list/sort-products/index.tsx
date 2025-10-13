@@ -2,6 +2,7 @@
 
 import FilterRadioGroup from "@modules/common/components/filter-radio-group"
 import React from "react"
+import { trackSortApplied } from "@lib/util/analytics"
 
 export type SortOptions = "price_asc" | "price_desc" | "created_at"
 
@@ -35,6 +36,7 @@ const SortProducts = ({
 }: SortProductsProps) => {
   const handleSelect = (value: SortOptions) => {
     if (disabled) return
+    trackSortApplied({ sort_type: value })
     setQueryParams("sortBy", value)
   }
 
