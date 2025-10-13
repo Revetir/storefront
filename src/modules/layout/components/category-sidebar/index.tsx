@@ -47,15 +47,9 @@ const CategoryNode = ({
   const currentBrandSlug = isOnBrandPage ? currentPath.split('/brands/')[1]?.split('/')[0] : null
   
   if (isTopLevelGenderCategory) {
-    // For top-level gender categories, check if we're already on that gender page
-    const isAlreadyOnThisGenderPage = gender === category.handle
-    if (isAlreadyOnThisGenderPage) {
-      // Stay on the same page - use the current path to avoid /men/men or /women/women
-      categoryPath = currentPath
-    } else {
-      // Navigate to the other gender page
-      categoryPath = `/${category.handle}`
-    }
+    // For top-level gender categories, just use the gender path
+    // LocalizedClientLink will handle adding the country code
+    categoryPath = `/${category.handle}`
   } else if (brandSlug) {
     // We're explicitly in brand context, use brand+category path
     categoryPath = `/${gender}/brands/${brandSlug}/${categorySlug}`
