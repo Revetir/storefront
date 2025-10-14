@@ -41,6 +41,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
     if (!container) return
     setIsDragging(false)
     container.style.userSelect = 'auto'
+    container.style.cursor = ''
   }
 
   const handleMouseUp = () => {
@@ -60,6 +61,13 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
     if (isDragging) {
       const handleGlobalMouseUp = () => {
         setIsDragging(false)
+        // Reset cursor on both containers
+        if (mobileScrollContainerRef.current) {
+          mobileScrollContainerRef.current.style.cursor = ''
+        }
+        if (tabletScrollContainerRef.current) {
+          tabletScrollContainerRef.current.style.cursor = ''
+        }
       }
 
       document.addEventListener('mouseup', handleGlobalMouseUp)

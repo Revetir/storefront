@@ -481,6 +481,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                     src="/images/sizing_information_missing.svg"
                     alt="Sizing information notice"
                     className="w-auto h-auto max-w-md mx-auto mb-6"
+                    loading="eager"
                   />
                   <p className="text-base text-gray-700 mb-2">
                     Measurements for this product will be available soon
@@ -499,13 +500,14 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             </div>
 
             {/* Mobile: Full height centered layout with close button */}
-            <div className="flex lg:hidden flex-col h-screen">
+            <div className="flex lg:hidden flex-col h-[100dvh]">
               <div className="flex-1 flex items-center justify-center px-6">
                 <div className="text-center">
                   <img
                     src="/images/sizing_information_missing.svg"
                     alt="Sizing information notice"
                     className="w-auto h-auto max-w-xs mx-auto mb-6"
+                    loading="eager"
                   />
                   <p className="text-base text-gray-700 mb-2">
                     Measurements for this product will be available soon
@@ -585,7 +587,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             </div>
 
             {/* Tablet/Phone Layout */}
-            <div className="flex lg:hidden flex-col h-screen">
+            <div className="flex lg:hidden flex-col h-[100dvh]">
               {/* Header - title at top, only if pages exist */}
               <div className="px-6 py-4 flex-shrink-0 text-center">
                 {/* Show dropdown only if both pages exist */}
