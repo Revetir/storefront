@@ -4,6 +4,7 @@ import { Brand } from "@lib/data/brands"
 import { StoreRegion } from "@medusajs/types"
 import PaginatedProductsClient from "@modules/store/templates/paginated-products-client"
 import RefinementList from "@modules/store/components/refinement-list"
+import CollapsibleText from "@modules/store/components/collapsible-text"
 import { Suspense } from "react"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 
@@ -39,9 +40,7 @@ const BrandTemplate = ({
           {brand.name} {genderDisplay}
         </h1>
         {brand.blurb && (
-          <div className="mt-4 text-base-regular text-gray-600">
-            {brand.blurb}
-          </div>
+          <CollapsibleText text={brand.blurb} className="mt-4 text-base-regular text-gray-600" />
         )}
       </div>
 

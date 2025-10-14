@@ -15,10 +15,47 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
   const mobileScrollContainerRef = useRef<HTMLDivElement>(null)
   const tabletScrollContainerRef = useRef<HTMLDivElement>(null)
 
+  // State for click-and-drag functionality
+  const [isDragging, setIsDragging] = useState(false)
+  const [startX, setStartX] = useState(0)
+  const [scrollLeft, setScrollLeft] = useState(0)
+
   const getAltText = (index: number) => {
     const brand = (product as any).brand?.name || "Product"
     const title = product.title || ""
     return `${brand} ${title} ${index + 1}`.trim()
+  }
+
+  // Click-and-drag handlers
+  const handleMouseDown = (e: React.MouseEvent, container: HTMLDivElement | null) => {
+    if (!container) return
+    setIsDragging(true)
+    setStartX(e.pageX - container.offsetLeft)
+    setScrollLeft(container.scrollLeft)
+    container.style.cursor = 'grabbing'
+    container.style.userSelect = 'none'
+  }
+
+  const handleMouseLeave = (container: HTMLDivElement | null) => {
+    if (!container) return
+    setIsDragging(false)
+    container.style.cursor = 'grab'
+    container.style.userSelect = 'auto'
+  }
+
+  const handleMouseUp = (container: HTMLDivElement | null) => {
+    if (!container) return
+    setIsDragging(false)
+    container.style.cursor = 'grab'
+    container.style.userSelect = 'auto'
+  }
+
+  const handleMouseMove = (e: React.MouseEvent, container: HTMLDivElement | null) => {
+    if (!isDragging || !container) return
+    e.preventDefault()
+    const x = e.pageX - container.offsetLeft
+    const walk = (x - startX) * 2 // Multiply by 2 for faster scrolling
+    container.scrollLeft = scrollLeft - walk
   }
 
   // Consolidated scroll handler for both mobile and tablet
@@ -57,9 +94,13 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
     <div className="flex items-start relative">
       {/* Mobile: Horizontal scrolling gallery with indicators - < md (768px) */}
       <div className="md:hidden w-full">
-        <div 
+        <div
           ref={mobileScrollContainerRef}
-          className="flex overflow-x-auto snap-x snap-mandatory gap-0 px-0 pb-2 no-scrollbar"
+          className="flex overflow-x-auto snap-x snap-mandatory gap-0 px-0 pb-2 no-scrollbar cursor-grab"
+          onMouseDown={(e) => handleMouseDown(e, mobileScrollContainerRef.current)}
+          onMouseLeave={() => handleMouseLeave(mobileScrollContainerRef.current)}
+          onMouseUp={() => handleMouseUp(mobileScrollContainerRef.current)}
+          onMouseMove={(e) => handleMouseMove(e, mobileScrollContainerRef.current)}
         >
           {images.map((image, index) => {
             return (
@@ -111,9 +152,13 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
 
       {/* Tablet: Horizontal scrolling gallery with indicators - md to xl (768px to 1280px) */}
       <div className="hidden md:block xl:hidden w-full h-full">
-        <div 
+        <div
           ref={tabletScrollContainerRef}
-          className="flex overflow-x-auto snap-x snap-mandatory gap-0 px-0 pb-2 no-scrollbar"
+          className="flex overflow-x-auto snap-x snap-mandatory gap-0 px-0 pb-2 no-scrollbar cursor-grab"
+          onMouseDown={(e) => handleMouseDown(e, tabletScrollContainerRef.current)}
+          onMouseLeave={() => handleMouseLeave(tabletScrollContainerRef.current)}
+          onMouseUp={() => handleMouseUp(tabletScrollContainerRef.current)}
+          onMouseMove={(e) => handleMouseMove(e, tabletScrollContainerRef.current)}
         >
           {images.map((image, index) => {
             return (

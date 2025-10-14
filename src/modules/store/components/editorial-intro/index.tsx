@@ -1,3 +1,5 @@
+import CollapsibleText from "@modules/store/components/collapsible-text"
+
 interface EditorialIntroProps {
   title: string
   blurb?: string
@@ -13,9 +15,7 @@ export default function EditorialIntro({ title, blurb }: EditorialIntroProps) {
       <h1 className="text-sm font-bold text-[#333] uppercase tracking-wide">
         {title}
       </h1>
-      <p className="text-sm text-[#333] mt-0 leading-relaxed">
-        {blurb}
-      </p>
+      <CollapsibleText text={blurb} className="mt-0" />
     </div>
   )
 }

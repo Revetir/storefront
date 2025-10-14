@@ -5,6 +5,7 @@ import { Category } from "@lib/data/categories"
 import { StoreRegion } from "@medusajs/types"
 import PaginatedProductsClient from "@modules/store/templates/paginated-products-client"
 import RefinementList from "@modules/store/components/refinement-list"
+import CollapsibleText from "@modules/store/components/collapsible-text"
 import { Suspense } from "react"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 
@@ -41,11 +42,11 @@ const BrandCategoryTemplate = ({
         <h1 className="text-2xl-semi text-gry-900">
           {brand.name} {genderDisplay} {category.name}
         </h1>
-        {(brand.blurb || category.metadata?.intro_blurb) ? (
-          <div className="mt-4 text-base-regular text-gray-600">
-            {brand.blurb ? <div className="mb-2">{String(brand.blurb)}</div> : null}
-            {category.metadata?.intro_blurb ? (
-              <div>{String(category.metadata.intro_blurb)}</div>
+        {(brand.blurb || category.metadata?.blurb?.text) ? (
+          <div className="mt-4 text-base-regular text-gray-600 space-y-2">
+            {brand.blurb ? <CollapsibleText text={String(brand.blurb)} /> : null}
+            {category.metadata?.blurb?.text ? (
+              <CollapsibleText text={String(category.metadata.blurb.text)} />
             ) : null}
           </div>
         ) : null}
