@@ -205,6 +205,13 @@
     @apply font-sans;
   }
 
+  /* Disable image drag-and-drop site-wide */
+  img {
+    user-drag: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+  }
+
   /* Custom text selection styling */
   ::selection {
     background-color: #d1d5db; /* light gray */

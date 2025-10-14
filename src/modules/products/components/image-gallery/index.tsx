@@ -29,6 +29,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
   // Click-and-drag handlers
   const handleMouseDown = (e: React.MouseEvent, container: HTMLDivElement | null) => {
     if (!container) return
+    e.preventDefault() // Prevent default drag behavior
     setIsDragging(true)
     setStartX(e.pageX - container.offsetLeft)
     setScrollLeft(container.scrollLeft)
@@ -39,15 +40,11 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
   const handleMouseLeave = (container: HTMLDivElement | null) => {
     if (!container) return
     setIsDragging(false)
-    container.style.cursor = 'grab'
     container.style.userSelect = 'auto'
   }
 
-  const handleMouseUp = (container: HTMLDivElement | null) => {
-    if (!container) return
+  const handleMouseUp = () => {
     setIsDragging(false)
-    container.style.cursor = 'grab'
-    container.style.userSelect = 'auto'
   }
 
   const handleMouseMove = (e: React.MouseEvent, container: HTMLDivElement | null) => {
@@ -57,6 +54,21 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
     const walk = (x - startX) * 2 // Multiply by 2 for faster scrolling
     container.scrollLeft = scrollLeft - walk
   }
+
+  // Global mouseup listener to handle mouse release anywhere on the page
+  useEffect(() => {
+    if (isDragging) {
+      const handleGlobalMouseUp = () => {
+        setIsDragging(false)
+      }
+
+      document.addEventListener('mouseup', handleGlobalMouseUp)
+
+      return () => {
+        document.removeEventListener('mouseup', handleGlobalMouseUp)
+      }
+    }
+  }, [isDragging])
 
   // Consolidated scroll handler for both mobile and tablet
   useEffect(() => {
@@ -96,10 +108,10 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
       <div className="md:hidden w-full">
         <div
           ref={mobileScrollContainerRef}
-          className="flex overflow-x-auto snap-x snap-mandatory gap-0 px-0 pb-2 no-scrollbar cursor-grab"
+          className="flex overflow-x-auto snap-x snap-mandatory gap-0 px-0 pb-2 no-scrollbar"
           onMouseDown={(e) => handleMouseDown(e, mobileScrollContainerRef.current)}
           onMouseLeave={() => handleMouseLeave(mobileScrollContainerRef.current)}
-          onMouseUp={() => handleMouseUp(mobileScrollContainerRef.current)}
+          onMouseUp={handleMouseUp}
           onMouseMove={(e) => handleMouseMove(e, mobileScrollContainerRef.current)}
         >
           {images.map((image, index) => {
@@ -126,6 +138,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
                       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><filter id="b"><feGaussianBlur stdDeviation="12" /></filter><image preserveAspectRatio="none" filter="url(#b)" href="${image.url}" width="100%" height="100%"/></svg>`
                     ).toString('base64')}`}
+                    onDragStart={(e) => e.preventDefault()}
                   />
                 )}
               </Container>
@@ -154,10 +167,10 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
       <div className="hidden md:block xl:hidden w-full h-full">
         <div
           ref={tabletScrollContainerRef}
-          className="flex overflow-x-auto snap-x snap-mandatory gap-0 px-0 pb-2 no-scrollbar cursor-grab"
+          className="flex overflow-x-auto snap-x snap-mandatory gap-0 px-0 pb-2 no-scrollbar"
           onMouseDown={(e) => handleMouseDown(e, tabletScrollContainerRef.current)}
           onMouseLeave={() => handleMouseLeave(tabletScrollContainerRef.current)}
-          onMouseUp={() => handleMouseUp(tabletScrollContainerRef.current)}
+          onMouseUp={handleMouseUp}
           onMouseMove={(e) => handleMouseMove(e, tabletScrollContainerRef.current)}
         >
           {images.map((image, index) => {
@@ -184,6 +197,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
                       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><filter id="b"><feGaussianBlur stdDeviation="12" /></filter><image preserveAspectRatio="none" filter="url(#b)" href="${image.url}" width="100%" height="100%"/></svg>`
                     ).toString('base64')}`}
+                    onDragStart={(e) => e.preventDefault()}
                   />
                 )}
               </Container>
@@ -240,6 +254,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
                       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><filter id="b"><feGaussianBlur stdDeviation="12" /></filter><image preserveAspectRatio="none" filter="url(#b)" href="${image.url}" width="100%" height="100%"/></svg>`
                     ).toString('base64')}`}
+                    onDragStart={(e) => e.preventDefault()}
                   />
                 )}
               </Container>
