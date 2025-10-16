@@ -21,7 +21,7 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       countryCode,
       queryParams: {
         handle: brandAndHandle,
-        fields: "handle,title,description,thumbnail,*images,+categories.*,+product_sku.*,+brand.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,*options.*,*options.values.*",
+        fields: "handle,title,description,thumbnail,*images,+categories.*,+product_sku.*,+brand.*,+brands.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,*options.*,*options.values.*",
         limit: 1,
       },
     }).then(({ response }) => response.products[0])
@@ -43,14 +43,27 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       countryCode,
       queryParams: {
         handle: handleCandidate,
-        // ensure brand is included to validate
-        fields: "handle,title,description,thumbnail,*images,+categories.*,+product_sku.*,+brand.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,*options.*,*options.values.*",
+        // ensure brand/brands are included to validate
+        fields: "handle,title,description,thumbnail,*images,+categories.*,+product_sku.*,+brand.*,+brands.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,*options.*,*options.values.*",
         limit: 1,
       },
     }).then(({ response }) => response.products[0])
 
     if (candidate) {
-      return { product: candidate, brandSlug: brandCandidate }
+      // Check if this is a multi-brand product
+      const brands = (candidate as any).brands
+      if (brands && Array.isArray(brands) && brands.length > 0) {
+        // Check if all brand slugs match when joined
+        const productBrandSlugs = brands.map((b: any) => b.slug).join("-")
+        if (productBrandSlugs === brandCandidate) {
+          return { product: candidate, brandSlug: brandCandidate }
+        }
+      }
+
+      // Fall back to single brand check for backward compatibility
+      if ((candidate as any).brand?.slug === brandCandidate) {
+        return { product: candidate, brandSlug: brandCandidate }
+      }
     }
   }
 

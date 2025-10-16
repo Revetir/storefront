@@ -4,6 +4,7 @@ import { Text } from "@medusajs/ui"
 import { listProducts } from "@lib/data/products"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { getAlgoliaProductPrice, isAlgoliaProduct } from "@lib/util/get-algolia-product-price"
+import { formatBrandNames, getProductUrl } from "@lib/util/brand-utils"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
@@ -47,6 +48,9 @@ function ProductPreview({
     cheapestPrice = priceResult.cheapestPrice
   }
 
+  const brandNames = formatBrandNames((product as any)?.brand || (product as any)?.brands)
+  const productUrl = getProductUrl((product as any)?.brand || (product as any)?.brands, product.handle)
+
   const handleMouseEnter = useCallback(() => {
     // Debounce prefetch by 300ms to avoid excessive prefetching
     if (prefetchTimeoutRef.current) {
@@ -54,12 +58,10 @@ function ProductPreview({
     }
 
     prefetchTimeoutRef.current = setTimeout(() => {
-      const brandSlug = ((product as any)?.brand?.slug as string)
-      const productUrl = `/products/${brandSlug}-${product.handle}`
       const localizedUrl = countryCode ? `/${countryCode}${productUrl}` : productUrl
       router.prefetch(localizedUrl)
     }, 300)
-  }, [product, countryCode, router])
+  }, [productUrl, countryCode, router])
 
   const handleMouseLeave = useCallback(() => {
     // Cancel prefetch if user leaves before timeout
@@ -71,7 +73,7 @@ function ProductPreview({
 
   return (
     <LocalizedClientLink
-      href={`/products/${((product as any)?.brand?.slug as string)}-${product.handle}`}
+      href={productUrl}
       className="group"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -89,14 +91,14 @@ function ProductPreview({
             priority={priority}
           />
         </div>
-        
+
         {/* Product info - using CSS Grid for consistent alignment */}
         <div className="mt-3 flex-1 grid grid-rows-[auto_auto_1fr] gap-1">
           {/* Brand - fixed height for alignment */}
           <div className="h-5 flex items-center">
-            {(product as any)?.brand?.name && (
+            {brandNames && (
               <p className="text-ui-fg-muted text-small font-medium leading-snug uppercase truncate">
-                {(product as any).brand.name}
+                {brandNames}
               </p>
             )}
           </div>

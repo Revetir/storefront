@@ -17,6 +17,7 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import ShoppingBag from "@modules/common/icons/shopping-bag"
 import { usePathname } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
+import { getProductUrl } from "@lib/util/brand-utils"
 
 const CartDropdown = ({
   cart: cartState,
@@ -140,9 +141,7 @@ const CartDropdown = ({
                           data-testid="cart-item"
                         >
                           <LocalizedClientLink
-                            href={(item.product as any)?.brand?.slug
-                              ? `/products/${(item.product as any).brand.slug}-${item.product_handle}`
-                              : `/products/${item.product_handle}`}
+                            href={getProductUrl((item.product as any)?.brands || (item.product as any)?.brand, item.product_handle || '')}
                             className="w-24"
                           >
                             <Thumbnail
@@ -166,9 +165,7 @@ const CartDropdown = ({
                                   )}
                                   <h3 className="text-base-regular overflow-hidden text-ellipsis">
                                     <LocalizedClientLink
-                                      href={(item.product as any)?.brand?.slug
-                                        ? `/products/${(item.product as any).brand.slug}-${item.product_handle}`
-                                        : `/products/${item.product_handle}`}
+                                      href={getProductUrl((item.product as any)?.brands || (item.product as any)?.brand, item.product_handle || '')}
                                       data-testid="product-link"
                                     >
                                       {item.title}

@@ -8,6 +8,7 @@ import { HttpTypes } from '@medusajs/types'
 import { getAlgoliaProductPrice, isAlgoliaProduct } from '@lib/util/get-algolia-product-price'
 import { getProductPrice } from '@lib/util/get-product-price'
 import { Text, clx } from "@medusajs/ui"
+import { getProductUrl } from '@lib/util/brand-utils'
 
 interface NewArrivalsProps {
   countryCode: string
@@ -100,11 +101,9 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                   }
 
                   return (
-                    <Link 
-                      key={product.id} 
-                      href={(product as any).brand?.slug 
-                        ? `/products/${(product as any).brand.slug}-${product.handle}`
-                        : `/products/${product.handle}`}
+                    <Link
+                      key={product.id}
+                      href={getProductUrl((product as any).brands || (product as any).brand, product.handle || '')}
                       className="group hover:opacity-80 transition-opacity"
                     >
                     <div className="aspect-square relative mb-4">

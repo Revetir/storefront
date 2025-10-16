@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { 
-  getSupportedRegions, 
+import {
+  getSupportedRegions,
   generateSitemapXML,
-  SitemapPage 
+  SitemapPage
 } from '../../lib/sitemap-utils'
+import { getProductUrl } from '../../lib/util/brand-utils'
 
 async function getAllProducts() {
   try {
@@ -21,7 +22,7 @@ async function getAllProducts() {
     
     while (true) {
       const response = await fetch(
-        `${backendUrl}/store/products?limit=${limit}&offset=${offset}&fields=handle,brand.*,updated_at,created_at,status`,
+        `${backendUrl}/store/products?limit=${limit}&offset=${offset}&fields=handle,brand.*,brands.*,updated_at,created_at,status`,
         {
           method: 'GET',
           headers: {
@@ -88,18 +89,18 @@ export async function GET(request: NextRequest) {
     const productPages: SitemapPage[] = []
     
     filteredProducts.forEach((product: any) => {
-      const productPath = `/products/${product.brand.slug}-${product.handle}`
-      const lastModified = product.updated_at 
-        ? new Date(product.updated_at).toISOString().split('T')[0] 
+      const productPath = getProductUrl(product.brands || product.brand, product.handle)
+      const lastModified = product.updated_at
+        ? new Date(product.updated_at).toISOString().split('T')[0]
         : currentDate
-      
+
       // Generate hreflang annotations for this product across all regions
       const hreflang: { [lang: string]: string } = {}
       regions.forEach(region => {
         const url = `${baseUrl}/${region.code}${productPath}`
         hreflang[region.hreflang] = url
       })
-      
+
       // Create page entries for each region
       regions.forEach(region => {
         productPages.push({

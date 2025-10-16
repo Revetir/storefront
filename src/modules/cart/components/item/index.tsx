@@ -14,6 +14,7 @@ import Spinner from "@modules/common/icons/spinner"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { useState } from "react"
 import { trackQuantityChange } from "@lib/util/analytics"
+import { formatBrandNames, getProductUrl, getPrimaryBrand } from "@lib/util/brand-utils"
 
 type ItemProps = {
   item: HttpTypes.StoreCartLineItem
@@ -38,10 +39,11 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       })
 
       // Track quantity change
+      const primaryBrand = getPrimaryBrand((item.product as any)?.brand || (item.product as any)?.brands)
       trackQuantityChange({
         product_id: item.product_id || '',
         product_name: item.product_title,
-        brand: (item.product as any)?.brand?.name,
+        brand: primaryBrand?.name,
         variant_id: item.variant_id,
         variant_name: item.variant?.title,
         old_quantity: oldQuantity,
@@ -58,13 +60,15 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   const maxQtyFromInventory = 10
   const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
 
+  const brandNames = formatBrandNames((item.product as any)?.brand || (item.product as any)?.brands)
+  const productUrl = getProductUrl((item.product as any)?.brand || (item.product as any)?.brands, item.product_handle || "")
+  const primaryBrand = getPrimaryBrand((item.product as any)?.brand || (item.product as any)?.brands)
+
   return (
     <Table.Row className="w-full" data-testid="product-row">
       <Table.Cell className="!pl-0 p-4 w-24">
         <LocalizedClientLink
-          href={(item.product as any)?.brand?.slug
-            ? `/products/${(item.product as any).brand.slug}-${item.product_handle}`
-            : `/products/${item.product_handle}`}
+          href={productUrl}
           className={clx("flex", {
             "w-16": type === "preview",
             "lg:w-24 w-12": type === "full",
@@ -75,7 +79,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             images={item.variant?.product?.images}
             size="square"
             product={{
-              brand: { name: (item.product as any)?.brand?.name || "Product" },
+              brand: { name: primaryBrand?.name || "Product" },
               title: item.product_title || ""
             } as any}
           />
@@ -83,9 +87,9 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       </Table.Cell>
 
       <Table.Cell className="text-left">
-        {(item.product as any)?.brand?.name && (
+        {brandNames && (
           <Text className="text-ui-fg-muted text-small font-medium uppercase mb-1">
-            {(item.product as any).brand.name}
+            {brandNames}
           </Text>
         )}
         <Text
@@ -106,7 +110,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
               trackingData={{
                 product_id: item.product_id,
                 product_name: item.product_title,
-                brand: (item.product as any)?.brand?.name,
+                brand: primaryBrand?.name,
                 variant_id: item.variant_id,
                 variant_name: item.variant?.title,
                 quantity: item.quantity,

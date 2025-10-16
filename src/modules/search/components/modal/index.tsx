@@ -7,6 +7,7 @@ import { getSearchClient } from "@lib/util/search-privacy"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Search from "@modules/common/icons/search"
+import { getProductUrl } from "@lib/util/brand-utils"
 
 // Helper for click outside
 function useOnClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void) {
@@ -243,11 +244,9 @@ const ProductHit = ({ hit }: { hit: any }) => {
         <h3>{hit.title}</h3>
         {/* <p className="text-sm text-gray-500">{hit.description}</p> */}
       </div>
-      <Link 
-        href={hit.brand?.slug 
-          ? `/products/${hit.brand.slug}-${hit.handle}`
-          : `/products/${hit.handle}`} 
-        className="absolute right-0 top-0 w-full h-full" 
+      <Link
+        href={getProductUrl(hit.brands || hit.brand, hit.handle || '')}
+        className="absolute right-0 top-0 w-full h-full"
         aria-label={`View Product: ${hit.title}`}
         onClick={handleProductClick}
       />

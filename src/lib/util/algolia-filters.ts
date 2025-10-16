@@ -12,6 +12,11 @@ export interface AlgoliaProduct {
     name: string
     slug: string
   }
+  brands?: Array<{
+    id: string
+    name: string
+    slug: string
+  }>
   gender: string[]
   allCategoryHandles: string[]
   allCategoryIds: string[]
@@ -110,7 +115,7 @@ export async function searchProductsWithAlgolia(
 
     // Brand filter
     if (brandSlug) {
-      filters.push(`brand.slug:"${brandSlug}"`)
+      filters.push(`(brand.slug:"${brandSlug}" OR brands.slug:"${brandSlug}")`)
     }
 
 

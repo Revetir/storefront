@@ -1,4 +1,5 @@
 import { HttpTypes } from "@medusajs/types"
+import { getProductUrl } from "./brand-utils"
 
 interface ProductJsonLdProps {
   product: HttpTypes.StoreProduct
@@ -236,7 +237,7 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
       }),
       ...(categories.length > 0 && { "category": categories[0] }),
       ...(allImages.length > 0 && { "image": allImages }),
-      "url": `https://revetir.com/${countryCode}/products/${brand?.slug ? `${brand.slug}-` : ''}${product.handle}`,
+      "url": `https://revetir.com/${countryCode}${getProductUrl((product as any).brands || brand, product.handle || '')}`,
       ...(color && { "color": color }),
       ...(material && { "material": material }),
       ...(gender && { "gender": gender }),
@@ -354,7 +355,7 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
       }),
       ...(categories.length > 0 && { "category": categories[0] }),
       ...(allImages.length > 0 && { "image": allImages }),
-      "url": `https://revetir.com/${countryCode}/products/${brand?.slug ? `${brand.slug}-` : ''}${product.handle}`,
+      "url": `https://revetir.com/${countryCode}${getProductUrl((product as any).brands || brand, product.handle || '')}`,
       ...(color && { "color": color }),
       ...(material && { "material": material }),
       ...(gender && { "gender": gender }),
