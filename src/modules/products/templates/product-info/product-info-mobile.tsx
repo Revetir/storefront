@@ -9,7 +9,7 @@ type ProductInfoMobileProps = {
 }
 
 const ProductInfoMobile = ({ product }: ProductInfoMobileProps) => {
-  const brands = getBrandsArray((product as any).brand || (product as any).brands)
+  const brands = getBrandsArray((product as any).brand)
 
   return (
     <div className="flex flex-col gap-y-2">

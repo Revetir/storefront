@@ -22,7 +22,7 @@ async function getAllProducts() {
     
     while (true) {
       const response = await fetch(
-        `${backendUrl}/store/products?limit=${limit}&offset=${offset}&fields=handle,brand.*,brands.*,updated_at,created_at,status`,
+        `${backendUrl}/store/products?limit=${limit}&offset=${offset}&fields=handle,brand.*,updated_at,created_at,status`,
         {
           method: 'GET',
           headers: {
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
     const productPages: SitemapPage[] = []
     
     filteredProducts.forEach((product: any) => {
-      const productPath = getProductUrl(product.brands || product.brand, product.handle)
+      const productPath = getProductUrl(product.brand, product.handle)
       const lastModified = product.updated_at
         ? new Date(product.updated_at).toISOString().split('T')[0]
         : currentDate

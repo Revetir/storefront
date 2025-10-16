@@ -9,7 +9,7 @@ type ProductInfoProps = {
 }
 
 const ProductInfo = ({ product }: ProductInfoProps) => {
-  const brands = getBrandsArray((product as any).brand || (product as any).brands)
+  const brands = getBrandsArray((product as any).brand)
 
   return (
     <div id="product-info" className="relative flex lg:items-center lg:min-h-[80vh]">

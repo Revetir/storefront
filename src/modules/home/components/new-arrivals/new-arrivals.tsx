@@ -103,7 +103,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                   return (
                     <Link
                       key={product.id}
-                      href={getProductUrl((product as any).brands || (product as any).brand, product.handle || '')}
+                      href={getProductUrl((product as any).brand, product.handle || '')}
                       className="group hover:opacity-80 transition-opacity"
                     >
                     <div className="aspect-square relative mb-4">

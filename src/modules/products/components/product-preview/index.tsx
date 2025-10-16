@@ -48,8 +48,8 @@ function ProductPreview({
     cheapestPrice = priceResult.cheapestPrice
   }
 
-  const brandNames = formatBrandNames((product as any)?.brand || (product as any)?.brands)
-  const productUrl = getProductUrl((product as any)?.brand || (product as any)?.brands, product.handle)
+  const brandNames = formatBrandNames((product as any)?.brand)
+  const productUrl = getProductUrl((product as any)?.brand, product.handle)
 
   const handleMouseEnter = useCallback(() => {
     // Debounce prefetch by 300ms to avoid excessive prefetching
