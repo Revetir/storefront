@@ -30,10 +30,10 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       return null
     }
 
-    // Normalize brands to array and get first brand slug
+    // Normalize brands to array and get all brand slugs joined
     const brandData = (product as any).brands
     const brands = Array.isArray(brandData) ? brandData : (brandData ? [brandData] : [])
-    const brandSlug = brands.length > 0 ? brands[0].slug : ""
+    const brandSlug = brands.length > 0 ? brands.map((b: any) => b.slug).join("-") : ""
 
     return { product, brandSlug }
   }
@@ -63,7 +63,7 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
         // Check if all brand slugs match when joined
         const productBrandSlugs = brands.map((b: any) => b.slug).join("-")
         if (productBrandSlugs === brandCandidate) {
-          return { product: candidate, brandSlug: brandCandidate }
+          return { product: candidate, brandSlug: productBrandSlugs }
         }
       }
     }
@@ -154,16 +154,18 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   // Normalize brands data
   const brandData = (product as any).brands
   const brands = Array.isArray(brandData) ? brandData : (brandData ? [brandData] : [])
+  const allBrandSlugs = brands.length > 0 ? brands.map((b: any) => b.slug).join("-") : ""
   const firstBrand = brands.length > 0 ? brands[0] : null
 
   // If the URL was handle-only, enforce canonical brand-handle URL
-  if (!brandAndHandle.includes("-") && firstBrand?.slug) {
-    const correctUrl = `/${params.countryCode}/products/${firstBrand.slug}-${product.handle}`
+  if (!brandAndHandle.includes("-") && allBrandSlugs) {
+    const correctUrl = `/${params.countryCode}/products/${allBrandSlugs}-${product.handle}`
     redirect(correctUrl)
   }
 
-  if (firstBrand?.slug && firstBrand.slug !== brandSlug) {
-    const correctUrl = `/${params.countryCode}/products/${firstBrand.slug}-${product.handle}`
+  // If brand slug in URL doesn't match all product brands, redirect to correct URL
+  if (allBrandSlugs && allBrandSlugs !== brandSlug) {
+    const correctUrl = `/${params.countryCode}/products/${allBrandSlugs}-${product.handle}`
     redirect(correctUrl)
   }
 
@@ -217,11 +219,11 @@ export default async function ProductPage(props: Props) {
   // Normalize brands data for resolved product
   const resolvedBrandData = (resolvedProduct as any).brands
   const resolvedBrands = Array.isArray(resolvedBrandData) ? resolvedBrandData : (resolvedBrandData ? [resolvedBrandData] : [])
-  const resolvedFirstBrand = resolvedBrands.length > 0 ? resolvedBrands[0] : null
+  const resolvedAllBrandSlugs = resolvedBrands.length > 0 ? resolvedBrands.map((b: any) => b.slug).join("-") : ""
 
   // If the URL was handle-only, enforce canonical brand-handle URL
-  if (!brandAndHandle.includes("-") && resolvedFirstBrand?.slug) {
-    const correctUrl = `/${params.countryCode}/products/${resolvedFirstBrand.slug}-${resolvedProduct.handle}`
+  if (!brandAndHandle.includes("-") && resolvedAllBrandSlugs) {
+    const correctUrl = `/${params.countryCode}/products/${resolvedAllBrandSlugs}-${resolvedProduct.handle}`
     redirect(correctUrl)
   }
 
@@ -242,10 +244,11 @@ export default async function ProductPage(props: Props) {
   // Normalize brands data for priced product
   const pricedBrandData = (pricedProduct as any).brands
   const pricedBrands = Array.isArray(pricedBrandData) ? pricedBrandData : (pricedBrandData ? [pricedBrandData] : [])
-  const pricedFirstBrand = pricedBrands.length > 0 ? pricedBrands[0] : null
+  const pricedAllBrandSlugs = pricedBrands.length > 0 ? pricedBrands.map((b: any) => b.slug).join("-") : ""
 
-  if (pricedFirstBrand?.slug && pricedFirstBrand.slug !== brandSlug) {
-    const correctUrl = `/${params.countryCode}/products/${pricedFirstBrand.slug}-${pricedProduct.handle}`
+  // If brand slug in URL doesn't match all product brands, redirect to correct URL
+  if (pricedAllBrandSlugs && pricedAllBrandSlugs !== brandSlug) {
+    const correctUrl = `/${params.countryCode}/products/${pricedAllBrandSlugs}-${pricedProduct.handle}`
     redirect(correctUrl)
   }
 
