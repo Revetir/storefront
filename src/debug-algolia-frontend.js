@@ -17,7 +17,7 @@ async function debugFrontendSearch() {
       const firstProduct = genderResult.hits[0]
       console.log("First product:")
       console.log("- Title:", firstProduct.title)
-      console.log("- Brand:", firstProduct.brand)
+      console.log("- Brands:", firstProduct.brands)
       console.log("- Gender:", firstProduct.gender)
       console.log("- All Category Handles:", firstProduct.allCategoryHandles)
       console.log("- Categories:", firstProduct.categories)
@@ -37,7 +37,7 @@ async function debugFrontendSearch() {
       const firstProduct = categoryResult.hits[0]
       console.log("First product:")
       console.log("- Title:", firstProduct.title)
-      console.log("- Brand:", firstProduct.brand)
+      console.log("- Brands:", firstProduct.brands)
       console.log("- All Category Handles:", firstProduct.allCategoryHandles)
     }
     
@@ -55,7 +55,7 @@ async function debugFrontendSearch() {
       const firstProduct = brandResult.hits[0]
       console.log("First product:")
       console.log("- Title:", firstProduct.title)
-      console.log("- Brand:", firstProduct.brand)
+      console.log("- Brands:", firstProduct.brands)
       console.log("- All Category Handles:", firstProduct.allCategoryHandles)
     }
     
@@ -74,7 +74,7 @@ async function debugFrontendSearch() {
       const firstProduct = combinedResult.hits[0]
       console.log("First product:")
       console.log("- Title:", firstProduct.title)
-      console.log("- Brand:", firstProduct.brand)
+      console.log("- Brands:", firstProduct.brands)
       console.log("- All Category Handles:", firstProduct.allCategoryHandles)
     }
     

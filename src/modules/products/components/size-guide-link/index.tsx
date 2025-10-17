@@ -19,7 +19,7 @@ const SizeGuideLink: React.FC<SizeGuideLinkProps> = ({ product }) => {
     trackSizeGuideOpened({
       product_id: product.id || '',
       product_name: product.title,
-      brand: (product as any)?.brand?.name,
+      brand: (product as any)?.brands?.[0]?.name,
     })
   }
 

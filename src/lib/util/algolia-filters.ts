@@ -7,11 +7,6 @@ export interface AlgoliaProduct {
   title: string
   handle: string
   thumbnail?: string
-  brand?: {
-    id: string
-    name: string
-    slug: string
-  }
   brands?: Array<{
     id: string
     name: string
@@ -113,9 +108,9 @@ export async function searchProductsWithAlgolia(
       filters.push(`allCategoryHandles:"${fullCategoryHandle}"`)
     }
 
-    // Brand filter - brand is now always an array
+    // Brand filter - brands is now always an array
     if (brandSlug) {
-      filters.push(`brand.slug:"${brandSlug}"`)
+      filters.push(`brands.slug:"${brandSlug}"`)
     }
 
 
@@ -156,7 +151,7 @@ export async function searchProductsWithAlgolia(
           'title',
           'handle',
           'thumbnail',
-          'brand',
+          'brands',
           'gender',
           'allCategoryHandles',
           'categories',

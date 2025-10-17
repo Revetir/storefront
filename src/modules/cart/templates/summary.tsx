@@ -33,14 +33,17 @@ const Summary = ({ cart }: SummaryProps) => {
     trackCheckoutInitiated({
       cart_value: cart.total,
       item_count: cart.items?.length || 0,
-      items: cart.items?.map(item => ({
-        product_id: item.product_id,
-        product_name: item.product_title,
-        brand: (item.product as any)?.brands?.[0]?.name,
-        variant_id: item.variant_id,
-        quantity: item.quantity,
-        price: item.unit_price,
-      })),
+      items: cart.items?.map(item => {
+        const product = item.product as any
+        return {
+          product_id: item.product_id,
+          product_name: item.product_title,
+          brand: product?.brands?.[0]?.name || undefined,
+          variant_id: item.variant_id,
+          quantity: item.quantity,
+          price: item.unit_price,
+        }
+      }),
     })
   }
 
