@@ -25,7 +25,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
                   {brand.name.toUpperCase()}
                 </LocalizedClientLink>
                 {index < brands.length - 1 && (
-                  <span className="text-medium text-ui-fg-muted">×</span>
+                  <span className="text-medium text-ui-fg-muted lowercase">x</span>
                 )}
               </React.Fragment>
             ))}

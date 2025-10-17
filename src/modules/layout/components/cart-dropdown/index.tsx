@@ -159,7 +159,7 @@ const CartDropdown = ({
                               <div className="flex items-start justify-between">
                                 <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
                                   {formatBrandNames((item.product as any)?.brand) && (
-                                    <span className="text-ui-fg-muted text-xs font-medium uppercase mb-0.5">
+                                    <span className="text-ui-fg-muted text-xs font-medium uppercase mb-0.5 truncate block">
                                       {formatBrandNames((item.product as any)?.brand)}
                                     </span>
                                   )}

@@ -12,7 +12,7 @@ export type BrandData = {
 /**
  * Format brand names for display with collaboration separator
  * @param brands - Array of brand objects or single brand object
- * @returns Formatted string like "Nike x Off-White" or single brand name
+ * @returns Formatted string like "NIKE x OFF-WHITE" with lowercase x separator
  */
 export function formatBrandNames(brands: BrandData[] | BrandData | undefined | null): string {
   if (!brands) {
@@ -29,6 +29,7 @@ export function formatBrandNames(brands: BrandData[] | BrandData | undefined | n
     return ""
   }
 
+  // Use lowercase 'x' as separator (brands are typically displayed uppercase)
   return brands.map(b => b.name).join(" x ")
 }
 
