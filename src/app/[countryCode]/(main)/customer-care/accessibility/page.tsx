@@ -13,7 +13,7 @@ export default function AccessibilityPage() {
         
         <div className="prose prose-gray max-w-none">
           <p className="text-gray-600 mb-8">
-            Fashion should be accessible to everyone. Revetir is committed 
+            Fashion should be accessible to everyone. REVETIR is committed 
             to ensuring that our website and services are accessible to people with disabilities 
             and provide an inclusive experience for all users.
           </p>

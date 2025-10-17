@@ -72,8 +72,9 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
   return null
 }
 
-// Revalidate product pages every hour (3600 seconds)
-export const revalidate = 3600
+// TODO: Increase cache back to 3600 (1 hour) or 86400 (24 hours) after testing
+// Temporarily set to 0 for testing brand updates - revalidate on every request
+export const revalidate = 0 // Was: 3600
 
 export async function generateStaticParams() {
   try {

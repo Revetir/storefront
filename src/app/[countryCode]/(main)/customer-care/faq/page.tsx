@@ -23,7 +23,7 @@ const faqData: FAQCategory[] = [
       },
       {
         question: "Do I need to make an account to place an order?",
-        answer: "No, all you need is an email to place and receive updates for your order. To checkout faster, easily view and manage orders online, and gain access to exclusive discounts and sales, we recommend creating a Revetir account."
+        answer: "No, all you need is an email to place and receive updates for your order. To checkout faster, easily view and manage orders online, and gain access to exclusive discounts and sales, we recommend creating a REVETIR account."
       },
       {
         question: "Can I cancel or modify my order?",

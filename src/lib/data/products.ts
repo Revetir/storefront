@@ -56,13 +56,15 @@ export const listProducts = async ({
     offset,
     region_id: region.id,
     // Optimized fields - only fetch what's needed by default
-    fields: queryParams?.fields || "id,title,handle,thumbnail,+brand.*",
+    fields: queryParams?.fields || "id,title,handle,thumbnail,+brands.*",
     ...queryParams,
   }
 
+  // TODO: Increase revalidate back to 3600 (1 hour) or 86400 (24 hours) after testing
+  // Temporarily set to 0 for testing brand updates - revalidate on every request
   const next = {
     ...(await getCacheOptions("products")),
-    revalidate: 3600, // 1 hour revalidation for better performance
+    revalidate: 0, // Was: 3600 - 1 hour revalidation for better performance
     tags: [`products-${region.id}`], // Simplified cache tags
   }
   

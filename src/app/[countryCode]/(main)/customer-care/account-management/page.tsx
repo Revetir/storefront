@@ -22,21 +22,21 @@ export default function ManageAccountPage() {
       <div>
         <h2 className="text-xl font-bold mb-4">Guest Orders</h2>
         <p className="mb-8">
-          To modify any order(s) placed as a guest you must create a Revetir account using the same e-mail address used to place the guest order(s).
+          To modify any order(s) placed as a guest you must create a REVETIR account using the same e-mail address used to place the guest order(s).
         </p>
       </div>
 
       <div>
         <h2 className="text-xl font-bold mb-4">Forgot Your Password</h2>
         <p className="mb-4">
-          If you have forgotten or misplaced your Revetir account password, you will be able to follow this link very soon.
+          If you have forgotten or misplaced your REVETIR account password, you will be able to follow this link very soon.
         </p>
       </div>
 
       <div>
         <h2 className="text-xl font-bold mb-4">Account-related Inquiries & Data Protection</h2>
         <p className="mb-4">
-          At Revetir, you have control over your personal information. As a customer, you may access your account at any time by logging into your account online.
+          At REVETIR, you have control over your personal information. As a customer, you may access your account at any time by logging into your account online.
         </p>
         <p className="mb-4">
           If you have an account, you may access it at any time on the Login page.
