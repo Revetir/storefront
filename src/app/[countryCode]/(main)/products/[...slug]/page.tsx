@@ -21,7 +21,7 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       countryCode,
       queryParams: {
         handle: brandAndHandle,
-        fields: "handle,title,description,thumbnail,*images,+categories.*,+product_sku.*,+brand.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,*options.*,*options.values.*",
+        fields: "handle,title,description,thumbnail,*images,+categories.*,+product_sku.*,+brands.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,*options.*,*options.values.*",
         limit: 1,
       },
     }).then(({ response }) => response.products[0])
@@ -30,7 +30,12 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       return null
     }
 
-    return { product, brandSlug: (product as any).brand?.slug || "" }
+    // Normalize brands to array and get first brand slug
+    const brandData = (product as any).brands
+    const brands = Array.isArray(brandData) ? brandData : (brandData ? [brandData] : [])
+    const brandSlug = brands.length > 0 ? brands[0].slug : ""
+
+    return { product, brandSlug }
   }
 
   // Try candidates by increasing the brand portion from the left
@@ -44,14 +49,14 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
       queryParams: {
         handle: handleCandidate,
         // ensure brand/brands are included to validate
-        fields: "handle,title,description,thumbnail,*images,+categories.*,+product_sku.*,+brand.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,*options.*,*options.values.*",
+        fields: "handle,title,description,thumbnail,*images,+categories.*,+product_sku.*,+brands.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,*options.*,*options.values.*",
         limit: 1,
       },
     }).then(({ response }) => response.products[0])
 
     if (candidate) {
-      // Get brand(s) - the 'brand' field returns an array when isList: true
-      const brandData = (candidate as any).brand
+      // Get brand(s) - the 'brands' field returns an array when isList: true
+      const brandData = (candidate as any).brands
       const brands = Array.isArray(brandData) ? brandData : (brandData ? [brandData] : [])
 
       if (brands.length > 0) {
@@ -83,7 +88,7 @@ export async function generateStaticParams() {
     const promises = countryCodes.map(async (country) => {
       const { response } = await listProducts({
         countryCode: country,
-        queryParams: { limit: 100, fields: "handle,+brand.*" },
+        queryParams: { limit: 100, fields: "handle,+brands.*" },
       })
 
       return {
@@ -97,10 +102,19 @@ export async function generateStaticParams() {
     return countryProducts
       .flatMap((countryData) =>
         countryData.products
-          .filter((product) => product.handle && (product as any).brand?.slug)
+          .filter((product) => {
+            const brandData = (product as any).brands
+            const brands = Array.isArray(brandData) ? brandData : (brandData ? [brandData] : [])
+            return product.handle && brands.length > 0 && brands[0]?.slug
+          })
           .map((product) => ({
             countryCode: countryData.country,
-            slug: [`${(product as any).brand.slug}-${product.handle}`],
+            slug: (() => {
+              const brandData = (product as any).brands
+              const brands = Array.isArray(brandData) ? brandData : (brandData ? [brandData] : [])
+              const brandSlug = brands.map((b: any) => b.slug).join("-")
+              return [`${brandSlug}-${product.handle}`]
+            })(),
           }))
       )
       .filter((param) => param.slug[0])
@@ -136,19 +150,24 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
   const { product, brandSlug } = resolved
 
+  // Normalize brands data
+  const brandData = (product as any).brands
+  const brands = Array.isArray(brandData) ? brandData : (brandData ? [brandData] : [])
+  const firstBrand = brands.length > 0 ? brands[0] : null
+
   // If the URL was handle-only, enforce canonical brand-handle URL
-  if (!brandAndHandle.includes("-") && (product as any).brand?.slug) {
-    const correctUrl = `/${params.countryCode}/products/${(product as any).brand.slug}-${product.handle}`
+  if (!brandAndHandle.includes("-") && firstBrand?.slug) {
+    const correctUrl = `/${params.countryCode}/products/${firstBrand.slug}-${product.handle}`
     redirect(correctUrl)
   }
 
-  if ((product as any).brand?.slug && (product as any).brand.slug !== brandSlug) {
-    const correctUrl = `/${params.countryCode}/products/${(product as any).brand.slug}-${product.handle}`
+  if (firstBrand?.slug && firstBrand.slug !== brandSlug) {
+    const correctUrl = `/${params.countryCode}/products/${firstBrand.slug}-${product.handle}`
     redirect(correctUrl)
   }
 
   // Generate meta description using the new format
-  const brandName = (product as any).brand?.name
+  const brandName = firstBrand?.name
   const metaDescription = `Buy ${brandName} ${product.title} on sale at REVETIR.com. Free Shipping & Returns in the US.`
 
   // Generate JSON-LD structured data
@@ -194,9 +213,14 @@ export default async function ProductPage(props: Props) {
 
   const { product: resolvedProduct, brandSlug } = resolved
 
+  // Normalize brands data for resolved product
+  const resolvedBrandData = (resolvedProduct as any).brands
+  const resolvedBrands = Array.isArray(resolvedBrandData) ? resolvedBrandData : (resolvedBrandData ? [resolvedBrandData] : [])
+  const resolvedFirstBrand = resolvedBrands.length > 0 ? resolvedBrands[0] : null
+
   // If the URL was handle-only, enforce canonical brand-handle URL
-  if (!brandAndHandle.includes("-") && (resolvedProduct as any).brand?.slug) {
-    const correctUrl = `/${params.countryCode}/products/${(resolvedProduct as any).brand.slug}-${resolvedProduct.handle}`
+  if (!brandAndHandle.includes("-") && resolvedFirstBrand?.slug) {
+    const correctUrl = `/${params.countryCode}/products/${resolvedFirstBrand.slug}-${resolvedProduct.handle}`
     redirect(correctUrl)
   }
 
@@ -206,7 +230,7 @@ export default async function ProductPage(props: Props) {
       handle: resolvedProduct.handle,
       // Ensure all relations needed by the template are present
       fields:
-        "*images,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.title,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,+metadata,+tags,+categories.*,+product_sku.*,+brand.*,*options.*,*options.values.*",
+        "*images,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.title,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,+metadata,+tags,+categories.*,+product_sku.*,+brands.*,*options.*,*options.values.*",
     },
   }).then(({ response }) => response.products[0])
 
@@ -214,8 +238,13 @@ export default async function ProductPage(props: Props) {
     notFound()
   }
 
-  if ((pricedProduct as any).brand?.slug && (pricedProduct as any).brand.slug !== brandSlug) {
-    const correctUrl = `/${params.countryCode}/products/${(pricedProduct as any).brand.slug}-${pricedProduct.handle}`
+  // Normalize brands data for priced product
+  const pricedBrandData = (pricedProduct as any).brands
+  const pricedBrands = Array.isArray(pricedBrandData) ? pricedBrandData : (pricedBrandData ? [pricedBrandData] : [])
+  const pricedFirstBrand = pricedBrands.length > 0 ? pricedBrands[0] : null
+
+  if (pricedFirstBrand?.slug && pricedFirstBrand.slug !== brandSlug) {
+    const correctUrl = `/${params.countryCode}/products/${pricedFirstBrand.slug}-${pricedProduct.handle}`
     redirect(correctUrl)
   }
 
@@ -237,7 +266,7 @@ export default async function ProductPage(props: Props) {
     queryParams: {
       ...queryParams,
       // Include brand to build canonical links in ProductPreview
-      fields: "handle,title,thumbnail,+brand.*",
+      fields: "handle,title,thumbnail,+brands.*",
     },
     countryCode: params.countryCode,
   }).then(({ response }) => {
