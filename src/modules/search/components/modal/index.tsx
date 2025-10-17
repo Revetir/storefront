@@ -238,14 +238,14 @@ const ProductHit = ({ hit }: { hit: any }) => {
         loading="lazy"
       />
       <div className="flex flex-col gap-y-1">
-        {hit.brand?.name && (
-          <span className="text-xs text-gray-500 uppercase tracking-wide">{hit.brand.name}</span>
+        {hit.brands?.[0]?.name && (
+          <span className="text-xs text-gray-500 uppercase tracking-wide">{hit.brands[0].name}</span>
         )}
         <h3>{hit.title}</h3>
         {/* <p className="text-sm text-gray-500">{hit.description}</p> */}
       </div>
       <Link
-        href={getProductUrl(hit.brands || hit.brand, hit.handle || '')}
+        href={getProductUrl(hit.brands, hit.handle || '')}
         className="absolute right-0 top-0 w-full h-full"
         aria-label={`View Product: ${hit.title}`}
         onClick={handleProductClick}
