@@ -17,7 +17,7 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import ShoppingBag from "@modules/common/icons/shopping-bag"
 import { usePathname } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
-import { getProductUrl, formatBrandNames } from "@lib/util/brand-utils"
+import { getProductUrl, formatBrandNames, getBrandsArray } from "@lib/util/brand-utils"
 
 const CartDropdown = ({
   cart: cartState,
@@ -158,9 +158,14 @@ const CartDropdown = ({
                             <div className="flex flex-col flex-1">
                               <div className="flex items-start justify-between">
                                 <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
-                                  {formatBrandNames((item.product as any)?.brand) && (
-                                    <span className="text-ui-fg-muted text-xs font-medium uppercase mb-0.5 truncate block">
-                                      {formatBrandNames((item.product as any)?.brand)}
+                                  {getBrandsArray((item.product as any)?.brand).length > 0 && (
+                                    <span className="text-ui-fg-muted text-xs font-medium mb-0.5 truncate block">
+                                      {getBrandsArray((item.product as any)?.brand).map((brand, idx, arr) => (
+                                        <Fragment key={brand.slug}>
+                                          <span className="uppercase">{brand.name}</span>
+                                          {idx < arr.length - 1 && <span> x </span>}
+                                        </Fragment>
+                                      ))}
                                     </span>
                                   )}
                                   <h3 className="text-base-regular overflow-hidden text-ellipsis">

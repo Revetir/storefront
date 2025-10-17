@@ -4,7 +4,7 @@ import { Text } from "@medusajs/ui"
 import { listProducts } from "@lib/data/products"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { getAlgoliaProductPrice, isAlgoliaProduct } from "@lib/util/get-algolia-product-price"
-import { formatBrandNames, getProductUrl } from "@lib/util/brand-utils"
+import { formatBrandNames, getProductUrl, getBrandsArray } from "@lib/util/brand-utils"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
@@ -48,7 +48,7 @@ function ProductPreview({
     cheapestPrice = priceResult.cheapestPrice
   }
 
-  const brandNames = formatBrandNames((product as any)?.brand)
+  const brands = getBrandsArray((product as any)?.brand)
   const productUrl = getProductUrl((product as any)?.brand, product.handle)
 
   const handleMouseEnter = useCallback(() => {
@@ -96,9 +96,14 @@ function ProductPreview({
         <div className="mt-3 flex-1 grid grid-rows-[auto_auto_1fr] gap-1">
           {/* Brand - fixed height for alignment */}
           <div className="h-5 flex items-center">
-            {brandNames && (
-              <p className="text-ui-fg-muted text-small font-medium leading-snug uppercase truncate">
-                {brandNames}
+            {brands.length > 0 && (
+              <p className="text-ui-fg-muted text-small font-medium leading-snug truncate">
+                {brands.map((brand, idx, arr) => (
+                  <React.Fragment key={brand.slug}>
+                    <span className="uppercase">{brand.name}</span>
+                    {idx < arr.length - 1 && <span> x </span>}
+                  </React.Fragment>
+                ))}
               </p>
             )}
           </div>

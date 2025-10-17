@@ -12,9 +12,9 @@ import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Spinner from "@modules/common/icons/spinner"
 import Thumbnail from "@modules/products/components/thumbnail"
-import { useState } from "react"
+import React, { useState } from "react"
 import { trackQuantityChange } from "@lib/util/analytics"
-import { formatBrandNames, getProductUrl, getPrimaryBrand } from "@lib/util/brand-utils"
+import { formatBrandNames, getProductUrl, getPrimaryBrand, getBrandsArray } from "@lib/util/brand-utils"
 
 type ItemProps = {
   item: HttpTypes.StoreCartLineItem
@@ -60,7 +60,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   const maxQtyFromInventory = 10
   const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
 
-  const brandNames = formatBrandNames((item.product as any)?.brand)
+  const brands = getBrandsArray((item.product as any)?.brand)
   const productUrl = getProductUrl((item.product as any)?.brand, item.product_handle || "")
   const primaryBrand = getPrimaryBrand((item.product as any)?.brand)
 
@@ -87,9 +87,14 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       </Table.Cell>
 
       <Table.Cell className="text-left">
-        {brandNames && (
-          <Text className="text-ui-fg-muted text-small font-medium uppercase mb-1">
-            {brandNames}
+        {brands.length > 0 && (
+          <Text className="text-ui-fg-muted text-small font-medium mb-1">
+            {brands.map((brand, idx, arr) => (
+              <React.Fragment key={brand.slug}>
+                <span className="uppercase">{brand.name}</span>
+                {idx < arr.length - 1 && <span> x </span>}
+              </React.Fragment>
+            ))}
           </Text>
         )}
         <Text
