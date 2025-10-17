@@ -17,7 +17,7 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import ShoppingBag from "@modules/common/icons/shopping-bag"
 import { usePathname } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
-import { getProductUrl } from "@lib/util/brand-utils"
+import { getProductUrl, formatBrandNames } from "@lib/util/brand-utils"
 
 const CartDropdown = ({
   cart: cartState,
@@ -141,7 +141,7 @@ const CartDropdown = ({
                           data-testid="cart-item"
                         >
                           <LocalizedClientLink
-                            href={getProductUrl((item.product as any)?.brands || (item.product as any)?.brand, item.product_handle || '')}
+                            href={getProductUrl((item.product as any)?.brand, item.product_handle || '')}
                             className="w-24"
                           >
                             <Thumbnail
@@ -158,14 +158,14 @@ const CartDropdown = ({
                             <div className="flex flex-col flex-1">
                               <div className="flex items-start justify-between">
                                 <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
-                                  {(item.product as any)?.brand?.name && (
+                                  {formatBrandNames((item.product as any)?.brand) && (
                                     <span className="text-ui-fg-muted text-xs font-medium uppercase mb-0.5">
-                                      {(item.product as any).brand.name}
+                                      {formatBrandNames((item.product as any)?.brand)}
                                     </span>
                                   )}
                                   <h3 className="text-base-regular overflow-hidden text-ellipsis">
                                     <LocalizedClientLink
-                                      href={getProductUrl((item.product as any)?.brands || (item.product as any)?.brand, item.product_handle || '')}
+                                      href={getProductUrl((item.product as any)?.brand, item.product_handle || '')}
                                       data-testid="product-link"
                                     >
                                       {item.title}

@@ -113,9 +113,9 @@ export async function searchProductsWithAlgolia(
       filters.push(`allCategoryHandles:"${fullCategoryHandle}"`)
     }
 
-    // Brand filter
+    // Brand filter - brand is now always an array
     if (brandSlug) {
-      filters.push(`(brand.slug:"${brandSlug}" OR brands.slug:"${brandSlug}")`)
+      filters.push(`brand.slug:"${brandSlug}"`)
     }
 
 
