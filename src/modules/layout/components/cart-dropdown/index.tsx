@@ -141,7 +141,7 @@ const CartDropdown = ({
                           data-testid="cart-item"
                         >
                           <LocalizedClientLink
-                            href={getProductUrl((item.product as any)?.brand, item.product_handle || '')}
+                            href={getProductUrl((item.product as any)?.brands, item.product_handle || '')}
                             className="w-24"
                           >
                             <Thumbnail
@@ -149,7 +149,7 @@ const CartDropdown = ({
                               images={item.variant?.product?.images}
                               size="square"
                               product={{
-                                brand: { name: (item.product as any)?.brand?.name || "Product" },
+                                brand: { name: (item.product as any)?.brands?.[0]?.name || "Product" },
                                 title: item.title || ""
                               } as any}
                             />
@@ -158,9 +158,9 @@ const CartDropdown = ({
                             <div className="flex flex-col flex-1">
                               <div className="flex items-start justify-between">
                                 <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
-                                  {getBrandsArray((item.product as any)?.brand).length > 0 && (
+                                  {getBrandsArray((item.product as any)?.brands).length > 0 && (
                                     <span className="text-ui-fg-muted text-xs font-medium mb-0.5 truncate block">
-                                      {getBrandsArray((item.product as any)?.brand).map((brand, idx, arr) => (
+                                      {getBrandsArray((item.product as any)?.brands).map((brand, idx, arr) => (
                                         <Fragment key={brand.slug}>
                                           <span className="uppercase">{brand.name}</span>
                                           {idx < arr.length - 1 && <span> x </span>}
@@ -170,7 +170,7 @@ const CartDropdown = ({
                                   )}
                                   <h3 className="text-base-regular overflow-hidden text-ellipsis">
                                     <LocalizedClientLink
-                                      href={getProductUrl((item.product as any)?.brand, item.product_handle || '')}
+                                      href={getProductUrl((item.product as any)?.brands, item.product_handle || '')}
                                       data-testid="product-link"
                                     >
                                       {item.title}

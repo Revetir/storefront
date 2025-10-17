@@ -39,7 +39,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       })
 
       // Track quantity change
-      const primaryBrand = getPrimaryBrand((item.product as any)?.brand)
+      const primaryBrand = getPrimaryBrand((item.product as any)?.brands)
       trackQuantityChange({
         product_id: item.product_id || '',
         product_name: item.product_title,
@@ -60,9 +60,9 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   const maxQtyFromInventory = 10
   const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
 
-  const brands = getBrandsArray((item.product as any)?.brand)
-  const productUrl = getProductUrl((item.product as any)?.brand, item.product_handle || "")
-  const primaryBrand = getPrimaryBrand((item.product as any)?.brand)
+  const brands = getBrandsArray((item.product as any)?.brands)
+  const productUrl = getProductUrl((item.product as any)?.brands, item.product_handle || "")
+  const primaryBrand = getPrimaryBrand((item.product as any)?.brands)
 
   return (
     <Table.Row className="w-full" data-testid="product-row">

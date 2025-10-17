@@ -103,13 +103,13 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                   return (
                     <Link
                       key={product.id}
-                      href={getProductUrl((product as any).brand, product.handle || '')}
+                      href={getProductUrl((product as any).brands, product.handle || '')}
                       className="group hover:opacity-80 transition-opacity"
                     >
                     <div className="aspect-square relative mb-4">
                       <Image
                         src={product.thumbnail || "/images/imgi_1_elementor-placeholder-image.png"}
-                        alt={`${(product as any).brand?.name || 'Product'} ${product.title}`}
+                        alt={`${(product as any).brands?.[0]?.name || 'Product'} ${product.title}`}
                         fill
                         className="rounded-md object-cover"
                         priority={index < 3} // Priority loading for first 3 visible products
@@ -119,7 +119,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                     </div>
                     <div className="text-left">
                       <p className="text-sm text-gray-500 mb-1 uppercase tracking-wide">
-                        {(product as any).brand?.name || 'Product'}
+                        {(product as any).brands?.[0]?.name || 'Product'}
                       </p>
                       <h3 className="font-medium text-lg mb-1">{product.title}</h3>
                       <div className="text-gray-600">

@@ -68,7 +68,7 @@ export default function ProductActions({
       trackVariantSelected({
         product_id: product.id || '',
         product_name: product.title,
-        brand: (product as any)?.brand?.name,
+        brand: (product as any)?.brands?.[0]?.name,
         option_type: option.title || 'unknown',
         option_value: value,
       })
@@ -132,7 +132,7 @@ export default function ProductActions({
       trackAddToBag({
         product_id: product.id || '',
         product_name: product.title,
-        brand: (product as any)?.brand?.name,
+        brand: (product as any)?.brands?.[0]?.name,
         variant_id: selectedVariant.id,
         variant_name: selectedVariant.title,
         price: selectedVariant.calculated_price?.calculated_amount,

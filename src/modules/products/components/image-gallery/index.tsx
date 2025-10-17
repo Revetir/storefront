@@ -21,7 +21,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
   const [scrollLeft, setScrollLeft] = useState(0)
 
   const getAltText = (index: number) => {
-    const brand = (product as any).brand?.name || "Product"
+    const brand = (product as any).brands?.[0]?.name || "Product"
     const title = product.title || ""
     return `${brand} ${title} ${index + 1}`.trim()
   }

@@ -22,7 +22,7 @@ async function getAllProducts() {
     
     while (true) {
       const response = await fetch(
-        `${backendUrl}/store/products?limit=${limit}&offset=${offset}&fields=handle,brand.*,updated_at,created_at,status`,
+        `${backendUrl}/store/products?limit=${limit}&offset=${offset}&fields=handle,brands.*,updated_at,created_at,status`,
         {
           method: 'GET',
           headers: {
@@ -76,20 +76,24 @@ export async function GET(request: NextRequest) {
     
     const filteredProducts = products.filter((product: any) => {
       const hasHandle = !!product.handle
-      const hasBrand = !!product.brand?.slug
+      const brandData = (product as any).brands
+      const brands = Array.isArray(brandData) ? brandData : (brandData ? [brandData] : [])
+      const hasBrand = brands.length > 0 && brands[0]?.slug
       const hasStatus = 'status' in product
       const isPublished = product.status === 'published'
       return hasHandle && hasBrand && (!hasStatus || isPublished)
     })
-    
+
     // Get all supported regions
     const regions = await getSupportedRegions()
-    
+
     // Generate product pages for all regions
     const productPages: SitemapPage[] = []
-    
+
     filteredProducts.forEach((product: any) => {
-      const productPath = getProductUrl(product.brand, product.handle)
+      const brandData = (product as any).brands
+      const brands = Array.isArray(brandData) ? brandData : (brandData ? [brandData] : [])
+      const productPath = getProductUrl(brands, product.handle)
       const lastModified = product.updated_at
         ? new Date(product.updated_at).toISOString().split('T')[0]
         : currentDate

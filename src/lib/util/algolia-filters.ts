@@ -209,7 +209,7 @@ export function convertAlgoliaProductsToMedusaFormat(products: AlgoliaProduct[])
     title: product.title,
     handle: product.handle,
     thumbnail: product.thumbnail,
-    brand: product.brand,
+    brands: product.brands,
     categories: product.categories,
     metadata: product.metadata,
     variants: product.variants,

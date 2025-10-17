@@ -141,7 +141,9 @@ function formatPrice(price: number): string {
 }
 
 export function generateProductJsonLd({ product, region, countryCode }: ProductJsonLdProps): string {
-  const brand = (product as any)?.brand
+  const brandData = (product as any)?.brands
+  const brands = Array.isArray(brandData) ? brandData : (brandData ? [brandData] : [])
+  const brand = brands[0]
   const brandName = brand?.name
   const productSku = (product as any)?.product_sku?.sku
   const images = product.images?.map(img => img.url) || []
