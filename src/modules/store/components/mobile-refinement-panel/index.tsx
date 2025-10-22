@@ -9,12 +9,14 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import CategorySidebar from "@modules/layout/components/category-sidebar"
 import TypeRefinementList from "@modules/store/components/refinement-list/product-types"
 import BrandRefinementList from "../refinement-list/product-brands"
+import ColorRefinementList from "../refinement-list/product-colors"
 
 interface MobileRefinementPanelProps {
   isOpen: boolean
   onClose: () => void
   sortBy: SortOptions
   selectedBrand?: string
+  selectedColor?: string
   initialTab?: "refine" | "sort"
 }
 
@@ -23,6 +25,7 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
   onClose,
   sortBy,
   selectedBrand,
+  selectedColor,
   initialTab = "refine"
 }) => {
   const [activeTab, setActiveTab] = useState<"refine" | "sort">(initialTab)
@@ -99,6 +102,12 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
                 <div>
                   <h3 className="text-sm font-medium uppercase tracking-wide mb-3">Brands</h3>
                   <BrandRefinementList selectedBrand={selectedBrand} />
+                </div>
+
+                {/* Colors */}
+                <div>
+                  <h3 className="text-sm font-medium uppercase tracking-wide mb-3">Colors</h3>
+                  <ColorRefinementList selectedColor={selectedColor} />
                 </div>
               </div>
             ) : (

@@ -12,6 +12,7 @@ export interface AlgoliaProduct {
     name: string
     slug: string
   }>
+  product_sku?: string | null
   gender: string[]
   allCategoryHandles: string[]
   allCategoryIds: string[]
@@ -48,6 +49,7 @@ export interface AlgoliaProduct {
   minPrice?: number | null
   minPriceUs?: number | null
   minPriceEu?: number | null
+  primaryColor?: string
   created_at: string
   updated_at: string
 }
@@ -64,6 +66,7 @@ export interface AlgoliaFilterOptions {
   gender?: "men" | "women"
   categoryHandle?: string
   brandSlug?: string
+  color?: string
   sortBy?: SortOptions
   page?: number
   hitsPerPage?: number
@@ -79,6 +82,7 @@ export async function searchProductsWithAlgolia(
     gender,
     categoryHandle,
     brandSlug,
+    color,
     sortBy = "created_at",
     page = 1,
     hitsPerPage = 20
@@ -111,6 +115,11 @@ export async function searchProductsWithAlgolia(
     // Brand filter - brands is now always an array
     if (brandSlug) {
       filters.push(`brands.slug:"${brandSlug}"`)
+    }
+
+    // Color filter
+    if (color) {
+      filters.push(`primaryColor:"${color}"`)
     }
 
 
@@ -152,6 +161,7 @@ export async function searchProductsWithAlgolia(
           'handle',
           'thumbnail',
           'brands',
+          'product_sku',
           'gender',
           'allCategoryHandles',
           'categories',
@@ -160,6 +170,7 @@ export async function searchProductsWithAlgolia(
           'minPrice',
           'minPriceUs',
           'minPriceEu',
+          'primaryColor',
           'created_at',
           'updated_at'
         ]

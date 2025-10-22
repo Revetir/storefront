@@ -2,10 +2,12 @@
 
 import { Suspense, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
+import { useSearchParams } from "next/navigation"
 
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
 import MobileRefinementPanel from "@modules/store/components/mobile-refinement-panel"
+import ColorRefinementList from "@modules/store/components/refinement-list/product-colors"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
 import PaginatedProductsClient from "./paginated-products-client"
@@ -37,6 +39,8 @@ const StoreTemplate = ({
   const sort = sortBy || "created_at"
   const [isMobileRefinementOpen, setIsMobileRefinementOpen] = useState(false)
   const [activeRefinementTab, setActiveRefinementTab] = useState<"refine" | "sort">("refine")
+  const searchParams = useSearchParams()
+  const selectedColor = searchParams.get('color') || undefined
 
   return (
     <>
@@ -121,23 +125,30 @@ const StoreTemplate = ({
 
           {/* Small Desktop Layout - lg to 2xl (1024px - 1536px) */}
           <div className="hidden lg:block 2xl:hidden">
-            <div className="flex justify-center w-full">
-              <div className="max-w-[1200px] px-6">
-                <div className="flex gap-8">
-                  {/* Compact Sidebar */}
-                  <div className="w-64 flex-shrink-0">
-                    <RefinementList sortBy={sort} selectedBrand={brand} />
-                  </div>
-                  {/* Product Grid */}
-                  <div className="flex-1">
-                    <PaginatedProductsClient
-                      products={products}
-                      region={region}
-                      totalPages={totalPages}
-                      currentPage={currentPage}
-                    />
+            <div className="relative">
+              <div className="flex justify-center w-full">
+                <div className="max-w-[1200px] px-6">
+                  <div className="flex gap-8">
+                    {/* Compact Sidebar */}
+                    <div className="w-64 flex-shrink-0">
+                      <RefinementList sortBy={sort} selectedBrand={brand} />
+                    </div>
+                    {/* Product Grid */}
+                    <div className="flex-1">
+                      <PaginatedProductsClient
+                        products={products}
+                        region={region}
+                        totalPages={totalPages}
+                        currentPage={currentPage}
+                      />
+                    </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Color Filter - Right Side */}
+              <div className="absolute right-9 top-0 z-10">
+                <ColorRefinementList selectedColor={selectedColor} />
               </div>
             </div>
           </div>
@@ -145,11 +156,16 @@ const StoreTemplate = ({
           {/* Large Desktop Layout - 2xl+ (>= 1536px) */}
           <div className="hidden 2xl:block">
             <div className="relative">
-              {/* Desktop Refinement List - Original positioning */}
+              {/* Desktop Refinement List - Left Side */}
               <div className="absolute left-9 top-0 z-10">
                 <RefinementList sortBy={sort} selectedBrand={brand} />
               </div>
-              
+
+              {/* Color Filter - Right Side */}
+              <div className="absolute right-9 top-0 z-10">
+                <ColorRefinementList selectedColor={selectedColor} />
+              </div>
+
               <div className="flex justify-center w-full">
                 <div className="max-w-[1200px] px-4 md:px-6">
                   <PaginatedProductsClient
@@ -171,6 +187,7 @@ const StoreTemplate = ({
         onClose={() => setIsMobileRefinementOpen(false)}
         sortBy={sort}
         selectedBrand={brand}
+        selectedColor={selectedColor}
         initialTab={activeRefinementTab}
       />
     </>
