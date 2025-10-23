@@ -28,7 +28,7 @@ export default function PaginatedProductsClient({
   if (!products || products.length === 0) {
     return (
       <div className="w-full py-12 text-center">
-        <p className="text-ui-fg-muted">No products found.</p>
+        <p className="text-ui-fg-muted">Our selection is updated daily — please check back soon for new arrivals</p>
       </div>
     )
   }

@@ -27,8 +27,7 @@ type SectionTab = 'brands' | 'categories' | 'colors'
 
 const COLOR_MAPPING = [
   'Black', 'White', 'Gray', 'Blue', 'Red', 'Brown', 'Green', 'Pink',
-  'Purple', 'Yellow', 'Orange', 'Multicolor', 'Transparent', 'Iridescent',
-  'Gold', 'Silver', 'Rose Gold'
+  'Purple', 'Yellow', 'Orange', 'Multicolor', 'Gold', 'Silver'
 ]
 
 const COLOR_STYLES: Record<string, string> = {
@@ -43,12 +42,9 @@ const COLOR_STYLES: Record<string, string> = {
   'Purple': 'text-purple-600',
   'Yellow': 'text-yellow-500',
   'Orange': 'text-orange-500',
-  'Multicolor': 'bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent',
-  'Transparent': 'text-gray-400 italic',
-  'Iridescent': 'bg-gradient-to-r from-purple-400 via-pink-500 to-yellow-500 bg-clip-text text-transparent',
+  'Multicolor': 'bg-gradient-to-r from-red-500 via-green-500 via-blue-500 to-purple-500 bg-clip-text text-transparent',
   'Gold': 'text-yellow-600',
-  'Silver': 'text-gray-400',
-  'Rose Gold': 'text-rose-400'
+  'Silver': 'text-gray-400'
 }
 
 const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
@@ -70,6 +66,13 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const params = useParams()
+
+  // Sync activeTab with initialTab when panel opens
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(initialTab)
+    }
+  }, [isOpen, initialTab])
 
   // Parse current page state into filters on mount/pathname change
   useEffect(() => {
@@ -309,46 +312,50 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
           <>
             {/* Applied Filters Pills Row */}
             {filterCount > 0 && (
-              <div className="px-6 py-3 border-b border-gray-200 flex items-center gap-2 flex-wrap flex-shrink-0">
-                {selectedFilters.brand && (
-                  <div className="bg-gray-100 text-black px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                    <span className="uppercase">{selectedFilters.brand}</span>
-                    <button
-                      onClick={() => handleRemoveFilter('brand')}
-                      className="hover:text-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-                )}
-                {selectedFilters.category && (
-                  <div className="bg-gray-100 text-black px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                    <span className="uppercase">{selectedFilters.category}</span>
-                    <button
-                      onClick={() => handleRemoveFilter('category')}
-                      className="hover:text-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-                )}
-                {selectedFilters.color && (
-                  <div className="bg-gray-100 text-black px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                    <span className="uppercase">{selectedFilters.color}</span>
-                    <button
-                      onClick={() => handleRemoveFilter('color')}
-                      className="hover:text-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-                )}
-                <button
-                  onClick={handleClearFilters}
-                  className="text-sm uppercase text-gray-600 hover:text-black underline"
-                >
-                  CLEAR
-                </button>
+              <div className="px-4 py-3 border-b border-gray-200 flex items-center gap-1.5 flex-shrink-0 overflow-x-auto">
+                <div className="flex items-center gap-1.5 flex-nowrap">
+                  {selectedFilters.brand && (
+                    <div className="bg-gray-100 text-black px-2.5 py-1 rounded-full text-xs flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
+                      <span className="uppercase">
+                        {brands.find(b => b.slug === selectedFilters.brand)?.name || selectedFilters.brand}
+                      </span>
+                      <button
+                        onClick={() => handleRemoveFilter('brand')}
+                        className="hover:text-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                  {selectedFilters.category && (
+                    <div className="bg-gray-100 text-black px-2.5 py-1 rounded-full text-xs flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
+                      <span className="uppercase">{selectedFilters.category}</span>
+                      <button
+                        onClick={() => handleRemoveFilter('category')}
+                        className="hover:text-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                  {selectedFilters.color && (
+                    <div className="bg-gray-100 text-black px-2.5 py-1 rounded-full text-xs flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
+                      <span className="uppercase">{selectedFilters.color}</span>
+                      <button
+                        onClick={() => handleRemoveFilter('color')}
+                        className="hover:text-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                  <button
+                    onClick={handleClearFilters}
+                    className="text-xs uppercase text-gray-600 hover:text-black underline whitespace-nowrap flex-shrink-0 px-1"
+                  >
+                    CLEAR
+                  </button>
+                </div>
               </div>
             )}
 

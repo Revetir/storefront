@@ -41,12 +41,6 @@ const RefinementList = ({ sortBy, 'data-testid': dataTestId, selectedBrand }: Re
 
   return (
     <div className="flex lg:flex-col gap-12 py-4 mb-8 lg:px-0 lg:min-w-[250px]">
-      <SortProducts 
-        sortBy={sortBy} 
-        setQueryParams={setQueryParams} 
-        data-testid={dataTestId}
-        disabled={isPending}
-      />
       <CategorySidebar className="border-r-0 p-0 w-full" />
       <BrandRefinementList selectedBrand={selectedBrand} />
     </div>

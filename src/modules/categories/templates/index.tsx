@@ -1,13 +1,13 @@
 "use client"
 
-import { Suspense, useState } from "react"
-import { usePathname, useSearchParams } from "next/navigation"
+import { Suspense, useState, useCallback, useTransition } from "react"
+import { usePathname, useSearchParams, useRouter } from "next/navigation"
 
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
 import MobileRefinementPanel from "@modules/store/components/mobile-refinement-panel"
 import ColorRefinementList from "@modules/store/components/refinement-list/product-colors"
-import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import SortProducts, { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
 import PaginatedProductsClient from "@modules/store/templates/paginated-products-client"
 import EditorialIntro from "@modules/store/components/editorial-intro"
@@ -57,6 +57,24 @@ const CategoryTemplate = ({
   const sort = sortBy || "created_at"
   const [isMobileRefinementOpen, setIsMobileRefinementOpen] = useState(false)
   const [activeRefinementTab, setActiveRefinementTab] = useState<"refine" | "sort">("refine")
+  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams)
+      params.set(name, value)
+      return params.toString()
+    },
+    [searchParams]
+  )
+
+  const setQueryParams = (name: string, value: string) => {
+    const query = createQueryString(name, value)
+    startTransition(() => {
+      router.push(`${pathname}?${query}`)
+    })
+  }
 
   return (
     <>
@@ -64,47 +82,49 @@ const CategoryTemplate = ({
         <div className="w-full">
           {/* Mobile/Tablet Layout - Show mobile refinement buttons when grid is 2 columns */}
           <div className="lg:hidden">
+            {/* Editorial Intro - Show above refinement bar on mobile */}
             <div className="w-full max-w-[1440px] mx-auto px-4">
-              {/* Editorial Intro - Show above refinement bar on mobile */}
-              <EditorialIntro 
-                title={editorialTitle || ""} 
-                blurb={editorialBlurb} 
+              <EditorialIntro
+                title={editorialTitle || ""}
+                blurb={editorialBlurb}
               />
-              
-              <div className="mb-6">
-                <div className="flex w-full border border-gray-300">
-                  <button
-                    onClick={() => {
-                      setActiveRefinementTab("refine")
-                      setIsMobileRefinementOpen(true)
-                    }}
-                    className="w-[70%] px-4 py-2 text-sm uppercase tracking-wide hover:bg-gray-50 border-r border-gray-300"
-                  >
-                    Refine
-                  </button>
-                  <button
-                    onClick={() => {
-                      setActiveRefinementTab("sort")
-                      setIsMobileRefinementOpen(true)
-                    }}
-                    className="w-[30%] px-4 py-2 text-sm uppercase tracking-wide hover:bg-gray-50"
-                  >
-                    Sort
-                  </button>
-                </div>
+            </div>
+
+            {/* Refine/Sort Buttons - Full width */}
+            <div className="mb-6">
+              <div className="flex w-full border border-gray-300">
+                <button
+                  onClick={() => {
+                    setActiveRefinementTab("refine")
+                    setIsMobileRefinementOpen(true)
+                  }}
+                  className="w-[70%] px-4 py-2 text-sm uppercase tracking-wide hover:bg-gray-50 border-r border-gray-300"
+                >
+                  Refine
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveRefinementTab("sort")
+                    setIsMobileRefinementOpen(true)
+                  }}
+                  className="w-[30%] px-4 py-2 text-sm uppercase tracking-wide hover:bg-gray-50"
+                >
+                  Sort
+                </button>
               </div>
-              
-              <div className="w-full">
-                <PaginatedProductsClient
-                  products={products}
-                  region={region}
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                  editorialTitle={editorialTitle}
-                  editorialBlurb={editorialBlurb}
-                  showEditorialIntro={false}
-                />
-              </div>
+            </div>
+
+            {/* Product Grid */}
+            <div className="w-full max-w-[1440px] mx-auto px-4">
+              <PaginatedProductsClient
+                products={products}
+                region={region}
+                totalPages={totalPages}
+                currentPage={currentPage}
+                editorialTitle={editorialTitle}
+                editorialBlurb={editorialBlurb}
+                showEditorialIntro={false}
+              />
             </div>
           </div>
 
@@ -128,8 +148,13 @@ const CategoryTemplate = ({
                 />
               </div>
               
-              {/* Right Sidebar - Color filter */}
+              {/* Right Sidebar - Sort and Color filter */}
               <div className="w-64 flex-shrink-0 px-4">
+                <SortProducts
+                  sortBy={sort}
+                  setQueryParams={setQueryParams}
+                  disabled={isPending}
+                />
                 <ColorRefinementList selectedColor={selectedColor} />
               </div>
             </div>
