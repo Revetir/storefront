@@ -42,13 +42,13 @@ const SortProducts = ({
 
   return (
     <div className="flex flex-col gap-2 my-4">
-      <span className="text-xs uppercase text-gray-500 mb-1 text-right">Sort by</span>
+      <span className="text-xs uppercase text-gray-500 mb-1">Sort by</span>
       {sortOptions.map((option) => (
         <button
           key={option.value}
           onClick={() => handleSelect(option.value as SortOptions)}
           disabled={disabled}
-          className={`text-right px-2 py-1 cursor-pointer uppercase text-xs font-sans ${
+          className={`text-left px-2 py-1 cursor-pointer uppercase text-xs font-sans ${
             sortBy === option.value
               ? "font-bold underline text-black"
               : "text-gray-700 hover:text-black"
