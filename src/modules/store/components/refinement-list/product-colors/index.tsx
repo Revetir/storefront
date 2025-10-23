@@ -31,12 +31,12 @@ export default function ColorRefinementList({ selectedColor: propSelectedColor }
 
   return (
     <div className="flex flex-col gap-1 my-4">
-      <span className="text-xs uppercase text-gray-500 mb-1">Colors</span>
+      <span className="text-xs uppercase text-gray-500 mb-1 text-right">Colors</span>
       {COLOR_MAPPING.map((color) => (
         <button
           key={color}
           onClick={() => handleSelect(color)}
-          className={`text-left px-2 py-1 cursor-pointer uppercase text-xs font-sans ${
+          className={`text-right px-2 py-1 cursor-pointer uppercase text-xs font-sans ${
             selectedColor === color
               ? "font-bold underline text-black"
               : "text-gray-700 hover:text-black"

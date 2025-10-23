@@ -27,7 +27,7 @@ type SectionTab = 'brands' | 'categories' | 'colors'
 
 const COLOR_MAPPING = [
   'Black', 'White', 'Gray', 'Blue', 'Red', 'Brown', 'Green', 'Pink',
-  'Purple', 'Yellow', 'Orange', 'Multicolor', 'Gold', 'Silver'
+  'Purple', 'Yellow', 'Orange', 'Gold', 'Silver'
 ]
 
 const COLOR_STYLES: Record<string, string> = {
@@ -42,7 +42,6 @@ const COLOR_STYLES: Record<string, string> = {
   'Purple': 'text-purple-600',
   'Yellow': 'text-yellow-500',
   'Orange': 'text-orange-500',
-  'Multicolor': 'bg-gradient-to-r from-red-500 via-green-500 via-blue-500 to-purple-500 bg-clip-text text-transparent',
   'Gold': 'text-yellow-600',
   'Silver': 'text-gray-400'
 }
