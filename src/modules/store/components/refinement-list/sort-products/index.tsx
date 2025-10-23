@@ -41,7 +41,7 @@ const SortProducts = ({
   }
 
   return (
-    <div className="flex flex-col gap-2 my-4 w-full">
+    <div className="flex flex-col gap-2 my-4">
       <span className="text-xs uppercase text-gray-500 mb-1 whitespace-nowrap">Sort by</span>
       {sortOptions.map((option) => (
         <button

@@ -40,7 +40,7 @@ export default function ColorRefinementList({ selectedColor: propSelectedColor }
   }
 
   return (
-    <div className="flex flex-col gap-1 my-4 w-full">
+    <div className="flex flex-col gap-1 my-4">
       <span className="text-xs uppercase text-gray-500 mb-1 whitespace-nowrap">Colors</span>
       {/* ALL COLORS option */}
       <button
