@@ -9,6 +9,26 @@ const COLOR_MAPPING = [
   'Gold', 'Silver', 'Rose Gold'
 ]
 
+const COLOR_STYLES: Record<string, string> = {
+  'Black': 'text-black',
+  'White': 'text-gray-300',
+  'Gray': 'text-gray-500',
+  'Blue': 'text-blue-600',
+  'Red': 'text-red-600',
+  'Brown': 'text-amber-700',
+  'Green': 'text-green-600',
+  'Pink': 'text-pink-500',
+  'Purple': 'text-purple-600',
+  'Yellow': 'text-yellow-500',
+  'Orange': 'text-orange-500',
+  'Multicolor': 'bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent',
+  'Transparent': 'text-gray-400 italic',
+  'Iridescent': 'bg-gradient-to-r from-purple-400 via-pink-500 to-yellow-500 bg-clip-text text-transparent',
+  'Gold': 'text-yellow-600',
+  'Silver': 'text-gray-400',
+  'Rose Gold': 'text-rose-400'
+}
+
 export default function ColorRefinementList({ selectedColor: propSelectedColor }: { selectedColor?: string }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -39,9 +59,9 @@ export default function ColorRefinementList({ selectedColor: propSelectedColor }
           onClick={() => handleSelect(color)}
           className={`text-left px-2 py-1 cursor-pointer uppercase text-xs font-sans ${
             selectedColor === color
-              ? "font-bold underline text-black"
-              : "text-gray-700 hover:text-black"
-          }`}
+              ? "font-bold underline"
+              : "hover:opacity-80"
+          } ${COLOR_STYLES[color] || 'text-gray-700'}`}
         >
           {color}
         </button>

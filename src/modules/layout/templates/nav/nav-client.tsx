@@ -15,10 +15,15 @@ interface NavClientProps {
   regions: StoreRegion[]
   customer: any
   categories: Category[]
+  brands: Array<{
+    id: string
+    name: string
+    slug: string
+  }>
   cart?: HttpTypes.StoreCart | null
 }
 
-export default function NavClient({ regions, customer, categories, cart }: NavClientProps) {
+export default function NavClient({ regions, customer, categories, brands, cart }: NavClientProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
@@ -96,6 +101,7 @@ export default function NavClient({ regions, customer, categories, cart }: NavCl
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         categories={categories}
+        brands={brands}
       />
     </>
   )

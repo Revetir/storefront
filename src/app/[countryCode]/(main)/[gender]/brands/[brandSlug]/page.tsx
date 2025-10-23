@@ -12,6 +12,7 @@ type Props = {
   searchParams: Promise<{
     sortBy?: SortOptions
     page?: string
+    color?: string
   }>
 }
 
@@ -63,7 +64,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export default async function BrandPage(props: Props) {
   const searchParams = await props.searchParams
   const params = await props.params
-  const { sortBy, page } = searchParams
+  const { sortBy, page, color } = searchParams
   const { countryCode, gender, brandSlug } = params
 
   // Validate gender
@@ -89,6 +90,7 @@ export default async function BrandPage(props: Props) {
   const algoliaResult = await searchProductsWithAlgolia({
     gender: gender as "men" | "women",
     brandSlug: brand.slug,
+    color: color,
     sortBy: sort,
     page: pageNumber,
     hitsPerPage: 20

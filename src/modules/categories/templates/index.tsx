@@ -1,11 +1,12 @@
 "use client"
 
 import { Suspense, useState } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
 import MobileRefinementPanel from "@modules/store/components/mobile-refinement-panel"
+import ColorRefinementList from "@modules/store/components/refinement-list/product-colors"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
 import PaginatedProductsClient from "@modules/store/templates/paginated-products-client"
@@ -36,8 +37,9 @@ const CategoryTemplate = ({
 }) => {
   // Detect if this is a brand page by checking the URL path structure
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const isBrandPage = pathname.includes('/brands/')
-  
+
   // Extract brand slug from URL path for brand pages
   let selectedBrand: string | undefined = undefined
   if (isBrandPage) {
@@ -47,6 +49,10 @@ const CategoryTemplate = ({
       selectedBrand = pathSegments[brandsIndex + 1]
     }
   }
+
+  // Extract color from query params
+  const selectedColor = searchParams.get('color') || undefined
+
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
   const [isMobileRefinementOpen, setIsMobileRefinementOpen] = useState(false)
@@ -66,13 +72,13 @@ const CategoryTemplate = ({
               />
               
               <div className="mb-6">
-                <div className="flex gap-2 w-full">
+                <div className="flex w-full border border-gray-300">
                   <button
                     onClick={() => {
                       setActiveRefinementTab("refine")
                       setIsMobileRefinementOpen(true)
                     }}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
+                    className="w-[70%] px-4 py-2 text-sm uppercase tracking-wide hover:bg-gray-50 border-r border-gray-300"
                   >
                     Refine
                   </button>
@@ -81,7 +87,7 @@ const CategoryTemplate = ({
                       setActiveRefinementTab("sort")
                       setIsMobileRefinementOpen(true)
                     }}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-sm uppercase tracking-wide hover:bg-gray-50"
+                    className="w-[30%] px-4 py-2 text-sm uppercase tracking-wide hover:bg-gray-50"
                   >
                     Sort
                   </button>
@@ -111,7 +117,7 @@ const CategoryTemplate = ({
               </div>
               
               {/* Center Container - Products grid with healthy margins */}
-              <div className="flex-1 px-6 pl-12">
+              <div className="flex-1 px-6">
                 <PaginatedProductsClient
                   products={products}
                   region={region}
@@ -122,9 +128,9 @@ const CategoryTemplate = ({
                 />
               </div>
               
-              {/* Right Sidebar - Smaller width since it's only whitespace and looks visually weird until we add content */}
-              <div className="w-32 flex-shrink-0 px-4">
-                {/* Empty for now - future refinements can go here */}
+              {/* Right Sidebar - Color filter */}
+              <div className="w-64 flex-shrink-0 px-4">
+                <ColorRefinementList selectedColor={selectedColor} />
               </div>
             </div>
           </div>
@@ -137,6 +143,7 @@ const CategoryTemplate = ({
         onClose={() => setIsMobileRefinementOpen(false)}
         sortBy={sort}
         selectedBrand={selectedBrand}
+        selectedColor={selectedColor}
         initialTab={activeRefinementTab}
       />
     </>

@@ -11,12 +11,18 @@ interface MobileSidePanelProps {
   isOpen: boolean
   onClose: () => void
   categories: Category[]
+  brands?: Array<{
+    id: string
+    name: string
+    slug: string
+  }>
 }
 
-const MobileSidePanel: React.FC<MobileSidePanelProps> = ({ 
-  isOpen, 
-  onClose, 
-  categories 
+const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
+  isOpen,
+  onClose,
+  categories,
+  brands = []
 }) => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [activeSubPanel, setActiveSubPanel] = useState<string | null>(null)
@@ -57,6 +63,10 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
 
   const openSubSubPanel = (categoryId: string) => {
     setSubPanelStack(prev => [...prev, {type: 'category', categoryId}])
+  }
+
+  const openBrandsPanel = () => {
+    setSubPanelStack(prev => [...prev, {type: 'brands'}])
   }
 
   const closeSubSubPanel = () => {
@@ -183,21 +193,21 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                 })}
               </div>
 
-              {/* Account and Bag */}
+              {/* Bag and Account */}
               <div className="space-y-2">
-                <LocalizedClientLink 
-                  href="/account" 
-                  className="block text-sm uppercase text-gray-700 hover:text-black"
-                  onClick={onClose}
-                >
-                  Account
-                </LocalizedClientLink>
                 <LocalizedClientLink
                   href="/bag"
                   className="block text-sm uppercase text-gray-700 hover:text-black"
                   onClick={onClose}
                 >
                   Bag
+                </LocalizedClientLink>
+                <LocalizedClientLink
+                  href="/account"
+                  className="block text-sm uppercase text-gray-700 hover:text-black"
+                  onClick={onClose}
+                >
+                  Account
                 </LocalizedClientLink>
               </div>
 
@@ -319,6 +329,9 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                 <h2 className="text-base font-medium uppercase tracking-wide">
                   {(() => {
                     const currentPanel = subPanelStack[subPanelStack.length - 1]
+                    if (currentPanel.type === 'brands') {
+                      return 'Brands'
+                    }
                     if (currentPanel.type === 'category' && currentPanel.categoryId) {
                       const selectedCategory = findCategoryById(categories, currentPanel.categoryId)
                       return selectedCategory ? selectedCategory.name : 'Category'
@@ -333,59 +346,135 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
               <div className="flex-1 overflow-y-auto p-4">
                 {(() => {
                   const currentPanel = subPanelStack[subPanelStack.length - 1]
+
+                  // Brands panel
+                  if (currentPanel.type === 'brands') {
+                    // Sort brands alphabetically
+                    const sortedBrands = [...brands].sort((a, b) =>
+                      a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+                    )
+
+                    // Get gender context from previous panel (if it exists)
+                    const previousPanel = subPanelStack.length > 1 ? subPanelStack[0] : null
+                    let genderPath = 'men' // default
+                    if (previousPanel && previousPanel.type === 'category' && previousPanel.categoryId) {
+                      const parentCat = findCategoryById(categories, previousPanel.categoryId)
+                      if (parentCat?.handle === 'women') {
+                        genderPath = 'women'
+                      }
+                    }
+
+                    return (
+                      <div className="space-y-3">
+                        {sortedBrands.map((brand) => (
+                          <LocalizedClientLink
+                            key={brand.id}
+                            href={`/${genderPath}/brands/${brand.slug}`}
+                            className="block text-sm uppercase text-gray-700 hover:text-black py-2"
+                            onClick={closeAllPanels}
+                          >
+                            {brand.name}
+                          </LocalizedClientLink>
+                        ))}
+                      </div>
+                    )
+                  }
+
+                  // Category panel
                   if (currentPanel.type === 'category' && currentPanel.categoryId) {
                     const selectedCategory = findCategoryById(categories, currentPanel.categoryId)
-                    
+
+                    // Check if this is a gender root category (men or women)
+                    const isGenderRoot = selectedCategory?.handle === 'men' || selectedCategory?.handle === 'women'
+                    const genderPath = selectedCategory?.handle === 'women' ? 'women' : 'men'
+
                     if (selectedCategory && selectedCategory.children && selectedCategory.children.length > 0) {
                       return (
-                        <div className="space-y-3">
-                          {selectedCategory.children.map((childCategory) => {
-                            const hasChildren = childCategory.children && childCategory.children.length > 0
-                            
-                            return (
-                              <div key={childCategory.id} className="flex items-center justify-between">
+                        <>
+                          {/* Special sections for gender root categories */}
+                          {isGenderRoot && (
+                            <>
+                              {/* Quick Links Section */}
+                              <div className="space-y-3 mb-10">
                                 <LocalizedClientLink
-                                  href={(() => {
-                                    // Handle top-level gender categories (men/women)
-                                    if (childCategory.handle === "men" || childCategory.handle === "women") {
-                                      return `/${childCategory.handle}`
-                                    }
-
-                                    // Extract gender and category slug from handle
-                                    let gender: string
-                                    let categorySlug: string
-
-                                    if (childCategory.handle.startsWith("mens-")) {
-                                      gender = "men"
-                                      categorySlug = childCategory.handle.replace("mens-", "")
-                                    } else if (childCategory.handle.startsWith("womens-")) {
-                                      gender = "women"
-                                      categorySlug = childCategory.handle.replace("womens-", "")
-                                    } else {
-                                      // Fallback to men if no gender prefix
-                                      gender = "men"
-                                      categorySlug = childCategory.handle
-                                    }
-
-                                    return `/${gender}/${categorySlug}`
-                                  })()}
-                                  className="text-sm uppercase text-gray-700 hover:text-black py-2"
+                                  href={`/${genderPath}`}
+                                  className="block text-sm uppercase text-gray-700 hover:text-black py-2"
                                   onClick={closeAllPanels}
                                 >
-                                  {childCategory.name}
+                                  New Arrivals
                                 </LocalizedClientLink>
-                                {hasChildren && (
+                                <div className="block text-sm uppercase text-gray-400 py-2 cursor-not-allowed">
+                                  Trending
+                                </div>
+                              </div>
+
+                              {/* Brands Section */}
+                              <div className="mb-10">
+                                <div className="flex items-center justify-between">
+                                  <span className="block text-sm uppercase text-gray-700 py-2">
+                                    Brands
+                                  </span>
                                   <button
-                                    onClick={() => openSubSubPanel(childCategory.id)}
+                                    onClick={openBrandsPanel}
                                     className="p-1 hover:bg-gray-100 rounded"
                                   >
                                     <ChevronRight className="w-4 h-4" />
                                   </button>
-                                )}
+                                </div>
                               </div>
-                            )
-                          })}
-                        </div>
+                            </>
+                          )}
+
+                          {/* Categories Section */}
+                          <div className="space-y-3">
+                            {selectedCategory.children.map((childCategory) => {
+                              const hasChildren = childCategory.children && childCategory.children.length > 0
+
+                              return (
+                                <div key={childCategory.id} className="flex items-center justify-between">
+                                  <LocalizedClientLink
+                                    href={(() => {
+                                      // Handle top-level gender categories (men/women)
+                                      if (childCategory.handle === "men" || childCategory.handle === "women") {
+                                        return `/${childCategory.handle}`
+                                      }
+
+                                      // Extract gender and category slug from handle
+                                      let gender: string
+                                      let categorySlug: string
+
+                                      if (childCategory.handle.startsWith("mens-")) {
+                                        gender = "men"
+                                        categorySlug = childCategory.handle.replace("mens-", "")
+                                      } else if (childCategory.handle.startsWith("womens-")) {
+                                        gender = "women"
+                                        categorySlug = childCategory.handle.replace("womens-", "")
+                                      } else {
+                                        // Fallback to men if no gender prefix
+                                        gender = "men"
+                                        categorySlug = childCategory.handle
+                                      }
+
+                                      return `/${gender}/${categorySlug}`
+                                    })()}
+                                    className="text-sm uppercase text-gray-700 hover:text-black py-2"
+                                    onClick={closeAllPanels}
+                                  >
+                                    {childCategory.name}
+                                  </LocalizedClientLink>
+                                  {hasChildren && (
+                                    <button
+                                      onClick={() => openSubSubPanel(childCategory.id)}
+                                      className="p-1 hover:bg-gray-100 rounded"
+                                    >
+                                      <ChevronRight className="w-4 h-4" />
+                                    </button>
+                                  )}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </>
                       )
                     }
                   }
