@@ -2,10 +2,10 @@
 import React from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 
-// Color mapping - same as in backend sync logic
+// Color mapping for frontend filters (Multicolor is handled in backend but not shown to users)
 const COLOR_MAPPING = [
   'Black', 'White', 'Gray', 'Blue', 'Red', 'Brown', 'Green', 'Pink',
-  'Purple', 'Yellow', 'Orange', 'Multicolor', 'Gold', 'Silver'
+  'Purple', 'Yellow', 'Orange', 'Gold', 'Silver'
 ]
 
 export default function ColorRefinementList({ selectedColor: propSelectedColor }: { selectedColor?: string }) {

@@ -49,7 +49,7 @@ export interface AlgoliaProduct {
   minPrice?: number | null
   minPriceUs?: number | null
   minPriceEu?: number | null
-  primaryColor?: string
+  primaryColor?: string[]
   created_at: string
   updated_at: string
 }

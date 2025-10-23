@@ -40,7 +40,7 @@ const RefinementList = ({ sortBy, 'data-testid': dataTestId, selectedBrand }: Re
   }
 
   return (
-    <div className="flex lg:flex-col gap-12 py-4 mb-8 lg:px-0 lg:min-w-[250px]">
+    <div className="flex lg:flex-col gap-6 py-4 mb-8 lg:px-0 lg:min-w-[250px]">
       <CategorySidebar className="border-r-0 p-0 w-full" />
       <BrandRefinementList selectedBrand={selectedBrand} />
     </div>
