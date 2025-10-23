@@ -149,13 +149,15 @@ const CategoryTemplate = ({
               </div>
               
               {/* Right Sidebar - Sort and Color filter */}
-              <div className="w-64 flex-shrink-0 pr-4 flex flex-col gap-6 items-end">
-                <SortProducts
-                  sortBy={sort}
-                  setQueryParams={setQueryParams}
-                  disabled={isPending}
-                />
-                <ColorRefinementList selectedColor={selectedColor} />
+              <div className="w-64 flex-shrink-0 pr-4 flex items-end">
+                <div className="flex flex-col gap-6">
+                  <SortProducts
+                    sortBy={sort}
+                    setQueryParams={setQueryParams}
+                    disabled={isPending}
+                  />
+                  <ColorRefinementList selectedColor={selectedColor} />
+                </div>
               </div>
             </div>
           </div>
