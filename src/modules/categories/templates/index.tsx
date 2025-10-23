@@ -150,7 +150,7 @@ const CategoryTemplate = ({
               
               {/* Right Sidebar - Sort and Color filter */}
               <div className="w-64 flex-shrink-0 pr-4 flex justify-end">
-                <div className="grid">
+                <div className="grid self-start">
                   <SortProducts
                     sortBy={sort}
                     setQueryParams={setQueryParams}
