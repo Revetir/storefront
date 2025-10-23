@@ -48,7 +48,7 @@ const SortProducts = ({
           key={option.value}
           onClick={() => handleSelect(option.value as SortOptions)}
           disabled={disabled}
-          className={`text-left px-2 py-1 cursor-pointer uppercase text-xs font-sans ${
+          className={`text-right px-2 py-1 cursor-pointer uppercase text-xs font-sans ${
             sortBy === option.value
               ? "font-bold underline text-black"
               : "text-gray-700 hover:text-black"

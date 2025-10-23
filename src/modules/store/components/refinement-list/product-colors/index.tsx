@@ -36,7 +36,7 @@ export default function ColorRefinementList({ selectedColor: propSelectedColor }
         <button
           key={color}
           onClick={() => handleSelect(color)}
-          className={`text-left px-2 py-1 cursor-pointer uppercase text-xs font-sans ${
+          className={`text-right px-2 py-1 cursor-pointer uppercase text-xs font-sans ${
             selectedColor === color
               ? "font-bold underline text-black"
               : "text-gray-700 hover:text-black"
