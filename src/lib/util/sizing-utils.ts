@@ -1,27 +1,30 @@
 import { HttpTypes } from "@medusajs/types"
 import { mapCategoryToTemplate } from "@lib/data/sizing-templates"
 
-export interface ProductSizingData {
-  measurements: Record<string, Record<string, number>>
-  fit?: string
-  material?: string
-  care_instructions?: string
+export interface ProductMeasurementsData {
+  measurements_by_variant: Record<string, Record<string, { value: number; unit: string }>>
+  template: string | null
+  diagram_config: any
 }
 
 /**
- * Check if a product has sizing metadata
+ * Fetch product measurements from API
  */
-export const hasSizingData = (product: HttpTypes.StoreProduct): boolean => {
-  return !!(product.metadata?.sizing)
-}
+export async function getProductMeasurements(productId: string): Promise<ProductMeasurementsData | null> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+    const response = await fetch(`${baseUrl}/store/products/${productId}/measurements`)
 
-/**
- * Get sizing data from product metadata
- */
-export const getProductSizingData = (product: HttpTypes.StoreProduct): ProductSizingData | null => {
-  if (!hasSizingData(product)) return null
-  
-  return product.metadata?.sizing as ProductSizingData
+    if (!response.ok) {
+      return null
+    }
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error("Failed to fetch product measurements:", error)
+    return null
+  }
 }
 
 /**
@@ -103,11 +106,10 @@ export const isSizingSupported = (categoryName: string): boolean => {
     "Shoes Men",
     "Shoes Women",
   ]
-  return supportedCategories.some(cat => 
+  return supportedCategories.some(cat =>
     cat.toLowerCase() === mappedCategory.toLowerCase()
   )
 }
-
 
 /**
  * Format measurement value with units
@@ -117,15 +119,11 @@ export const formatMeasurement = (value: number, units: string = "cm"): string =
 }
 
 /**
- * Get available sizes for a product
+ * Get available sizes for a product from its variants
  */
 export const getAvailableSizes = (product: HttpTypes.StoreProduct): string[] => {
-  const sizingData = getProductSizingData(product)
-  if (!sizingData?.measurements) return []
-  
-  // Get sizes from the first measurement (assuming all measurements have the same sizes)
-  const firstMeasurement = Object.values(sizingData.measurements)[0]
-  return Object.keys(firstMeasurement || {})
+  if (!product.variants || product.variants.length === 0) return []
+
+  // Get variant titles (these are the size names)
+  return product.variants.map(v => v.title || "").filter(Boolean)
 }
-
-

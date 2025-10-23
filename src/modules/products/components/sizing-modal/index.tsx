@@ -32,34 +32,69 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     return template
   }, [templateCategory])
 
-  // Get product measurements from metadata
-  const productMeasurements = useMemo(() => {
-    if (!product.metadata?.sizing) {
-      return null
-    }
+  // Fetch product measurements from API
+  const [productMeasurements, setProductMeasurements] = useState<any>(null)
+  const [isLoadingMeasurements, setIsLoadingMeasurements] = useState(false)
 
-    // Handle case where sizing metadata is a JSON string
-    let sizingData = product.metadata.sizing
-    if (typeof sizingData === 'string') {
+  React.useEffect(() => {
+    if (!isOpen) return
+
+    const fetchMeasurements = async () => {
+      setIsLoadingMeasurements(true)
       try {
-        sizingData = JSON.parse(sizingData)
+        const baseUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+        const response = await fetch(`${baseUrl}/store/products/${product.id}/measurements`)
+
+        if (response.ok) {
+          const data = await response.json()
+          setProductMeasurements(data)
+        } else {
+          setProductMeasurements(null)
+        }
       } catch (error) {
-        return null
+        console.error("Failed to fetch measurements:", error)
+        setProductMeasurements(null)
+      } finally {
+        setIsLoadingMeasurements(false)
       }
     }
 
-    return sizingData as any
-  }, [product.metadata])
+    fetchMeasurements()
+  }, [isOpen, product.id])
 
   // Check if shoes category
   const isShoes = sizingTemplate?.diagram_component === "ShoesMen" ||
                   sizingTemplate?.diagram_component === "ShoesWomen" ||
                   sizingTemplate?.diagram_component === "ShoesUnisex"
 
+  // Create variant mapping (variant title -> variant id)
+  const variantMap = useMemo(() => {
+    const map = new Map<string, string>()
+    if (product.variants) {
+      for (const variant of product.variants) {
+        map.set(variant.title || "", variant.id)
+      }
+    }
+    return map
+  }, [product.variants])
+
+  // Get variant ID for selected size
+  const selectedVariantId = useMemo(() => {
+    return variantMap.get(selectedSize) || null
+  }, [selectedSize, variantMap])
+
+  // Get measurements for selected variant
+  const selectedVariantMeasurements = useMemo(() => {
+    if (!selectedVariantId || !productMeasurements?.measurements_by_variant) {
+      return null
+    }
+    return productMeasurements.measurements_by_variant[selectedVariantId]
+  }, [selectedVariantId, productMeasurements])
+
   // Page visibility logic
   const showPMPage = useMemo(() => {
-    // PM page requires BOTH measurements AND template
-    return !!(productMeasurements?.measurements && sizingTemplate && !isShoes)
+    // PM page requires measurements data, template, and not shoes
+    return !!(productMeasurements?.measurements_by_variant && Object.keys(productMeasurements.measurements_by_variant).length > 0 && sizingTemplate && !isShoes)
   }, [productMeasurements, sizingTemplate, isShoes])
 
   const showSCCPage = useMemo(() => {
@@ -81,12 +116,11 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     }
   }, [showPMPage, showSCCPage])
 
-  // Get available sizes from product measurements
+  // Get available sizes from product variants
   const availableSizes = useMemo(() => {
-    if (!productMeasurements?.measurements) return ["S", "M", "L", "XL"]
-    const firstMeasurement = Object.values(productMeasurements.measurements)[0] as Record<string, number>
-    return Object.keys(firstMeasurement)
-  }, [productMeasurements])
+    if (!product.variants || product.variants.length === 0) return []
+    return product.variants.map(v => v.title || "").filter(Boolean)
+  }, [product.variants])
 
   // Set default selected size to first available size
   React.useEffect(() => {
@@ -161,18 +195,26 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   const renderMeasurementOverlays = () => {
     if (!sizingTemplate) return null
     if (isShoes) return null
+    if (!selectedVariantMeasurements) return null
 
     return Object.entries(sizingTemplate.measurement_points).map(([key, point]) => {
-      let measurementValue: number | string = "-"
+      const measurement = selectedVariantMeasurements[key]
 
-      // Priority 1: Use product metadata measurements if available
-      if (productMeasurements?.measurements?.[key]?.[selectedSize]) {
-        measurementValue = productMeasurements.measurements[key][selectedSize]
+      if (!measurement) return null
+
+      const measurementValue = measurement.value
+      const unit = measurement.unit
+
+      // Format value with unit (handle conversion if needed)
+      let displayValue = measurementValue
+      if (useInches && unit === "cm") {
+        displayValue = convertToInches(measurementValue)
+      } else if (!useInches && unit === "inches") {
+        // Convert inches to cm
+        displayValue = Math.round(measurementValue * 2.54 * 10) / 10
       }
-      // Priority 2: Fall back to template size chart only if no product metadata
-      else if (!productMeasurements?.measurements && sizingTemplate.size_chart[selectedSize]?.[key]) {
-        measurementValue = sizingTemplate.size_chart[selectedSize][key]
-      }
+
+      const formattedValue = useInches ? `${displayValue}"` : `${displayValue}cm`
 
       const x = `${point.x_percent}%`
       const y = `${point.y_percent}%`
@@ -188,7 +230,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             transform: transform,
           }}
         >
-          {typeof measurementValue === 'number' ? formatMeasurementValue(measurementValue) : measurementValue}
+          {formattedValue}
         </div>
       )
     })
