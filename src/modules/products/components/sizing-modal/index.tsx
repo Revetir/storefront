@@ -42,7 +42,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     const fetchMeasurements = async () => {
       setIsLoadingMeasurements(true)
       try {
-        const baseUrl = process.env.MEDUSA_BACKEND_URL || "http://localhost:9000"
+        const baseUrl = process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
         const url = `${baseUrl}/store/products/${product.id}/measurements`
 
         console.log("[SIZING MODAL] Fetching measurements from:", url)
