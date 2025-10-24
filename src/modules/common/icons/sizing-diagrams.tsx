@@ -11,9 +11,6 @@ export const PantsDiagram: React.FC<{ className?: string }> = ({ className = "" 
   </div>
 )
 
-// T-Shirt sizing diagram
-//pants and necklace diagrams deleted
-
 export const SizingMissingDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
   <svg
     viewBox="0 0 300 150"
@@ -63,7 +60,7 @@ export const SizingMissingDiagram: React.FC<{ className?: string }> = ({ classNa
   </svg>
 );
 
-// Keep GenericDiagram as alias for backward compatibility
+// TODO: Remove references to GenericDiagram (was alias for backward compatibility)
 export const GenericDiagram = SizingMissingDiagram;
 
 

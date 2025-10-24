@@ -50,6 +50,16 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         console.log("[SIZING MODAL] Product ID:", product.id)
         console.log("[SIZING MODAL] Backend URL:", baseUrl)
 
+        console.debug("[SIZING MODAL] sizingTemplate:", sizingTemplate)
+        console.debug("[SIZING MODAL] templateCategory:", templateCategory)
+        console.debug("[SIZING MODAL] availableSizes:", availableSizes)
+        console.debug("[SIZING MODAL] selectedSize:", selectedSize)
+        console.debug("[SIZING MODAL] selectedVariantId:", selectedVariantId)
+        console.debug("[SIZING MODAL] productMeasurements keys:", productMeasurements ? Object.keys(productMeasurements) : null)
+        console.debug("[SIZING MODAL] measurements_by_variant keys:",
+          productMeasurements?.measurements_by_variant ? Object.keys(productMeasurements.measurements_by_variant) : null)
+        console.debug("[SIZING MODAL] selectedVariantMeasurements:", selectedVariantMeasurements)
+
         const response = await fetch(url, {
           method: "GET",
           headers: {
