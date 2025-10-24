@@ -18,7 +18,7 @@ type PageType = "PM" | "SCC"
 const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => {
   // State for size and unit toggles
   const [selectedSize, setSelectedSize] = useState<string>("S")
-  const [useInches, setUseInches] = useState<boolean>(false)
+  const [useInches, setUseInches] = useState<boolean>(true)
   const [currentPage, setCurrentPage] = useState<PageType>("PM")
 
   // Fetch product measurements from API
