@@ -43,16 +43,32 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
       setIsLoadingMeasurements(true)
       try {
         const baseUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-        const response = await fetch(`${baseUrl}/store/products/${product.id}/measurements`)
+        const url = `${baseUrl}/store/products/${product.id}/measurements`
+
+        console.log("[SIZING MODAL] Fetching measurements from:", url)
+        console.log("[SIZING MODAL] Product ID:", product.id)
+        console.log("[SIZING MODAL] Backend URL:", baseUrl)
+
+        const response = await fetch(url)
+
+        console.log("[SIZING MODAL] Response status:", response.status)
+        console.log("[SIZING MODAL] Response ok:", response.ok)
 
         if (response.ok) {
           const data = await response.json()
+          console.log("[SIZING MODAL] Measurements data:", data)
           setProductMeasurements(data)
         } else {
+          console.log("[SIZING MODAL] Failed response:", await response.text())
           setProductMeasurements(null)
         }
       } catch (error) {
-        console.error("Failed to fetch measurements:", error)
+        console.error("[SIZING MODAL] Failed to fetch measurements:", error)
+        console.error("[SIZING MODAL] Error details:", {
+          message: error instanceof Error ? error.message : 'Unknown error',
+          name: error instanceof Error ? error.name : 'Unknown',
+          stack: error instanceof Error ? error.stack : 'No stack'
+        })
         setProductMeasurements(null)
       } finally {
         setIsLoadingMeasurements(false)
