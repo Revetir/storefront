@@ -1,5 +1,16 @@
 import React from "react"
 
+// Pants sizing diagram
+export const PantsDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
+  <div className={`w-full h-auto ${className}`}>
+    <img
+      src="/images/pants_sizing_diagram.svg"
+      alt="Pants measurements diagram"
+      className="w-full h-auto"
+    />
+  </div>
+)
+
 // T-Shirt sizing diagram
 //pants and necklace diagrams deleted
 

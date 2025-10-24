@@ -5,7 +5,7 @@ import { HttpTypes } from "@medusajs/types"
 import Modal from "@modules/common/components/modal"
 import { getSizingTemplate, SizingTemplate } from "@lib/data/sizing-templates"
 import { getProductCategory, getBestSizingCategory, getProductTemplateCategory } from "@lib/util/sizing-utils"
-import { SizingMissingDiagram } from "@modules/common/icons/sizing-diagrams"
+import { SizingMissingDiagram, PantsDiagram } from "@modules/common/icons/sizing-diagrams"
 import X from "@modules/common/icons/x"
 
 interface SizingModalProps {
@@ -153,7 +153,10 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         // Shoes use a conversion table only, no diagram
         return null
 
-      // TODO: Add diagram rendering cases here when templates are implemented
+      case "PantsDiagram":
+        return <PantsDiagram className="w-full h-auto max-w-md" />
+
+      // TODO: Add more diagram rendering cases here when templates are implemented
       // Example:
       // case "ShirtsDiagram":
       //   return (

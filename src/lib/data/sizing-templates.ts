@@ -52,6 +52,44 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
   // - Sweaters: chest, waist, length, shoulder
   //
 
+  // Pants template with SVG diagram
+  {
+    category: "Pants",
+    diagram_component: "PantsDiagram",
+    units: "cm",
+    measurement_points: {
+      waist: {
+        x_percent: 50,
+        y_percent: 9.5,
+        offset_x: 0,
+        offset_y: 0,
+        label: "Waist"
+      },
+      rise: {
+        x_percent: 79.7,
+        y_percent: 21.1,
+        offset_x: 0,
+        offset_y: 0,
+        label: "Rise"
+      },
+      inseam: {
+        x_percent: 59,
+        y_percent: 53.6,
+        offset_x: 0,
+        offset_y: 0,
+        label: "Inseam"
+      },
+      leg_opening: {
+        x_percent: 32.8,
+        y_percent: 88.8,
+        offset_x: 0,
+        offset_y: 0,
+        label: "Leg Opening"
+      }
+    },
+    size_chart: {}
+  },
+
   // Shoes categories render a conversion chart (EU/US/UK/JP) in the modal
   // The modal provides a custom renderer; size_chart remains empty
   {
