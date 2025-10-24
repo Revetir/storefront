@@ -43,13 +43,20 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
       setIsLoadingMeasurements(true)
       try {
         const baseUrl = process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
+        const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY;
         const url = `${baseUrl}/store/products/${product.id}/measurements`
 
         console.log("[SIZING MODAL] Fetching measurements from:", url)
         console.log("[SIZING MODAL] Product ID:", product.id)
         console.log("[SIZING MODAL] Backend URL:", baseUrl)
 
-        const response = await fetch(url)
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json",
+            "x-publishable-api-key": publishableKey ?? ""
+          }
+        });
 
         console.log("[SIZING MODAL] Response status:", response.status)
         console.log("[SIZING MODAL] Response ok:", response.ok)
