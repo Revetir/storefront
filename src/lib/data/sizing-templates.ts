@@ -112,19 +112,12 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
     units: "cm",
     measurement_points: {},
     size_chart: {}
-  },
-  {
-    category: "Generic",
-    diagram_component: "GenericDiagram",
-    units: "cm",
-    measurement_points: {},
-    size_chart: {}
   }
 ]
 
 
 // Map category to sizing template using hierarchical lookup
-export const mapCategoryToTemplate = (categoryName: string, categoryId?: string): string => {
+export const mapCategoryToTemplate = (categoryName: string, categoryId?: string): string | undefined => {
   try {
     // Lazy import to avoid circular deps
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -136,9 +129,9 @@ export const mapCategoryToTemplate = (categoryName: string, categoryId?: string)
       name: categoryName
     })
 
-    return template || "Generic"
+    return template
   } catch (e) {
-    return "Generic"
+    return undefined
   }
 }
 

@@ -30,23 +30,23 @@ export async function getProductMeasurements(productId: string): Promise<Product
 /**
  * Get the primary category name for a product
  */
-export const getProductCategory = (product: HttpTypes.StoreProduct): string => {
-  return product.categories?.[0]?.name || "Generic"
+export const getProductCategory = (product: HttpTypes.StoreProduct): string | undefined => {
+  return product.categories?.[0]?.name
 }
 
 /**
  * Get the best matching category for sizing from product's category hierarchy
  */
-export const getBestSizingCategory = (product: HttpTypes.StoreProduct): string => {
+export const getBestSizingCategory = (product: HttpTypes.StoreProduct): string | undefined => {
   if (!product.categories || product.categories.length === 0) {
-    return "Generic"
+    return undefined
   }
 
   // Try each category in the product's categories array
   for (const category of product.categories) {
     const mappedCategory = mapCategoryToTemplate(category.name, category.id)
-    // If we get a specific template (not Generic), use it
-    if (mappedCategory !== "Generic") {
+    // If we get a specific template, use it
+    if (mappedCategory) {
       return category.name
     }
   }
@@ -59,9 +59,9 @@ export const getBestSizingCategory = (product: HttpTypes.StoreProduct): string =
  * Get the mapped template category for a product using hierarchical lookup
  * Special handling for unisex shoes (products in both mens-shoes and womens-shoes)
  */
-export const getProductTemplateCategory = (product: HttpTypes.StoreProduct): string => {
+export const getProductTemplateCategory = (product: HttpTypes.StoreProduct): string | undefined => {
   if (!product.categories || product.categories.length === 0) {
-    return "Generic"
+    return undefined
   }
 
   // Collect all template mappings from all categories
@@ -69,7 +69,7 @@ export const getProductTemplateCategory = (product: HttpTypes.StoreProduct): str
 
   for (const category of product.categories) {
     const mappedCategory = mapCategoryToTemplate(category.name, category.id)
-    if (mappedCategory !== "Generic") {
+    if (mappedCategory) {
       templateCategories.add(mappedCategory)
     }
   }
@@ -89,8 +89,8 @@ export const getProductTemplateCategory = (product: HttpTypes.StoreProduct): str
     return Array.from(templateCategories)[0]
   }
 
-  // Final fallback
-  return "Generic"
+  // No template found
+  return undefined
 }
 
 /**
@@ -98,9 +98,9 @@ export const getProductTemplateCategory = (product: HttpTypes.StoreProduct): str
  */
 export const isSizingSupported = (categoryName: string): boolean => {
   const mappedCategory = mapCategoryToTemplate(categoryName)
+  if (!mappedCategory) return false
+
   const supportedCategories = [
-    "Shirts",
-    "Sweatshirts",
     "Pants",
     "Shoes Unisex",
     "Shoes Men",

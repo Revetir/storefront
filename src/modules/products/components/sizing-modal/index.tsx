@@ -4,7 +4,6 @@ import React, { useMemo, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 import Modal from "@modules/common/components/modal"
 import { getSizingTemplate, SizingTemplate } from "@lib/data/sizing-templates"
-import { getProductCategory, getBestSizingCategory, getProductTemplateCategory } from "@lib/util/sizing-utils"
 import { SizingMissingDiagram, PantsDiagram } from "@modules/common/icons/sizing-diagrams"
 import X from "@modules/common/icons/x"
 
@@ -17,24 +16,20 @@ interface SizingModalProps {
 type PageType = "PM" | "SCC"
 
 const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => {
-  // Get the product category and template category
-  const productCategory = getProductCategory(product)
-  const templateCategory = getProductTemplateCategory(product)
-
   // State for size and unit toggles
   const [selectedSize, setSelectedSize] = useState<string>("S")
   const [useInches, setUseInches] = useState<boolean>(false)
   const [currentPage, setCurrentPage] = useState<PageType>("PM")
 
-  // Get the sizing template for this category
-  const sizingTemplate = useMemo(() => {
-    const template = getSizingTemplate(templateCategory)
-    return template
-  }, [templateCategory])
-
   // Fetch product measurements from API
   const [productMeasurements, setProductMeasurements] = useState<any>(null)
   const [isLoadingMeasurements, setIsLoadingMeasurements] = useState(false)
+
+  // Get the sizing template from backend data
+  const sizingTemplate = useMemo(() => {
+    if (!productMeasurements?.template) return null
+    return getSizingTemplate(productMeasurements.template)
+  }, [productMeasurements?.template])
 
   React.useEffect(() => {
     if (!isOpen) return
@@ -50,16 +45,6 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         console.log("[SIZING MODAL] Product ID:", product.id)
         console.log("[SIZING MODAL] Backend URL:", baseUrl)
 
-        console.debug("[SIZING MODAL] sizingTemplate:", sizingTemplate)
-        console.debug("[SIZING MODAL] templateCategory:", templateCategory)
-        console.debug("[SIZING MODAL] availableSizes:", availableSizes)
-        console.debug("[SIZING MODAL] selectedSize:", selectedSize)
-        console.debug("[SIZING MODAL] selectedVariantId:", selectedVariantId)
-        console.debug("[SIZING MODAL] productMeasurements keys:", productMeasurements ? Object.keys(productMeasurements) : null)
-        console.debug("[SIZING MODAL] measurements_by_variant keys:",
-          productMeasurements?.measurements_by_variant ? Object.keys(productMeasurements.measurements_by_variant) : null)
-        console.debug("[SIZING MODAL] selectedVariantMeasurements:", selectedVariantMeasurements)
-
         const response = await fetch(url, {
           method: "GET",
           headers: {
@@ -74,6 +59,8 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         if (response.ok) {
           const data = await response.json()
           console.log("[SIZING MODAL] Measurements data:", data)
+          console.log("[SIZING MODAL] Template from backend:", data.template)
+          console.log("[SIZING MODAL] measurements_by_variant keys:", data.measurements_by_variant ? Object.keys(data.measurements_by_variant) : null)
           setProductMeasurements(data)
         } else {
           console.log("[SIZING MODAL] Failed response:", await response.text())
@@ -279,11 +266,15 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     return (
       <>
         {/* Desktop/Laptop: Horizontal layout */}
-        <div className="hidden lg:flex gap-8 items-center justify-center h-full w-full">
+        <div className="hidden lg:flex gap-8 items-start justify-center h-full w-full">
           {/* Left side - Diagram with measurements */}
-          <div className="flex justify-center items-center flex-1">
-            <div className="relative w-full flex justify-center">
-              {renderDiagram()}
+          <div className="flex justify-center items-start flex-1 min-h-[360px]">
+            <div className="relative w-full flex justify-center items-start min-h-[360px]">
+              {renderDiagram() ?? (
+                <div className="w-full flex items-center justify-center text-sm text-gray-500">
+                  Diagram unavailable
+                </div>
+              )}
               {renderMeasurementOverlays()}
             </div>
           </div>
@@ -339,10 +330,14 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         {/* Tablet/Phone: Vertically stacked */}
         <div className="flex lg:hidden flex-col gap-6 w-full">
           {/* Diagram */}
-          <div className="relative w-full flex justify-center">
-            {renderDiagram()}
-            {renderMeasurementOverlays()}
-          </div>
+            <div className="relative w-full flex justify-center min-h-[280px]">
+              {renderDiagram() ?? (
+                <div className="w-full flex items-center justify-center text-sm text-gray-500">
+                  Diagram unavailable
+                </div>
+              )}
+              {renderMeasurementOverlays()}
+            </div>
 
           {/* Controls */}
           <div className="flex flex-col gap-4 w-full">
@@ -398,7 +393,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   const renderSCCPage = () => {
     if (!showSCCPage) return null
 
-    const heading = templateCategory
+    const heading = sizingTemplate?.category || ""
     const rows = heading === "Shoes Men" ? SHOES_MEN : heading === "Shoes Women" ? SHOES_WOMEN : SHOES_UNISEX
     const isUnisex = heading === "Shoes Unisex"
 

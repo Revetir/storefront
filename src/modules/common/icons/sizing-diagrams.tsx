@@ -59,10 +59,3 @@ export const SizingMissingDiagram: React.FC<{ className?: string }> = ({ classNa
     </text>
   </svg>
 );
-
-// TODO: Remove references to GenericDiagram (was alias for backward compatibility)
-export const GenericDiagram = SizingMissingDiagram;
-
-
-
-

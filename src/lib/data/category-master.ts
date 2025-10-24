@@ -1,12 +1,8 @@
 export type TemplateCategory =
-  | "Shirts"
-  | "Sweatshirts"
   | "Pants"
-  | "Merch"
   | "Shoes Unisex"
   | "Shoes Men"
   | "Shoes Women"
-  | "Generic"
 
 export interface CategoryRecord {
   id: string
@@ -100,8 +96,8 @@ export const CategoryMaster = {
 
     while (currentId && !visited.has(currentId)) {
       visited.add(currentId)
-      const category = state.byId[currentId]
-      path.push(`${category?.name || currentId} (${currentId})`)
+      const categoryRecord: CategoryRecord | undefined = state.byId[currentId]
+      path.push(`${categoryRecord?.name || currentId} (${currentId})`)
 
       // Check if current category has a template
       const template = state.templateById[currentId]
@@ -110,7 +106,7 @@ export const CategoryMaster = {
       }
 
       // Move up to parent
-      currentId = category?.parentId
+      currentId = categoryRecord?.parentId
     }
 
     return undefined
@@ -128,8 +124,8 @@ export const CategoryMaster = {
 
       if (currentId === targetCategoryId) return true
 
-      const category = state.byId[currentId]
-      currentId = category?.parentId
+      const categoryRecord: CategoryRecord | undefined = state.byId[currentId]
+      currentId = categoryRecord?.parentId
     }
 
     return false
