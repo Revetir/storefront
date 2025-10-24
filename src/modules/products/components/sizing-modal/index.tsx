@@ -239,6 +239,8 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
       const formattedValue = useInches ? `${displayValue}"` : `${displayValue}cm`
 
+      // Position overlays relative to the diagram's aspect ratio container
+      // This ensures consistent positioning regardless of viewport size
       const x = `${point.x_percent}%`
       const y = `${point.y_percent}%`
       const transform = `translate(${point.offset_x}px, ${point.offset_y}px)`
@@ -246,7 +248,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
       return (
         <div
           key={key}
-          className="absolute bg-white/80 text-black text-xs whitespace-nowrap"
+          className="absolute bg-white/90 text-black text-[10px] sm:text-xs px-1 py-0.5 whitespace-nowrap pointer-events-none"
           style={{
             left: x,
             top: y,
@@ -268,10 +270,10 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         {/* Desktop/Laptop: Horizontal layout */}
         <div className="hidden lg:flex gap-8 items-start justify-center h-full w-full">
           {/* Left side - Diagram with measurements */}
-          <div className="flex justify-center items-start flex-1 min-h-[360px]">
-            <div className="relative w-full flex justify-center items-start min-h-[360px]">
+          <div className="flex justify-start items-center flex-1 pr-8">
+            <div className="relative w-full flex justify-start items-center">
               {renderDiagram() ?? (
-                <div className="w-full flex items-center justify-center text-sm text-gray-500">
+                <div className="w-full flex items-center justify-start text-sm text-gray-500">
                   Diagram unavailable
                 </div>
               )}
@@ -330,7 +332,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         {/* Tablet/Phone: Vertically stacked */}
         <div className="flex lg:hidden flex-col gap-6 w-full">
           {/* Diagram */}
-            <div className="relative w-full flex justify-center min-h-[280px]">
+            <div className="relative w-full flex justify-center items-center">
               {renderDiagram() ?? (
                 <div className="w-full flex items-center justify-center text-sm text-gray-500">
                   Diagram unavailable
@@ -653,7 +655,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               </div>
 
               {/* Main content */}
-              <div className={`flex-1 flex flex-col overflow-y-auto ${currentPage === "SCC" ? "mr-8" : ""}`}>
+              <div className={`flex-1 flex flex-col overflow-hidden ${currentPage === "SCC" ? "mr-8" : ""}`}>
                 {currentPage === "PM" && renderPMPage()}
                 {currentPage === "SCC" && renderSCCPage()}
               </div>
@@ -682,7 +684,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               </div>
 
               {/* Main content - scrollable with padding for fixed button */}
-              <div className="flex-1 overflow-y-auto px-6 pb-20">
+              <div className="flex-1 overflow-hidden px-6 pb-20">
                 {currentPage === "PM" && renderPMPage()}
                 {currentPage === "SCC" && renderSCCPage()}
               </div>

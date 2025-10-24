@@ -2,11 +2,11 @@ import React from "react"
 
 // Pants sizing diagram
 export const PantsDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
-  <div className={`w-full h-auto ${className}`}>
+  <div className={`w-full h-auto ${className}`} style={{ aspectRatio: '600/800' }}>
     <img
       src="/images/pants_sizing_diagram.svg"
       alt="Pants measurements diagram"
-      className="w-full h-auto"
+      className="w-full h-full object-contain"
     />
   </div>
 )
