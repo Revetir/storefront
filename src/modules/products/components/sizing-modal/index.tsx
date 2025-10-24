@@ -242,7 +242,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
       return (
         <div
           key={key}
-          className="absolute bg-white/90 text-black text-[10px] sm:text-xs px-1 py-0.5 whitespace-nowrap pointer-events-none"
+          className="absolute text-black text-[10px] sm:text-xs whitespace-nowrap pointer-events-none"
           style={{
             left: `${point.x_percent}%`,
             top: `${point.y_percent}%`,
