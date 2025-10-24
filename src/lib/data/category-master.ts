@@ -552,10 +552,17 @@ export type { CategoryMasterState }
   CategoryMaster.setTemplate({ handle: "womens-shoes" }, "Shoes Women")
 
   // ===========================================================================================
-  // TODO: Add template assignments for apparel categories after templates are designed
+  // APPAREL TEMPLATES
   // ===========================================================================================
-  //
-  // Examples (uncomment when corresponding templates are ready in sizing-templates.ts):
+
+  // PANTS & JEANS
+  CategoryMaster.setTemplate({ handle: "mens-pants" }, "Pants")
+  CategoryMaster.setTemplate({ handle: "womens-pants" }, "Pants")
+  CategoryMaster.setTemplate({ handle: "mens-jeans" }, "Pants")
+
+  // ===========================================================================================
+  // TODO: Uncomment additional templates as they are designed
+  // ===========================================================================================
   //
   // SHIRTS & TOPS
   // CategoryMaster.setTemplate({ handle: "mens-shirts" }, "Shirts")
@@ -563,10 +570,7 @@ export type { CategoryMasterState }
   // CategoryMaster.setTemplate({ handle: "mens-tops" }, "Shirts")
   // CategoryMaster.setTemplate({ handle: "womens-tops" }, "Shirts")
   //
-  // PANTS, JEANS & SHORTS
-  // CategoryMaster.setTemplate({ handle: "mens-pants" }, "Pants")
-  // CategoryMaster.setTemplate({ handle: "womens-pants" }, "Pants")
-  // CategoryMaster.setTemplate({ handle: "mens-jeans" }, "Pants")
+  // SHORTS
   // CategoryMaster.setTemplate({ handle: "mens-shorts" }, "Shorts")
   //
   // SWEATERS & HOODIES
