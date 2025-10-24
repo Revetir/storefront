@@ -1,8 +1,6 @@
 export interface MeasurementPoint {
   x_percent: number
   y_percent: number
-  offset_x: number
-  offset_y: number
   label: string
 }
 
@@ -60,30 +58,22 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
     measurement_points: {
       waist: {
         x_percent: 50,
-        y_percent: 9.5,
-        offset_x: 0,
-        offset_y: 0,
+        y_percent: 8,
         label: "Waist"
       },
       rise: {
-        x_percent: 79.7,
-        y_percent: 21.1,
-        offset_x: 0,
-        offset_y: 0,
+        x_percent: 79,
+        y_percent: 21,
         label: "Rise"
       },
       inseam: {
         x_percent: 59,
-        y_percent: 53.6,
-        offset_x: 0,
-        offset_y: 0,
+        y_percent: 53,
         label: "Inseam"
       },
       leg_opening: {
-        x_percent: 32.8,
-        y_percent: 88.8,
-        offset_x: 0,
-        offset_y: 0,
+        x_percent: 32,
+        y_percent: 89,
         label: "Leg Opening"
       }
     },

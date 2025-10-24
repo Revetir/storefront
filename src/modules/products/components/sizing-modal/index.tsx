@@ -239,20 +239,13 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
       const formattedValue = useInches ? `${displayValue}"` : `${displayValue}cm`
 
-      // Position overlays relative to the diagram's aspect ratio container
-      // This ensures consistent positioning regardless of viewport size
-      const x = `${point.x_percent}%`
-      const y = `${point.y_percent}%`
-      const transform = `translate(${point.offset_x}px, ${point.offset_y}px)`
-
       return (
         <div
           key={key}
           className="absolute bg-white/90 text-black text-[10px] sm:text-xs px-1 py-0.5 whitespace-nowrap pointer-events-none"
           style={{
-            left: x,
-            top: y,
-            transform: transform,
+            left: `${point.x_percent}%`,
+            top: `${point.y_percent}%`,
           }}
         >
           {formattedValue}

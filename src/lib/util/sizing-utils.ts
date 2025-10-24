@@ -4,7 +4,6 @@ import { mapCategoryToTemplate } from "@lib/data/sizing-templates"
 export interface ProductMeasurementsData {
   measurements_by_variant: Record<string, Record<string, { value: number; unit: string }>>
   template: string | null
-  diagram_config: any
 }
 
 /**
