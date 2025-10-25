@@ -261,7 +261,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     return (
       <>
         {/* Desktop/Laptop: Horizontal layout */}
-        <div className="hidden lg:flex gap-8 items-start justify-center h-full w-full">
+        <div className="hidden lg:flex gap-8 items-center justify-center h-full w-full">
           {/* Left side - Diagram with measurements */}
           <div className="flex justify-start items-center flex-1 pr-8">
             <div className="relative w-full flex justify-start items-center">
@@ -335,7 +335,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
             </div>
 
           {/* Controls */}
-          <div className="flex flex-col gap-4 w-full">
+          <div className="flex flex-col gap-4 w-full items-center">
             <div className="flex flex-col gap-3">
               <span className="text-xs">Displaying measurements for size:</span>
               <div className="flex gap-2 flex-wrap">
