@@ -1,5 +1,6 @@
 export type TemplateCategory =
   | "Pants"
+  | "T-Shirts"
   | "Shoes Unisex"
   | "Shoes Men"
   | "Shoes Women"
@@ -555,6 +556,10 @@ export type { CategoryMasterState }
   CategoryMaster.setTemplate({ handle: "mens-pants" }, "Pants")
   CategoryMaster.setTemplate({ handle: "womens-pants" }, "Pants")
   CategoryMaster.setTemplate({ handle: "mens-jeans" }, "Pants")
+
+  // T-SHIRTS
+  CategoryMaster.setTemplate({ handle: "mens-t-shirts" }, "T-Shirts")
+  CategoryMaster.setTemplate({ handle: "womens-t-shirts" }, "T-Shirts")
 
   // ===========================================================================================
   // TODO: Uncomment additional templates as they are designed

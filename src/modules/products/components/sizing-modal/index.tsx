@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 import Modal from "@modules/common/components/modal"
 import { getSizingTemplate, SizingTemplate } from "@lib/data/sizing-templates"
-import { SizingMissingDiagram, PantsDiagram } from "@modules/common/icons/sizing-diagrams"
+import { SizingMissingDiagram, PantsDiagram, TShirtsDiagram } from "@modules/common/icons/sizing-diagrams"
 import X from "@modules/common/icons/x"
 
 interface SizingModalProps {
@@ -176,6 +176,9 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
       case "PantsDiagram":
         return <PantsDiagram className="w-full h-auto max-w-md" />
 
+      case "TShirtsDiagram":
+        return <TShirtsDiagram className="w-full h-auto max-w-md" />
+
       // TODO: Add more diagram rendering cases here when templates are implemented
       // Example:
       // case "ShirtsDiagram":
@@ -261,7 +264,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     return (
       <>
         {/* Desktop/Laptop: Horizontal layout */}
-        <div className="hidden lg:flex gap-8 items-center justify-center h-full w-full">
+        <div className="hidden lg:flex gap-8 justify-center h-full w-full relative">
           {/* Left side - Diagram with measurements */}
           <div className="flex justify-start items-center flex-1 pr-8">
             <div className="relative w-full flex justify-start items-center">
@@ -275,7 +278,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           </div>
 
           {/* Right side - Controls */}
-          <div className="flex flex-col gap-6 w-64 flex-shrink-0">
+          <div className="flex flex-col gap-6 w-64 flex-shrink-0 absolute right-0" style={{ top: '30%' }}>
             {/* Size selector */}
             <div className="flex flex-col gap-3">
               <span className="text-xs">Displaying measurements for size:</span>
