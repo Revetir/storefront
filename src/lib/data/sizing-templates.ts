@@ -93,7 +93,7 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
       },
       shoulder: {
         x_percent: 44,
-        y_percent: 22,
+        y_percent: 21,
         label: "Shoulder"
       },
       chest: {
