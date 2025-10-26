@@ -25,11 +25,26 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   const [productMeasurements, setProductMeasurements] = useState<any>(null)
   const [isLoadingMeasurements, setIsLoadingMeasurements] = useState(false)
 
-  // Get the sizing template from backend data
+  // Get the sizing template from backend data OR frontend category lookup
   const sizingTemplate = useMemo(() => {
-    if (!productMeasurements?.template) return null
-    return getSizingTemplate(productMeasurements.template)
-  }, [productMeasurements?.template])
+    // First try backend template (for products with measurements)
+    if (productMeasurements?.template) {
+      return getSizingTemplate(productMeasurements.template)
+    }
+
+    // Fallback to frontend category lookup (for shoes and products without measurements)
+    if (product.categories && product.categories.length > 0) {
+      const { mapCategoryToTemplate } = require("@lib/data/sizing-templates")
+      for (const category of product.categories) {
+        const templateName = mapCategoryToTemplate(category.name, category.id)
+        if (templateName) {
+          return getSizingTemplate(templateName)
+        }
+      }
+    }
+
+    return null
+  }, [productMeasurements?.template, product.categories])
 
   React.useEffect(() => {
     if (!isOpen) return
