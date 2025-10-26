@@ -1,6 +1,7 @@
 export type TemplateCategory =
   | "Pants"
   | "T-Shirts"
+  | "Sweaters"
   | "Shoes Unisex"
   | "Shoes Men"
   | "Shoes Women"
@@ -561,6 +562,10 @@ export type { CategoryMasterState }
   CategoryMaster.setTemplate({ handle: "mens-t-shirts" }, "T-Shirts")
   CategoryMaster.setTemplate({ handle: "womens-t-shirts" }, "T-Shirts")
 
+  // SWEATERS
+  CategoryMaster.setTemplate({ handle: "mens-sweaters" }, "Sweaters")
+  CategoryMaster.setTemplate({ handle: "womens-sweaters" }, "Sweaters")
+
   // ===========================================================================================
   // TODO: Uncomment additional templates as they are designed
   // ===========================================================================================
@@ -573,10 +578,6 @@ export type { CategoryMasterState }
   //
   // SHORTS
   // CategoryMaster.setTemplate({ handle: "mens-shorts" }, "Shorts")
-  //
-  // SWEATERS & HOODIES
-  // CategoryMaster.setTemplate({ handle: "mens-sweaters" }, "Sweaters")
-  // CategoryMaster.setTemplate({ handle: "womens-sweaters" }, "Sweaters")
   //
   // JACKETS & COATS
   // CategoryMaster.setTemplate({ handle: "mens-jackets-coats" }, "Jackets")

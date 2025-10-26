@@ -110,6 +110,36 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
     size_chart: {}
   },
 
+  // Sweaters template with SVG diagram
+  {
+    category: "Sweaters",
+    diagram_component: "SweatersDiagram",
+    units: "cm",
+    measurement_points: {
+      sleeve: {
+        x_percent: 22,
+        y_percent: 36,
+        label: "Sleeve"
+      },
+      shoulder: {
+        x_percent: 67,
+        y_percent: 26,
+        label: "Shoulder"
+      },
+      chest: {
+        x_percent: 67,
+        y_percent: 43,
+        label: "Chest"
+      },
+      length: {
+        x_percent: 96,
+        y_percent: 50,
+        label: "Length"
+      }
+    },
+    size_chart: {}
+  },
+
   // Shoes categories render a conversion chart (EU/US/UK/JP) in the modal
   // The modal provides a custom renderer; size_chart remains empty
   {

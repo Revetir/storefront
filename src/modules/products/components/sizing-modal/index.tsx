@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 import Modal from "@modules/common/components/modal"
 import { getSizingTemplate, SizingTemplate } from "@lib/data/sizing-templates"
-import { SizingMissingDiagram, PantsDiagram, TShirtsDiagram } from "@modules/common/icons/sizing-diagrams"
+import { SizingMissingDiagram, PantsDiagram, TShirtsDiagram, SweatersDiagram } from "@modules/common/icons/sizing-diagrams"
 import X from "@modules/common/icons/x"
 
 interface SizingModalProps {
@@ -139,7 +139,43 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   // Get available sizes from product variants
   const availableSizes = useMemo(() => {
     if (!product.variants || product.variants.length === 0) return []
-    return product.variants.map(v => v.title || "").filter(Boolean)
+
+    // Universal sort function that handles predefined sizes and numeric/alphanumeric values
+    const sizeOrder = [
+      "xxxs", "xxs", "xs", "s", "sm", "small",
+      "m", "med", "medium", "l", "large",
+      "xl", "xxl", "xxxl", "xxxxl"
+    ]
+
+    const universalSort = (a: string, b: string) => {
+      const aLower = a.toLowerCase()
+      const bLower = b.toLowerCase()
+
+      const aIndex = sizeOrder.indexOf(aLower)
+      const bIndex = sizeOrder.indexOf(bLower)
+
+      if (aIndex !== -1 && bIndex !== -1) {
+        // Both are in the sizeOrder list
+        return aIndex - bIndex
+      } else if (aIndex !== -1) {
+        // Only a is in the list -> a comes first
+        return -1
+      } else if (bIndex !== -1) {
+        // Only b is in the list -> b comes first
+        return 1
+      }
+
+      // Fallback: numeric/alphanumeric natural sort
+      return a.localeCompare(b, undefined, {
+        numeric: true,
+        sensitivity: 'base'
+      })
+    }
+
+    return product.variants
+      .map(v => v.title || "")
+      .filter(Boolean)
+      .sort(universalSort)
   }, [product.variants])
 
   // Set default selected size to first available size
@@ -178,6 +214,9 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
       case "TShirtsDiagram":
         return <TShirtsDiagram className="w-full h-auto max-w-md" />
+
+      case "SweatersDiagram":
+        return <SweatersDiagram className="w-full h-auto max-w-md" />
 
       // TODO: Add more diagram rendering cases here when templates are implemented
       // Example:
