@@ -26,7 +26,7 @@ export const TShirtsDiagram: React.FC<{ className?: string }> = ({ className = "
 export const SweatersDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
   <div className={`w-full h-auto ${className}`} style={{ aspectRatio: '600/800' }}>
     <img
-      src="/images/sweaters_sizing_diagram_vertical.svg"
+      src="/images/sweaters_sizing_diagram_wide.svg"
       alt="Sweaters measurements diagram"
       className="w-full h-full object-contain"
     />

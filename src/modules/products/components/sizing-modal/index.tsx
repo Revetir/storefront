@@ -395,7 +395,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
           <div className="flex flex-col gap-4 w-full items-center">
             <div className="flex flex-col gap-3">
               <span className="text-xs">Displaying measurements for size:</span>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 justify-center flex-wrap">
                 {availableSizes.map((size) => (
                   <button
                     key={size}
