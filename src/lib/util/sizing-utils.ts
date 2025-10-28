@@ -36,14 +36,14 @@ export const getProductCategory = (product: HttpTypes.StoreProduct): string | un
 /**
  * Get the best matching category for sizing from product's category hierarchy
  */
-export const getBestSizingCategory = (product: HttpTypes.StoreProduct): string | undefined => {
+export const getBestSizingCategory = async (product: HttpTypes.StoreProduct): Promise<string | undefined> => {
   if (!product.categories || product.categories.length === 0) {
     return undefined
   }
 
   // Try each category in the product's categories array
   for (const category of product.categories) {
-    const mappedCategory = mapCategoryToTemplate(category.name, category.id)
+    const mappedCategory = await mapCategoryToTemplate(category.name, category.id)
     // If we get a specific template, use it
     if (mappedCategory) {
       return category.name
@@ -58,7 +58,7 @@ export const getBestSizingCategory = (product: HttpTypes.StoreProduct): string |
  * Get the mapped template category for a product using hierarchical lookup
  * Special handling for unisex shoes (products in both mens-shoes and womens-shoes)
  */
-export const getProductTemplateCategory = (product: HttpTypes.StoreProduct): string | undefined => {
+export const getProductTemplateCategory = async (product: HttpTypes.StoreProduct): Promise<string | undefined> => {
   if (!product.categories || product.categories.length === 0) {
     return undefined
   }
@@ -67,7 +67,7 @@ export const getProductTemplateCategory = (product: HttpTypes.StoreProduct): str
   const templateCategories = new Set<string>()
 
   for (const category of product.categories) {
-    const mappedCategory = mapCategoryToTemplate(category.name, category.id)
+    const mappedCategory = await mapCategoryToTemplate(category.name, category.id)
     if (mappedCategory) {
       templateCategories.add(mappedCategory)
     }
@@ -95,8 +95,8 @@ export const getProductTemplateCategory = (product: HttpTypes.StoreProduct): str
 /**
  * Check if a product category supports sizing
  */
-export const isSizingSupported = (categoryName: string): boolean => {
-  const mappedCategory = mapCategoryToTemplate(categoryName)
+export const isSizingSupported = async (categoryName: string): Promise<boolean> => {
+  const mappedCategory = await mapCategoryToTemplate(categoryName)
   if (!mappedCategory) return false
 
   const supportedCategories = [

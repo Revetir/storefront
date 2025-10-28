@@ -117,7 +117,7 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
     units: "cm",
     measurement_points: {
       sleeve: {
-        x_percent: 16,
+        x_percent: 15,
         y_percent: 44,
         label: "Sleeve"
       },
@@ -167,14 +167,14 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
 
 
 // Map category to sizing template using hierarchical lookup
-export const mapCategoryToTemplate = (categoryName: string, categoryId?: string): string | undefined => {
+export const mapCategoryToTemplate = async (categoryName: string, categoryId?: string): Promise<string | undefined> => {
   try {
     // Lazy import to avoid circular deps
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { CategoryMaster } = require("@lib/data/category-master") as typeof import("@lib/data/category-master")
 
     // getTemplateForCategory now uses hierarchical lookup by default
-    const template = CategoryMaster.getTemplateForCategory({
+    const template = await CategoryMaster.getTemplateForCategory({
       id: categoryId,
       name: categoryName
     })

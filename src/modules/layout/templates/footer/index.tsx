@@ -25,7 +25,7 @@ export default function Footer() {
               Partnerships
             </LocalizedClientLink>
             <a
-              href="https://instagram.com/youcouldbewearingthis"
+              href="https://instagram.com/shoprevetir"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-ui-fg-base"
@@ -34,7 +34,7 @@ export default function Footer() {
               Instagram
             </a>
             <a
-              href="https://tiktok.com/@youcouldbewearingthis"
+              href="https://tiktok.com/@shoprevetir"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-ui-fg-base"

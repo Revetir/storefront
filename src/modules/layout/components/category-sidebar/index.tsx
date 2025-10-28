@@ -198,17 +198,62 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
     return null
   }
 
+  // Helper function to filter category tree to only show categories with products
+  const filterCategoryTree = (categories: Category[], availableHandles: Set<string>): Category[] => {
+    return categories
+      .map(cat => {
+        // Recursively filter children first
+        const filteredChildren = cat.children && cat.children.length > 0
+          ? filterCategoryTree(cat.children, availableHandles)
+          : []
+
+        // Show this category if:
+        // 1. It has products (in availableHandles), OR
+        // 2. It has children with products (filteredChildren not empty)
+        if (availableHandles.has(cat.handle) || filteredChildren.length > 0) {
+          return {
+            ...cat,
+            children: filteredChildren
+          }
+        }
+
+        return null
+      })
+      .filter(Boolean) as Category[]
+  }
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         setLoading(true)
-        const res = await fetch("/api/categories")
+
+        // Import Algolia facets dynamically
+        const { getAvailableCategories } = await import("@lib/util/algolia-facets")
+
+        // Parallel fetch: Algolia facets + full category tree
+        const [categoryFacets, res] = await Promise.all([
+          getAvailableCategories({
+            gender: genderParam as "men" | "women" | undefined,
+            brandSlug: brandSlugParam
+          }),
+          fetch("/api/categories")
+        ])
+
         if (!res.ok) {
           throw new Error("Failed to fetch categories")
         }
+
         const data = await res.json()
-        setCategories(data.categories || [])
-        
+        const allCategories = data.categories || []
+
+        // Build set of available handles from Algolia facets
+        const availableHandles = new Set(categoryFacets.map((f: any) => f.handle))
+
+        // Filter tree to only show categories with products
+        const filteredCategories = filterCategoryTree(allCategories, availableHandles)
+
+        setCategories(filteredCategories)
+
         // Auto-expand categories along the chain to the current category
         if (currentCategoryHandle) {
           const newExpanded = new Set<string>()
@@ -232,11 +277,11 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
             return false
           }
 
-          expandPathToCategoryByHandle(data.categories || [], currentCategoryHandle)
+          expandPathToCategoryByHandle(filteredCategories, currentCategoryHandle)
           setExpandedCategories(newExpanded)
 
           // Find and set the active category path for highlighting
-          const path = findCategoryPath(data.categories || [], currentCategoryHandle)
+          const path = findCategoryPath(filteredCategories, currentCategoryHandle)
           if (path) {
             setActiveCategoryPath(path)
           }
@@ -249,7 +294,7 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
     }
 
     fetchCategories()
-  }, [currentCategoryHandle])
+  }, [currentCategoryHandle, genderParam, brandSlugParam])
 
   const handleToggleExpanded = (categoryId: string) => {
     setExpandedCategories(prev => {

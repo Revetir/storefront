@@ -25,26 +25,39 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   const [productMeasurements, setProductMeasurements] = useState<any>(null)
   const [isLoadingMeasurements, setIsLoadingMeasurements] = useState(false)
 
-  // Get the sizing template from backend data OR frontend category lookup
-  const sizingTemplate = useMemo(() => {
-    // First try backend template (for products with measurements)
-    if (productMeasurements?.template) {
-      return getSizingTemplate(productMeasurements.template)
-    }
+  // State for sizing template (fetched asynchronously)
+  const [sizingTemplate, setSizingTemplate] = useState<SizingTemplate | null>(null)
 
-    // Fallback to frontend category lookup (for shoes and products without measurements)
-    if (product.categories && product.categories.length > 0) {
-      const { mapCategoryToTemplate } = require("@lib/data/sizing-templates")
-      for (const category of product.categories) {
-        const templateName = mapCategoryToTemplate(category.name, category.id)
-        if (templateName) {
-          return getSizingTemplate(templateName)
+  // Fetch sizing template asynchronously when modal opens or productMeasurements change
+  React.useEffect(() => {
+    if (!isOpen) return
+
+    const fetchSizingTemplate = async () => {
+      // First try backend template (for products with measurements)
+      if (productMeasurements?.template) {
+        const template = getSizingTemplate(productMeasurements.template)
+        setSizingTemplate(template)
+        return
+      }
+
+      // Fallback to frontend category lookup (for shoes and products without measurements)
+      if (product.categories && product.categories.length > 0) {
+        const { mapCategoryToTemplate } = require("@lib/data/sizing-templates")
+        for (const category of product.categories) {
+          const templateName = await mapCategoryToTemplate(category.name, category.id)
+          if (templateName) {
+            const template = getSizingTemplate(templateName)
+            setSizingTemplate(template)
+            return
+          }
         }
       }
+
+      setSizingTemplate(null)
     }
 
-    return null
-  }, [productMeasurements?.template, product.categories])
+    fetchSizingTemplate()
+  }, [isOpen, productMeasurements?.template, product.categories])
 
   React.useEffect(() => {
     if (!isOpen) return

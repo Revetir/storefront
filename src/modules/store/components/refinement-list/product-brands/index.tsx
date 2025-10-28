@@ -12,16 +12,43 @@ export default function BrandRefinementList({ selectedBrand: propSelectedBrand }
   const selectedBrand = propSelectedBrand || ""
 
   useEffect(() => {
-    listBrands()
-      .then((fetchedBrands) => {
-        // Sort brands alphabetically by name
-        const sortedBrands = [...fetchedBrands].sort((a, b) =>
-          a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
-        )
-        setBrands(sortedBrands)
-      })
-      .finally(() => setLoading(false))
-  }, [])
+    const fetchBrands = async () => {
+      try {
+        setLoading(true)
+
+        const gender = (params?.gender as string) || "men"
+        const categorySlug = params?.categorySlug as string
+
+        // Import Algolia facets dynamically
+        const { getAvailableBrands } = await import("@lib/util/algolia-facets")
+
+        // Parallel fetch: Algolia facets + all brands
+        const [brandFacets, allBrands] = await Promise.all([
+          getAvailableBrands({
+            gender: gender as "men" | "women",
+            categoryHandle: categorySlug
+          }),
+          listBrands()
+        ])
+
+        // Build set of available brand slugs from Algolia facets
+        const availableSlugs = new Set(brandFacets.map((f: any) => f.slug))
+
+        // Filter brands to only those with products in current context
+        const filteredBrands = allBrands
+          .filter(brand => availableSlugs.has(brand.slug))
+          .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+
+        setBrands(filteredBrands)
+      } catch (error) {
+        console.error("Error fetching brands:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchBrands()
+  }, [params?.gender, params?.categorySlug, params?.brandSlug])
 
   const handleSelect = (slug: string) => {
     const countryCode = params?.countryCode as string
