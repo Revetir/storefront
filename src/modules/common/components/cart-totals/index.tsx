@@ -61,14 +61,14 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
           </div>
         )}
         <div className="flex flex-col">
-          <div className="flex items-center justify-between uppercase">
+          <div className="flex items-center justify-between">
             <button
               onClick={() => setDeliveryExpanded(!deliveryExpanded)}
               className="flex items-center gap-1.5 text-left hover:text-gray-700 transition-colors group"
               aria-expanded={deliveryExpanded}
               aria-label="Toggle delivery information"
             >
-              <span>Delivery</span>
+              <span className="uppercase">Delivery</span>
               <svg
                 className={`w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-all duration-300 ${
                   deliveryExpanded ? 'rotate-180' : 'rotate-0'
@@ -87,7 +87,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
               data-value={shipping_subtotal || 0}
             >
               {shipping_subtotal === 0 ? (
-                convertToLocale({ amount: 0, currency_code })
+                <strong>Free</strong>
               ) : (
                 convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })
               )}
@@ -95,21 +95,21 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
           </div>
           {deliveryExpanded && (
             <div className="overflow-hidden animate-accordion-open">
-              <p className="text-xs text-gray-600 mt-2 px-4 leading-relaxed">
-                Standard shipping is complimentary on this order, with all duties and additional import fees prepaid
+              <p className="text-xs italic text-gray-500 mt-1 leading-relaxed">
+                Standard shipping is <strong>complimentary</strong> on this order, with all duties and additional import fees prepaid
               </p>
             </div>
           )}
         </div>
         <div className="flex flex-col">
-          <div className="flex items-center justify-between uppercase">
+          <div className="flex items-center justify-between">
             <button
               onClick={() => setReturnsExpanded(!returnsExpanded)}
               className="flex items-center gap-1.5 text-left hover:text-gray-700 transition-colors group"
               aria-expanded={returnsExpanded}
               aria-label="Toggle returns information"
             >
-              <span>Returns</span>
+              <span className="uppercase">Returns</span>
               <svg
                 className={`w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-all duration-300 ${
                   returnsExpanded ? 'rotate-180' : 'rotate-0'
@@ -124,13 +124,13 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
               </svg>
             </button>
             <span>
-              {convertToLocale({ amount: 0, currency_code })}
+              <strong>Free</strong>
             </span>
           </div>
           {returnsExpanded && (
             <div className="overflow-hidden animate-accordion-open">
-              <p className="text-xs text-gray-600 mt-2 px-4 leading-relaxed">
-                Returns are complimentary within 7 days of delivery, with a prepaid return label included in every order
+              <p className="text-xs italic text-gray-500 mt-1 leading-relaxed">
+                Returns are <strong>complimentary</strong> within 7 days of delivery, with a prepaid return label included in every order
               </p>
             </div>
           )}
