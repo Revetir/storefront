@@ -136,12 +136,17 @@ module.exports = {
           "0%": { transform: "translateY(-100%)" },
           "100%": { transform: "translateY(0)" },
         },
+        fadeIn: {
+          "0%": { opacity: "0", transform: "translateY(5px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         ring: "ring 2.2s cubic-bezier(0.5, 0, 0.5, 1) infinite",
         "fade-in-right":
           "fade-in-right 0.3s cubic-bezier(0.5, 0, 0.5, 1) forwards",
         "fade-in-top": "fade-in-top 0.2s cubic-bezier(0.5, 0, 0.5, 1) forwards",
+        fadeIn: "fadeIn 0.2s ease-out forwards",
         "fade-out-top":
           "fade-out-top 0.2s cubic-bezier(0.5, 0, 0.5, 1) forwards",
         "accordion-open":

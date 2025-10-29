@@ -154,12 +154,12 @@ const CartDropdown = ({
                               } as any}
                             />
                           </LocalizedClientLink>
-                          <div className="flex flex-col justify-between flex-1">
-                            <div className="flex flex-col flex-1">
+                          <div className="flex flex-col justify-start flex-1">
+                            <div className="flex flex-col">
                               <div className="flex items-start justify-between">
                                 <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
                                   {getBrandsArray((item.product as any)?.brands).length > 0 && (
-                                    <span className="text-ui-fg-muted text-xs font-medium mb-0.5 truncate block">
+                                    <span className="text-ui-fg-muted text-xs font-medium truncate block">
                                       {getBrandsArray((item.product as any)?.brands).map((brand, idx, arr) => (
                                         <Fragment key={brand.slug}>
                                           <span className="uppercase">{brand.name}</span>
@@ -168,7 +168,7 @@ const CartDropdown = ({
                                       ))}
                                     </span>
                                   )}
-                                  <h3 className="text-base-regular overflow-hidden text-ellipsis normal-case">
+                                  <h3 className="text-base-regular overflow-hidden text-ellipsis normal-case mb-1">
                                     <LocalizedClientLink
                                       href={getProductUrl((item.product as any)?.brands, item.product_handle || '')}
                                       data-testid="product-link"
