@@ -14,23 +14,11 @@ const LineItemUnitPrice = ({
   currencyCode,
 }: LineItemUnitPriceProps) => {
   const { total, original_total } = item
+  const hasReducedPrice = total < original_total
 
-  // Calculate original price from variant if not provided on line item
-  let originalPrice = original_total
-  if (!originalPrice && item.variant?.calculated_price) {
-    const variantOriginal = item.variant.calculated_price.original_amount
-    const variantCalculated = item.variant.calculated_price.calculated_amount
-    // Only use variant price if there's actually a discount
-    if (variantOriginal && variantCalculated && variantOriginal > variantCalculated) {
-      originalPrice = variantOriginal * item.quantity
-    }
-  }
-
-  const hasReducedPrice = !!(originalPrice && total && total < originalPrice)
-
-  const percentage_diff = hasReducedPrice
-    ? Math.round(((originalPrice - total) / originalPrice) * 100)
-    : 0
+  const percentage_diff = Math.round(
+    ((original_total - total) / original_total) * 100
+  )
 
   return (
     <div className="flex flex-col text-ui-fg-muted justify-center h-full">
@@ -45,7 +33,7 @@ const LineItemUnitPrice = ({
               data-testid="product-unit-original-price"
             >
               {convertToLocale({
-                amount: originalPrice / item.quantity,
+                amount: original_total / item.quantity,
                 currency_code: currencyCode,
               })}
             </span>
