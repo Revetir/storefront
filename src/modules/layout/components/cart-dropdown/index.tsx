@@ -168,7 +168,7 @@ const CartDropdown = ({
                                       ))}
                                     </span>
                                   )}
-                                  <h3 className="text-base-regular overflow-hidden text-ellipsis normal-case mb-1">
+                                  <h3 className="text-base-regular overflow-hidden text-ellipsis normal-case">
                                     <LocalizedClientLink
                                       href={getProductUrl((item.product as any)?.brands, item.product_handle || '')}
                                       data-testid="product-link"
@@ -204,7 +204,7 @@ const CartDropdown = ({
                             </div>
                             <DeleteButton
                               id={item.id}
-                              className="mt-1"
+                              className="mt-2"
                               data-testid="cart-item-remove-button"
                             >
                               Remove
