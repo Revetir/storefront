@@ -60,7 +60,7 @@ const Summary = ({ cart }: SummaryProps) => {
         data-testid="checkout-button"
         onClick={handleCheckoutClick}
       >
-        <Button className="w-full h-10 uppercase">Proceed to checkout</Button>
+        <Button className="w-full h-10 uppercase">Continue to checkout</Button>
       </LocalizedClientLink>
     </div>
   )

@@ -40,7 +40,7 @@ export default function HowToShopPage() {
           </p>
           
           <p className="text-gray-600 leading-relaxed mb-6">
-            Clicking 'Proceed to Checkout' leads to the final stage of the process.
+            Clicking 'Continue to Checkout' leads to the final stage of the process.
           </p>
           
           <p className="text-gray-600 leading-relaxed mb-6">

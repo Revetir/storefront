@@ -2,7 +2,6 @@
 
 import { convertToLocale } from "@lib/util/money"
 import React, { useState } from "react"
-import Tooltip from "../tooltip"
 
 type CartTotalsProps = {
   totals: {
@@ -21,8 +20,8 @@ type CartTotalsProps = {
 }
 
 const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
-  const [deliveryTooltipVisible, setDeliveryTooltipVisible] = useState(false)
-  const [returnsTooltipVisible, setReturnsTooltipVisible] = useState(false)
+  const [deliveryExpanded, setDeliveryExpanded] = useState(false)
+  const [returnsExpanded, setReturnsExpanded] = useState(false)
   const {
     currency_code,
     total,
@@ -61,37 +60,80 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
             </span>
           </div>
         )}
-        <div className="flex items-center justify-between uppercase">
-          <Tooltip
-            content="Standard shipping is complimentary on this order, with all duties and additional import fees prepaid"
-            onVisibilityChange={setDeliveryTooltipVisible}
-          >
-            <span>Delivery</span>
-          </Tooltip>
-          <span
-            data-testid="cart-shipping"
-            data-value={shipping_subtotal || 0}
-            className={deliveryTooltipVisible ? 'hidden' : ''}
-          >
-            {shipping_subtotal === 0 ? (
-              <span className="font-bold">FREE</span>
-            ) : (
-              convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })
-            )}
-          </span>
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between uppercase">
+            <button
+              onClick={() => setDeliveryExpanded(!deliveryExpanded)}
+              className="flex items-center gap-1.5 text-left hover:text-gray-700 transition-colors group"
+              aria-expanded={deliveryExpanded}
+              aria-label="Toggle delivery information"
+            >
+              <span>Delivery</span>
+              <svg
+                className={`w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-all duration-300 ${
+                  deliveryExpanded ? 'rotate-180' : 'rotate-0'
+                }`}
+                fill="none"
+                strokeWidth="2"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <span
+              data-testid="cart-shipping"
+              data-value={shipping_subtotal || 0}
+            >
+              {shipping_subtotal === 0 ? (
+                convertToLocale({ amount: 0, currency_code })
+              ) : (
+                convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })
+              )}
+            </span>
+          </div>
+          {deliveryExpanded && (
+            <div className="overflow-hidden animate-accordion-open">
+              <p className="text-xs text-gray-600 mt-2 px-4 leading-relaxed">
+                Standard shipping is complimentary on this order, with all duties and additional import fees prepaid
+              </p>
+            </div>
+          )}
         </div>
-        <div className="flex items-center justify-between uppercase">
-          <Tooltip
-            content="Returns are complimentary within 7 days of delivery, with a prepaid return label included in every order"
-            onVisibilityChange={setReturnsTooltipVisible}
-          >
-            <span>Returns</span>
-          </Tooltip>
-          <span
-            className={returnsTooltipVisible ? 'hidden' : 'font-bold'}
-          >
-            FREE
-          </span>
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between uppercase">
+            <button
+              onClick={() => setReturnsExpanded(!returnsExpanded)}
+              className="flex items-center gap-1.5 text-left hover:text-gray-700 transition-colors group"
+              aria-expanded={returnsExpanded}
+              aria-label="Toggle returns information"
+            >
+              <span>Returns</span>
+              <svg
+                className={`w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-all duration-300 ${
+                  returnsExpanded ? 'rotate-180' : 'rotate-0'
+                }`}
+                fill="none"
+                strokeWidth="2"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <span>
+              {convertToLocale({ amount: 0, currency_code })}
+            </span>
+          </div>
+          {returnsExpanded && (
+            <div className="overflow-hidden animate-accordion-open">
+              <p className="text-xs text-gray-600 mt-2 px-4 leading-relaxed">
+                Returns are complimentary within 7 days of delivery, with a prepaid return label included in every order
+              </p>
+            </div>
+          )}
         </div>
         <div className="flex justify-between">
           <span className="flex gap-x-1 items-center uppercase">Taxes</span>
