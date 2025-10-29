@@ -156,16 +156,17 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       )}
 
       <Table.Cell className="!pr-0">
-        <div className="flex flex-col items-end h-full justify-between lg:justify-center">
-          <div className="flex items-center justify-end w-full">
-            <LineItemPrice
-              item={item}
-              style="tight"
-              currencyCode={currencyCode}
-            />
-          </div>
+        <div className="relative h-full flex items-center justify-end lg:justify-center">
+          {/* Price - centered vertically */}
+          <LineItemPrice
+            item={item}
+            style="tight"
+            currencyCode={currencyCode}
+          />
+
+          {/* Preview mode: quantity x unit price below */}
           {type === "preview" && (
-            <span className="flex gap-x-1">
+            <span className="flex gap-x-1 absolute bottom-1 right-0">
               <Text className="text-ui-fg-muted">{item.quantity}x </Text>
               <LineItemUnitPrice
                 item={item}
@@ -174,8 +175,10 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
               />
             </span>
           )}
+
+          {/* Full mode mobile: quantity controls and delete button at bottom right */}
           {type === "full" && (
-            <div className="lg:hidden flex items-center gap-1.5 self-end">
+            <div className="lg:hidden absolute bottom-1 right-0 flex items-center gap-1.5">
               <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden">
                 <button
                   onClick={() => changeQuantity(Math.max(1, item.quantity - 1))}

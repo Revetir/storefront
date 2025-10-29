@@ -185,7 +185,7 @@ const CartDropdown = ({
                                     />
                                   </div>
                                   <span
-                                    className="text-ui-fg-subtle text-xs"
+                                    className="text-ui-fg-muted text-xs"
                                     data-testid="cart-item-quantity"
                                     data-value={item.quantity}
                                   >

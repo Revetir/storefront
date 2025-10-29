@@ -21,7 +21,7 @@ const LineItemOptions = ({
     <Text
       data-testid={dataTestid}
       data-value={dataValue}
-      className="inline-block txt-small text-ui-fg-subtle w-full overflow-hidden text-ellipsis"
+      className="inline-block text-xs text-ui-fg-muted w-full overflow-hidden text-ellipsis"
     >
       Size: <span className={variant.title && variant.title.length <= 3 ? "uppercase" : ""}>{variant.title}</span>
     </Text>

@@ -18,7 +18,7 @@ const CartTemplate = ({
         {cart?.items?.length ? (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-x-40">
             <div className="flex flex-col gap-y-6">
-              <div className="bg-white py-6">
+              <div className="bg-white">
                 <ItemsTemplate cart={cart} />
               </div>
               {!customer && (
@@ -40,7 +40,7 @@ const CartTemplate = ({
                 )}
                 {cart && cart.region && (
                   <>
-                    <div className="bg-white py-6">
+                    <div className="bg-white">
                       <Summary cart={cart as any} />
                     </div>
                   </>
