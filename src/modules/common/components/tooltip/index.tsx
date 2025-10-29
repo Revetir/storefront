@@ -61,14 +61,8 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
         </svg>
       </div>
       {isVisible && (
-        <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 text-sm text-gray-700 bg-white rounded-lg shadow-xl border border-gray-200 whitespace-normal w-64 animate-fadeIn md:w-64 w-[calc(100vw-2rem)] max-w-xs">
-          <div className="text-center leading-relaxed">{content}</div>
-          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1">
-            <div className="border-8 border-transparent border-t-white"></div>
-            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[17px]">
-              <div className="border-8 border-transparent border-t-gray-200"></div>
-            </div>
-          </div>
+        <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs text-gray-700 bg-white rounded-lg shadow-xl border border-gray-200 whitespace-normal w-80 animate-fadeIn md:w-80 w-[calc(100vw-2rem)] max-w-sm">
+          <div className="text-left leading-snug">{content}</div>
           {/* Close button for mobile - only visible on touch devices */}
           <button
             onClick={() => setIsVisible(false)}

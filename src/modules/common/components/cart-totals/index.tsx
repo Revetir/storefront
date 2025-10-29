@@ -65,17 +65,17 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
           </Tooltip>
           <span data-testid="cart-shipping" data-value={shipping_subtotal || 0}>
             {shipping_subtotal === 0 ? (
-              <span>FREE</span>
+              <span className="font-bold">FREE</span>
             ) : (
               convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })
             )}
           </span>
         </div>
         <div className="flex items-center justify-between uppercase">
-          <Tooltip content="Free returns for any reason within 7 days of delivery. You can request a prepaid label through your account or our Customer Care team">
+          <Tooltip content="Returns are complimentary within 7 days of delivery, with a prepaid return label included in every order">
             <span>Returns</span>
           </Tooltip>
-          <span>FREE</span>
+          <span className="font-bold">FREE</span>
         </div>
         <div className="flex justify-between">
           <span className="flex gap-x-1 items-center uppercase">Taxes</span>
