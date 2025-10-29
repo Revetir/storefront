@@ -86,7 +86,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         </LocalizedClientLink>
       </Table.Cell>
 
-      <Table.Cell className="text-left py-3">
+      <Table.Cell className="text-left py-3 !pr-0 lg:pr-4">
         {brands.length > 0 && (
           <Text className="text-ui-fg-muted text-small font-medium mb-1">
             {brands.map((brand, idx, arr) => (
@@ -157,10 +157,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
       <Table.Cell className="!pr-0">
         <span
-          className={clx("!pr-0", {
-            "flex flex-col items-end h-full justify-center": type === "preview",
-            "flex flex-col items-end h-full justify-end lg:justify-center": type === "full",
-          })}
+          className={clx("!pr-0 flex flex-col items-end h-full justify-center")}
         >
           {type === "preview" && (
             <span className="flex gap-x-1 ">
@@ -178,23 +175,23 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             currencyCode={currencyCode}
           />
           {type === "full" && (
-            <div className="lg:hidden mt-2 flex items-center gap-2">
+            <div className="lg:hidden mt-2 flex items-center gap-1.5">
               <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden">
                 <button
                   onClick={() => changeQuantity(Math.max(1, item.quantity - 1))}
                   disabled={item.quantity <= 1 || updating}
-                  className="px-2 py-1 hover:bg-ui-bg-subtle transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium"
+                  className="px-1.5 py-0.5 hover:bg-ui-bg-subtle transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-xs font-medium"
                   aria-label="Decrease quantity"
                 >
                   −
                 </button>
-                <span className="px-2 py-1 text-sm font-medium min-w-[2rem] text-center border-x border-ui-border-base">
+                <span className="px-1.5 py-0.5 text-xs font-medium min-w-[1.5rem] text-center border-x border-ui-border-base">
                   {item.quantity}
                 </span>
                 <button
                   onClick={() => changeQuantity(Math.min(maxQuantity, item.quantity + 1))}
                   disabled={item.quantity >= maxQuantity || updating}
-                  className="px-2 py-1 hover:bg-ui-bg-subtle transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium"
+                  className="px-1.5 py-0.5 hover:bg-ui-bg-subtle transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-xs font-medium"
                   aria-label="Increase quantity"
                 >
                   +

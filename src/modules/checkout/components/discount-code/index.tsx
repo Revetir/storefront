@@ -57,48 +57,31 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   return (
     <div className="w-full bg-white flex flex-col">
       <div className="txt-medium">
-        <form action={(a) => addPromotionCode(a)} className="w-full mb-5">
-          <Label className="flex gap-x-1 my-2 items-center">
-            {/* <button
-              onClick={() => setIsOpen(!isOpen)}
-              type="button"
-              className="txt-medium text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
-              data-testid="add-discount-button"
-            >
-              Add Promotion Code(s)
-            </button> */}
-
-            {/* <Tooltip content="You can add multiple promotion codes">
-              <InformationCircleSolid color="var(--fg-muted)" />
-            </Tooltip> */}
-          </Label>
-
-          {isOpen && (
-            <>
-              <div className="flex w-full gap-x-2">
-                <Input
-                  className="size-full"
-                  id="promotion-input"
-                  name="code"
-                  type="text"
-                  autoFocus={false}
-                  data-testid="discount-input"
-                />
-                <SubmitButton
-                  variant="secondary"
-                  data-testid="discount-apply-button"
-                >
-                  Apply
-                </SubmitButton>
-              </div>
-
-              <ErrorMessage
-                error={message}
-                data-testid="discount-error-message"
+        {isOpen && (
+          <form action={(a) => addPromotionCode(a)} className="w-full mb-5">
+            <div className="flex w-full gap-x-2">
+              <Input
+                className="size-full"
+                id="promotion-input"
+                name="code"
+                type="text"
+                autoFocus={false}
+                data-testid="discount-input"
               />
-            </>
-          )}
-        </form>
+              <SubmitButton
+                variant="secondary"
+                data-testid="discount-apply-button"
+              >
+                Apply
+              </SubmitButton>
+            </div>
+
+            <ErrorMessage
+              error={message}
+              data-testid="discount-error-message"
+            />
+          </form>
+        )}
 
         {promotions.length > 0 && (
           <div className="w-full flex items-center">

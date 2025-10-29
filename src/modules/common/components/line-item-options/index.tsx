@@ -23,7 +23,7 @@ const LineItemOptions = ({
       data-value={dataValue}
       className="inline-block txt-small text-ui-fg-subtle w-full overflow-hidden text-ellipsis"
     >
-      Size: {variant.title}
+      Size: <span className={variant.title && variant.title.length <= 3 ? "uppercase" : ""}>{variant.title}</span>
     </Text>
   )
 }

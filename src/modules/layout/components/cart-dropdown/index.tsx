@@ -168,20 +168,24 @@ const CartDropdown = ({
                                       ))}
                                     </span>
                                   )}
-                                  <h3 className="text-base-regular overflow-hidden text-ellipsis">
+                                  <h3 className="text-base-regular overflow-hidden text-ellipsis normal-case">
                                     <LocalizedClientLink
                                       href={getProductUrl((item.product as any)?.brands, item.product_handle || '')}
                                       data-testid="product-link"
+                                      className="normal-case"
                                     >
                                       {item.title}
                                     </LocalizedClientLink>
                                   </h3>
-                                  <LineItemOptions
-                                    variant={item.variant}
-                                    data-testid="cart-item-variant"
-                                    data-value={item.variant}
-                                  />
+                                  <div className="text-ui-fg-subtle text-xs">
+                                    <LineItemOptions
+                                      variant={item.variant}
+                                      data-testid="cart-item-variant"
+                                      data-value={item.variant}
+                                    />
+                                  </div>
                                   <span
+                                    className="text-ui-fg-subtle text-xs"
                                     data-testid="cart-item-quantity"
                                     data-value={item.quantity}
                                   >
@@ -212,7 +216,7 @@ const CartDropdown = ({
                     <div className="flex items-center justify-between">
                       <span className="text-ui-fg-base font-semibold">
                         Subtotal{" "}
-                        <span className="font-normal">(excl. taxes)</span>
+                        <span className="font-normal"> (excl. taxes)</span>
                       </span>
                       <span
                         className="text-large-semi"

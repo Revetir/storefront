@@ -30,7 +30,7 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
             </Table.HeaderCell>
           </Table.Row>
         </Table.Header>
-        <Table.Body>
+        <Table.Body className="[&_tr]:bg-transparent [&_tr:hover]:bg-transparent">
           {items
             ? items
                 .sort((a, b) => {
