@@ -15,9 +15,20 @@ const LineItemPrice = ({
   currencyCode,
 }: LineItemPriceProps) => {
   const { total, original_total } = item
-  const originalPrice = original_total
+
+  // Calculate original price from variant if not provided on line item
+  let originalPrice = original_total
+  if (!originalPrice && item.variant?.calculated_price) {
+    const variantOriginal = item.variant.calculated_price.original_amount
+    const variantCalculated = item.variant.calculated_price.calculated_amount
+    // Only use variant price if there's actually a discount
+    if (variantOriginal && variantCalculated && variantOriginal > variantCalculated) {
+      originalPrice = variantOriginal * item.quantity
+    }
+  }
+
   const currentPrice = total
-  const hasReducedPrice = currentPrice < originalPrice
+  const hasReducedPrice = !!(originalPrice && currentPrice && currentPrice < originalPrice)
 
   return (
     <div className="flex flex-col gap-x-2 text-ui-fg-subtle items-end">
