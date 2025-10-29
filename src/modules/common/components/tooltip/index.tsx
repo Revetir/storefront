@@ -17,23 +17,24 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
 
   // Calculate vertical offset and width to align tooltip with parent container
   useEffect(() => {
-    if (isVisible && triggerRef.current && tooltipContentRef.current) {
+    if (isVisible && triggerRef.current && tooltipContentRef.current && tooltipRef.current) {
       const trigger = triggerRef.current
       const tooltipContent = tooltipContentRef.current
+      const tooltipWrapper = tooltipRef.current
       const parentRow = trigger.closest('.flex.items-center') as HTMLElement
 
       if (parentRow) {
-        const triggerRect = trigger.getBoundingClientRect()
+        const wrapperRect = tooltipWrapper.getBoundingClientRect()
         const rowRect = parentRow.getBoundingClientRect()
         const tooltipContentRect = tooltipContent.getBoundingClientRect()
 
         // Calculate the center of the parent row
         const rowCenter = rowRect.height / 2
-        // Calculate the center of the trigger element
-        const triggerTopRelativeToRow = triggerRect.top - rowRect.top
-        const triggerCenter = triggerTopRelativeToRow + (triggerRect.height / 2)
+        // Calculate the center of the tooltip wrapper (which is the positioning reference)
+        const wrapperTopRelativeToRow = wrapperRect.top - rowRect.top
+        const wrapperCenter = wrapperTopRelativeToRow + (wrapperRect.height / 2)
         // Calculate offset needed to align tooltip center with row center
-        const offset = rowCenter - triggerCenter
+        const offset = rowCenter - wrapperCenter
 
         setVerticalOffset(offset)
 
