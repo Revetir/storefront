@@ -55,9 +55,9 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   const [message, formAction] = useActionState(submitPromotionForm, null)
 
   return (
-    <div className="w-full bg-white flex flex-col">
+    <>
       {(isOpen || promotions.length > 0) && (
-        <div className="txt-medium">
+        <div className="w-full bg-white flex flex-col txt-medium">
           {isOpen && (
             <form action={(a) => addPromotionCode(a)} className="w-full mb-5">
               <div className="flex w-full gap-x-2">
@@ -156,7 +156,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
           )}
         </div>
       )}
-    </div>
+    </>
   )
 }
 

@@ -66,12 +66,12 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
   return (
     <Table.Row className="w-full [&:hover]:bg-transparent" data-testid="product-row">
-      <Table.Cell className="!pl-0 p-4 w-24">
+      <Table.Cell className="!pl-0 py-4 pr-4 w-24">
         <LocalizedClientLink
           href={productUrl}
           className={clx("flex", {
-            "w-16": type === "preview",
-            "lg:w-24 w-12": type === "full",
+            "w-20": type === "preview",
+            "w-full": type === "full",
           })}
         >
           <Thumbnail
@@ -103,7 +103,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         >
           {item.product_title}
         </Text>
-        <LineItemOptions variant={item.variant} data-testid="product-variant" />
+        <LineItemOptions variant={item.variant} data-testid="product-variant" size="text-sm" />
       </Table.Cell>
 
       {type === "full" && (

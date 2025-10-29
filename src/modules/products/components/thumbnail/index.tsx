@@ -32,7 +32,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   return (
     <Container
       className={clx(
-        "relative w-full h-full aspect-[1/1] p-0 overflow-hidden shadow-none p-4 bg-ui-bg-subtle ",
+        "relative w-full h-full aspect-[1/1] p-0 overflow-hidden shadow-none bg-ui-bg-subtle ",
         className
       )}
       data-testid={dataTestid}

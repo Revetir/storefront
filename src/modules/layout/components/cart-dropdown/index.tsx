@@ -136,13 +136,13 @@ const CartDropdown = ({
                       })
                       .map((item) => (
                         <div
-                          className="grid grid-cols-[122px_1fr] gap-x-4"
+                          className="grid grid-cols-[132px_1fr] gap-x-4"
                           key={item.id}
                           data-testid="cart-item"
                         >
                           <LocalizedClientLink
                             href={getProductUrl((item.product as any)?.brands, item.product_handle || '')}
-                            className="w-24"
+                            className="w-full"
                           >
                             <Thumbnail
                               thumbnail={item.thumbnail}
@@ -182,6 +182,7 @@ const CartDropdown = ({
                                       variant={item.variant}
                                       data-testid="cart-item-variant"
                                       data-value={item.variant}
+                                      size="text-xs"
                                     />
                                   </div>
                                   <span
@@ -189,7 +190,7 @@ const CartDropdown = ({
                                     data-testid="cart-item-quantity"
                                     data-value={item.quantity}
                                   >
-                                    Quantity: {item.quantity}
+                                    <span className="normal-case">Quantity:</span> {item.quantity}
                                   </span>
                                 </div>
                                 <div className="flex justify-end">
