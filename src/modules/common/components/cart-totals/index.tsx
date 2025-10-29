@@ -1,7 +1,7 @@
 "use client"
 
 import { convertToLocale } from "@lib/util/money"
-import React from "react"
+import React, { useState } from "react"
 import Tooltip from "../tooltip"
 
 type CartTotalsProps = {
@@ -21,6 +21,8 @@ type CartTotalsProps = {
 }
 
 const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
+  const [deliveryTooltipVisible, setDeliveryTooltipVisible] = useState(false)
+  const [returnsTooltipVisible, setReturnsTooltipVisible] = useState(false)
   const {
     currency_code,
     total,
@@ -60,10 +62,17 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
           </div>
         )}
         <div className="flex items-center justify-between uppercase">
-          <Tooltip content="Standard shipping is complimentary on this order, with all duties and additional import fees prepaid">
+          <Tooltip
+            content="Standard shipping is complimentary on this order, with all duties and additional import fees prepaid"
+            onVisibilityChange={setDeliveryTooltipVisible}
+          >
             <span>Delivery</span>
           </Tooltip>
-          <span data-testid="cart-shipping" data-value={shipping_subtotal || 0}>
+          <span
+            data-testid="cart-shipping"
+            data-value={shipping_subtotal || 0}
+            className={deliveryTooltipVisible ? 'hidden' : ''}
+          >
             {shipping_subtotal === 0 ? (
               <span className="font-bold">FREE</span>
             ) : (
@@ -72,10 +81,17 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
           </span>
         </div>
         <div className="flex items-center justify-between uppercase">
-          <Tooltip content="Returns are complimentary within 7 days of delivery, with a prepaid return label included in every order">
+          <Tooltip
+            content="Returns are complimentary within 7 days of delivery, with a prepaid return label included in every order"
+            onVisibilityChange={setReturnsTooltipVisible}
+          >
             <span>Returns</span>
           </Tooltip>
-          <span className="font-bold">FREE</span>
+          <span
+            className={returnsTooltipVisible ? 'hidden' : 'font-bold'}
+          >
+            FREE
+          </span>
         </div>
         <div className="flex justify-between">
           <span className="flex gap-x-1 items-center uppercase">Taxes</span>

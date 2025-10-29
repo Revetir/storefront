@@ -5,11 +5,17 @@ import React, { useState, useEffect, useRef } from "react"
 type TooltipProps = {
   content: string
   children: React.ReactNode
+  onVisibilityChange?: (visible: boolean) => void
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
+const Tooltip: React.FC<TooltipProps> = ({ content, children, onVisibilityChange }) => {
   const [isVisible, setIsVisible] = useState(false)
   const tooltipRef = useRef<HTMLDivElement>(null)
+
+  // Notify parent of visibility changes
+  useEffect(() => {
+    onVisibilityChange?.(isVisible)
+  }, [isVisible, onVisibilityChange])
 
   // Handle clicks outside tooltip to close it on mobile
   useEffect(() => {
@@ -61,11 +67,8 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
         </svg>
       </span>
       {isVisible && (
-        <span
-          className="absolute z-50 left-full ml-2 px-3 py-2 text-xs text-gray-700 bg-white rounded-lg shadow-xl whitespace-normal w-64 md:w-auto md:min-w-[400px] md:max-w-lg animate-fadeIn before:content-[''] before:absolute before:right-full before:top-1/2 before:h-px before:bg-gray-300 before:w-2 after:content-[''] after:absolute after:left-0 after:top-1/2 after:bottom-0 after:w-px after:bg-gray-300"
-          style={{ top: '50%', transform: 'translateY(-50%)' }}
-        >
-          <span className="text-left leading-snug normal-case block border-b border-l border-gray-300 -ml-px -mb-px pl-px pb-px">{content}</span>
+        <span className="flex items-center ml-2 px-3 py-2 text-xs text-gray-700 bg-white rounded-lg shadow-xl border border-gray-200 whitespace-normal w-64 md:w-auto md:min-w-[400px] md:max-w-lg animate-fadeIn before:content-[''] before:absolute before:right-full before:top-1/2 before:-translate-y-1/2 before:border-[6px] before:border-transparent before:border-r-white after:content-[''] after:absolute after:right-full after:top-1/2 after:-translate-y-1/2 after:border-[7px] after:border-transparent after:border-r-gray-200">
+          <span className="text-left leading-snug normal-case block">{content}</span>
         </span>
       )}
     </span>
