@@ -17,17 +17,27 @@ const CartTemplate = ({
       <div className="content-container" data-testid="cart-container">
         {cart?.items?.length ? (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-x-40">
-            <div className="flex flex-col bg-white py-6 gap-y-6">
+            <div className="flex flex-col gap-y-6">
+              <div className="bg-white py-6">
+                <ItemsTemplate cart={cart} />
+              </div>
               {!customer && (
                 <>
-                  <SignInPrompt />
-                  <Divider />
+                  <div className="lg:hidden bg-white py-6">
+                    <SignInPrompt />
+                  </div>
                 </>
               )}
-              <ItemsTemplate cart={cart} />
             </div>
             <div className="relative">
               <div className="flex flex-col gap-y-8 sticky top-12">
+                {!customer && (
+                  <>
+                    <div className="hidden lg:block bg-white py-6">
+                      <SignInPrompt />
+                    </div>
+                  </>
+                )}
                 {cart && cart.region && (
                   <>
                     <div className="bg-white py-6">

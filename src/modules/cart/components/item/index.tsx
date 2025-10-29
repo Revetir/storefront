@@ -45,7 +45,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         product_name: item.product_title,
         brand: primaryBrand?.name,
         variant_id: item.variant_id,
-        variant_name: item.variant?.title,
+        variant_name: item.variant?.title || undefined,
         old_quantity: oldQuantity,
         new_quantity: quantity,
       })
@@ -65,7 +65,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   const primaryBrand = getPrimaryBrand((item.product as any)?.brands)
 
   return (
-    <Table.Row className="w-full" data-testid="product-row">
+    <Table.Row className="w-full [&:hover]:bg-transparent" data-testid="product-row">
       <Table.Cell className="!pl-0 p-4 w-24">
         <LocalizedClientLink
           href={productUrl}
@@ -86,7 +86,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         </LocalizedClientLink>
       </Table.Cell>
 
-      <Table.Cell className="text-left">
+      <Table.Cell className="text-left py-3">
         {brands.length > 0 && (
           <Text className="text-ui-fg-muted text-small font-medium mb-1">
             {brands.map((brand, idx, arr) => (
@@ -107,7 +107,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       </Table.Cell>
 
       {type === "full" && (
-        <Table.Cell>
+        <Table.Cell className="hidden lg:table-cell">
           <div className="flex gap-2 items-center w-28">
             <DeleteButton
               id={item.id}
@@ -117,7 +117,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
                 product_name: item.product_title,
                 brand: primaryBrand?.name,
                 variant_id: item.variant_id,
-                variant_name: item.variant?.title,
+                variant_name: item.variant?.title || undefined,
                 quantity: item.quantity,
               }}
             />
@@ -138,10 +138,6 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
                   </option>
                 )
               )}
-
-              <option value={1} key={1}>
-                1
-              </option>
             </CartItemSelect>
             {updating && <Spinner />}
           </div>
@@ -163,6 +159,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         <span
           className={clx("!pr-0", {
             "flex flex-col items-end h-full justify-center": type === "preview",
+            "flex flex-col items-end h-full justify-end lg:justify-center": type === "full",
           })}
         >
           {type === "preview" && (
@@ -180,6 +177,44 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             style="tight"
             currencyCode={currencyCode}
           />
+          {type === "full" && (
+            <div className="lg:hidden mt-2 flex items-center gap-2">
+              <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden">
+                <button
+                  onClick={() => changeQuantity(Math.max(1, item.quantity - 1))}
+                  disabled={item.quantity <= 1 || updating}
+                  className="px-2 py-1 hover:bg-ui-bg-subtle transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium"
+                  aria-label="Decrease quantity"
+                >
+                  −
+                </button>
+                <span className="px-2 py-1 text-sm font-medium min-w-[2rem] text-center border-x border-ui-border-base">
+                  {item.quantity}
+                </span>
+                <button
+                  onClick={() => changeQuantity(Math.min(maxQuantity, item.quantity + 1))}
+                  disabled={item.quantity >= maxQuantity || updating}
+                  className="px-2 py-1 hover:bg-ui-bg-subtle transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium"
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+              </div>
+              {updating && <Spinner />}
+              <DeleteButton
+                id={item.id}
+                data-testid="product-delete-button-mobile"
+                trackingData={{
+                  product_id: item.product_id,
+                  product_name: item.product_title,
+                  brand: primaryBrand?.name,
+                  variant_id: item.variant_id,
+                  variant_name: item.variant?.title || undefined,
+                  quantity: item.quantity,
+                }}
+              />
+            </div>
+          )}
         </span>
       </Table.Cell>
     </Table.Row>

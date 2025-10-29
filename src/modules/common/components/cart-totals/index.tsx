@@ -13,6 +13,9 @@ type CartTotalsProps = {
     gift_card_total?: number | null
     currency_code: string
     shipping_subtotal?: number | null
+    shipping_address?: {
+      address_1?: string | null
+    } | null
   }
 }
 
@@ -25,7 +28,11 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
     discount_total,
     gift_card_total,
     shipping_subtotal,
+    shipping_address,
   } = totals
+
+  // Check if we have an address for tax calculation
+  const hasAddress = !!shipping_address?.address_1
 
   return (
     <div>
@@ -54,13 +61,21 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
         <div className="flex items-center justify-between">
           <span>Shipping</span>
           <span data-testid="cart-shipping" data-value={shipping_subtotal || 0}>
-            {convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })}
+            {shipping_subtotal === 0 ? (
+              <span className="italic">FREE</span>
+            ) : (
+              convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })
+            )}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="flex gap-x-1 items-center ">Taxes</span>
           <span data-testid="cart-taxes" data-value={tax_total || 0}>
-            {convertToLocale({ amount: tax_total ?? 0, currency_code })}
+            {hasAddress ? (
+              convertToLocale({ amount: tax_total ?? 0, currency_code })
+            ) : (
+              <span className="italic">Calculated at checkout</span>
+            )}
           </span>
         </div>
         {!!gift_card_total && (
@@ -79,7 +94,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
       </div>
       <div className="h-px w-full border-b border-gray-200 my-4" />
       <div className="flex items-center justify-between text-ui-fg-base mb-2 txt-medium ">
-        <span>Total</span>
+        <span>Order Total</span>
         <span
           className="txt-xlarge-plus"
           data-testid="cart-total"

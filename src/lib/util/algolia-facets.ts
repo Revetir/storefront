@@ -12,13 +12,14 @@ export interface AlgoliaFacetOptions {
   gender?: "men" | "women"
   categoryHandle?: string
   brandSlug?: string
+  color?: string
 }
 
 /**
  * Get available categories from Algolia facets (contextual based on current filters)
  * Returns only categories that have products matching the current filter context
  *
- * @param options - Filter options (gender, brandSlug)
+ * @param options - Filter options (gender, brandSlug, color)
  * @returns Array of category handles that have products
  *
  * @example
@@ -31,11 +32,18 @@ export interface AlgoliaFacetOptions {
  *   gender: "men",
  *   brandSlug: "balenciaga"
  * })
+ *
+ * @example
+ * // Get categories that have black products
+ * const categories = await getAvailableCategories({
+ *   gender: "men",
+ *   color: "Black"
+ * })
  */
 export async function getAvailableCategories(
   options: AlgoliaFacetOptions = {}
 ): Promise<CategoryFacet[]> {
-  const { gender, brandSlug } = options
+  const { gender, brandSlug, color } = options
 
   try {
     const indexName = process.env.NEXT_PUBLIC_ALGOLIA_PRODUCT_INDEX_NAME
@@ -52,6 +60,9 @@ export async function getAvailableCategories(
     }
     if (brandSlug) {
       filters.push(`brands.slug:"${brandSlug}"`)
+    }
+    if (color) {
+      filters.push(`primaryColor:"${color}"`)
     }
 
     console.log("[Algolia Facets] Fetching categories with filters:", filters.join(" AND ") || "none")
@@ -85,7 +96,7 @@ export async function getAvailableCategories(
  * Get available brands from Algolia facets (contextual based on current filters)
  * Returns only brands that have products matching the current filter context
  *
- * @param options - Filter options (gender, categoryHandle)
+ * @param options - Filter options (gender, categoryHandle, color)
  * @returns Array of brand slugs that have products
  *
  * @example
@@ -98,11 +109,18 @@ export async function getAvailableCategories(
  *   gender: "men",
  *   categoryHandle: "pants"
  * })
+ *
+ * @example
+ * // Get brands that sell black products
+ * const brands = await getAvailableBrands({
+ *   gender: "men",
+ *   color: "Black"
+ * })
  */
 export async function getAvailableBrands(
   options: AlgoliaFacetOptions = {}
 ): Promise<BrandFacet[]> {
-  const { gender, categoryHandle } = options
+  const { gender, categoryHandle, color } = options
 
   try {
     const indexName = process.env.NEXT_PUBLIC_ALGOLIA_PRODUCT_INDEX_NAME
@@ -121,6 +139,9 @@ export async function getAvailableBrands(
       const genderPrefix = gender === "men" ? "mens" : "womens"
       const fullCategoryHandle = `${genderPrefix}-${categoryHandle}`
       filters.push(`allCategoryHandles:"${fullCategoryHandle}"`)
+    }
+    if (color) {
+      filters.push(`primaryColor:"${color}"`)
     }
 
     console.log("[Algolia Facets] Fetching brands with filters:", filters.join(" AND ") || "none")

@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react"
-import { useParams, usePathname, useRouter } from "next/navigation"
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Brand, listBrands } from "@lib/data/brands"
 
 export default function BrandRefinementList({ selectedBrand: propSelectedBrand }: { selectedBrand?: string }) {
@@ -9,7 +9,9 @@ export default function BrandRefinementList({ selectedBrand: propSelectedBrand }
   const params = useParams()
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const selectedBrand = propSelectedBrand || ""
+  const colorParam = searchParams.get('color') || undefined
 
   useEffect(() => {
     const fetchBrands = async () => {
@@ -26,7 +28,8 @@ export default function BrandRefinementList({ selectedBrand: propSelectedBrand }
         const [brandFacets, allBrands] = await Promise.all([
           getAvailableBrands({
             gender: gender as "men" | "women",
-            categoryHandle: categorySlug
+            categoryHandle: categorySlug,
+            color: colorParam
           }),
           listBrands()
         ])
@@ -48,7 +51,7 @@ export default function BrandRefinementList({ selectedBrand: propSelectedBrand }
     }
 
     fetchBrands()
-  }, [params?.gender, params?.categorySlug, params?.brandSlug])
+  }, [params?.gender, params?.categorySlug, params?.brandSlug, colorParam])
 
   const handleSelect = (slug: string) => {
     const countryCode = params?.countryCode as string

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams, usePathname } from "next/navigation"
+import { useParams, usePathname, useSearchParams } from "next/navigation"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Category } from "@lib/data/categories"
 
@@ -162,12 +162,14 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
   const [error, setError] = useState<string | null>(null)
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [activeCategoryPath, setActiveCategoryPath] = useState<string[]>([])
-  
+
   const pathname = usePathname()
   const params = useParams()
+  const searchParams = useSearchParams()
   const countryCode = params?.countryCode as string
   const genderParam = (params?.gender as string) || ""
   const brandSlugParam = params?.brandSlug as string | undefined
+  const colorParam = searchParams.get('color') || undefined
 
   // Determine the current category handle from pretty URL routes
   // Supported: /{countryCode}/{gender}/{categorySlug} and /{countryCode}/{gender}/brands/{brandSlug}/{categorySlug}
@@ -234,7 +236,8 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
         const [categoryFacets, res] = await Promise.all([
           getAvailableCategories({
             gender: genderParam as "men" | "women" | undefined,
-            brandSlug: brandSlugParam
+            brandSlug: brandSlugParam,
+            color: colorParam
           }),
           fetch("/api/categories")
         ])
@@ -294,7 +297,7 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
     }
 
     fetchCategories()
-  }, [currentCategoryHandle, genderParam, brandSlugParam])
+  }, [currentCategoryHandle, genderParam, brandSlugParam, colorParam])
 
   const handleToggleExpanded = (categoryId: string) => {
     setExpandedCategories(prev => {

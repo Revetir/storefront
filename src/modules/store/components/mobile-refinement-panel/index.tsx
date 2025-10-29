@@ -109,40 +109,90 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
     setSelectedFilters(filters)
   }, [isOpen, pathname, searchParams, params])
 
-  // Fetch brands
+  // Fetch brands with contextual filtering based on selected category
   useEffect(() => {
     if (activeTab === 'refine' && activeSection === 'brands') {
-      listBrands().then(fetchedBrands => {
-        const sorted = [...fetchedBrands].sort((a, b) =>
-          a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
-        )
-        setBrands(sorted)
-      })
-    }
-  }, [activeTab, activeSection])
+      const fetchBrands = async () => {
+        try {
+          const { getAvailableBrands } = await import("@lib/util/algolia-facets")
 
-  // Fetch categories
+          const gender = params?.gender as string || "men"
+
+          // Get contextual brand facets based on selected category and color
+          const [brandFacets, allBrands] = await Promise.all([
+            getAvailableBrands({
+              gender: gender as "men" | "women",
+              categoryHandle: selectedFilters.category, // Filter by selected category if any
+              color: selectedFilters.color // Filter by selected color if any
+            }),
+            listBrands()
+          ])
+
+          // Build set of available brand slugs from Algolia facets
+          const availableSlugs = new Set(brandFacets.map((f: any) => f.slug))
+
+          // Filter brands to only those with products in current context
+          const filteredBrands = allBrands
+            .filter(brand => availableSlugs.has(brand.slug))
+            .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+
+          setBrands(filteredBrands)
+        } catch (error) {
+          console.error("[Mobile Panel] Error fetching brands:", error)
+        }
+      }
+
+      fetchBrands()
+    }
+  }, [activeTab, activeSection, selectedFilters.category, selectedFilters.color, params])
+
+  // Fetch categories with contextual filtering based on selected brand
   useEffect(() => {
     if (activeTab === 'refine' && activeSection === 'categories') {
-      fetch('/api/categories')
-        .then(res => res.json())
-        .then(data => {
-          const allCategories = data.categories || []
-          // Filter categories by current gender
+      const fetchCategories = async () => {
+        try {
+          const { getAvailableCategories } = await import("@lib/util/algolia-facets")
+
           const genderParam = params?.gender as string
+
+          // Get contextual category facets based on selected brand and color
+          const [categoryFacets, res] = await Promise.all([
+            getAvailableCategories({
+              gender: genderParam as "men" | "women",
+              brandSlug: selectedFilters.brand, // Filter by selected brand if any
+              color: selectedFilters.color // Filter by selected color if any
+            }),
+            fetch('/api/categories')
+          ])
+
+          const data = await res.json()
+          const allCategories = data.categories || []
+
+          // Build set of available handles from Algolia facets
+          const availableHandles = new Set(categoryFacets.map((f: any) => f.handle))
+
+          // Filter categories by current gender and available products
           if (genderParam) {
             // Find the gender root category (men or women)
             const genderRoot = allCategories.find((cat: Category) => cat.handle === genderParam)
             if (genderRoot && genderRoot.children) {
-              // Show only children of the gender category, not the gender itself
-              setCategories(genderRoot.children)
+              // Filter tree to only show categories with products
+              const filteredCategories = filterCategoryTree(genderRoot.children, availableHandles)
+              setCategories(filteredCategories)
             }
           } else {
-            setCategories(allCategories)
+            // No gender specified, filter all categories
+            const filteredCategories = filterCategoryTree(allCategories, availableHandles)
+            setCategories(filteredCategories)
           }
-        })
+        } catch (error) {
+          console.error("[Mobile Panel] Error fetching categories:", error)
+        }
+      }
+
+      fetchCategories()
     }
-  }, [activeTab, activeSection, params])
+  }, [activeTab, activeSection, selectedFilters.brand, selectedFilters.color, params])
 
   const handleToggleCategory = (categoryId: string) => {
     setExpandedCategories(prev => {
@@ -154,6 +204,30 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
       }
       return newSet
     })
+  }
+
+  // Helper function to filter category tree to only show categories with products
+  const filterCategoryTree = (categories: Category[], availableHandles: Set<string>): Category[] => {
+    return categories
+      .map(cat => {
+        // Recursively filter children first
+        const filteredChildren = cat.children && cat.children.length > 0
+          ? filterCategoryTree(cat.children, availableHandles)
+          : []
+
+        // Show this category if:
+        // 1. It has products (in availableHandles), OR
+        // 2. It has children with products (filteredChildren not empty)
+        if (availableHandles.has(cat.handle) || filteredChildren.length > 0) {
+          return {
+            ...cat,
+            children: filteredChildren
+          }
+        }
+
+        return null
+      })
+      .filter(Boolean) as Category[]
   }
 
   const renderCategoryTree = (category: Category, level: number = 0) => {
