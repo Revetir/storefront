@@ -35,7 +35,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
   }
 
   return (
-    <div className="inline-flex items-center gap-1" ref={tooltipRef}>
+    <div className="relative inline-flex items-center gap-1" ref={tooltipRef}>
       {children}
       <div
         onMouseEnter={() => setIsVisible(true)}
@@ -45,7 +45,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
           e.preventDefault()
           handleToggle()
         }}
-        className="relative cursor-help touch-manipulation"
+        className="cursor-help touch-manipulation"
       >
         <svg
           className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
