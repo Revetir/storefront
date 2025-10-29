@@ -60,7 +60,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
           </div>
         )}
         <div className="flex items-center justify-between uppercase">
-          <Tooltip content="Standard international shipping (7–14 days) is complimentary on this order, with all duties and additional import fees prepaid">
+          <Tooltip content="Standard shipping is complimentary on this order, with all duties and additional import fees prepaid">
             <span>Delivery</span>
           </Tooltip>
           <span data-testid="cart-shipping" data-value={shipping_subtotal || 0}>
