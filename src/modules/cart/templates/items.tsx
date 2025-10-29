@@ -16,21 +16,21 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
       <div className="pb-3 flex items-center">
         <Heading className="text-xl uppercase">Shopping Bag</Heading>
       </div>
-      <Table>
-        <Table.Header className="border-t-0 bg-transparent">
-          <Table.Row className="text-ui-fg-subtle txt-medium-plus bg-transparent">
-            <Table.HeaderCell className="!pl-0 bg-transparent uppercase">Item</Table.HeaderCell>
-            <Table.HeaderCell className="bg-transparent"></Table.HeaderCell>
-            <Table.HeaderCell className="hidden lg:table-cell bg-transparent uppercase">Quantity</Table.HeaderCell>
-            <Table.HeaderCell className="hidden lg:table-cell bg-transparent uppercase">
+      <Table className="[&_thead_tr]:!bg-transparent [&_thead_tr:hover]:!bg-transparent">
+        <Table.Header className="border-t-0 !bg-transparent">
+          <Table.Row className="text-ui-fg-subtle txt-medium-plus !bg-transparent hover:!bg-transparent">
+            <Table.HeaderCell className="!pl-0 !bg-transparent uppercase">Item</Table.HeaderCell>
+            <Table.HeaderCell className="!bg-transparent"></Table.HeaderCell>
+            <Table.HeaderCell className="hidden lg:table-cell !bg-transparent uppercase">Quantity</Table.HeaderCell>
+            <Table.HeaderCell className="hidden lg:table-cell !bg-transparent uppercase">
               Price
             </Table.HeaderCell>
-            <Table.HeaderCell className="!pr-0 text-right bg-transparent uppercase">
+            <Table.HeaderCell className="!pr-0 text-right !bg-transparent uppercase">
               Total
             </Table.HeaderCell>
           </Table.Row>
         </Table.Header>
-        <Table.Body className="[&_tr]:bg-transparent [&_tr:hover]:bg-transparent">
+        <Table.Body className="[&_tr]:!bg-transparent [&_tr:hover]:!bg-transparent">
           {items
             ? items
                 .sort((a, b) => {

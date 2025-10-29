@@ -88,7 +88,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
       <Table.Cell className="text-left py-3 !pr-0 lg:pr-4">
         {brands.length > 0 && (
-          <Text className="text-ui-fg-muted text-small font-medium mb-1">
+          <Text className="text-ui-fg-muted text-small font-medium">
             {brands.map((brand, idx, arr) => (
               <React.Fragment key={brand.slug}>
                 <span className="uppercase">{brand.name}</span>
@@ -156,11 +156,16 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       )}
 
       <Table.Cell className="!pr-0">
-        <span
-          className={clx("!pr-0 flex flex-col items-end h-full justify-center")}
-        >
+        <div className="flex flex-col items-end h-full justify-between lg:justify-center">
+          <div className="flex items-center justify-end w-full">
+            <LineItemPrice
+              item={item}
+              style="tight"
+              currencyCode={currencyCode}
+            />
+          </div>
           {type === "preview" && (
-            <span className="flex gap-x-1 ">
+            <span className="flex gap-x-1">
               <Text className="text-ui-fg-muted">{item.quantity}x </Text>
               <LineItemUnitPrice
                 item={item}
@@ -169,13 +174,8 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
               />
             </span>
           )}
-          <LineItemPrice
-            item={item}
-            style="tight"
-            currencyCode={currencyCode}
-          />
           {type === "full" && (
-            <div className="lg:hidden mt-2 flex items-center gap-1.5">
+            <div className="lg:hidden flex items-center gap-1.5 self-end">
               <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden">
                 <button
                   onClick={() => changeQuantity(Math.max(1, item.quantity - 1))}
@@ -212,7 +212,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
               />
             </div>
           )}
-        </span>
+        </div>
       </Table.Cell>
     </Table.Row>
   )

@@ -30,7 +30,7 @@ const CartTemplate = ({
               )}
             </div>
             <div className="relative">
-              <div className="flex flex-col gap-y-8 sticky top-12">
+              <div className="flex flex-col gap-y-4 sticky top-12">
                 {!customer && (
                   <>
                     <div className="hidden lg:block bg-white py-6">
