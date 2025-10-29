@@ -61,7 +61,10 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
         </svg>
       </span>
       {isVisible && (
-        <span className="absolute z-50 left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-xs text-gray-700 bg-white rounded-lg shadow-xl border border-gray-200 whitespace-normal w-64 md:w-auto md:min-w-[400px] md:max-w-lg animate-fadeIn before:content-[''] before:absolute before:right-full before:top-1/2 before:-translate-y-1/2 before:border-[6px] before:border-transparent before:border-r-white after:content-[''] after:absolute after:right-full after:top-1/2 after:-translate-y-1/2 after:border-[7px] after:border-transparent after:border-r-gray-200">
+        <span
+          className="absolute z-50 left-full ml-2 px-3 py-2 text-xs text-gray-700 bg-white rounded-lg shadow-xl border border-gray-200 whitespace-normal w-64 md:w-auto md:min-w-[400px] md:max-w-lg animate-fadeIn before:content-[''] before:absolute before:right-full before:top-1/2 before:-translate-y-1/2 before:border-[6px] before:border-transparent before:border-r-white after:content-[''] after:absolute after:right-full after:top-1/2 after:-translate-y-1/2 after:border-[7px] after:border-transparent after:border-r-gray-200"
+          style={{ top: '50%', transform: 'translateY(-50%)' }}
+        >
           <span className="text-left leading-snug normal-case block">{content}</span>
         </span>
       )}
