@@ -10,49 +10,6 @@ type TooltipProps = {
 const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
   const [isVisible, setIsVisible] = useState(false)
   const tooltipRef = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLSpanElement>(null)
-  const tooltipContentRef = useRef<HTMLSpanElement>(null)
-  const [verticalOffset, setVerticalOffset] = useState<number>(0)
-  const [tooltipWidth, setTooltipWidth] = useState<number | null>(null)
-
-  // Calculate vertical offset and width to align tooltip with parent container
-  useEffect(() => {
-    if (isVisible && triggerRef.current && tooltipContentRef.current && tooltipRef.current) {
-      const trigger = triggerRef.current
-      const tooltipContent = tooltipContentRef.current
-      const tooltipWrapper = tooltipRef.current
-      const parentRow = trigger.closest('.flex.items-center') as HTMLElement
-
-      if (parentRow) {
-        const wrapperRect = tooltipWrapper.getBoundingClientRect()
-        const rowRect = parentRow.getBoundingClientRect()
-        const tooltipContentRect = tooltipContent.getBoundingClientRect()
-
-        // Calculate the center of the parent row
-        const rowCenter = rowRect.height / 2
-        // Calculate the center of the tooltip wrapper (which is the positioning reference)
-        const wrapperTopRelativeToRow = wrapperRect.top - rowRect.top
-        const wrapperCenter = wrapperTopRelativeToRow + (wrapperRect.height / 2)
-        // Calculate offset needed to align tooltip center with row center
-        const offset = rowCenter - wrapperCenter
-
-        setVerticalOffset(offset)
-
-        // Find the SUMMARY container (parent of all rows)
-        const summaryContainer = parentRow.parentElement as HTMLElement
-        if (summaryContainer) {
-          const containerRect = summaryContainer.getBoundingClientRect()
-          // Calculate available space from tooltip start to container end
-          const tooltipLeft = tooltipContentRect.left
-          const containerRight = containerRect.right
-          const availableWidth = containerRight - tooltipLeft
-
-          // Set tooltip width to fill available space (minus some padding)
-          setTooltipWidth(availableWidth - 16) // 16px for right padding
-        }
-      }
-    }
-  }, [isVisible])
 
   // Handle clicks outside tooltip to close it on mobile
   useEffect(() => {
@@ -81,7 +38,6 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
     <span className="relative inline-flex items-center gap-1 self-stretch" ref={tooltipRef}>
       {children}
       <span
-        ref={triggerRef}
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
         onClick={handleToggle}
@@ -106,17 +62,10 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
       </span>
       {isVisible && (
         <span
-          ref={tooltipContentRef}
-          className="absolute z-50 left-full ml-2 px-3 py-2 text-xs text-gray-700 bg-white rounded-lg shadow-xl border border-gray-200 whitespace-normal animate-fadeIn before:content-[''] before:absolute before:right-full before:top-1/2 before:-translate-y-1/2 before:border-[6px] before:border-transparent before:border-r-white after:content-[''] after:absolute after:right-full after:top-1/2 after:-translate-y-1/2 after:border-[7px] after:border-transparent after:border-r-gray-200"
-          style={{
-            top: '50%',
-            transform: `translateY(calc(-50% + ${verticalOffset}px))`,
-            width: tooltipWidth ? `${tooltipWidth}px` : 'auto',
-            minWidth: tooltipWidth ? 'auto' : '400px',
-            maxWidth: tooltipWidth ? 'none' : '32rem'
-          }}
+          className="absolute z-50 left-full ml-2 px-3 py-2 text-xs text-gray-700 bg-white rounded-lg shadow-xl whitespace-normal w-64 md:w-auto md:min-w-[400px] md:max-w-lg animate-fadeIn before:content-[''] before:absolute before:right-full before:top-1/2 before:h-px before:bg-gray-300 before:w-2 after:content-[''] after:absolute after:left-0 after:top-1/2 after:bottom-0 after:w-px after:bg-gray-300"
+          style={{ top: '50%', transform: 'translateY(-50%)' }}
         >
-          <span className="text-left leading-snug normal-case block">{content}</span>
+          <span className="text-left leading-snug normal-case block border-b border-l border-gray-300 -ml-px -mb-px pl-px pb-px">{content}</span>
         </span>
       )}
     </span>
