@@ -35,9 +35,9 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
   }
 
   return (
-    <div className="relative inline-flex items-center gap-1" ref={tooltipRef}>
+    <span className="relative inline-flex items-center gap-1 self-stretch" ref={tooltipRef}>
       {children}
-      <div
+      <span
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
         onClick={handleToggle}
@@ -45,7 +45,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
           e.preventDefault()
           handleToggle()
         }}
-        className="cursor-help touch-manipulation"
+        className="cursor-help touch-manipulation inline-flex items-center"
       >
         <svg
           className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
@@ -60,12 +60,12 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
           />
         </svg>
         {isVisible && (
-          <div className="absolute z-50 left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-xs text-gray-700 bg-white rounded-lg shadow-xl border border-gray-200 whitespace-normal w-64 md:w-auto md:min-w-[400px] md:max-w-lg animate-fadeIn before:content-[''] before:absolute before:right-full before:top-1/2 before:-translate-y-1/2 before:border-[6px] before:border-transparent before:border-r-white after:content-[''] after:absolute after:right-full after:top-1/2 after:-translate-y-1/2 after:border-[7px] after:border-transparent after:border-r-gray-200">
-            <div className="text-left leading-snug normal-case">{content}</div>
-          </div>
+          <span className="absolute z-50 left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-xs text-gray-700 bg-white rounded-lg shadow-xl border border-gray-200 whitespace-normal w-64 md:w-auto md:min-w-[400px] md:max-w-lg animate-fadeIn before:content-[''] before:absolute before:right-full before:top-1/2 before:-translate-y-1/2 before:border-[6px] before:border-transparent before:border-r-white after:content-[''] after:absolute after:right-full after:top-1/2 after:-translate-y-1/2 after:border-[7px] after:border-transparent after:border-r-gray-200">
+            <span className="text-left leading-snug normal-case block">{content}</span>
+          </span>
         )}
-      </div>
-    </div>
+      </span>
+    </span>
   )
 }
 
