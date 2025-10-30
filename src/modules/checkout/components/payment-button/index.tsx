@@ -7,7 +7,8 @@ import { Button } from "@medusajs/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
 import React, { useState, useEffect } from "react"
 import ErrorMessage from "../error-message"
-import { useParams, usePathname, useRouter } from "next/navigation"
+import { useParams } from "next/navigation"
+import { validateCheckout, triggerFieldErrors, scrollToTop } from "../../utils/validate-checkout"
 
 
 type PaymentButtonProps = {
@@ -39,7 +40,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       )
     case isManual(paymentSession?.provider_id):
       return (
-        <ManualTestPaymentButton notReady={notReady} data-testid={dataTestId} />
+        <ManualTestPaymentButton notReady={notReady} cart={cart} data-testid={dataTestId} />
       )
     default:
       return <Button disabled className="uppercase">Select a payment method</Button>
@@ -81,10 +82,23 @@ const StripePaymentButton = ({
   const disabled = !stripe || !elements ? true : false
 
   const handlePayment = async () => {
+    // Validate all required checkout fields first
+    const validationErrors = validateCheckout(cart)
+
+    if (validationErrors.length > 0) {
+      // Scroll to top to show errors
+      scrollToTop()
+
+      // Trigger field errors
+      triggerFieldErrors(validationErrors)
+
+      return
+    }
+
     if (!stripe || !elements || !cart) {
       return
     }
-    
+
     setSubmitting(true)
 
 
@@ -156,17 +170,6 @@ const StripePaymentButton = ({
     }
   }, [cart.payment_collection?.status])
 
-  useEffect(() => {
-    elements?.getElement("payment")?.on("change", (e) => {
-      if (!e.complete) {
-        // redirect to payment step if not complete
-        router.push(pathname + "?step=payment", {
-          scroll: false,
-        })
-      }
-    })
-  }, [elements])
-
   return (
     <>
       <Button
@@ -187,7 +190,7 @@ const StripePaymentButton = ({
   )
 }
 
-const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
+const ManualTestPaymentButton = ({ notReady, cart }: { notReady: boolean, cart: HttpTypes.StoreCart }) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -202,6 +205,19 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
   }
 
   const handlePayment = () => {
+    // Validate all required checkout fields first
+    const validationErrors = validateCheckout(cart)
+
+    if (validationErrors.length > 0) {
+      // Scroll to top to show errors
+      scrollToTop()
+
+      // Trigger field errors
+      triggerFieldErrors(validationErrors)
+
+      return
+    }
+
     setSubmitting(true)
 
     onPaymentCompleted()

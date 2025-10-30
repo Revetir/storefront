@@ -17,12 +17,49 @@ export default function ContactUsPage() {
     type: "success" | "error" | null
     message: string
   }>({ type: null, message: "" })
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: "" }))
+    }
+  }
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+
+    // Validate email on blur
+    if (name === "email" && value) {
+      if (!validateEmail(value)) {
+        setErrors(prev => ({ ...prev, [name]: "Please enter a valid email address" }))
+      }
+    }
+  }
+
+  const handleInvalid = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    e.preventDefault()
+    const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+
+    if (target.name === "email") {
+      if (!target.value) {
+        setErrors(prev => ({ ...prev, [target.name]: "Please enter your email address" }))
+      } else if (!validateEmail(target.value)) {
+        setErrors(prev => ({ ...prev, [target.name]: "Please enter a valid email address" }))
+      }
+    } else {
+      const label = target.labels?.[0]?.textContent?.replace(" *", "") || target.name
+      setErrors(prev => ({ ...prev, [target.name]: `Please enter your ${label.toLowerCase()}` }))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -89,14 +126,17 @@ export default function ContactUsPage() {
               <label htmlFor="request" className="block text-sm font-medium text-gray-700 mb-1">
                 Request *
               </label>
-                                             <select
-                  id="request"
-                  name="request"
-                  value={formData.request}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                >
+              <select
+                id="request"
+                name="request"
+                value={formData.request}
+                onChange={handleInputChange}
+                onInvalid={handleInvalid}
+                required
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent ${
+                  errors.request ? 'border-red-500' : 'border-gray-300'
+                }`}
+              >
                 <option value="" disabled>How can we help you?</option>
                 <option value="I want to modify or cancel my order">I want to modify or cancel my order</option>
                 <option value="I want to return an order">I want to return an order</option>
@@ -108,12 +148,15 @@ export default function ContactUsPage() {
                 <option value="My request is URGENT">My request is URGENT</option>
                 <option value="I want to delete my account">I want to delete my account</option>
               </select>
+              {errors.request && (
+                <p className="text-red-500 text-xs mt-1">Please enter your request</p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-10 gap-4">
               <div className="md:col-span-7">
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name *
+                  Full Name*
                 </label>
                 <input
                   type="text"
@@ -121,9 +164,15 @@ export default function ContactUsPage() {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
+                  onInvalid={handleInvalid}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                    errors.name ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
+                {errors.name && (
+                  <p className="text-red-500 text-xs mt-1">Please enter your full name</p>
+                )}
               </div>
 
               <div className="md:col-span-3">
@@ -143,7 +192,7 @@ export default function ContactUsPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address *
+                Email Address*
               </label>
               <input
                 type="email"
@@ -151,14 +200,21 @@ export default function ContactUsPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
+                onBlur={handleBlur}
+                onInvalid={handleInvalid}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                  errors.email ? 'border-red-500' : 'border-gray-300'
+                }`}
               />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
             </div>
 
             <div>
               <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                Subject *
+                Subject
               </label>
               <input
                 type="text"
@@ -166,24 +222,29 @@ export default function ContactUsPage() {
                 name="subject"
                 value={formData.subject}
                 onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
               />
             </div>
 
             <div>
               <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                Message *
+                Message*
               </label>
               <textarea
                 id="message"
                 name="message"
                 value={formData.message}
                 onChange={handleInputChange}
+                onInvalid={handleInvalid}
                 required
                 rows={6}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                  errors.message ? 'border-red-500' : 'border-gray-300'
+                }`}
               />
+              {errors.message && (
+                <p className="text-red-500 text-xs mt-1">Please enter a message</p>
+              )}
             </div>
 
             <button
