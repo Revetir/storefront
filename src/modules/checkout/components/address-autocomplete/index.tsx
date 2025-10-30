@@ -209,10 +209,12 @@ const AddressAutocomplete = React.forwardRef<
         console.log("AddressAutocomplete - selection in progress, will sync aggressively after delay")
 
         // Set value multiple times with different delays to override Radar's clearing
+        // Radar clears the input AFTER selection, so we need longer delays to happen after its clearing
         const timeouts = [
-          setTimeout(setValue, 50),   // First attempt
-          setTimeout(setValue, 150),  // Second attempt
-          setTimeout(setValue, 300),  // Final attempt
+          setTimeout(setValue, 100),   // First attempt - after Radar starts clearing
+          setTimeout(setValue, 250),   // Second attempt - after Radar completes clearing
+          setTimeout(setValue, 500),   // Third attempt - safety net
+          setTimeout(setValue, 750),   // Final attempt - ensure value persists
         ]
 
         return () => {

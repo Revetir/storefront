@@ -170,10 +170,10 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false 
         <div className="flex justify-between">
           <span className="flex gap-x-1 items-center uppercase">Taxes</span>
           <span data-testid="cart-taxes" data-value={tax_total || 0}>
-            {hasAddress ? (
-              convertToLocale({ amount: tax_total ?? 0, currency_code })
-            ) : isCalculatingTax ? (
+            {isCalculatingTax ? (
               <span className="italic">Calculating...</span>
+            ) : hasAddress ? (
+              convertToLocale({ amount: tax_total ?? 0, currency_code })
             ) : (
               <span className="italic">
                 {isCheckoutPage ? "Enter shipping address" : "Calculated at checkout"}
