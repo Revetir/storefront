@@ -125,11 +125,15 @@ const AddressAutocomplete = React.forwardRef<
         }
 
         // Create new autocomplete instance
+        // Note: Radar's UI autocomplete only accepts a single country code, not an array
+        // If multiple countries, we'll use the first one or omit for all countries
+        const singleCountryCode = countryCodes && countryCodes.length > 0 ? countryCodes[0] : undefined
+
         autocompleteRef.current = Radar.ui.autocomplete({
           container: containerRef.current,
           responsive: true,
           width: "100%",
-          countryCodes: countryCodes,
+          ...(singleCountryCode && { countryCode: singleCountryCode }),
           onSelection: handleSelection,
         })
 
@@ -201,7 +205,7 @@ const AddressAutocomplete = React.forwardRef<
             className={`absolute transition-all duration-300 pointer-events-none ${
               labelFloating
                 ? "top-1 left-4 text-xs text-ui-fg-subtle"
-                : "top-3 left-10 text-ui-fg-subtle"
+                : "top-3 left-4 text-ui-fg-subtle"
             }`}
           >
             {label}
@@ -218,7 +222,7 @@ const AddressAutocomplete = React.forwardRef<
           .address-autocomplete-container .radar-autocomplete-input {
             padding-top: 1rem !important;
             padding-bottom: 0.25rem !important;
-            padding-left: 2.5rem !important;
+            padding-left: 1rem !important;
             padding-right: 1rem !important;
             display: block !important;
             width: 100% !important;
@@ -246,11 +250,9 @@ const AddressAutocomplete = React.forwardRef<
             background-color: var(--ui-bg-field-hover) !important;
           }
 
-          /* Position search icon */
+          /* Hide search icon completely */
           .address-autocomplete-container .radar-autocomplete-search-icon {
-            left: 1rem !important;
-            top: 0.75rem !important;
-            z-index: 1 !important;
+            display: none !important;
           }
 
           /* Style the results dropdown */

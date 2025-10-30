@@ -1,6 +1,6 @@
 import { HttpTypes } from "@medusajs/types"
 import Input from "@modules/common/components/input"
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import CountrySelect from "../country-select"
 import AddressAutocomplete, {
   RadarAddress,
@@ -23,6 +23,11 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
     () => cart?.region?.countries?.map((c) => c.iso_2).filter((code): code is string => !!code),
     [cart?.region]
   )
+
+  // Debug logging to track formData changes
+  useEffect(() => {
+    console.log("BillingAddress - formData updated:", formData)
+  }, [formData])
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -50,12 +55,17 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
         address.countryCode?.toLowerCase() || "",
     }
 
-    console.log("BillingAddress - updating form fields:", updatedFields)
+    console.log("BillingAddress - updating form fields:", JSON.stringify(updatedFields, null, 2))
 
-    setFormData((prevState: any) => ({
-      ...prevState,
-      ...updatedFields,
-    }))
+    // Force a new object reference to ensure React detects the change
+    setFormData((prevState: any) => {
+      const newState = {
+        ...prevState,
+        ...updatedFields,
+      }
+      console.log("BillingAddress - new formData state:", JSON.stringify(newState, null, 2))
+      return newState
+    })
   }
 
   return (

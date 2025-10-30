@@ -84,6 +84,11 @@ const ShippingAddress = ({
     }
   }, [cart]) // Add cart as a dependency
 
+  // Debug logging to track formData changes
+  useEffect(() => {
+    console.log("ShippingAddress - formData updated:", formData)
+  }, [formData])
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLInputElement | HTMLSelectElement
@@ -110,12 +115,17 @@ const ShippingAddress = ({
         address.countryCode?.toLowerCase() || "",
     }
 
-    console.log("ShippingAddress - updating form fields:", updatedFields)
+    console.log("ShippingAddress - updating form fields:", JSON.stringify(updatedFields, null, 2))
 
-    setFormData((prevState: Record<string, any>) => ({
-      ...prevState,
-      ...updatedFields,
-    }))
+    // Force a new object reference to ensure React detects the change
+    setFormData((prevState: Record<string, any>) => {
+      const newState = {
+        ...prevState,
+        ...updatedFields,
+      }
+      console.log("ShippingAddress - new formData state:", JSON.stringify(newState, null, 2))
+      return newState
+    })
   }
 
   return (
