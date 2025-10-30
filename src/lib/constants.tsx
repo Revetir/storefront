@@ -51,17 +51,13 @@ export const paymentInfoMap: Record<
     title: "Affirm",
     icon: <Affirm />
   },
-  cashapp: {
-    title: "Cashapp Pay",
-    icon: <Cashapp />
-  },
   amazon_pay: {
     title: "Amazon Pay",
     icon: <Amazon />
   },
   afterpay_clearpay: {
     title: "Afterpay",
-    icon: <Klarna />
+    icon: <Cashapp />
   },
   apple_pay: {
     title: "Apple Pay",
