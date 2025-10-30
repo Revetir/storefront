@@ -76,15 +76,41 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false 
     if (typeof window !== "undefined") {
       const snapshot = sessionStorage.getItem("checkout_tax_snapshot")
       if (snapshot) {
-        const { oldTax, timestamp } = JSON.parse(snapshot)
+        const { oldTax, timestamp, calculationId } = JSON.parse(snapshot)
 
-        // Only clear if the tax value has CHANGED from the old value
-        // This prevents clearing when we're showing stale data
-        if (tax_total !== oldTax && tax_total !== undefined && tax_total !== null) {
-          console.log(`CartTotals - Tax updated from ${oldTax} to ${tax_total}, clearing calculating state`)
+        // Check if calculation has timed out (more than 5 seconds)
+        const age = Date.now() - timestamp
+        // if (age > 5000) {
+        //   console.log(`CartTotals - Calculation timed out after ${age}ms, clearing state`)
+        //   setIsCalculatingTax(false)
+        //   sessionStorage.removeItem("checkout_tax_snapshot")
+        //   return
+        // }
+
+        // Clear if tax value has CHANGED from old value
+        // OR if we have valid tax data (even if same value) after a reasonable delay
+        const hasNewData = tax_total !== oldTax && tax_total !== undefined && tax_total !== null
+        const hasValidDataAfterDelay = age > 1000 && tax_total !== undefined && tax_total !== null
+
+        if (hasNewData) {
+          console.log(`CartTotals - Tax updated from ${oldTax} to ${tax_total} (calc ${calculationId}), clearing state`)
           setIsCalculatingTax(false)
+          // Update snapshot with the new tax value for next calculation
+          sessionStorage.setItem("checkout_tax_snapshot", JSON.stringify({
+            oldTax: tax_total,
+            timestamp: Date.now(),
+            calculationId: calculationId
+          }))
+        } else if (hasValidDataAfterDelay) {
+          console.log(`CartTotals - Valid tax data after delay: ${tax_total} (calc ${calculationId}), clearing state`)
+          setIsCalculatingTax(false)
+          sessionStorage.setItem("checkout_tax_snapshot", JSON.stringify({
+            oldTax: tax_total,
+            timestamp: Date.now(),
+            calculationId: calculationId
+          }))
         } else {
-          console.log(`CartTotals - Still calculating, current tax: ${tax_total}, old tax: ${oldTax}`)
+          console.log(`CartTotals - Still calculating (${age}ms), current: ${tax_total}, old: ${oldTax}`)
         }
       } else {
         // No snapshot means we're not in a redirect scenario

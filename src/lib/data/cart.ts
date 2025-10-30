@@ -389,7 +389,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
   }
 
   redirect(
-    `/${formData.get("shipping_address.country_code")}/checkout?step=delivery`
+    `/${formData.get("shipping_address.country_code")}/checkout`
   )
 }
 

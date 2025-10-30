@@ -37,8 +37,33 @@ const ShippingAddress = ({
     email: cart?.email || "",
   })
 
-  const [hasUserEdited, setHasUserEdited] = useState(false)
+  // Initialize hasUserEdited from sessionStorage to persist across redirects
+  const [hasUserEdited, setHasUserEdited] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem("checkout_user_edited_address")
+      if (stored === "true") {
+        console.log("ShippingAddress - restoring hasUserEdited from sessionStorage")
+        return true
+      }
+    }
+    return false
+  })
+
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Cleanup sessionStorage on unmount (when user leaves checkout)
+  useEffect(() => {
+    return () => {
+      // Only clear if navigating away from checkout entirely
+      // The redirect within checkout will preserve the state
+      if (typeof window !== "undefined") {
+        const currentPath = window.location.pathname
+        if (!currentPath.includes('/checkout')) {
+          sessionStorage.removeItem("checkout_user_edited_address")
+        }
+      }
+    }
+  }, [])
 
   // Check if address is complete for tax calculation
   useEffect(() => {
@@ -131,6 +156,10 @@ const ShippingAddress = ({
     >
   ) => {
     setHasUserEdited(true)
+    // Persist to sessionStorage to survive redirect
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("checkout_user_edited_address", "true")
+    }
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -144,13 +173,16 @@ const ShippingAddress = ({
   // Auto-save address data on blur with debounce
   const debouncedSaveAddress = useCallback(
     debounce(async (data: Record<string, any>) => {
-      // Store the current tax value before starting calculation
+      // Store the current tax value AND a unique calculation ID before starting calculation
       // This helps us detect when NEW tax data arrives after the redirect
-      if (typeof window !== "undefined" && cart?.tax_total !== undefined) {
+      if (typeof window !== "undefined") {
+        const calculationId = Date.now()
         sessionStorage.setItem("checkout_tax_snapshot", JSON.stringify({
-          oldTax: cart.tax_total,
-          timestamp: Date.now()
+          oldTax: cart?.tax_total ?? null,
+          timestamp: calculationId,
+          calculationId: calculationId
         }))
+        console.log(`ShippingAddress - Starting tax calculation ${calculationId}, oldTax: ${cart?.tax_total}`)
       }
 
       setIsCalculatingTax(true)
@@ -229,6 +261,10 @@ const ShippingAddress = ({
     console.log("ShippingAddress - handleAddressSelect called with:", address)
 
     setHasUserEdited(true)
+    // Persist to sessionStorage to survive redirect
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("checkout_user_edited_address", "true")
+    }
 
     // Transform state code to Medusa format: {countryCode}-{stateCode}
     const countryCode = address.countryCode?.toLowerCase() || ""
