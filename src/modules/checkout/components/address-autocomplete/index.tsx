@@ -94,10 +94,10 @@ const AddressAutocomplete = React.forwardRef<
         // Update the parent's form state with all address fields
         onAddressSelect(address)
 
-        // Clear the selection flag after a brief delay to allow state updates
+        // Clear the selection flag after a delay to allow state updates and auto-save
         setTimeout(() => {
           isSelectingRef.current = false
-        }, 100)
+        }, 500)
       },
       [onAddressSelect]
     )

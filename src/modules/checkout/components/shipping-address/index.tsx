@@ -141,8 +141,13 @@ const ShippingAddress = ({
 
         // Auto-save to cart (silently, don't block user)
         await setAddresses(null, formDataObj)
-      } catch (error) {
-        // Silent error - don't interrupt user flow
+      } catch (error: any) {
+        // NEXT_REDIRECT is expected - it means the save was successful and triggered a revalidation
+        if (error?.message === 'NEXT_REDIRECT' || error?.digest?.includes('NEXT_REDIRECT')) {
+          console.log("Auto-save successful (triggered revalidation)")
+          return
+        }
+        // Only log actual errors
         console.error("Auto-save failed:", error)
       }
     }, 500),
@@ -225,6 +230,14 @@ const ShippingAddress = ({
       console.log("ShippingAddress - new formData state:", JSON.stringify(newState, null, 2))
       return newState
     })
+
+    // Trigger auto-save with the updated data
+    // Merge current formData with updatedFields for the save
+    const mergedData = {
+      ...formData,
+      ...updatedFields,
+    }
+    debouncedSaveAddress(mergedData)
   }
 
   return (
