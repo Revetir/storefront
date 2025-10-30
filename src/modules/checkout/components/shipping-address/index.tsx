@@ -23,18 +23,39 @@ const ShippingAddress = ({
   onChange: () => void
 }) => {
   const { setLocalAddressComplete, setIsCalculatingTax } = useCheckoutContext()
-  const [formData, setFormData] = useState<Record<string, any>>({
-    "shipping_address.first_name": cart?.shipping_address?.first_name || "",
-    "shipping_address.last_name": cart?.shipping_address?.last_name || "",
-    "shipping_address.address_1": cart?.shipping_address?.address_1 || "",
-    "shipping_address.address_2": cart?.shipping_address?.address_2 || "",
-    "shipping_address.company": cart?.shipping_address?.company || "",
-    "shipping_address.postal_code": cart?.shipping_address?.postal_code || "",
-    "shipping_address.city": cart?.shipping_address?.city || "",
-    "shipping_address.country_code": cart?.shipping_address?.country_code || "",
-    "shipping_address.province": cart?.shipping_address?.province || "",
-    "shipping_address.phone": cart?.shipping_address?.phone || "",
-    email: cart?.email || "",
+
+  // Initialize formData - restore from sessionStorage if user was editing, otherwise use cart data
+  const [formData, setFormData] = useState<Record<string, any>>(() => {
+    // Check if we have persisted form data from before redirect
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem("checkout_user_edited_address")
+      const storedFormData = sessionStorage.getItem("checkout_address_form_data")
+
+      if (stored === "true" && storedFormData) {
+        try {
+          const parsed = JSON.parse(storedFormData)
+          console.log("ShippingAddress - restoring form data from sessionStorage:", parsed)
+          return parsed
+        } catch (e) {
+          console.error("Failed to parse stored form data:", e)
+        }
+      }
+    }
+
+    // Default: initialize from cart prop
+    return {
+      "shipping_address.first_name": cart?.shipping_address?.first_name || "",
+      "shipping_address.last_name": cart?.shipping_address?.last_name || "",
+      "shipping_address.address_1": cart?.shipping_address?.address_1 || "",
+      "shipping_address.address_2": cart?.shipping_address?.address_2 || "",
+      "shipping_address.company": cart?.shipping_address?.company || "",
+      "shipping_address.postal_code": cart?.shipping_address?.postal_code || "",
+      "shipping_address.city": cart?.shipping_address?.city || "",
+      "shipping_address.country_code": cart?.shipping_address?.country_code || "",
+      "shipping_address.province": cart?.shipping_address?.province || "",
+      "shipping_address.phone": cart?.shipping_address?.phone || "",
+      email: cart?.email || "",
+    }
   })
 
   // Initialize hasUserEdited from sessionStorage to persist across redirects
@@ -51,6 +72,13 @@ const ShippingAddress = ({
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  // Persist formData to sessionStorage when user is editing
+  useEffect(() => {
+    if (hasUserEdited && typeof window !== "undefined") {
+      sessionStorage.setItem("checkout_address_form_data", JSON.stringify(formData))
+    }
+  }, [formData, hasUserEdited])
+
   // Cleanup sessionStorage on unmount (when user leaves checkout)
   useEffect(() => {
     return () => {
@@ -60,6 +88,7 @@ const ShippingAddress = ({
         const currentPath = window.location.pathname
         if (!currentPath.includes('/checkout')) {
           sessionStorage.removeItem("checkout_user_edited_address")
+          sessionStorage.removeItem("checkout_address_form_data")
         }
       }
     }

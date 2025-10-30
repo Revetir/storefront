@@ -44,8 +44,12 @@ export const CheckoutProvider = ({ children }: { children: React.ReactNode }) =>
           JSON.stringify({ isCalculating: true, timestamp: Date.now() })
         )
       } else {
+        // When calculation completes, we can clear the form data snapshot too
+        // This allows fresh cart data to sync on the next page load
         sessionStorage.removeItem(STORAGE_KEY)
         sessionStorage.removeItem(TAX_SNAPSHOT_KEY)
+        // Note: We keep checkout_address_form_data and checkout_user_edited_address
+        // because user might change address again, and we want to preserve their edits
       }
     }
   }, [isCalculatingTax])
