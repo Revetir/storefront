@@ -17,9 +17,10 @@ type CartTotalsProps = {
       address_1?: string | null
     } | null
   }
+  isCheckoutPage?: boolean
 }
 
-const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
+const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false }) => {
   const [deliveryExpanded, setDeliveryExpanded] = useState(false)
   const [returnsExpanded, setReturnsExpanded] = useState(false)
   const {
@@ -145,7 +146,9 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
             {hasAddress ? (
               convertToLocale({ amount: tax_total ?? 0, currency_code })
             ) : (
-              <span className="italic">Calculated at checkout</span>
+              <span className="italic">
+                {isCheckoutPage ? "Enter shipping address" : "Calculated at checkout"}
+              </span>
             )}
           </span>
         </div>
@@ -165,7 +168,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
       </div>
       <div className="h-px w-full border-b border-gray-200 my-4" />
       <div className="flex items-center justify-between text-ui-fg-base mb-2 txt-medium uppercase">
-        <span>Estimated Order Total</span>
+        <span>{isCheckoutPage && hasAddress ? "Order Total" : "Estimated Order Total"}</span>
         <span
           className="txt-xlarge-plus"
           data-testid="cart-total"

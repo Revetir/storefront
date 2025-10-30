@@ -98,6 +98,12 @@ const Shipping: React.FC<ShippingProps> = ({
     if (_pickupMethods?.find((m) => m.id === shippingMethodId)) {
       setShowPickupOptions(PICKUP_OPTION_ON)
     }
+
+    // Auto-select the only available shipping method if there's only one option
+    if (!shippingMethodId && _shippingMethods?.length === 1) {
+      const onlyOption = _shippingMethods[0]
+      handleSetShippingMethod(onlyOption.id, "shipping")
+    }
   }, [availableShippingMethods])
 
 
@@ -145,10 +151,7 @@ const Shipping: React.FC<ShippingProps> = ({
           <div className="grid">
             <div className="flex flex-col">
               <span className="font-medium txt-medium text-ui-fg-base">
-                Shipping method
-              </span>
-              <span className="mb-4 text-ui-fg-muted txt-medium">
-                Select your preferred delivery method
+                Shipping Method
               </span>
             </div>
             <div data-testid="delivery-options-container">
@@ -221,9 +224,16 @@ const Shipping: React.FC<ShippingProps> = ({
                           <MedusaRadio
                             checked={option.id === shippingMethodId}
                           />
-                          <span className="text-base-regular">
-                            {option.name}
-                          </span>
+                          <div className="flex flex-col">
+                            <span className="text-base-regular">
+                              {option.name}
+                            </span>
+                            {(option as any).description && (
+                              <span className="text-sm text-ui-fg-muted">
+                                {(option as any).description}
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <span className="justify-self-end text-ui-fg-base">
                           {option.price_type === "flat" ? (
