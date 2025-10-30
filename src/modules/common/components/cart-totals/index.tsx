@@ -32,10 +32,12 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false 
   // Try to get checkout context if available (only on checkout page)
   let localAddressComplete = false
   let isCalculatingTax = false
+  let setIsCalculatingTax: ((value: boolean) => void) | null = null
   try {
     const context = useCheckoutContext()
     localAddressComplete = context.localAddressComplete
     isCalculatingTax = context.isCalculatingTax
+    setIsCalculatingTax = context.setIsCalculatingTax
   } catch {
     // Context not available (e.g., on bag page) - that's fine
   }
@@ -63,6 +65,15 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false 
 
   // Use local address state for immediate feedback, fall back to cart data
   const hasAddress = localAddressComplete || hasAddressInCart
+
+  // Auto-clear calculating state when we detect valid tax has arrived
+  // This handles the case where the page redirected and state was restored from sessionStorage
+  React.useEffect(() => {
+    if (isCalculatingTax && hasAddress && tax_total && tax_total > 0 && setIsCalculatingTax) {
+      console.log("CartTotals - Tax calculation complete, clearing calculating state")
+      setIsCalculatingTax(false)
+    }
+  }, [isCalculatingTax, hasAddress, tax_total, setIsCalculatingTax])
 
   return (
     <div>

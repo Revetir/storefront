@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useState, useCallback } from "react"
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react"
 
 interface CheckoutContextType {
   localAddressComplete: boolean
@@ -11,9 +11,40 @@ interface CheckoutContextType {
 
 const CheckoutContext = createContext<CheckoutContextType | undefined>(undefined)
 
+const STORAGE_KEY = "checkout_calculating_tax"
+
 export const CheckoutProvider = ({ children }: { children: React.ReactNode }) => {
+  // Initialize isCalculatingTax from sessionStorage to persist across redirects
+  const [isCalculatingTax, setIsCalculatingTax] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem(STORAGE_KEY)
+      if (stored) {
+        const { isCalculating, timestamp } = JSON.parse(stored)
+        // Clear if older than 10 seconds (tax calculation should complete by then)
+        if (Date.now() - timestamp < 10000) {
+          return isCalculating
+        }
+        sessionStorage.removeItem(STORAGE_KEY)
+      }
+    }
+    return false
+  })
+
   const [localAddressComplete, setLocalAddressComplete] = useState(false)
-  const [isCalculatingTax, setIsCalculatingTax] = useState(false)
+
+  // Persist isCalculatingTax to sessionStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (isCalculatingTax) {
+        sessionStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ isCalculating: true, timestamp: Date.now() })
+        )
+      } else {
+        sessionStorage.removeItem(STORAGE_KEY)
+      }
+    }
+  }, [isCalculatingTax])
 
   const value = {
     localAddressComplete,

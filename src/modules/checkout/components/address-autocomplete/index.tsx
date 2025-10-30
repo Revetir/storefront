@@ -183,8 +183,8 @@ const AddressAutocomplete = React.forwardRef<
       }
     }, [isInitialized, countryCodes, handleSelection])
 
-    // Sync the value prop to Radar's input element (without recreating autocomplete)
-    // Use aggressive timing to override Radar's internal input clearing behavior
+    // Sync the value prop to Radar's input element using MutationObserver
+    // This is more reliable than timeouts because it reacts to actual DOM changes
     useEffect(() => {
       if (!containerRef.current) return
       if (value === undefined) return
@@ -201,24 +201,50 @@ const AddressAutocomplete = React.forwardRef<
           console.log("AddressAutocomplete - syncing value prop to input:", value)
           input.value = value
           setHasValue(!!value)
+
+          // Dispatch input event to keep Radar's internal state in sync
+          const event = new Event('input', { bubbles: true })
+          input.dispatchEvent(event)
         }
       }
 
-      // If we're in the middle of a selection, wait a bit then start aggressive syncing
+      // If we're in the middle of a selection, use MutationObserver to watch for DOM changes
       if (isSelectingRef.current) {
-        console.log("AddressAutocomplete - selection in progress, will sync aggressively after delay")
+        console.log("AddressAutocomplete - selection in progress, watching for DOM changes")
 
-        // Set value multiple times with different delays to override Radar's clearing
-        // Radar clears the input AFTER selection, so we need longer delays to happen after its clearing
-        const timeouts = [
-          setTimeout(setValue, 100),   // First attempt - after Radar starts clearing
-          setTimeout(setValue, 250),   // Second attempt - after Radar completes clearing
-          setTimeout(setValue, 500),   // Third attempt - safety net
-          setTimeout(setValue, 750),   // Final attempt - ensure value persists
-        ]
+        // Set value immediately first
+        setValue()
+
+        // Create MutationObserver to watch for Radar clearing the input
+        const observer = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
+              // Value attribute changed, restore our value
+              setValue()
+            }
+          }
+        })
+
+        // Watch for value changes on the input element
+        observer.observe(input, {
+          attributes: true,
+          attributeFilter: ['value'],
+        })
+
+        // Also use requestAnimationFrame to set value at next paint
+        // This catches cases where Radar modifies the value property directly
+        const rafId = requestAnimationFrame(() => {
+          setValue()
+
+          // Schedule another check after a short delay
+          const timeoutId = setTimeout(setValue, 100)
+
+          return () => clearTimeout(timeoutId)
+        })
 
         return () => {
-          timeouts.forEach(t => clearTimeout(t))
+          observer.disconnect()
+          cancelAnimationFrame(rafId)
         }
       } else {
         // Normal sync outside of selection
