@@ -2,8 +2,8 @@ const GooglePay = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      height="20"
-      width="20"
+      height="14"
+      width="14"
       viewBox="0 0 1094 742"
       id="googlePayIcon"
     >

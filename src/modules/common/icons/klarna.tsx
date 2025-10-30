@@ -2,7 +2,7 @@ const Klarna = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      height="13"
+      height="14"
       width="32"
       viewBox="0 0 50 20"
       id="klarnaIcon"

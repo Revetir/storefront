@@ -2,8 +2,8 @@ const Lock = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      height="16"
-      width="16"
+      height="14"
+      width="14"
       viewBox="0 0 100 100"
       id="lockIcon"
     >

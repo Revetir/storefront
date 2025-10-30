@@ -3,8 +3,8 @@ const Cashapp = () => {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      height="20"
-      width="20"
+      height="14"
+      width="14"
       viewBox="0 0 256 256"
       id="cashappIcon"
     >

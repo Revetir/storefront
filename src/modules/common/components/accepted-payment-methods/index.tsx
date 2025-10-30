@@ -3,6 +3,8 @@ import Mastercard from "@modules/common/icons/mastercard"
 import Amex from "@modules/common/icons/amex"
 import Discover from "@modules/common/icons/discover"
 import ApplePay from "@modules/common/icons/apple-pay"
+import GooglePay from "@modules/common/icons/google-pay"
+import Cashapp from "@modules/common/icons/cashapp"
 import Klarna from "@modules/common/icons/klarna"
 import Lock from "@modules/common/icons/lock"
 
@@ -24,6 +26,8 @@ const AcceptedPaymentMethods = () => {
         <Amex />
         <Discover />
         <ApplePay />
+        <GooglePay />
+        <Cashapp />
         <Klarna />
       </div>
     </div>
