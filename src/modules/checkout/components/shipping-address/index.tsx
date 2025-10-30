@@ -144,6 +144,15 @@ const ShippingAddress = ({
   // Auto-save address data on blur with debounce
   const debouncedSaveAddress = useCallback(
     debounce(async (data: Record<string, any>) => {
+      // Store the current tax value before starting calculation
+      // This helps us detect when NEW tax data arrives after the redirect
+      if (typeof window !== "undefined" && cart?.tax_total !== undefined) {
+        sessionStorage.setItem("checkout_tax_snapshot", JSON.stringify({
+          oldTax: cart.tax_total,
+          timestamp: Date.now()
+        }))
+      }
+
       setIsCalculatingTax(true)
       try {
         // Create FormData to match the setAddresses server action signature
@@ -161,7 +170,7 @@ const ShippingAddress = ({
         // NEXT_REDIRECT is expected - it means the save was successful and triggered a revalidation
         if (error?.message === 'NEXT_REDIRECT' || error?.digest?.includes('NEXT_REDIRECT')) {
           console.log("Auto-save successful (triggered revalidation)")
-          setIsCalculatingTax(false)
+          // Don't clear isCalculatingTax here - let the redirect happen with state persisted
           return
         }
         // Only log actual errors
@@ -169,7 +178,7 @@ const ShippingAddress = ({
         setIsCalculatingTax(false)
       }
     }, 500),
-    [setIsCalculatingTax]
+    [setIsCalculatingTax, cart?.tax_total]
   )
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {

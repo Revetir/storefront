@@ -58,12 +58,20 @@ const AddressAutocomplete = React.forwardRef<
   ) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const autocompleteRef = useRef<any>(null)
+    const inputRef = useRef<HTMLInputElement | null>(null)
     const [isInitialized, setIsInitialized] = useState(false)
     const [isFocused, setIsFocused] = useState(false)
     const [hasValue, setHasValue] = useState(false)
     const isSelectingRef = useRef(false)
+    const onAddressSelectRef = useRef(onAddressSelect)
 
-    // Memoize the selection handler to prevent recreation on every render
+    // Keep the ref updated without causing effect re-runs
+    useEffect(() => {
+      onAddressSelectRef.current = onAddressSelect
+    }, [onAddressSelect])
+
+    // Memoize the selection handler with stable identity
+    // Don't include onAddressSelect in deps to prevent autocomplete recreation
     const handleSelection = useCallback(
       (address: RadarAddress) => {
         console.log("Radar address selected:", address)
@@ -75,16 +83,15 @@ const AddressAutocomplete = React.forwardRef<
         setHasValue(true)
 
         // Update the parent's form state with all address fields
-        // The parent will pass the value back down via props, which our sync effect will handle
-        onAddressSelect(address)
+        // Use the ref to avoid dependency on the prop
+        onAddressSelectRef.current(address)
 
-        // Clear the selection flag after a shorter delay
-        // The value sync effect will handle setting the input value
+        // Clear the selection flag after a delay
         setTimeout(() => {
           isSelectingRef.current = false
-        }, 200)
+        }, 1000)
       },
-      [onAddressSelect]
+      [] // Empty deps - stable function identity
     )
 
     // Initialize Radar SDK once
@@ -142,6 +149,9 @@ const AddressAutocomplete = React.forwardRef<
         ) as HTMLInputElement
 
         if (input) {
+          // Store input reference for value syncing
+          inputRef.current = input
+
           const handleFocus = () => setIsFocused(true)
           const handleBlur = () => {
             setIsFocused(false)
@@ -183,68 +193,48 @@ const AddressAutocomplete = React.forwardRef<
       }
     }, [isInitialized, countryCodes, handleSelection])
 
-    // Sync the value prop to Radar's input element using MutationObserver
-    // This is more reliable than timeouts because it reacts to actual DOM changes
+    // Sync the value prop to Radar's input element
+    // This effect runs whenever the value prop changes from the parent
     useEffect(() => {
-      if (!containerRef.current) return
+      // Use the stored input reference
+      const input = inputRef.current
+      if (!input) {
+        console.log("AddressAutocomplete - no input ref available yet")
+        return
+      }
       if (value === undefined) return
-
-      const input = containerRef.current.querySelector(
-        ".radar-autocomplete-input"
-      ) as HTMLInputElement
-
-      if (!input) return
 
       // Function to set the input value
       const setValue = () => {
         if (input.value !== value) {
-          console.log("AddressAutocomplete - syncing value prop to input:", value)
+          console.log("AddressAutocomplete - syncing value to input:", value)
           input.value = value
           setHasValue(!!value)
-
-          // Dispatch input event to keep Radar's internal state in sync
-          const event = new Event('input', { bubbles: true })
-          input.dispatchEvent(event)
         }
       }
 
-      // If we're in the middle of a selection, use MutationObserver to watch for DOM changes
+      // If we're in the middle of a selection, aggressively sync the value
       if (isSelectingRef.current) {
-        console.log("AddressAutocomplete - selection in progress, watching for DOM changes")
+        console.log("AddressAutocomplete - selection in progress, will sync value aggressively")
 
-        // Set value immediately first
+        // Set value immediately
         setValue()
 
-        // Create MutationObserver to watch for Radar clearing the input
-        const observer = new MutationObserver((mutations) => {
-          for (const mutation of mutations) {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
-              // Value attribute changed, restore our value
-              setValue()
-            }
-          }
-        })
-
-        // Watch for value changes on the input element
-        observer.observe(input, {
-          attributes: true,
-          attributeFilter: ['value'],
-        })
-
-        // Also use requestAnimationFrame to set value at next paint
-        // This catches cases where Radar modifies the value property directly
-        const rafId = requestAnimationFrame(() => {
-          setValue()
-
-          // Schedule another check after a short delay
-          const timeoutId = setTimeout(setValue, 100)
-
-          return () => clearTimeout(timeoutId)
-        })
+        // Continue setting value with multiple strategies to overcome Radar's behavior
+        const timeoutId1 = setTimeout(setValue, 0)
+        const timeoutId2 = setTimeout(setValue, 50)
+        const timeoutId3 = setTimeout(setValue, 100)
+        const timeoutId4 = setTimeout(setValue, 200)
+        const timeoutId5 = setTimeout(setValue, 400)
+        const timeoutId6 = setTimeout(setValue, 600)
 
         return () => {
-          observer.disconnect()
-          cancelAnimationFrame(rafId)
+          clearTimeout(timeoutId1)
+          clearTimeout(timeoutId2)
+          clearTimeout(timeoutId3)
+          clearTimeout(timeoutId4)
+          clearTimeout(timeoutId5)
+          clearTimeout(timeoutId6)
         }
       } else {
         // Normal sync outside of selection

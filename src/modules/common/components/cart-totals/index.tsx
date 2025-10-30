@@ -66,12 +66,34 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false 
   // Use local address state for immediate feedback, fall back to cart data
   const hasAddress = localAddressComplete || hasAddressInCart
 
-  // Auto-clear calculating state when we detect valid tax has arrived
+  // Auto-clear calculating state when we detect NEW tax has arrived
   // This handles the case where the page redirected and state was restored from sessionStorage
   React.useEffect(() => {
-    if (isCalculatingTax && hasAddress && tax_total && tax_total > 0 && setIsCalculatingTax) {
-      console.log("CartTotals - Tax calculation complete, clearing calculating state")
-      setIsCalculatingTax(false)
+    if (!isCalculatingTax || !setIsCalculatingTax) return
+    if (!hasAddress) return
+
+    // Check if we have a snapshot of the old tax value
+    if (typeof window !== "undefined") {
+      const snapshot = sessionStorage.getItem("checkout_tax_snapshot")
+      if (snapshot) {
+        const { oldTax, timestamp } = JSON.parse(snapshot)
+
+        // Only clear if the tax value has CHANGED from the old value
+        // This prevents clearing when we're showing stale data
+        if (tax_total !== oldTax && tax_total !== undefined && tax_total !== null) {
+          console.log(`CartTotals - Tax updated from ${oldTax} to ${tax_total}, clearing calculating state`)
+          setIsCalculatingTax(false)
+        } else {
+          console.log(`CartTotals - Still calculating, current tax: ${tax_total}, old tax: ${oldTax}`)
+        }
+      } else {
+        // No snapshot means we're not in a redirect scenario
+        // Clear if we have valid tax
+        if (tax_total !== undefined && tax_total !== null) {
+          console.log("CartTotals - No snapshot, clearing calculating state")
+          setIsCalculatingTax(false)
+        }
+      }
     }
   }, [isCalculatingTax, hasAddress, tax_total, setIsCalculatingTax])
 

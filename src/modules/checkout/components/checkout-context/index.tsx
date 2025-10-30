@@ -12,6 +12,7 @@ interface CheckoutContextType {
 const CheckoutContext = createContext<CheckoutContextType | undefined>(undefined)
 
 const STORAGE_KEY = "checkout_calculating_tax"
+const TAX_SNAPSHOT_KEY = "checkout_tax_snapshot"
 
 export const CheckoutProvider = ({ children }: { children: React.ReactNode }) => {
   // Initialize isCalculatingTax from sessionStorage to persist across redirects
@@ -22,9 +23,11 @@ export const CheckoutProvider = ({ children }: { children: React.ReactNode }) =>
         const { isCalculating, timestamp } = JSON.parse(stored)
         // Clear if older than 10 seconds (tax calculation should complete by then)
         if (Date.now() - timestamp < 10000) {
+          console.log("CheckoutProvider - restoring calculating state from storage")
           return isCalculating
         }
         sessionStorage.removeItem(STORAGE_KEY)
+        sessionStorage.removeItem(TAX_SNAPSHOT_KEY)
       }
     }
     return false
@@ -42,6 +45,7 @@ export const CheckoutProvider = ({ children }: { children: React.ReactNode }) =>
         )
       } else {
         sessionStorage.removeItem(STORAGE_KEY)
+        sessionStorage.removeItem(TAX_SNAPSHOT_KEY)
       }
     }
   }, [isCalculatingTax])
