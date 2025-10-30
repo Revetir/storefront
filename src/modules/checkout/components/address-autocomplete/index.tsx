@@ -68,36 +68,21 @@ const AddressAutocomplete = React.forwardRef<
       (address: RadarAddress) => {
         console.log("Radar address selected:", address)
 
-        // Mark that we're in the middle of a selection to prevent value sync interference
+        // Mark that we're in the middle of a selection
         isSelectingRef.current = true
 
         // Mark that we have a value for the floating label
         setHasValue(true)
 
-        // Ensure Radar's input displays the selected address immediately
-        if (containerRef.current) {
-          const input = containerRef.current.querySelector(
-            ".radar-autocomplete-input"
-          ) as HTMLInputElement
-          if (input) {
-            const addressString = `${address.number || ""} ${
-              address.street || ""
-            }`.trim()
-            input.value = addressString
-            console.log(
-              "AddressAutocomplete - set input value to:",
-              addressString
-            )
-          }
-        }
-
         // Update the parent's form state with all address fields
+        // The parent will pass the value back down via props, which our sync effect will handle
         onAddressSelect(address)
 
-        // Clear the selection flag after a delay to allow state updates and auto-save
+        // Clear the selection flag after a shorter delay
+        // The value sync effect will handle setting the input value
         setTimeout(() => {
           isSelectingRef.current = false
-        }, 500)
+        }, 200)
       },
       [onAddressSelect]
     )
@@ -199,24 +184,43 @@ const AddressAutocomplete = React.forwardRef<
     }, [isInitialized, countryCodes, handleSelection])
 
     // Sync the value prop to Radar's input element (without recreating autocomplete)
+    // Use aggressive timing to override Radar's internal input clearing behavior
     useEffect(() => {
       if (!containerRef.current) return
-
-      // Don't sync if we're in the middle of a selection to avoid interference
-      if (isSelectingRef.current) {
-        console.log("AddressAutocomplete - skipping sync during selection")
-        return
-      }
+      if (value === undefined) return
 
       const input = containerRef.current.querySelector(
         ".radar-autocomplete-input"
       ) as HTMLInputElement
 
-      if (input && value !== undefined && input.value !== value) {
-        // Only sync when values actually differ
-        console.log("AddressAutocomplete - syncing value prop to input:", value)
-        input.value = value
-        setHasValue(!!value)
+      if (!input) return
+
+      // Function to set the input value
+      const setValue = () => {
+        if (input.value !== value) {
+          console.log("AddressAutocomplete - syncing value prop to input:", value)
+          input.value = value
+          setHasValue(!!value)
+        }
+      }
+
+      // If we're in the middle of a selection, wait a bit then start aggressive syncing
+      if (isSelectingRef.current) {
+        console.log("AddressAutocomplete - selection in progress, will sync aggressively after delay")
+
+        // Set value multiple times with different delays to override Radar's clearing
+        const timeouts = [
+          setTimeout(setValue, 50),   // First attempt
+          setTimeout(setValue, 150),  // Second attempt
+          setTimeout(setValue, 300),  // Final attempt
+        ]
+
+        return () => {
+          timeouts.forEach(t => clearTimeout(t))
+        }
+      } else {
+        // Normal sync outside of selection
+        setValue()
       }
     }, [value])
 

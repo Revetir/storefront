@@ -8,6 +8,7 @@ import dynamic from "next/dynamic"
 const PaymentWrapper = dynamic(() => import("@modules/checkout/components/payment-wrapper"))
 const CheckoutForm = dynamic(() => import("@modules/checkout/templates/checkout-form"))
 const CheckoutSummary = dynamic(() => import("@modules/checkout/templates/checkout-summary"))
+const CheckoutWrapper = dynamic(() => import("@modules/checkout/components/checkout-wrapper"))
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -23,11 +24,13 @@ export default async function Checkout() {
   const customer = await retrieveCustomer()
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_416px] content-container gap-x-40 py-12">
-      <PaymentWrapper cart={cart}>
-        <CheckoutForm cart={cart} customer={customer} />
-      </PaymentWrapper>
-      <CheckoutSummary cart={cart} />
-    </div>
+    <CheckoutWrapper>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_416px] content-container gap-x-40 py-12">
+        <PaymentWrapper cart={cart}>
+          <CheckoutForm cart={cart} customer={customer} />
+        </PaymentWrapper>
+        <CheckoutSummary cart={cart} />
+      </div>
+    </CheckoutWrapper>
   )
 }

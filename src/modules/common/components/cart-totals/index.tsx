@@ -2,6 +2,7 @@
 
 import { convertToLocale } from "@lib/util/money"
 import React, { useState } from "react"
+import { useCheckoutContext } from "@modules/checkout/components/checkout-context"
 
 type CartTotalsProps = {
   totals: {
@@ -27,6 +28,18 @@ type CartTotalsProps = {
 const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false }) => {
   const [deliveryExpanded, setDeliveryExpanded] = useState(false)
   const [returnsExpanded, setReturnsExpanded] = useState(false)
+
+  // Try to get checkout context if available (only on checkout page)
+  let localAddressComplete = false
+  let isCalculatingTax = false
+  try {
+    const context = useCheckoutContext()
+    localAddressComplete = context.localAddressComplete
+    isCalculatingTax = context.isCalculatingTax
+  } catch {
+    // Context not available (e.g., on bag page) - that's fine
+  }
+
   const {
     currency_code,
     total,
@@ -38,15 +51,18 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false 
     shipping_address,
   } = totals
 
-  // Check if we have a complete address for tax calculation
+  // Check if we have a complete address for tax calculation (from cart data)
   // Tax calculation requires: street address, city, state/province, postal code, and country
-  const hasAddress = !!(
+  const hasAddressInCart = !!(
     shipping_address?.address_1 &&
     shipping_address?.city &&
     shipping_address?.province &&
     shipping_address?.postal_code &&
     shipping_address?.country_code
   )
+
+  // Use local address state for immediate feedback, fall back to cart data
+  const hasAddress = localAddressComplete || hasAddressInCart
 
   return (
     <div>
@@ -156,6 +172,8 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false 
           <span data-testid="cart-taxes" data-value={tax_total || 0}>
             {hasAddress ? (
               convertToLocale({ amount: tax_total ?? 0, currency_code })
+            ) : isCalculatingTax ? (
+              <span className="italic">Calculating...</span>
             ) : (
               <span className="italic">
                 {isCheckoutPage ? "Enter shipping address" : "Calculated at checkout"}

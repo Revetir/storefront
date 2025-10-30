@@ -9,6 +9,7 @@ import AddressAutocomplete, {
 } from "../address-autocomplete"
 import { US_STATES } from "../../utils/us-states"
 import { setAddresses } from "@lib/data/cart"
+import { useCheckoutContext } from "../checkout-context"
 
 const ShippingAddress = ({
   customer,
@@ -21,6 +22,7 @@ const ShippingAddress = ({
   checked: boolean
   onChange: () => void
 }) => {
+  const { setLocalAddressComplete, setIsCalculatingTax } = useCheckoutContext()
   const [formData, setFormData] = useState<Record<string, any>>({
     "shipping_address.first_name": cart?.shipping_address?.first_name || "",
     "shipping_address.last_name": cart?.shipping_address?.last_name || "",
@@ -37,6 +39,19 @@ const ShippingAddress = ({
 
   const [hasUserEdited, setHasUserEdited] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Check if address is complete for tax calculation
+  useEffect(() => {
+    const isComplete = !!(
+      formData["shipping_address.address_1"] &&
+      formData["shipping_address.city"] &&
+      formData["shipping_address.province"] &&
+      formData["shipping_address.postal_code"] &&
+      formData["shipping_address.country_code"]
+    )
+
+    setLocalAddressComplete(isComplete)
+  }, [formData, setLocalAddressComplete])
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -129,6 +144,7 @@ const ShippingAddress = ({
   // Auto-save address data on blur with debounce
   const debouncedSaveAddress = useCallback(
     debounce(async (data: Record<string, any>) => {
+      setIsCalculatingTax(true)
       try {
         // Create FormData to match the setAddresses server action signature
         const formDataObj = new FormData()
@@ -145,13 +161,15 @@ const ShippingAddress = ({
         // NEXT_REDIRECT is expected - it means the save was successful and triggered a revalidation
         if (error?.message === 'NEXT_REDIRECT' || error?.digest?.includes('NEXT_REDIRECT')) {
           console.log("Auto-save successful (triggered revalidation)")
+          setIsCalculatingTax(false)
           return
         }
         // Only log actual errors
         console.error("Auto-save failed:", error)
+        setIsCalculatingTax(false)
       }
     }, 500),
-    []
+    [setIsCalculatingTax]
   )
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
