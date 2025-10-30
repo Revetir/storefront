@@ -96,8 +96,9 @@ const ShippingAddress = ({
   }
 
   const handleAddressSelect = (address: RadarAddress) => {
-    setFormData((prevState: Record<string, any>) => ({
-      ...prevState,
+    console.log("ShippingAddress - handleAddressSelect called with:", address)
+
+    const updatedFields = {
       "shipping_address.address_1": `${address.number || ""} ${
         address.street || ""
       }${address.unit ? " " + address.unit : ""}`.trim(),
@@ -107,6 +108,13 @@ const ShippingAddress = ({
       "shipping_address.postal_code": address.postalCode || "",
       "shipping_address.country_code":
         address.countryCode?.toLowerCase() || "",
+    }
+
+    console.log("ShippingAddress - updating form fields:", updatedFields)
+
+    setFormData((prevState: Record<string, any>) => ({
+      ...prevState,
+      ...updatedFields,
     }))
   }
 

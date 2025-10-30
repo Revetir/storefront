@@ -36,8 +36,9 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
   }
 
   const handleAddressSelect = (address: RadarAddress) => {
-    setFormData((prevState: any) => ({
-      ...prevState,
+    console.log("BillingAddress - handleAddressSelect called with:", address)
+
+    const updatedFields = {
       "billing_address.address_1": `${address.number || ""} ${
         address.street || ""
       }${address.unit ? " " + address.unit : ""}`.trim(),
@@ -47,6 +48,13 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
       "billing_address.postal_code": address.postalCode || "",
       "billing_address.country_code":
         address.countryCode?.toLowerCase() || "",
+    }
+
+    console.log("BillingAddress - updating form fields:", updatedFields)
+
+    setFormData((prevState: any) => ({
+      ...prevState,
+      ...updatedFields,
     }))
   }
 
