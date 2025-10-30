@@ -60,8 +60,6 @@ const StripePaymentButton = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const { countryCode } = useParams()
-  const router = useRouter()
-  const pathname = usePathname()
   const paymentSession = cart.payment_collection?.payment_sessions?.find(
     (session) => session.provider_id === "pp_stripe_stripe"
   )
