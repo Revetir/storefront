@@ -93,13 +93,15 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
               )}
             </span>
           </div>
-          {deliveryExpanded && (
-            <div className="overflow-hidden animate-accordion-open">
-              <p className="text-xs italic text-gray-500 mt-1 leading-relaxed">
-                Standard shipping is <strong>complimentary</strong> on this order, with all duties and additional import fees prepaid
-              </p>
-            </div>
-          )}
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              deliveryExpanded ? 'max-h-32 opacity-100' : 'max-h-0 opacity-0'
+            }`}
+          >
+            <p className="text-xs italic text-gray-500 mt-1 leading-relaxed">
+              Standard shipping is <strong>complimentary</strong> on this order, with all duties and additional import fees prepaid.
+            </p>
+          </div>
         </div>
         <div className="flex flex-col">
           <div className="flex items-center justify-between">
@@ -127,13 +129,15 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
               <strong>Free</strong>
             </span>
           </div>
-          {returnsExpanded && (
-            <div className="overflow-hidden animate-accordion-open">
-              <p className="text-xs italic text-gray-500 mt-1 leading-relaxed">
-                Returns are <strong>complimentary</strong> within 7 days of delivery, with a prepaid return label included in every order
-              </p>
-            </div>
-          )}
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              returnsExpanded ? 'max-h-32 opacity-100' : 'max-h-0 opacity-0'
+            }`}
+          >
+            <p className="text-xs italic text-gray-500 mt-1 leading-relaxed">
+              Returns are <strong>complimentary</strong> within 7 days of delivery, with a prepaid return label included in every order.
+            </p>
+          </div>
         </div>
         <div className="flex justify-between">
           <span className="flex gap-x-1 items-center uppercase">Taxes</span>

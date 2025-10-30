@@ -8,6 +8,7 @@ import Klarna from "@modules/common/icons/klarna"
 import Affirm from "@modules/common/icons/affirm"
 import Cashapp from "@modules/common/icons/cashapp"
 import Amazon from "@modules/common/icons/amazon"
+import ApplePay from "@modules/common/icons/apple-pay"
 
 /* Map of payment provider_id to their title and icon. Add in any payment providers you want to use. */
 export const paymentInfoMap: Record<
@@ -61,6 +62,10 @@ export const paymentInfoMap: Record<
   afterpay_clearpay: {
     title: "Afterpay",
     icon: <Klarna />
+  },
+  apple_pay: {
+    title: "Apple Pay",
+    icon: <ApplePay />
   }
 }
 
