@@ -34,6 +34,8 @@ const ShippingAddress = ({
     email: cart?.email || "",
   })
 
+  const [hasUserEdited, setHasUserEdited] = useState(false)
+
   const countriesInRegion = useMemo(
     () => cart?.region?.countries?.map((c) => c.iso_2).filter((code): code is string => !!code),
     [cart?.region]
@@ -74,6 +76,12 @@ const ShippingAddress = ({
   }
 
   useEffect(() => {
+    // Only initialize form data from cart if user hasn't manually edited yet
+    if (hasUserEdited) {
+      console.log("ShippingAddress - skipping cart sync, user has edited form")
+      return
+    }
+
     // Ensure cart is not null and has a shipping_address before setting form data
     if (cart && cart.shipping_address) {
       setFormAddress(cart?.shipping_address, cart?.email)
@@ -82,7 +90,7 @@ const ShippingAddress = ({
     if (cart && !cart.email && customer?.email) {
       setFormAddress(undefined, customer.email)
     }
-  }, [cart]) // Add cart as a dependency
+  }, [cart, hasUserEdited]) // Add hasUserEdited as a dependency
 
   // Debug logging to track formData changes
   useEffect(() => {
@@ -94,6 +102,7 @@ const ShippingAddress = ({
       HTMLInputElement | HTMLInputElement | HTMLSelectElement
     >
   ) => {
+    setHasUserEdited(true)
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -102,6 +111,8 @@ const ShippingAddress = ({
 
   const handleAddressSelect = (address: RadarAddress) => {
     console.log("ShippingAddress - handleAddressSelect called with:", address)
+
+    setHasUserEdited(true)
 
     const updatedFields = {
       "shipping_address.address_1": `${address.number || ""} ${

@@ -19,6 +19,8 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
     "billing_address.phone": cart?.billing_address?.phone || "",
   })
 
+  const [hasUserEdited, setHasUserEdited] = useState(false)
+
   const countriesInRegion = useMemo(
     () => cart?.region?.countries?.map((c) => c.iso_2).filter((code): code is string => !!code),
     [cart?.region]
@@ -34,6 +36,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
       HTMLInputElement | HTMLInputElement | HTMLSelectElement
     >
   ) => {
+    setHasUserEdited(true)
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -42,6 +45,8 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
 
   const handleAddressSelect = (address: RadarAddress) => {
     console.log("BillingAddress - handleAddressSelect called with:", address)
+
+    setHasUserEdited(true)
 
     const updatedFields = {
       "billing_address.address_1": `${address.number || ""} ${

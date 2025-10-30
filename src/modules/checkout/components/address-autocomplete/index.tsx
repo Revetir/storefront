@@ -239,6 +239,11 @@ const AddressAutocomplete = React.forwardRef<
             transition: all 0.2s ease !important;
           }
 
+          /* Ensure border is visible and matches other inputs */
+          .address-autocomplete-container .radar-autocomplete-wrapper {
+            border: none !important;
+          }
+
           .address-autocomplete-container .radar-autocomplete-input:focus {
             outline: none !important;
             ring: 0 !important;
@@ -266,33 +271,63 @@ const AddressAutocomplete = React.forwardRef<
             border-radius: 0.375rem !important;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
               0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-            padding: 0.25rem 0 !important;
+            padding: 0 !important;
             max-height: 300px !important;
             overflow-y: auto !important;
+          }
+
+          /* Add SUGGESTIONS heading */
+          .address-autocomplete-container .radar-autocomplete-results-list::before {
+            content: "SUGGESTIONS" !important;
+            display: block !important;
+            padding: 0.75rem 1rem !important;
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            color: var(--ui-fg-base) !important;
+            border-bottom: 1px solid var(--ui-border-base) !important;
+            background-color: white !important;
           }
 
           /* Style individual result items */
           .address-autocomplete-container .radar-autocomplete-results-item {
             padding: 0.75rem 1rem !important;
             cursor: pointer !important;
-            transition: background-color 0.15s ease !important;
+            transition: all 0.15s ease !important;
             font-size: 0.875rem !important;
             color: var(--ui-fg-base) !important;
             white-space: normal !important;
             word-wrap: break-word !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.25rem !important;
+            background-color: white !important;
           }
 
+          /* Hover effect - invert colors (black <-> white) */
           .address-autocomplete-container .radar-autocomplete-results-item:hover,
           .address-autocomplete-container
             .radar-autocomplete-results-item-selected,
           .address-autocomplete-container
             .radar-autocomplete-results-item[aria-selected="true"] {
-            background-color: var(--ui-bg-subtle) !important;
+            background-color: black !important;
+            color: white !important;
+          }
+
+          .address-autocomplete-container .radar-autocomplete-results-item:hover b,
+          .address-autocomplete-container .radar-autocomplete-results-item-selected b,
+          .address-autocomplete-container .radar-autocomplete-results-item[aria-selected="true"] b {
+            color: white !important;
           }
 
           .address-autocomplete-container .radar-autocomplete-results-item b {
             color: var(--ui-fg-base) !important;
             font-weight: 600 !important;
+          }
+
+          /* Hide the pin/marker icon */
+          .address-autocomplete-container .radar-autocomplete-results-marker {
+            display: none !important;
           }
 
           /* Hide the powered by Radar footer */
