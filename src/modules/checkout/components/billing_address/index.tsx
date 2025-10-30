@@ -11,6 +11,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
     "billing_address.first_name": cart?.billing_address?.first_name || "",
     "billing_address.last_name": cart?.billing_address?.last_name || "",
     "billing_address.address_1": cart?.billing_address?.address_1 || "",
+    "billing_address.address_2": cart?.billing_address?.address_2 || "",
     "billing_address.company": cart?.billing_address?.company || "",
     "billing_address.postal_code": cart?.billing_address?.postal_code || "",
     "billing_address.city": cart?.billing_address?.city || "",
@@ -51,7 +52,8 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
     const updatedFields = {
       "billing_address.address_1": `${address.number || ""} ${
         address.street || ""
-      }${address.unit ? " " + address.unit : ""}`.trim(),
+      }`.trim(),
+      "billing_address.address_2": address.unit || "",
       "billing_address.city": address.city || "",
       "billing_address.province":
         address.stateCode || address.state || "",
@@ -77,7 +79,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
-          label="First name"
+          label="First Name"
           name="billing_address.first_name"
           autoComplete="given-name"
           value={formData["billing_address.first_name"]}
@@ -86,7 +88,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           data-testid="billing-first-name-input"
         />
         <Input
-          label="Last name"
+          label="Last Name"
           name="billing_address.last_name"
           autoComplete="family-name"
           value={formData["billing_address.last_name"]}
@@ -95,7 +97,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           data-testid="billing-last-name-input"
         />
         <AddressAutocomplete
-          label="Address"
+          label="Street Address"
           name="billing_address.address_1"
           autoComplete="address-line1"
           value={formData["billing_address.address_1"]}
@@ -105,14 +107,28 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           required
           data-testid="billing-address-input"
         />
-        <Input
-          label="Company"
-          name="billing_address.company"
-          value={formData["billing_address.company"]}
-          onChange={handleChange}
-          autoComplete="organization"
-          data-testid="billing-company-input"
-        />
+        <div className="flex gap-4">
+          <div className="w-1/2">
+            <Input
+              label="Apt. / Unit #"
+              name="billing_address.address_2"
+              autoComplete="address-line2"
+              value={formData["billing_address.address_2"]}
+              onChange={handleChange}
+              data-testid="billing-address-2-input"
+            />
+          </div>
+          <div className="w-1/2">
+            <Input
+              label="Company"
+              name="billing_address.company"
+              value={formData["billing_address.company"]}
+              onChange={handleChange}
+              autoComplete="organization"
+              data-testid="billing-company-input"
+            />
+          </div>
+        </div>
         <Input
           label="City"
           name="billing_address.city"
@@ -122,16 +138,28 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           required
           data-testid="billing-city-input"
         />
-        <div className="w-3/5">
-          <Input
-            label="Postal code"
-            name="billing_address.postal_code"
-            autoComplete="postal-code"
-            value={formData["billing_address.postal_code"]}
-            onChange={handleChange}
-            required
-            data-testid="billing-postal-input"
-          />
+        <div className="flex gap-4">
+          <div className="w-3/5">
+            <Input
+              label="State"
+              name="billing_address.province"
+              autoComplete="address-level1"
+              value={formData["billing_address.province"]}
+              onChange={handleChange}
+              data-testid="billing-province-input"
+            />
+          </div>
+          <div className="w-2/5">
+            <Input
+              label="Zip Code"
+              name="billing_address.postal_code"
+              autoComplete="postal-code"
+              value={formData["billing_address.postal_code"]}
+              onChange={handleChange}
+              required
+              data-testid="billing-postal-input"
+            />
+          </div>
         </div>
         <CountrySelect
           name="billing_address.country_code"
@@ -142,16 +170,6 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           required
           data-testid="billing-country-select"
         />
-        <div className="w-3/5">
-          <Input
-            label="State / Province"
-            name="billing_address.province"
-            autoComplete="address-level1"
-            value={formData["billing_address.province"]}
-            onChange={handleChange}
-            data-testid="billing-province-input"
-          />
-        </div>
         <div className="w-3/5">
           <Input
             label="Phone"

@@ -72,6 +72,23 @@ const AddressAutocomplete = React.forwardRef<
 
         // Mark that we have a value for the floating label
         setHasValue(true)
+
+        // Ensure Radar's input displays the selected address immediately
+        if (containerRef.current) {
+          const input = containerRef.current.querySelector(
+            ".radar-autocomplete-input"
+          ) as HTMLInputElement
+          if (input) {
+            const addressString = `${address.number || ""} ${
+              address.street || ""
+            }`.trim()
+            input.value = addressString
+            console.log(
+              "AddressAutocomplete - set input value to:",
+              addressString
+            )
+          }
+        }
       },
       [onAddressSelect]
     )
@@ -172,6 +189,21 @@ const AddressAutocomplete = React.forwardRef<
       }
     }, [isInitialized, countryCodes, handleSelection])
 
+    // Sync the value prop to Radar's input element (without recreating autocomplete)
+    useEffect(() => {
+      if (!containerRef.current) return
+
+      const input = containerRef.current.querySelector(
+        ".radar-autocomplete-input"
+      ) as HTMLInputElement
+
+      if (input && value !== undefined && input.value !== value) {
+        console.log("AddressAutocomplete - syncing value prop to input:", value)
+        input.value = value
+        setHasValue(!!value)
+      }
+    }, [value])
+
     // Determine if label should be floating
     const labelFloating = isFocused || hasValue
 
@@ -189,8 +221,8 @@ const AddressAutocomplete = React.forwardRef<
           <label
             className={`absolute transition-all duration-300 pointer-events-none mx-3 px-1 ${
               labelFloating
-                ? "top-1 left-4 text-xs text-ui-fg-subtle"
-                : "top-3 left-4 text-ui-fg-subtle"
+                ? "top-1 text-xs text-ui-fg-subtle"
+                : "top-3 text-ui-fg-subtle"
             }`}
           >
             {label}
@@ -213,7 +245,7 @@ const AddressAutocomplete = React.forwardRef<
             width: 100% !important;
             height: 2.75rem !important;
             margin-top: 0 !important;
-            background-color: var(--ui-bg-field) !important;
+            background-color: transparent !important;
             border: 1px solid var(--ui-border-base) !important;
             border-radius: 0.375rem !important;
             appearance: none !important;
@@ -234,10 +266,6 @@ const AddressAutocomplete = React.forwardRef<
             ring: 0 !important;
             box-shadow: 0 0 0 2px var(--ui-border-interactive) !important;
             border-color: var(--ui-border-interactive) !important;
-          }
-
-          .address-autocomplete-container .radar-autocomplete-input:hover {
-            background-color: var(--ui-bg-field-hover) !important;
           }
 
           /* Hide search icon completely */
