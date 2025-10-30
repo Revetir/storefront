@@ -15,6 +15,10 @@ type CartTotalsProps = {
     shipping_subtotal?: number | null
     shipping_address?: {
       address_1?: string | null
+      city?: string | null
+      province?: string | null
+      postal_code?: string | null
+      country_code?: string | null
     } | null
   }
   isCheckoutPage?: boolean
@@ -34,8 +38,15 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false 
     shipping_address,
   } = totals
 
-  // Check if we have an address for tax calculation
-  const hasAddress = !!shipping_address?.address_1
+  // Check if we have a complete address for tax calculation
+  // Tax calculation requires: street address, city, state/province, postal code, and country
+  const hasAddress = !!(
+    shipping_address?.address_1 &&
+    shipping_address?.city &&
+    shipping_address?.province &&
+    shipping_address?.postal_code &&
+    shipping_address?.country_code
+  )
 
   return (
     <div>

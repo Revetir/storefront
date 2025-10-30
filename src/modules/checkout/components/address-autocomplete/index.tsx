@@ -61,11 +61,15 @@ const AddressAutocomplete = React.forwardRef<
     const [isInitialized, setIsInitialized] = useState(false)
     const [isFocused, setIsFocused] = useState(false)
     const [hasValue, setHasValue] = useState(false)
+    const isSelectingRef = useRef(false)
 
     // Memoize the selection handler to prevent recreation on every render
     const handleSelection = useCallback(
       (address: RadarAddress) => {
         console.log("Radar address selected:", address)
+
+        // Mark that we're in the middle of a selection to prevent value sync interference
+        isSelectingRef.current = true
 
         // Mark that we have a value for the floating label
         setHasValue(true)
@@ -84,14 +88,16 @@ const AddressAutocomplete = React.forwardRef<
               "AddressAutocomplete - set input value to:",
               addressString
             )
-            // Force the browser to acknowledge the change
-            input.dispatchEvent(new Event('input', { bubbles: true }))
           }
         }
 
         // Update the parent's form state with all address fields
-        // This is done AFTER setting the local input to avoid race conditions
         onAddressSelect(address)
+
+        // Clear the selection flag after a brief delay to allow state updates
+        setTimeout(() => {
+          isSelectingRef.current = false
+        }, 100)
       },
       [onAddressSelect]
     )
@@ -196,19 +202,21 @@ const AddressAutocomplete = React.forwardRef<
     useEffect(() => {
       if (!containerRef.current) return
 
+      // Don't sync if we're in the middle of a selection to avoid interference
+      if (isSelectingRef.current) {
+        console.log("AddressAutocomplete - skipping sync during selection")
+        return
+      }
+
       const input = containerRef.current.querySelector(
         ".radar-autocomplete-input"
       ) as HTMLInputElement
 
-      if (input && value !== undefined) {
-        // Always sync the value, even if it appears the same
-        // This ensures visual persistence after autocomplete selection
+      if (input && value !== undefined && input.value !== value) {
+        // Only sync when values actually differ
         console.log("AddressAutocomplete - syncing value prop to input:", value)
         input.value = value
         setHasValue(!!value)
-
-        // Force a repaint to ensure the browser updates the input display
-        input.dispatchEvent(new Event('input', { bubbles: true }))
       }
     }, [value])
 
@@ -220,7 +228,7 @@ const AddressAutocomplete = React.forwardRef<
         <div className="flex relative w-full txt-compact-medium address-autocomplete-container">
           <div
             ref={containerRef}
-            className="w-full border border-ui-border-base rounded-md"
+            className="w-full"
             data-testid={dataTestId}
             style={{
               position: "relative",
@@ -245,18 +253,15 @@ const AddressAutocomplete = React.forwardRef<
             opacity: 0 !important;
           }
 
-          /* Style Radar input to match Medusa Input component */
+          /* Style Radar input to match other form inputs */
           .address-autocomplete-container .radar-autocomplete-input {
-            padding-top: 1rem !important;
-            padding-bottom: 0.25rem !important;
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
+            padding: 0.5rem 0.75rem !important;
             display: block !important;
             width: 100% !important;
-            height: 2.75rem !important;
+            height: auto !important;
             margin-top: 0 !important;
             background-color: transparent !important;
-            border: 1px solid var(--ui-border-base) !important;
+            border: 1px solid rgb(209, 213, 219) !important;
             border-radius: 0.375rem !important;
             appearance: none !important;
             box-sizing: border-box !important;
