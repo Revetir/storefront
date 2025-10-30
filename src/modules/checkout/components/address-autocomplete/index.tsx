@@ -67,9 +67,6 @@ const AddressAutocomplete = React.forwardRef<
       (address: RadarAddress) => {
         console.log("Radar address selected:", address)
 
-        // Update the parent's form state with all address fields
-        onAddressSelect(address)
-
         // Mark that we have a value for the floating label
         setHasValue(true)
 
@@ -87,8 +84,14 @@ const AddressAutocomplete = React.forwardRef<
               "AddressAutocomplete - set input value to:",
               addressString
             )
+            // Force the browser to acknowledge the change
+            input.dispatchEvent(new Event('input', { bubbles: true }))
           }
         }
+
+        // Update the parent's form state with all address fields
+        // This is done AFTER setting the local input to avoid race conditions
+        onAddressSelect(address)
       },
       [onAddressSelect]
     )
@@ -197,10 +200,15 @@ const AddressAutocomplete = React.forwardRef<
         ".radar-autocomplete-input"
       ) as HTMLInputElement
 
-      if (input && value !== undefined && input.value !== value) {
+      if (input && value !== undefined) {
+        // Always sync the value, even if it appears the same
+        // This ensures visual persistence after autocomplete selection
         console.log("AddressAutocomplete - syncing value prop to input:", value)
         input.value = value
         setHasValue(!!value)
+
+        // Force a repaint to ensure the browser updates the input display
+        input.dispatchEvent(new Event('input', { bubbles: true }))
       }
     }, [value])
 
@@ -218,16 +226,18 @@ const AddressAutocomplete = React.forwardRef<
               position: "relative",
             }}
           />
-          <label
-            className={`absolute transition-all duration-300 pointer-events-none mx-3 px-1 ${
-              labelFloating
-                ? "top-1 text-xs text-ui-fg-subtle"
-                : "top-3 text-ui-fg-subtle"
-            }`}
-          >
-            {label}
-            {required && <span className="text-rose-500 ml-0.5">*</span>}
-          </label>
+          {label && (
+            <label
+              className={`absolute transition-all duration-300 pointer-events-none mx-3 px-1 ${
+                labelFloating
+                  ? "top-1 text-xs text-ui-fg-subtle"
+                  : "top-3 text-ui-fg-subtle"
+              }`}
+            >
+              {label}
+              {required && <span className="text-rose-500 ml-0.5">*</span>}
+            </label>
+          )}
         </div>
         <style jsx global>{`
           /* Hide Radar's default placeholder */
