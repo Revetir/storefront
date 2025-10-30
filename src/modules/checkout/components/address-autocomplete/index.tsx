@@ -72,22 +72,8 @@ const AddressAutocomplete = React.forwardRef<
 
         // Mark that we have a value for the floating label
         setHasValue(true)
-
-        // Create synthetic event for the address field itself
-        const addressString = `${address.number || ""} ${address.street || ""}${
-          address.unit ? " " + address.unit : ""
-        }`.trim()
-
-        const syntheticEvent = {
-          target: {
-            name,
-            value: addressString,
-          },
-        } as React.ChangeEvent<HTMLInputElement>
-
-        onChange(syntheticEvent)
       },
-      [name, onChange, onAddressSelect]
+      [onAddressSelect]
     )
 
     // Initialize Radar SDK once
@@ -158,9 +144,8 @@ const AddressAutocomplete = React.forwardRef<
           input.addEventListener("blur", handleBlur)
           input.addEventListener("input", handleInput)
 
-          // Set initial value if provided
-          if (value) {
-            input.value = value
+          // Check if input has initial value for label positioning
+          if (input.value) {
             setHasValue(true)
           }
 
@@ -185,7 +170,7 @@ const AddressAutocomplete = React.forwardRef<
           autocompleteRef.current.remove()
         }
       }
-    }, [isInitialized, countryCodes, handleSelection, value])
+    }, [isInitialized, countryCodes, handleSelection])
 
     // Determine if label should be floating
     const labelFloating = isFocused || hasValue
@@ -195,14 +180,14 @@ const AddressAutocomplete = React.forwardRef<
         <div className="flex relative w-full txt-compact-medium address-autocomplete-container">
           <div
             ref={containerRef}
-            className="w-full"
+            className="w-full border border-ui-border-base rounded-md"
             data-testid={dataTestId}
             style={{
               position: "relative",
             }}
           />
           <label
-            className={`absolute transition-all duration-300 pointer-events-none ${
+            className={`absolute transition-all duration-300 pointer-events-none mx-3 px-1 ${
               labelFloating
                 ? "top-1 left-4 text-xs text-ui-fg-subtle"
                 : "top-3 left-4 text-ui-fg-subtle"
