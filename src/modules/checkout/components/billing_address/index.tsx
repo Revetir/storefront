@@ -1,7 +1,10 @@
 import { HttpTypes } from "@medusajs/types"
 import Input from "@modules/common/components/input"
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 import CountrySelect from "../country-select"
+import AddressAutocomplete, {
+  RadarAddress,
+} from "../address-autocomplete"
 
 const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
   const [formData, setFormData] = useState<any>({
@@ -16,6 +19,11 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
     "billing_address.phone": cart?.billing_address?.phone || "",
   })
 
+  const countriesInRegion = useMemo(
+    () => cart?.region?.countries?.map((c) => c.iso_2).filter((code): code is string => !!code),
+    [cart?.region]
+  )
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLInputElement | HTMLSelectElement
@@ -25,6 +33,21 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
       ...formData,
       [e.target.name]: e.target.value,
     })
+  }
+
+  const handleAddressSelect = (address: RadarAddress) => {
+    setFormData((prevState: any) => ({
+      ...prevState,
+      "billing_address.address_1": `${address.number || ""} ${
+        address.street || ""
+      }${address.unit ? " " + address.unit : ""}`.trim(),
+      "billing_address.city": address.city || "",
+      "billing_address.province":
+        address.stateCode || address.state || "",
+      "billing_address.postal_code": address.postalCode || "",
+      "billing_address.country_code":
+        address.countryCode?.toLowerCase() || "",
+    }))
   }
 
   return (
@@ -48,12 +71,14 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           required
           data-testid="billing-last-name-input"
         />
-        <Input
+        <AddressAutocomplete
           label="Address"
           name="billing_address.address_1"
           autoComplete="address-line1"
           value={formData["billing_address.address_1"]}
           onChange={handleChange}
+          onAddressSelect={handleAddressSelect}
+          countryCodes={countriesInRegion}
           required
           data-testid="billing-address-input"
         />

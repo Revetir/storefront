@@ -6,6 +6,9 @@ import { mapKeys } from "lodash"
 import React, { useEffect, useMemo, useState } from "react"
 import AddressSelect from "../address-select"
 import CountrySelect from "../country-select"
+import AddressAutocomplete, {
+  RadarAddress,
+} from "../address-autocomplete"
 
 const ShippingAddress = ({
   customer,
@@ -32,7 +35,7 @@ const ShippingAddress = ({
   })
 
   const countriesInRegion = useMemo(
-    () => cart?.region?.countries?.map((c) => c.iso_2),
+    () => cart?.region?.countries?.map((c) => c.iso_2).filter((code): code is string => !!code),
     [cart?.region]
   )
 
@@ -92,6 +95,21 @@ const ShippingAddress = ({
     })
   }
 
+  const handleAddressSelect = (address: RadarAddress) => {
+    setFormData((prevState: Record<string, any>) => ({
+      ...prevState,
+      "shipping_address.address_1": `${address.number || ""} ${
+        address.street || ""
+      }${address.unit ? " " + address.unit : ""}`.trim(),
+      "shipping_address.city": address.city || "",
+      "shipping_address.province":
+        address.stateCode || address.state || "",
+      "shipping_address.postal_code": address.postalCode || "",
+      "shipping_address.country_code":
+        address.countryCode?.toLowerCase() || "",
+    }))
+  }
+
   return (
     <>
       {customer && (addressesInRegion?.length || 0) > 0 && (
@@ -129,12 +147,14 @@ const ShippingAddress = ({
           required
           data-testid="shipping-last-name-input"
         />
-        <Input
+        <AddressAutocomplete
           label="Address"
           name="shipping_address.address_1"
           autoComplete="address-line1"
           value={formData["shipping_address.address_1"]}
           onChange={handleChange}
+          onAddressSelect={handleAddressSelect}
+          countryCodes={countriesInRegion}
           required
           data-testid="shipping-address-input"
         />
