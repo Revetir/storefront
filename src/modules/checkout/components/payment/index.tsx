@@ -31,9 +31,10 @@ const Payment = ({
   const stripe = stripeReady ? useStripe() : null
   const elements = stripeReady ? useElements() : null
 
-  // Ensure cart total is in cents (smallest currency unit) and is an integer
-  // Medusa returns amounts in cents, but we ensure it's a whole number for Stripe elements
-  const cartTotal = cart?.total || 0
+  // Convert cart total to cents (smallest currency unit) for Stripe
+  // Medusa v2 returns amounts as decimal dollars (e.g., 813.75), but Stripe expects cents (e.g., 81375)
+  // Multiply by 100 and round to ensure we have a whole number in cents
+  const cartTotal = Math.round((cart?.total || 0) * 100)
 
   // Detect available payment methods (filters Apple Pay/Google Pay based on device)
   // Uses browser-based detection to check wallet availability
@@ -83,6 +84,7 @@ const Payment = ({
 
   // Calculate installment amount for BNPL services (4 equal payments)
   const calculateInstallment = () => {
+    // cartTotal is now in cents, so divide by 100 to get dollars
     const totalInDollars = cartTotal / 100
     const installmentAmount = (totalInDollars / 4).toFixed(2)
     return installmentAmount
