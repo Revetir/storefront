@@ -2,9 +2,9 @@
 
 import { RadioGroup, Radio } from "@headlessui/react"
 import { setShippingMethod } from "@lib/data/cart"
-import { calculatePriceForShippingOption } from "@lib/data/fulfillment"
+// import { calculatePriceForShippingOption } from "@lib/data/fulfillment"
 import { convertToLocale } from "@lib/util/money"
-import { Loader } from "@medusajs/icons"
+// import { Loader } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Text, clx } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
@@ -85,13 +85,13 @@ const Shipping: React.FC<ShippingProps> = ({
   availableShippingMethods,
 }) => {
   const [isLoading, setIsLoading] = useState(false)
-  const [isLoadingPrices, setIsLoadingPrices] = useState(true)
+  // const [isLoadingPrices, setIsLoadingPrices] = useState(true)
 
   const [showPickupOptions, setShowPickupOptions] =
     useState<string>(PICKUP_OPTION_OFF)
-  const [calculatedPricesMap, setCalculatedPricesMap] = useState<
-    Record<string, number>
-  >({})
+  // const [calculatedPricesMap, setCalculatedPricesMap] = useState<
+  //   Record<string, number>
+  // >({})
   const [error, setError] = useState<string | null>(null)
   const [shippingMethodId, setShippingMethodId] = useState<string | null>(
     cart.shipping_methods?.at(-1)?.shipping_option_id || null
@@ -109,25 +109,25 @@ const Shipping: React.FC<ShippingProps> = ({
   const hasPickupOptions = !!_pickupMethods?.length
 
   useEffect(() => {
-    setIsLoadingPrices(true)
+    // Commented out calculated price logic - only supporting flat prices for now
+    // setIsLoadingPrices(true)
+    // if (_shippingMethods?.length) {
+    //   const promises = _shippingMethods
+    //     .filter((sm) => sm.price_type === "calculated")
+    //     .map((sm) => calculatePriceForShippingOption(sm.id, cart.id))
 
-    if (_shippingMethods?.length) {
-      const promises = _shippingMethods
-        .filter((sm) => sm.price_type === "calculated")
-        .map((sm) => calculatePriceForShippingOption(sm.id, cart.id))
+    //   if (promises.length) {
+    //     Promise.allSettled(promises).then((res) => {
+    //       const pricesMap: Record<string, number> = {}
+    //       res
+    //         .filter((r) => r.status === "fulfilled")
+    //         .forEach((p) => (pricesMap[p.value?.id || ""] = p.value?.amount!))
 
-      if (promises.length) {
-        Promise.allSettled(promises).then((res) => {
-          const pricesMap: Record<string, number> = {}
-          res
-            .filter((r) => r.status === "fulfilled")
-            .forEach((p) => (pricesMap[p.value?.id || ""] = p.value?.amount!))
-
-          setCalculatedPricesMap(pricesMap)
-          setIsLoadingPrices(false)
-        })
-      }
-    }
+    //       setCalculatedPricesMap(pricesMap)
+    //       setIsLoadingPrices(false)
+    //     })
+    //   }
+    // }
 
     if (_pickupMethods?.find((m) => m.id === shippingMethodId)) {
       setShowPickupOptions(PICKUP_OPTION_ON)
@@ -184,9 +184,6 @@ const Shipping: React.FC<ShippingProps> = ({
       </div>
           <div className="grid">
             <div className="flex flex-col">
-              <span className="font-medium txt-medium text-ui-fg-base">
-                Shipping Method
-              </span>
             </div>
             <div data-testid="delivery-options-container">
               <div className="pb-8 md:pt-0 pt-2">
@@ -233,24 +230,11 @@ const Shipping: React.FC<ShippingProps> = ({
                   onChange={(v) => v && handleSetShippingMethod(v, "shipping")}
                 >
                   {_shippingMethods?.map((option) => {
-                    const isDisabled =
-                      option.price_type === "calculated" &&
-                      !isLoadingPrices &&
-                      typeof calculatedPricesMap[option.id] !== "number"
-
-                    const price = option.price_type === "flat"
-                      ? convertToLocale({
-                          amount: option.amount!,
-                          currency_code: cart?.currency_code,
-                        })
-                      : calculatedPricesMap[option.id]
-                      ? convertToLocale({
-                          amount: calculatedPricesMap[option.id],
-                          currency_code: cart?.currency_code,
-                        })
-                      : isLoadingPrices
-                      ? null
-                      : "-"
+                    // Simplified for flat prices only
+                    const price = convertToLocale({
+                      amount: option.amount!,
+                      currency_code: cart?.currency_code,
+                    })
 
                     const estimatedDelivery = option.type?.description
                       ? calculateEstimatedDeliveryDate(option.type.description)
@@ -261,24 +245,14 @@ const Shipping: React.FC<ShippingProps> = ({
                         key={option.id}
                         value={option.id}
                         data-testid="delivery-option-radio"
-                        disabled={isDisabled}
-                        className={clx(
-                          "flex items-center gap-x-4 text-small-regular cursor-pointer py-1.5",
-                          {
-                            "cursor-not-allowed": isDisabled,
-                          }
-                        )}
+                        className="flex items-center gap-x-4 text-small-regular cursor-pointer py-1.5"
                       >
                         <MedusaRadio
                           checked={option.id === shippingMethodId}
                         />
                         <div className="flex flex-col flex-1">
                           <span className="text-base-regular">
-                            {isLoadingPrices ? (
-                              <Loader className="inline mr-2" />
-                            ) : (
-                              <>{price} | {option.name}</>
-                            )}
+                            {price} | {option.name}
                           </span>
                           {estimatedDelivery && (
                             <span className="text-sm text-ui-fg-muted">
