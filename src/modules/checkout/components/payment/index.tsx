@@ -35,7 +35,8 @@ const Payment = ({
 
   // Detect available payment methods (filters Apple Pay/Google Pay based on device)
   // Uses Stripe's Express Checkout Element internally to check availability
-  const { availableMethods, isChecking } = useAvailablePaymentMethods()
+  // Pass elements from context so the hook can access Stripe Elements
+  const { availableMethods, isChecking } = useAvailablePaymentMethods(elements)
 
   const paidByGiftcard =
     cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0

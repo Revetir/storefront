@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { useElements } from "@stripe/react-stripe-js"
 import { PAYMENT_METHODS, PaymentMethodConfig } from "./payment-methods-config"
 
 interface PaymentMethodAvailability {
@@ -7,8 +6,7 @@ interface PaymentMethodAvailability {
   googlePay: boolean
 }
 
-export const useAvailablePaymentMethods = () => {
-  const elements = useElements()
+export const useAvailablePaymentMethods = (elements: any) => {
   const [availability, setAvailability] = useState<PaymentMethodAvailability>({
     applePay: false,
     googlePay: false,
