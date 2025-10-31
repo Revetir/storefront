@@ -122,14 +122,16 @@ const Payment = ({
       case 'afterpay_clearpay':
         return (
           <div className="space-y-2">
-            <PaymentMethodMessagingElement
-              options={{
-                amount: cartTotal,
-                currency: 'USD',
-                paymentMethodTypes: ['afterpay_clearpay'],
-                countryCode: 'US',
-              }}
-            />
+            {stripe && elements && (
+              <PaymentMethodMessagingElement
+                options={{
+                  amount: cartTotal,
+                  currency: 'USD',
+                  paymentMethodTypes: ['afterpay_clearpay'],
+                  countryCode: 'US',
+                }}
+              />
+            )}
             <p className="text-xs text-gray-500">
               You will be redirected to complete your payment.
             </p>
@@ -139,14 +141,16 @@ const Payment = ({
       case 'klarna':
         return (
           <div className="space-y-2">
-            <PaymentMethodMessagingElement
-              options={{
-                amount: cartTotal,
-                currency: 'USD',
-                paymentMethodTypes: ['klarna'],
-                countryCode: 'US',
-              }}
-            />
+            {stripe && elements && (
+              <PaymentMethodMessagingElement
+                options={{
+                  amount: cartTotal,
+                  currency: 'USD',
+                  paymentMethodTypes: ['klarna'],
+                  countryCode: 'US',
+                }}
+              />
+            )}
             <p className="text-xs text-gray-500">
               Click the payment button below to continue.
             </p>

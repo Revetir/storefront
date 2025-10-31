@@ -53,9 +53,11 @@ const Review = ({ cart }: { cart: any }) => {
     switch (selectedPaymentMethod) {
       case 'apple_pay':
         return {
-          paymentMethods: {
+          wallets: {
             applePay: 'always' as const,
             googlePay: 'never' as const,
+          },
+          paymentMethods: {
             link: 'never' as const,
             paypal: 'never' as const,
             amazonPay: 'never' as const,
@@ -63,9 +65,11 @@ const Review = ({ cart }: { cart: any }) => {
         }
       case 'google_pay':
         return {
-          paymentMethods: {
+          wallets: {
             applePay: 'never' as const,
             googlePay: 'always' as const,
+          },
+          paymentMethods: {
             link: 'never' as const,
             paypal: 'never' as const,
             amazonPay: 'never' as const,
@@ -73,9 +77,11 @@ const Review = ({ cart }: { cart: any }) => {
         }
       case 'klarna':
         return {
-          paymentMethods: {
+          wallets: {
             applePay: 'never' as const,
             googlePay: 'never' as const,
+          },
+          paymentMethods: {
             link: 'never' as const,
             paypal: 'never' as const,
             amazonPay: 'never' as const,
@@ -84,9 +90,11 @@ const Review = ({ cart }: { cart: any }) => {
         }
       default:
         return {
-          paymentMethods: {
+          wallets: {
             applePay: 'never' as const,
             googlePay: 'never' as const,
+          },
+          paymentMethods: {
             link: 'never' as const,
             paypal: 'never' as const,
             amazonPay: 'never' as const,
