@@ -5,12 +5,13 @@ import { Heading } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import Divider from "@modules/common/components/divider"
 import { useContext, useEffect, useState } from "react"
-import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js"
+import { CardElement, PaymentMethodMessagingElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { StripeContext } from "../payment-wrapper/stripe-wrapper"
 import CustomPaymentSelector from "./custom-payment-selector"
 import { useAvailablePaymentMethods } from "./use-available-payment-methods"
 import { PaymentMethodType } from "./payment-methods-config"
 import { usePaymentContext } from "./payment-context"
+import Lock from "@modules/common/icons/lock"
 
 const Payment = ({
   cart,
@@ -34,9 +35,8 @@ const Payment = ({
   const cartTotal = cart?.total || 0
 
   // Detect available payment methods (filters Apple Pay/Google Pay based on device)
-  // Uses Stripe's Express Checkout Element internally to check availability
-  // Pass elements from context so the hook can access Stripe Elements
-  const { availableMethods, isChecking } = useAvailablePaymentMethods(elements)
+  // Uses browser-based detection to check wallet availability
+  const { availableMethods, isChecking } = useAvailablePaymentMethods()
 
   const paidByGiftcard =
     cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
@@ -114,43 +114,22 @@ const Payment = ({
         )
 
       case 'apple_pay':
-        return (
-          <div className="space-y-2">
-            <p className="text-sm text-gray-700">
-              Complete your purchase securely with Apple Pay.
-            </p>
-            <p className="text-xs text-gray-500">
-              Click the payment button below to continue.
-            </p>
-          </div>
-        )
+        return null
 
       case 'google_pay':
-        return (
-          <div className="space-y-2">
-            <p className="text-sm text-gray-700">
-              Complete your purchase securely with Google Pay.
-            </p>
-            <p className="text-xs text-gray-500">
-              Click the payment button below to continue.
-            </p>
-          </div>
-        )
+        return null
 
       case 'afterpay_clearpay':
         return (
           <div className="space-y-2">
-            <p className="text-sm text-gray-700">
-              Pay in <span className="font-semibold">4 interest-free payments of ${installmentAmount}</span>.{' '}
-              <a
-                href="https://www.afterpay.com/how-it-works"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
-              >
-                Learn more
-              </a>
-            </p>
+            <PaymentMethodMessagingElement
+              options={{
+                amount: cartTotal,
+                currency: 'USD',
+                paymentMethodTypes: ['afterpay_clearpay'],
+                countryCode: 'US',
+              }}
+            />
             <p className="text-xs text-gray-500">
               You will be redirected to complete your payment.
             </p>
@@ -160,17 +139,14 @@ const Payment = ({
       case 'klarna':
         return (
           <div className="space-y-2">
-            <p className="text-sm text-gray-700">
-              Pay now, in <span className="font-semibold">4 interest-free payments of ${installmentAmount}</span>, or over 3–12 months.{' '}
-              <a
-                href="https://www.klarna.com/us/customer-service/what-is-klarna/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
-              >
-                Learn more
-              </a>
-            </p>
+            <PaymentMethodMessagingElement
+              options={{
+                amount: cartTotal,
+                currency: 'USD',
+                paymentMethodTypes: ['klarna'],
+                countryCode: 'US',
+              }}
+            />
             <p className="text-xs text-gray-500">
               Click the payment button below to continue.
             </p>
@@ -185,9 +161,12 @@ const Payment = ({
   return (
     <div className="bg-white">
       <div className="flex flex-row items-center justify-between mb-6">
+        <div className="flex items-center">
+          <Lock />
+        </div>
         <Heading
           level="h2"
-          className="flex flex-row text-xl gap-x-2 items-baseline uppercase"
+          className="text-xl gap-x-2 items-baseline uppercase"
         >
           Secure Payment
         </Heading>

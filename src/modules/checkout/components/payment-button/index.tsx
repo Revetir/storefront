@@ -11,6 +11,7 @@ import { useParams } from "next/navigation"
 import { validateCheckout, triggerFieldErrors, scrollToTop } from "../../utils/validate-checkout"
 import { usePaymentContext } from "../payment/payment-context"
 import { PaymentMethodType } from "../payment/payment-methods-config"
+import AfterpayButton from "../afterpay-button"
 
 
 type PaymentButtonProps = {
@@ -136,35 +137,68 @@ const StripePaymentButton = ({
     /**
      * Payment Method Handling Strategy:
      *
-     * CARD PAYMENTS (current implementation):
+     * CARD PAYMENTS:
      * - Uses CardElement with stripe.confirmCardPayment()
      * - Collects card details inline on checkout page
-     * - Works as expected
      *
-     * FUTURE IMPLEMENTATIONS NEEDED:
+     * AFTERPAY/CLEARPAY (BNPL - Redirect-based):
+     * - Uses stripe.confirmAfterpayClearpayPayment() with return_url
+     * - User is redirected to Afterpay's site to complete payment
+     * - After completion, user returns to our return_url
      *
-     * 1. APPLE PAY / GOOGLE PAY (Wallet Payments):
-     *    - Use stripe.confirmCardPayment() with payment_method from wallet
-     *    - Payment method is created via PaymentRequest API
-     *    - No separate element needed, wallet handles UI
-     *
-     * 2. AFTERPAY / KLARNA (BNPL - Redirect-based):
-     *    - Use stripe.confirmPayment() with return_url parameter
-     *    - User is redirected to provider's site to complete payment
-     *    - After completion, user returns to our return_url
-     *    - Example:
-     *      stripe.confirmPayment({
-     *        clientSecret,
-     *        confirmParams: {
-     *          payment_method: 'afterpay_clearpay', // or 'klarna'
-     *          return_url: `${window.location.origin}/checkout/confirmation`,
-     *        }
-     *      })
-     *
-     * The selectedPaymentMethod from context will determine which flow to use.
+     * APPLE PAY / GOOGLE PAY / KLARNA:
+     * - Handled via ExpressCheckoutElement in review component
      */
 
-    // Get the CardElement (we're using CardElement instead of PaymentElement now)
+    // Handle Afterpay payment flow
+    if (selectedPaymentMethod === 'afterpay_clearpay') {
+      const billingDetails = {
+        name: `${cart.billing_address?.first_name} ${cart.billing_address?.last_name}`,
+        email: cart.email,
+        phone: cart.billing_address?.phone ?? undefined,
+        address: {
+          line1: cart.billing_address?.address_1 ?? undefined,
+          line2: cart.billing_address?.address_2 ?? undefined,
+          city: cart.billing_address?.city ?? undefined,
+          state: cart.billing_address?.province ?? undefined,
+          postal_code: cart.billing_address?.postal_code ?? undefined,
+          country: cart.billing_address?.country_code ?? undefined,
+        },
+      }
+
+      const shippingDetails = {
+        name: `${cart.shipping_address?.first_name} ${cart.shipping_address?.last_name}`,
+        phone: cart.shipping_address?.phone ?? undefined,
+        address: {
+          line1: cart.shipping_address?.address_1 ?? undefined,
+          line2: cart.shipping_address?.address_2 ?? undefined,
+          city: cart.shipping_address?.city ?? undefined,
+          state: cart.shipping_address?.province ?? undefined,
+          postal_code: cart.shipping_address?.postal_code ?? undefined,
+          country: cart.shipping_address?.country_code ?? undefined,
+        },
+      }
+
+      await stripe
+        .confirmAfterpayClearpayPayment(clientSecret, {
+          payment_method: {
+            billing_details: billingDetails,
+          },
+          shipping: shippingDetails,
+          return_url: `${window.location.origin}/${countryCode}/checkout`,
+        })
+        .then(({ error }) => {
+          if (error) {
+            setErrorMessage(error.message || null)
+            setSubmitting(false)
+          }
+          // If successful, Stripe will redirect to return_url
+        })
+
+      return
+    }
+
+    // Handle card payment flow
     const cardElement = elements.getElement('card')
 
     if (!cardElement) {
@@ -173,8 +207,6 @@ const StripePaymentButton = ({
       return
     }
 
-    // TODO: Add payment method routing logic here based on selectedPaymentMethod
-    // For now, only card payment is implemented
     // Use confirmCardPayment for CardElement
     await stripe
     .confirmCardPayment(clientSecret, {
@@ -232,16 +264,24 @@ const StripePaymentButton = ({
 
   return (
     <>
-      <Button
-        disabled={disabled || notReady}
-        onClick={handlePayment}
-        size="large"
-        isLoading={submitting}
-        data-testid={dataTestId}
-        className="uppercase"
-      >
-        {buttonText}
-      </Button>
+      {selectedPaymentMethod === 'afterpay_clearpay' ? (
+        <AfterpayButton
+          onClick={handlePayment}
+          disabled={disabled || notReady}
+          isLoading={submitting}
+        />
+      ) : (
+        <Button
+          disabled={disabled || notReady}
+          onClick={handlePayment}
+          size="large"
+          isLoading={submitting}
+          data-testid={dataTestId}
+          className="uppercase"
+        >
+          {buttonText}
+        </Button>
+      )}
       <ErrorMessage
         error={errorMessage}
         data-testid="stripe-payment-error-message"

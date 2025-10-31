@@ -17,6 +17,7 @@ const Review = ({ cart }: { cart: any }) => {
 
   // Express Checkout methods handle payment with their own buttons
   // No need to show the traditional "Place Order" button for these
+  // Note: Afterpay is handled via redirect in PaymentButton, not ExpressCheckoutElement
   const isExpressCheckoutMethod =
     selectedPaymentMethod === 'apple_pay' ||
     selectedPaymentMethod === 'google_pay' ||

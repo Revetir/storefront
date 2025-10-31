@@ -29,8 +29,7 @@ const CustomPaymentSelector: React.FC<CustomPaymentSelectorProps> = ({
           <Radio
             value={method.id}
             className={clx(
-              "flex items-center justify-between gap-x-4 text-small-regular cursor-pointer py-3 transition-colors",
-              "hover:bg-gray-50"
+              "flex items-center justify-between gap-x-4 text-small-regular cursor-pointer py-3 transition-colors"
             )}
           >
             <div className="flex items-center gap-x-4 flex-1">

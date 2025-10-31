@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
 import { PAYMENT_METHODS, PaymentMethodConfig } from "./payment-methods-config"
+import { checkWalletAvailability } from "@lib/util/wallet-availability"
 
 interface PaymentMethodAvailability {
   applePay: boolean
   googlePay: boolean
 }
 
-export const useAvailablePaymentMethods = (elements: any) => {
+export const useAvailablePaymentMethods = () => {
   const [availability, setAvailability] = useState<PaymentMethodAvailability>({
     applePay: false,
     googlePay: false,
@@ -14,66 +15,16 @@ export const useAvailablePaymentMethods = (elements: any) => {
   const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {
-    const checkWalletAvailability = async () => {
-      if (!elements) {
-        setIsChecking(false)
-        return
-      }
+    // Use browser-based wallet detection
+    const walletAvailability = checkWalletAvailability()
 
-      try {
-        // Create a hidden Express Checkout Element to check availability
-        // This uses Stripe's internal availability checking
-        const expressCheckoutElement = elements.create('expressCheckout', {
-          paymentMethods: {
-            applePay: 'auto',
-            googlePay: 'auto',
-            link: 'never',
-            paypal: 'never',
-            amazonPay: 'never',
-          },
-        })
+    setAvailability({
+      applePay: walletAvailability.applePay,
+      googlePay: walletAvailability.googlePay,
+    })
 
-        // Listen for the ready event to get available payment methods
-        expressCheckoutElement.on('ready', (event: any) => {
-          const availablePaymentMethods = event.availablePaymentMethods || {}
-
-          setAvailability({
-            applePay: availablePaymentMethods.applePay || false,
-            googlePay: availablePaymentMethods.googlePay || false,
-          })
-
-          console.log('Express Checkout available payment methods:', availablePaymentMethods)
-          setIsChecking(false)
-
-          // Cleanup: destroy the hidden element after checking
-          expressCheckoutElement.destroy()
-        })
-
-        // Mount to a temporary hidden container to trigger the ready event
-        const tempDiv = document.createElement('div')
-        tempDiv.style.display = 'none'
-        document.body.appendChild(tempDiv)
-        expressCheckoutElement.mount(tempDiv)
-
-        // Cleanup on unmount
-        return () => {
-          try {
-            expressCheckoutElement.destroy()
-          } catch (e) {
-            // Element may already be destroyed
-          }
-          if (tempDiv.parentNode) {
-            tempDiv.parentNode.removeChild(tempDiv)
-          }
-        }
-      } catch (error) {
-        console.error('Error checking payment method availability:', error)
-        setIsChecking(false)
-      }
-    }
-
-    checkWalletAvailability()
-  }, [elements])
+    setIsChecking(false)
+  }, [])
 
   // Filter payment methods based on device support
   const availableMethods: PaymentMethodConfig[] = PAYMENT_METHODS.filter((method) => {
