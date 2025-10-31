@@ -32,7 +32,9 @@ const Payment = ({
   const stripe = stripeReady ? useStripe() : null
   const elements = stripeReady ? useElements() : null
 
-  const cartTotal = cart?.total || 0
+  // Ensure cart total is in cents (smallest currency unit) and is an integer
+  // Medusa returns amounts in cents, but we ensure it's a whole number for Stripe elements
+  const cartTotal = Math.round(cart?.total || 0)
 
   // Detect available payment methods (filters Apple Pay/Google Pay based on device)
   // Uses browser-based detection to check wallet availability
@@ -122,7 +124,7 @@ const Payment = ({
       case 'afterpay_clearpay':
         return (
           <div className="space-y-2">
-            {stripe && elements && (
+            {stripe && elements && cartTotal > 0 && (
               <PaymentMethodMessagingElement
                 options={{
                   amount: cartTotal,
@@ -141,7 +143,7 @@ const Payment = ({
       case 'klarna':
         return (
           <div className="space-y-2">
-            {stripe && elements && (
+            {stripe && elements && cartTotal > 0 && (
               <PaymentMethodMessagingElement
                 options={{
                   amount: cartTotal,

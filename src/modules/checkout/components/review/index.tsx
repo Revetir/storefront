@@ -48,56 +48,56 @@ const Review = ({ cart }: { cart: any }) => {
     console.log('Express Checkout clicked:', event)
   }
 
+  const handleExpressCheckoutError = (event: any) => {
+    console.error('Express Checkout error:', event)
+    setErrorMessage(event.error?.message || 'An error occurred with the payment method')
+  }
+
   // Determine which payment method to show in ExpressCheckoutElement
   const getExpressCheckoutOptions = () => {
     switch (selectedPaymentMethod) {
       case 'apple_pay':
         return {
-          wallets: {
+          paymentMethods: {
             applePay: 'always' as const,
             googlePay: 'never' as const,
-          },
-          paymentMethods: {
             link: 'never' as const,
             paypal: 'never' as const,
             amazonPay: 'never' as const,
+            klarna: 'never' as const,
           },
         }
       case 'google_pay':
         return {
-          wallets: {
+          paymentMethods: {
             applePay: 'never' as const,
             googlePay: 'always' as const,
-          },
-          paymentMethods: {
             link: 'never' as const,
             paypal: 'never' as const,
             amazonPay: 'never' as const,
+            klarna: 'never' as const,
           },
         }
       case 'klarna':
         return {
-          wallets: {
+          paymentMethods: {
             applePay: 'never' as const,
             googlePay: 'never' as const,
-          },
-          paymentMethods: {
             link: 'never' as const,
             paypal: 'never' as const,
             amazonPay: 'never' as const,
-            // Klarna will show if available in Express Checkout
+            // Klarna will show automatically if available - no 'always' option
           },
         }
       default:
         return {
-          wallets: {
+          paymentMethods: {
             applePay: 'never' as const,
             googlePay: 'never' as const,
-          },
-          paymentMethods: {
             link: 'never' as const,
             paypal: 'never' as const,
             amazonPay: 'never' as const,
+            klarna: 'never' as const,
           },
         }
     }
@@ -125,13 +125,17 @@ const Review = ({ cart }: { cart: any }) => {
       </div>
       {isExpressCheckoutMethod ? (
         <div className="w-full">
-          {stripe && elements && (
+          {stripe && elements ? (
             <ExpressCheckoutElement
               options={getExpressCheckoutOptions()}
               onConfirm={handleExpressCheckoutConfirm}
               onReady={handleExpressCheckoutReady}
               onClick={handleExpressCheckoutClick}
             />
+          ) : (
+            <div className="py-4 text-sm text-gray-500">
+              Initializing payment method...
+            </div>
           )}
           <ErrorMessage
             error={errorMessage}
