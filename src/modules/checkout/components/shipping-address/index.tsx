@@ -202,19 +202,9 @@ const ShippingAddress = ({
   // Auto-save address data on blur with debounce
   const debouncedSaveAddress = useCallback(
     debounce(async (data: Record<string, any>) => {
-      // Store the current tax value AND a unique calculation ID before starting calculation
-      // This helps us detect when NEW tax data arrives after the redirect
-      if (typeof window !== "undefined") {
-        const calculationId = Date.now()
-        sessionStorage.setItem("checkout_tax_snapshot", JSON.stringify({
-          oldTax: cart?.tax_total ?? null,
-          timestamp: calculationId,
-          calculationId: calculationId
-        }))
-        console.log(`ShippingAddress - Starting tax calculation ${calculationId}, oldTax: ${cart?.tax_total}`)
-      }
+      // Note: setIsCalculatingTax(true) and snapshot are now set BEFORE calling this function
+      // to prevent $0.00 flash. This function just performs the actual save.
 
-      setIsCalculatingTax(true)
       try {
         // Create FormData to match the setAddresses server action signature
         const formDataObj = new FormData()
@@ -239,7 +229,7 @@ const ShippingAddress = ({
         setIsCalculatingTax(false)
       }
     }, 500),
-    [setIsCalculatingTax, cart?.tax_total]
+    [setIsCalculatingTax]
   )
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -269,6 +259,19 @@ const ShippingAddress = ({
     )
 
     if (isAddressComplete) {
+      // Set calculating state BEFORE triggering debounced save to prevent $0.00 flash
+      // This ensures "Calculating..." shows immediately when address becomes complete
+      if (typeof window !== "undefined") {
+        const calculationId = Date.now()
+        sessionStorage.setItem("checkout_tax_snapshot", JSON.stringify({
+          oldTax: cart?.tax_total ?? null,
+          timestamp: calculationId,
+          calculationId: calculationId
+        }))
+        console.log(`ShippingAddress - Starting tax calculation ${calculationId}, oldTax: ${cart?.tax_total}`)
+      }
+      setIsCalculatingTax(true)
+
       debouncedSaveAddress(formData)
     }
   }
@@ -332,6 +335,19 @@ const ShippingAddress = ({
       console.log("ShippingAddress - new formData state:", JSON.stringify(newState, null, 2))
       return newState
     })
+
+    // Set calculating state BEFORE triggering debounced save to prevent $0.00 flash
+    // Autocomplete fills all fields at once, so address is always complete here
+    if (typeof window !== "undefined") {
+      const calculationId = Date.now()
+      sessionStorage.setItem("checkout_tax_snapshot", JSON.stringify({
+        oldTax: cart?.tax_total ?? null,
+        timestamp: calculationId,
+        calculationId: calculationId
+      }))
+      console.log(`ShippingAddress - Starting tax calculation ${calculationId}, oldTax: ${cart?.tax_total}`)
+    }
+    setIsCalculatingTax(true)
 
     // Trigger auto-save with the updated data
     // Merge current formData with updatedFields for the save

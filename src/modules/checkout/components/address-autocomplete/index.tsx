@@ -164,8 +164,25 @@ const AddressAutocomplete = React.forwardRef<
             setIsFocused(false)
             setHasValue(!!input.value)
           }
-          const handleInput = () => {
+          const handleInput = (e: Event) => {
             setHasValue(!!input.value)
+
+            // Forward input changes to parent's onChange handler
+            // Create a synthetic React event to match the onChange signature
+            if (onChange) {
+              const syntheticEvent = {
+                target: {
+                  name: name,
+                  value: (e.target as HTMLInputElement).value,
+                },
+                currentTarget: {
+                  name: name,
+                  value: (e.target as HTMLInputElement).value,
+                },
+              } as React.ChangeEvent<HTMLInputElement>
+
+              onChange(syntheticEvent)
+            }
           }
 
           input.addEventListener("focus", handleFocus)
