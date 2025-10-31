@@ -259,8 +259,18 @@ const ShippingAddress = ({
       }
     }
 
-    // Trigger auto-save on blur
-    debouncedSaveAddress(formData)
+    // Only trigger auto-save if all 4 required address fields are complete
+    // This ensures cart updates (and price changes) only happen when we can actually show the tax
+    const isAddressComplete = !!(
+      formData["shipping_address.address_1"] &&
+      formData["shipping_address.city"] &&
+      formData["shipping_address.province"] &&
+      formData["shipping_address.postal_code"]
+    )
+
+    if (isAddressComplete) {
+      debouncedSaveAddress(formData)
+    }
   }
 
   const handleInvalid = (e: React.FormEvent<HTMLInputElement | HTMLSelectElement>) => {
