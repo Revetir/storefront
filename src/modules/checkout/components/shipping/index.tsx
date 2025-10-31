@@ -47,28 +47,37 @@ function formatAddress(address: HttpTypes.StoreCartAddress | null | undefined) {
 }
 
 function calculateEstimatedDeliveryDate(description: string): string | null {
-  // Extract the maximum number from patterns like "7-14 days" or "14 days"
-  const match = description.match(/(\d+)(?:-(\d+))?\s*days?/i)
+  try {
+    // Parse JSON description format: {"processing":{"min_days":3,"max_days":7},"shipping":{"min_days":7,"max_days":14}}
+    const data = JSON.parse(description)
 
-  if (!match) {
+    if (!data.processing || !data.shipping) {
+      return null
+    }
+
+    // Calculate total min and max days
+    const minTotalDays = data.processing.min_days + data.shipping.min_days
+    const maxTotalDays = data.processing.max_days + data.shipping.max_days
+
+    // Calculate the delivery date range
+    const minDeliveryDate = new Date()
+    minDeliveryDate.setDate(minDeliveryDate.getDate() + minTotalDays)
+
+    const maxDeliveryDate = new Date()
+    maxDeliveryDate.setDate(maxDeliveryDate.getDate() + maxTotalDays)
+
+    // Format as "Weekday, Month Day" (e.g., "Monday, November 10")
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric'
+    })
+
+    return `Delivered by ${formatter.format(minDeliveryDate)} - ${formatter.format(maxDeliveryDate)}`
+  } catch (error) {
+    // If JSON parsing fails, return null
     return null
   }
-
-  // Get the max number (second group if range exists, otherwise first group)
-  const maxDays = match[2] ? parseInt(match[2], 10) : parseInt(match[1], 10)
-
-  // Calculate the delivery date
-  const deliveryDate = new Date()
-  deliveryDate.setDate(deliveryDate.getDate() + maxDays)
-
-  // Format as "Day, Month Date" (e.g., "Monday, Nov 14")
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric'
-  })
-
-  return `Estimated delivery by ${formatter.format(deliveryDate)}`
 }
 
 const Shipping: React.FC<ShippingProps> = ({
@@ -229,6 +238,24 @@ const Shipping: React.FC<ShippingProps> = ({
                       !isLoadingPrices &&
                       typeof calculatedPricesMap[option.id] !== "number"
 
+                    const price = option.price_type === "flat"
+                      ? convertToLocale({
+                          amount: option.amount!,
+                          currency_code: cart?.currency_code,
+                        })
+                      : calculatedPricesMap[option.id]
+                      ? convertToLocale({
+                          amount: calculatedPricesMap[option.id],
+                          currency_code: cart?.currency_code,
+                        })
+                      : isLoadingPrices
+                      ? null
+                      : "-"
+
+                    const estimatedDelivery = option.type?.description
+                      ? calculateEstimatedDeliveryDate(option.type.description)
+                      : null
+
                     return (
                       <Radio
                         key={option.id}
@@ -236,50 +263,29 @@ const Shipping: React.FC<ShippingProps> = ({
                         data-testid="delivery-option-radio"
                         disabled={isDisabled}
                         className={clx(
-                          "flex items-center justify-between text-small-regular cursor-pointer py-4 border rounded-rounded px-8 mb-2 hover:shadow-borders-interactive-with-active",
+                          "flex items-center gap-x-4 text-small-regular cursor-pointer py-1.5",
                           {
-                            "border-ui-border-interactive":
-                              option.id === shippingMethodId,
-                            "hover:shadow-brders-none cursor-not-allowed":
-                              isDisabled,
+                            "cursor-not-allowed": isDisabled,
                           }
                         )}
                       >
-                        <div className="flex items-center gap-x-4">
-                          <MedusaRadio
-                            checked={option.id === shippingMethodId}
-                          />
-                          <div className="flex flex-col">
-                            <span className="text-base-regular">
-                              {option.name}
-                            </span>
-                            {option.type?.description && (
-                              <span className="text-sm text-ui-fg-muted">
-                                {option.type.description}
-                                {calculateEstimatedDeliveryDate(option.type.description) && (
-                                  <> | {calculateEstimatedDeliveryDate(option.type.description)}</>
-                                )}
-                              </span>
+                        <MedusaRadio
+                          checked={option.id === shippingMethodId}
+                        />
+                        <div className="flex flex-col flex-1">
+                          <span className="text-base-regular">
+                            {isLoadingPrices ? (
+                              <Loader className="inline mr-2" />
+                            ) : (
+                              <>{price} | {option.name}</>
                             )}
-                          </div>
-                        </div>
-                        <span className="justify-self-end text-ui-fg-base">
-                          {option.price_type === "flat" ? (
-                            convertToLocale({
-                              amount: option.amount!,
-                              currency_code: cart?.currency_code,
-                            })
-                          ) : calculatedPricesMap[option.id] ? (
-                            convertToLocale({
-                              amount: calculatedPricesMap[option.id],
-                              currency_code: cart?.currency_code,
-                            })
-                          ) : isLoadingPrices ? (
-                            <Loader />
-                          ) : (
-                            "-"
+                          </span>
+                          {estimatedDelivery && (
+                            <span className="text-sm text-ui-fg-muted">
+                              {estimatedDelivery}
+                            </span>
                           )}
-                        </span>
+                        </div>
                       </Radio>
                     )
                   })}
