@@ -95,20 +95,13 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false 
         if (hasNewData) {
           console.log(`CartTotals - Tax updated from ${oldTax} to ${tax_total} (calc ${calculationId}), clearing state`)
           setIsCalculatingTax(false)
-          // Update snapshot with the new tax value for next calculation
-          sessionStorage.setItem("checkout_tax_snapshot", JSON.stringify({
-            oldTax: tax_total,
-            timestamp: Date.now(),
-            calculationId: calculationId
-          }))
+          // Remove snapshot entirely - calculation complete
+          sessionStorage.removeItem("checkout_tax_snapshot")
         } else if (hasValidDataAfterDelay) {
           console.log(`CartTotals - Valid tax data after delay: ${tax_total} (calc ${calculationId}), clearing state`)
           setIsCalculatingTax(false)
-          sessionStorage.setItem("checkout_tax_snapshot", JSON.stringify({
-            oldTax: tax_total,
-            timestamp: Date.now(),
-            calculationId: calculationId
-          }))
+          // Remove snapshot entirely - calculation complete
+          sessionStorage.removeItem("checkout_tax_snapshot")
         } else {
           console.log(`CartTotals - Still calculating (${age}ms), current: ${tax_total}, old: ${oldTax}`)
         }

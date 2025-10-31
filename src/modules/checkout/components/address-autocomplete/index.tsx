@@ -152,6 +152,13 @@ const AddressAutocomplete = React.forwardRef<
           // Store input reference for value syncing
           inputRef.current = input
 
+          // Set initial value immediately if we have one (e.g., from sessionStorage)
+          if (value && value !== "") {
+            console.log("AddressAutocomplete - setting initial value immediately:", value)
+            input.value = value
+            setHasValue(true)
+          }
+
           const handleFocus = () => setIsFocused(true)
           const handleBlur = () => {
             setIsFocused(false)
@@ -192,18 +199,6 @@ const AddressAutocomplete = React.forwardRef<
         }
       }
     }, [isInitialized, countryCodes, handleSelection])
-
-    // Set initial value when input becomes available (handles restored sessionStorage values)
-    const [hasSetInitialValue, setHasSetInitialValue] = useState(false)
-    useEffect(() => {
-      const input = inputRef.current
-      if (input && value && !hasSetInitialValue) {
-        console.log("AddressAutocomplete - setting initial value after input creation:", value)
-        input.value = value
-        setHasValue(!!value)
-        setHasSetInitialValue(true)
-      }
-    }, [value, hasSetInitialValue])
 
     // Sync the value prop to Radar's input element
     // This effect runs whenever the value prop changes from the parent
