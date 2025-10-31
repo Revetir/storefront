@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useStripe } from "@stripe/react-stripe-js"
+import { useElements } from "@stripe/react-stripe-js"
 import { PAYMENT_METHODS, PaymentMethodConfig } from "./payment-methods-config"
 
 interface PaymentMethodAvailability {
@@ -7,12 +7,8 @@ interface PaymentMethodAvailability {
   googlePay: boolean
 }
 
-export const useAvailablePaymentMethods = (
-  cartTotal: number,
-  currency: string,
-  countryCode?: string
-) => {
-  const stripe = useStripe()
+export const useAvailablePaymentMethods = () => {
+  const elements = useElements()
   const [availability, setAvailability] = useState<PaymentMethodAvailability>({
     applePay: false,
     googlePay: false,
@@ -21,53 +17,65 @@ export const useAvailablePaymentMethods = (
 
   useEffect(() => {
     const checkWalletAvailability = async () => {
-      if (!stripe) {
-        setIsChecking(false)
-        return
-      }
-
-      // Don't check if we don't have a valid amount or country
-      if (!cartTotal || cartTotal <= 0 || !countryCode) {
+      if (!elements) {
         setIsChecking(false)
         return
       }
 
       try {
-        // Create a PaymentRequest to check device capabilities
-        // Note: amount must be in cents (smallest currency unit)
-        // Medusa sometimes returns values with fractional cents, so we round to ensure integer
-        const paymentRequest = stripe.paymentRequest({
-          country: countryCode.toUpperCase(),
-          currency: currency.toLowerCase(),
-          total: {
-            label: 'Total',
-            amount: Math.round(cartTotal), // Round to nearest cent to handle fractional values
+        // Create a hidden Express Checkout Element to check availability
+        // This uses Stripe's internal availability checking
+        const expressCheckoutElement = elements.create('expressCheckout', {
+          paymentMethods: {
+            applePay: 'auto',
+            googlePay: 'auto',
+            link: 'never',
+            paypal: 'never',
+            amazonPay: 'never',
           },
-          requestPayerName: true,
-          requestPayerEmail: true,
         })
 
-        // Check if Apple Pay or Google Pay can be used
-        const result = await paymentRequest.canMakePayment()
+        // Listen for the ready event to get available payment methods
+        expressCheckoutElement.on('ready', (event: any) => {
+          const availablePaymentMethods = event.availablePaymentMethods || {}
 
-        if (result) {
           setAvailability({
-            applePay: result.applePay || false,
-            googlePay: result.googlePay || false,
+            applePay: availablePaymentMethods.applePay || false,
+            googlePay: availablePaymentMethods.googlePay || false,
           })
-          console.log('Payment method availability:', result)
-        } else {
-          console.log('No wallet payment methods available')
+
+          console.log('Express Checkout available payment methods:', availablePaymentMethods)
+          setIsChecking(false)
+
+          // Cleanup: destroy the hidden element after checking
+          expressCheckoutElement.destroy()
+        })
+
+        // Mount to a temporary hidden container to trigger the ready event
+        const tempDiv = document.createElement('div')
+        tempDiv.style.display = 'none'
+        document.body.appendChild(tempDiv)
+        expressCheckoutElement.mount(tempDiv)
+
+        // Cleanup on unmount
+        return () => {
+          try {
+            expressCheckoutElement.destroy()
+          } catch (e) {
+            // Element may already be destroyed
+          }
+          if (tempDiv.parentNode) {
+            tempDiv.parentNode.removeChild(tempDiv)
+          }
         }
       } catch (error) {
         console.error('Error checking payment method availability:', error)
-      } finally {
         setIsChecking(false)
       }
     }
 
     checkWalletAvailability()
-  }, [stripe, cartTotal, currency, countryCode])
+  }, [elements])
 
   // Filter payment methods based on device support
   const availableMethods: PaymentMethodConfig[] = PAYMENT_METHODS.filter((method) => {

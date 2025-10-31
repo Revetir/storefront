@@ -32,15 +32,10 @@ const Payment = ({
   const elements = stripeReady ? useElements() : null
 
   const cartTotal = cart?.total || 0
-  const currency = cart?.currency_code || 'usd'
-  const countryCode = cart?.shipping_address?.country_code || cart?.region?.countries?.[0]?.iso_2
 
   // Detect available payment methods (filters Apple Pay/Google Pay based on device)
-  const { availableMethods, isChecking } = useAvailablePaymentMethods(
-    cartTotal,
-    currency,
-    countryCode
-  )
+  // Uses Stripe's Express Checkout Element internally to check availability
+  const { availableMethods, isChecking } = useAvailablePaymentMethods()
 
   const paidByGiftcard =
     cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
