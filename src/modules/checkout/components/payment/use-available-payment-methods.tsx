@@ -7,7 +7,11 @@ interface PaymentMethodAvailability {
   googlePay: boolean
 }
 
-export const useAvailablePaymentMethods = (cartTotal: number, currency: string) => {
+export const useAvailablePaymentMethods = (
+  cartTotal: number,
+  currency: string,
+  countryCode?: string
+) => {
   const stripe = useStripe()
   const [availability, setAvailability] = useState<PaymentMethodAvailability>({
     applePay: false,
@@ -22,14 +26,21 @@ export const useAvailablePaymentMethods = (cartTotal: number, currency: string) 
         return
       }
 
+      // Don't check if we don't have a valid amount or country
+      if (!cartTotal || cartTotal <= 0 || !countryCode) {
+        setIsChecking(false)
+        return
+      }
+
       try {
         // Create a PaymentRequest to check device capabilities
+        // Note: amount must be in cents (smallest currency unit)
         const paymentRequest = stripe.paymentRequest({
-          country: 'US',
+          country: countryCode.toUpperCase(),
           currency: currency.toLowerCase(),
           total: {
             label: 'Total',
-            amount: cartTotal,
+            amount: cartTotal, // Cart total should already be in cents from Medusa
           },
           requestPayerName: true,
           requestPayerEmail: true,
@@ -43,6 +54,9 @@ export const useAvailablePaymentMethods = (cartTotal: number, currency: string) 
             applePay: result.applePay || false,
             googlePay: result.googlePay || false,
           })
+          console.log('Payment method availability:', result)
+        } else {
+          console.log('No wallet payment methods available')
         }
       } catch (error) {
         console.error('Error checking payment method availability:', error)
@@ -52,7 +66,7 @@ export const useAvailablePaymentMethods = (cartTotal: number, currency: string) 
     }
 
     checkWalletAvailability()
-  }, [stripe, cartTotal, currency])
+  }, [stripe, cartTotal, currency, countryCode])
 
   // Filter payment methods based on device support
   const availableMethods: PaymentMethodConfig[] = PAYMENT_METHODS.filter((method) => {

@@ -4,7 +4,6 @@ import Amex from "@modules/common/icons/amex"
 import Discover from "@modules/common/icons/discover"
 import ApplePay from "@modules/common/icons/apple-pay"
 import GooglePay from "@modules/common/icons/google-pay"
-import Affirm from "@modules/common/icons/affirm"
 import Cashapp from "@modules/common/icons/cashapp"
 import Klarna from "@modules/common/icons/klarna"
 
@@ -12,7 +11,6 @@ export type PaymentMethodType =
   | 'card'
   | 'apple_pay'
   | 'google_pay'
-  | 'affirm'
   | 'afterpay_clearpay'
   | 'klarna'
 
@@ -45,13 +43,6 @@ export const PAYMENT_METHODS: PaymentMethodConfig[] = [
     icons: [GooglePay],
     requiresElement: false,
     requiresDeviceSupport: true,
-  },
-  {
-    id: 'affirm',
-    label: 'Pay with Affirm',
-    icons: [Affirm],
-    requiresElement: false,
-    requiresDeviceSupport: false,
   },
   {
     id: 'afterpay_clearpay',

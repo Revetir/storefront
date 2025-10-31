@@ -9,11 +9,40 @@ import React, { useState, useEffect } from "react"
 import ErrorMessage from "../error-message"
 import { useParams } from "next/navigation"
 import { validateCheckout, triggerFieldErrors, scrollToTop } from "../../utils/validate-checkout"
+import { usePaymentContext } from "../payment/payment-context"
+import { PaymentMethodType } from "../payment/payment-methods-config"
 
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
   "data-testid": string
+}
+
+/**
+ * Get the button text based on the selected payment method
+ *
+ * Future Enhancement:
+ * - For Apple Pay, Google Pay, and Klarna: Replace text buttons with branded button images
+ *   from /images folder (e.g., "Continue with Klarna" branded button)
+ * - Current implementation uses text for all payment methods
+ */
+const getButtonText = (paymentMethod: PaymentMethodType | null): string => {
+  switch (paymentMethod) {
+    case 'afterpay_clearpay':
+      return 'Pay with Afterpay'
+    case 'klarna':
+      // TODO: Replace with branded Klarna button image in future
+      return 'Continue with Klarna'
+    case 'apple_pay':
+      // TODO: Replace with Apple Pay button image in future
+      return 'Pay with Apple Pay'
+    case 'google_pay':
+      // TODO: Replace with Google Pay button image in future
+      return 'Pay with Google Pay'
+    case 'card':
+    default:
+      return 'Place order'
+  }
 }
 
 const PaymentButton: React.FC<PaymentButtonProps> = ({
@@ -58,11 +87,14 @@ const StripePaymentButton = ({
 }) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const { selectedPaymentMethod } = usePaymentContext()
 
   const { countryCode } = useParams()
   const paymentSession = cart.payment_collection?.payment_sessions?.find(
     (session) => session.provider_id === "pp_stripe_stripe"
   )
+
+  const buttonText = getButtonText(selectedPaymentMethod)
 
   const onPaymentCompleted = async () => {
     await placeOrder()
@@ -101,6 +133,37 @@ const StripePaymentButton = ({
 
     const clientSecret = paymentSession?.data?.client_secret as string
 
+    /**
+     * Payment Method Handling Strategy:
+     *
+     * CARD PAYMENTS (current implementation):
+     * - Uses CardElement with stripe.confirmCardPayment()
+     * - Collects card details inline on checkout page
+     * - Works as expected
+     *
+     * FUTURE IMPLEMENTATIONS NEEDED:
+     *
+     * 1. APPLE PAY / GOOGLE PAY (Wallet Payments):
+     *    - Use stripe.confirmCardPayment() with payment_method from wallet
+     *    - Payment method is created via PaymentRequest API
+     *    - No separate element needed, wallet handles UI
+     *
+     * 2. AFTERPAY / KLARNA (BNPL - Redirect-based):
+     *    - Use stripe.confirmPayment() with return_url parameter
+     *    - User is redirected to provider's site to complete payment
+     *    - After completion, user returns to our return_url
+     *    - Example:
+     *      stripe.confirmPayment({
+     *        clientSecret,
+     *        confirmParams: {
+     *          payment_method: 'afterpay_clearpay', // or 'klarna'
+     *          return_url: `${window.location.origin}/checkout/confirmation`,
+     *        }
+     *      })
+     *
+     * The selectedPaymentMethod from context will determine which flow to use.
+     */
+
     // Get the CardElement (we're using CardElement instead of PaymentElement now)
     const cardElement = elements.getElement('card')
 
@@ -110,6 +173,8 @@ const StripePaymentButton = ({
       return
     }
 
+    // TODO: Add payment method routing logic here based on selectedPaymentMethod
+    // For now, only card payment is implemented
     // Use confirmCardPayment for CardElement
     await stripe
     .confirmCardPayment(clientSecret, {
@@ -175,7 +240,7 @@ const StripePaymentButton = ({
         data-testid={dataTestId}
         className="uppercase"
       >
-        Place order
+        {buttonText}
       </Button>
       <ErrorMessage
         error={errorMessage}
