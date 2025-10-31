@@ -96,7 +96,12 @@ const Payment = ({
               <PaymentElement
                 onChange={handlePaymentElementChange}
                 options={{
-                  layout: "accordion",
+                  layout: {
+                    type: 'accordion',
+                    radios: true,
+                    paymentMethodLogoPosition: 'end',
+                    defaultCollapsed: false,
+                  },
                   paymentMethodOrder: ['card', 'apple_pay', 'google_pay', 'affirm', 'afterpay_clearpay', 'klarna'],
                   fields: {
                     billingDetails: 'auto'

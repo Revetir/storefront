@@ -36,34 +36,45 @@ const StripeWrapper: React.FC<StripeWrapperProps> = ({
       },
       rules: {
         '.Tab': {
-          border: '1px solid #e5e7eb',
-          borderRadius: '8px',
-          padding: '16px 32px',
-          marginBottom: '8px',
-          backgroundColor: '#ffffff',
+          border: 'none',
+          borderRadius: '0',
+          padding: '6px 0',
+          marginBottom: '0',
+          backgroundColor: 'transparent',
           boxShadow: 'none',
-          transition: 'all 150ms ease-in-out',
+          transition: 'none',
         },
         '.Tab:hover': {
-          boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.1), 0 0 0 4px rgba(0, 0, 0, 0.05)',
-        },
-        '.Tab--selected': {
-          border: '1px solid #000000',
+          backgroundColor: 'transparent',
           boxShadow: 'none',
         },
+        '.Tab--selected': {
+          backgroundColor: 'transparent',
+          border: 'none',
+        },
         '.Tab--selected:hover': {
-          boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.1), 0 0 0 4px rgba(0, 0, 0, 0.05)',
+          backgroundColor: 'transparent',
         },
         '.TabIcon': {
           filter: 'grayscale(100%)',
+          opacity: '0.5',
         },
         '.TabIcon--selected': {
           filter: 'grayscale(0%)',
+          opacity: '1',
         },
         '.TabLabel': {
           fontWeight: '400',
           fontSize: '16px',
           lineHeight: '24px',
+        },
+        '.RadioIcon': {
+          border: '2px solid #000000',
+          borderRadius: '50%',
+        },
+        '.RadioIconInner': {
+          backgroundColor: '#000000',
+          borderRadius: '50%',
         },
         '.Input': {
           border: '1px solid #e5e7eb',
