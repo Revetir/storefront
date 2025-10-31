@@ -228,9 +228,9 @@ const Shipping: React.FC<ShippingProps> = ({
                             <span className="text-base-regular">
                               {option.name}
                             </span>
-                            {(option as any).description && (
+                            {option.type?.description && (
                               <span className="text-sm text-ui-fg-muted">
-                                {(option as any).description}
+                                {option.type.description}
                               </span>
                             )}
                           </div>

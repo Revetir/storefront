@@ -76,7 +76,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false 
     if (typeof window !== "undefined") {
       const snapshot = sessionStorage.getItem("checkout_tax_snapshot")
       if (snapshot) {
-        const { oldTax, timestamp, calculationId } = JSON.parse(snapshot)
+        const { oldTax, timestamp, calculationId, targetAddress } = JSON.parse(snapshot)
 
         // Check if calculation has timed out (more than 5 seconds)
         const age = Date.now() - timestamp
@@ -87,23 +87,38 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false 
         //   return
         // }
 
+        // Check if the cart's address matches the target address we were calculating for
+        // This handles the case where tax stays the same (same jurisdiction, different address)
+        const addressMatches = targetAddress && shipping_address && (
+          shipping_address.address_1 === targetAddress.address_1 &&
+          shipping_address.city === targetAddress.city &&
+          shipping_address.province === targetAddress.province &&
+          shipping_address.postal_code === targetAddress.postal_code
+        )
+
         // Clear if tax value has CHANGED from old value
-        // OR if we have valid tax data (even if same value) after a reasonable delay
         const hasNewData = tax_total !== oldTax && tax_total !== undefined && tax_total !== null
+
+        // Clear if we have valid tax data AND address matches what we were calculating for
+        const calculationComplete = addressMatches && tax_total !== undefined && tax_total !== null
+
+        // Fallback: Clear if we have valid tax data after a reasonable delay (for older snapshots without targetAddress)
         const hasValidDataAfterDelay = age > 1000 && tax_total !== undefined && tax_total !== null
 
         if (hasNewData) {
           console.log(`CartTotals - Tax updated from ${oldTax} to ${tax_total} (calc ${calculationId}), clearing state`)
           setIsCalculatingTax(false)
-          // Remove snapshot entirely - calculation complete
+          sessionStorage.removeItem("checkout_tax_snapshot")
+        } else if (calculationComplete) {
+          console.log(`CartTotals - Address matches target, calculation complete (calc ${calculationId}), tax: ${tax_total}, clearing state`)
+          setIsCalculatingTax(false)
           sessionStorage.removeItem("checkout_tax_snapshot")
         } else if (hasValidDataAfterDelay) {
           console.log(`CartTotals - Valid tax data after delay: ${tax_total} (calc ${calculationId}), clearing state`)
           setIsCalculatingTax(false)
-          // Remove snapshot entirely - calculation complete
           sessionStorage.removeItem("checkout_tax_snapshot")
         } else {
-          console.log(`CartTotals - Still calculating (${age}ms), current: ${tax_total}, old: ${oldTax}`)
+          console.log(`CartTotals - Still calculating (${age}ms), current: ${tax_total}, old: ${oldTax}, addressMatches: ${addressMatches}`)
         }
       } else {
         // No snapshot means we're not in a redirect scenario
@@ -114,7 +129,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false 
         }
       }
     }
-  }, [isCalculatingTax, hasAddress, tax_total, setIsCalculatingTax])
+  }, [isCalculatingTax, hasAddress, tax_total, shipping_address, setIsCalculatingTax])
 
   return (
     <div>

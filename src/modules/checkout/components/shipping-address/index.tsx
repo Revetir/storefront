@@ -263,10 +263,18 @@ const ShippingAddress = ({
       // This ensures "Calculating..." shows immediately when address becomes complete
       if (typeof window !== "undefined") {
         const calculationId = Date.now()
+        // Store the address we're calculating for, not just the tax amount
+        // This allows us to detect completion even when tax stays the same (same jurisdiction)
         sessionStorage.setItem("checkout_tax_snapshot", JSON.stringify({
           oldTax: cart?.tax_total ?? null,
           timestamp: calculationId,
-          calculationId: calculationId
+          calculationId: calculationId,
+          targetAddress: {
+            address_1: formData["shipping_address.address_1"],
+            city: formData["shipping_address.city"],
+            province: formData["shipping_address.province"],
+            postal_code: formData["shipping_address.postal_code"],
+          }
         }))
         console.log(`ShippingAddress - Starting tax calculation ${calculationId}, oldTax: ${cart?.tax_total}`)
       }
@@ -340,10 +348,18 @@ const ShippingAddress = ({
     // Autocomplete fills all fields at once, so address is always complete here
     if (typeof window !== "undefined") {
       const calculationId = Date.now()
+      // Store the address we're calculating for, not just the tax amount
+      // This allows us to detect completion even when tax stays the same (same jurisdiction)
       sessionStorage.setItem("checkout_tax_snapshot", JSON.stringify({
         oldTax: cart?.tax_total ?? null,
         timestamp: calculationId,
-        calculationId: calculationId
+        calculationId: calculationId,
+        targetAddress: {
+          address_1: updatedFields["shipping_address.address_1"],
+          city: updatedFields["shipping_address.city"],
+          province: updatedFields["shipping_address.province"],
+          postal_code: updatedFields["shipping_address.postal_code"],
+        }
       }))
       console.log(`ShippingAddress - Starting tax calculation ${calculationId}, oldTax: ${cart?.tax_total}`)
     }
