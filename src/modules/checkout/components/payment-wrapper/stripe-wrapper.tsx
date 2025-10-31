@@ -22,6 +22,67 @@ const StripeWrapper: React.FC<StripeWrapperProps> = ({
 }) => {
   const options: StripeElementsOptions = {
     clientSecret: paymentSession!.data?.client_secret as string | undefined,
+    appearance: {
+      theme: 'stripe',
+      variables: {
+        fontFamily: 'Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif',
+        fontSizeBase: '16px',
+        colorPrimary: '#000000',
+        colorBackground: '#ffffff',
+        colorText: '#000000',
+        colorDanger: '#dc2626',
+        borderRadius: '8px',
+        spacingUnit: '4px',
+      },
+      rules: {
+        '.Tab': {
+          border: '1px solid #e5e7eb',
+          borderRadius: '8px',
+          padding: '16px 32px',
+          marginBottom: '8px',
+          backgroundColor: '#ffffff',
+          boxShadow: 'none',
+          transition: 'all 150ms ease-in-out',
+        },
+        '.Tab:hover': {
+          boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.1), 0 0 0 4px rgba(0, 0, 0, 0.05)',
+        },
+        '.Tab--selected': {
+          border: '1px solid #000000',
+          boxShadow: 'none',
+        },
+        '.Tab--selected:hover': {
+          boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.1), 0 0 0 4px rgba(0, 0, 0, 0.05)',
+        },
+        '.TabIcon': {
+          filter: 'grayscale(100%)',
+        },
+        '.TabIcon--selected': {
+          filter: 'grayscale(0%)',
+        },
+        '.TabLabel': {
+          fontWeight: '400',
+          fontSize: '16px',
+          lineHeight: '24px',
+        },
+        '.Input': {
+          border: '1px solid #e5e7eb',
+          borderRadius: '8px',
+          padding: '12px 16px',
+          fontSize: '16px',
+          backgroundColor: '#ffffff',
+        },
+        '.Input:focus': {
+          border: '1px solid #000000',
+          boxShadow: '0 0 0 1px #000000',
+        },
+        '.Label': {
+          fontSize: '14px',
+          fontWeight: '500',
+          marginBottom: '8px',
+        },
+      },
+    },
   }
 
   if (!stripeKey) {
