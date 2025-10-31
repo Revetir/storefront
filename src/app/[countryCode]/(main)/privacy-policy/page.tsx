@@ -13,11 +13,11 @@ export default function PrivacyPage() {
         
         <div className="prose prose-gray max-w-none text-sm">
           <p className="text-gray-600 mb-8">
-            Last updated March, 2025
+            Last updated October, 2025
           </p>
           
           <p className="text-gray-600 mb-8">
-            REVETIR (referred to as "we", "us" or "our") is a luxury e-commerce company headquartered at <strong>1 Beihuayuan Street, Chaoyang District, Beijing 100024, China</strong>. We respect your privacy and are committed to protecting your personal information in accordance with applicable laws (including the EU General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA)). This Privacy Policy explains how we collect, use, disclose and protect your personal data when you use our website or purchase our products. It also describes your privacy rights under applicable laws and how to exercise them. By using our website or providing your information to REVETIR, you agree to the practices described in this policy.
+            REVETIR LLC (referred to as "REVETIR", "we", "us" or "our") is an e-commerce and technology company with its principal office at 2 Park Avenue, 20th Floor, New York, NY 10016. We respect your privacy and are committed to protecting your personal information in accordance with applicable laws (including the EU General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA)). This Privacy Policy explains how we collect, use, disclose and protect your personal data when you use our website or purchase our products. It also describes your privacy rights under applicable laws and how to exercise them. By using our website or providing your information to REVETIR, you agree to the practices described in this policy.
           </p>
           
           <section className="mb-8">
@@ -86,7 +86,7 @@ export default function PrivacyPage() {
               <li><strong>Payment Processors:</strong> When you pay by credit card, your payment details are securely sent to Stripe, our payment processor. Stripe is a trusted third party that handles payment transactions in compliance with financial regulations. We only receive confirmation of payment and do not see your full credit card number. Stripe uses industry-standard encryption, so your payment data is fully protected.</li>
               <li><strong>Shipping and Logistics Providers:</strong> We share your name, address, and order details with shipping companies (e.g. couriers and postal services) to deliver your purchases. Those companies use your information only to fulfill the shipment.</li>
               <li><strong>IT and Service Providers:</strong> We may share data with service providers who support our business operations. This includes hosting providers, email service providers, customer support platforms, CRM systems, and others. For example, we use Google (for Analytics and Ads), Meta (Facebook/Instagram Ads), and Algolia (site search) to run our website and analyze traffic. These services may receive hashed or aggregated data for analytics and advertising (for instance, Google Analytics receives anonymized browsing statistics). We only share data with service providers under strict agreements that limit their use of data to the purposes we specify.</li>
-              <li><strong>Legal and Government Authorities:</strong> We may disclose personal data to law enforcement or regulators if required by law (e.g. in response to a subpoena or legal obligation) or to protect the rights, safety, or property of Revetir, our customers, or others.</li>
+              <li><strong>Legal and Government Authorities:</strong> We may disclose personal data to law enforcement or regulators if required by law (e.g. in response to a subpoena or legal obligation) or to protect the rights, safety, or property of REVETIR, our customers, or others.</li>
             </ul>
             <br></br>
             <p className="text-gray-600 mb-4">
@@ -128,7 +128,7 @@ export default function PrivacyPage() {
             
             <h3 className="text-xl font-semibold mb-3">California Privacy Rights</h3>
             <p className="text-gray-600 mb-4">
-              If you are a California resident, the CCPA gives you additional rights concerning your personal information. In particular, you have the right to: request disclosure of what personal information we have collected about you; request deletion of your personal information; and opt out of the sale or sharing of your personal information. (Note: Revetir does <em>not</em> sell your personal information, but we still honor opt-out requests as a matter of policy.) California law also gives you the right to non-discrimination for exercising your privacy rights and to correct inaccurate data. To exercise any California privacy right, you may use the same contact methods listed above (your account or email). We will provide the required privacy notices and disclosures for California residents as mandated by law.
+              If you are a California resident, the CCPA gives you additional rights concerning your personal information. In particular, you have the right to: request disclosure of what personal information we have collected about you; request deletion of your personal information; and opt out of the sale or sharing of your personal information. (Note: REVETIR does <em>not</em> sell your personal information, but we still honor opt-out requests as a matter of policy.) California law also gives you the right to non-discrimination for exercising your privacy rights and to correct inaccurate data. To exercise any California privacy right, you may use the same contact methods listed above (your account or email). We will provide the required privacy notices and disclosures for California residents as mandated by law.
             </p>
             <p className="text-gray-600 mb-4">
               We take these rights seriously. For example, under the CCPA we will provide you with details about the categories of data collected and shared in the past 12 months, the purposes of collection, and the third parties with whom data is shared. We maintain a "Do Not Sell or Share My Personal Information" link on our website for California users (even though we do not currently sell data) to comply with legal requirements. We do not discriminate against customers who exercise any of their privacy rights.
@@ -151,7 +151,7 @@ export default function PrivacyPage() {
             
             <div className="border-t border-b border-gray-300 py-4 mb-8">
               <p className="text-gray-600 font-bold text-center">
-                You have the right to refuse your consent to the provision of your personal information by Revetir, in which case you will not be able to create an account with Revetir or purchase Revetir products.
+                You have the right to refuse your consent to the provision of your personal information by REVETIR, in which case you will not be able to create an account with REVETIR or purchase REVETIR products.
               </p>
             </div>
             
@@ -161,7 +161,7 @@ export default function PrivacyPage() {
                 If you have any questions about this Privacy Policy, or if you would like to exercise your privacy rights, please contact us by email at <a href="mailto:care@revetir.com" className="text-blue-600 hover:underline"><strong>care@revetir.com</strong></a> (use the subject line "Privacy"). We will respond to your inquiries or requests as promptly as possible.
               </p>
               <p className="text-gray-600 mb-4">
-                Thank you for trusting Revetir with your personal information. We are committed to keeping that information secure and using it responsibly.
+                Thank you for trusting REVETIR with your personal information. We are committed to keeping that information secure and using it responsibly.
               </p>
             </section>
         </div>

@@ -18,11 +18,11 @@ export default function TermsConditionsPage() {
           
           <h2 className="text-2xl font-semibold mb-4">REVETIR Terms and Conditions</h2>
           <p className="text-gray-600 mb-8">
-            Last updated: March, 2025
+            Last updated: October, 2025
           </p>
           
           <p className="text-gray-600 mb-8">
-            This website is published by M.B. Smith d.b.a REVETIR, headquartered at 1 Beihuayuan Street, Chaoyang District, Beijing, 100024, China ("we" or "REVETIR").
+            This website is published by REVETIR LLC, with its principal office at 2 Park Avenue, 20th Floor, New York, NY 10016 ("we" or "REVETIR").
           </p>
           
           <section className="mb-8">
@@ -30,15 +30,15 @@ export default function TermsConditionsPage() {
             
             <h3 className="text-xl font-semibold mb-3">1.1 Overview.</h3>
             <p className="text-gray-600 mb-4">
-              The following terms and conditions (these "Terms") govern all use by U.S. users or visitors of: (i) the Revetir website, https://www.revetir.com (the "Website"); (ii) any and all services or communications available on or through the Website or otherwise provided by Revetir, including in connection with: (a) e-commerce; and (b) accessing or viewing materials online, for example, editorial articles and newsletters; and (iii) any other engagement with Revetir online and offline, such as when you call our customer care center (collectively, the "Services"). The Services are owned and operated by Revetir and any reference to the "Services" herein includes a reference to any part or component of the Services. Please note that the Privacy Policy, Return Policy, Payment Information Policy, Product Information Policy, Promotions, and FAQs provide additional terms governing the purchase of products through the Services, and are incorporated in these Terms by reference.
+              The following terms and conditions (these "Terms") govern all use by U.S. users or visitors of: (i) the REVETIR website, https://www.revetir.com (the "Website"); (ii) any and all services or communications available on or through the Website or otherwise provided by REVETIR, including in connection with: (a) e-commerce; and (b) accessing or viewing materials online, for example, editorial articles and newsletters; and (iii) any other engagement with REVETIR online and offline, such as when you contact our customer service (collectively, the "Services"). The Services are owned and operated by REVETIR and any reference to the "Services" herein includes a reference to any part or component of the Services. Please note that the Privacy Policy, Return Policy, Payment Information Policy, Product Information Policy, Promotions, and FAQs provide additional terms governing the purchase of products through the Services, and are incorporated in these Terms by reference.
             </p>
             <p className="text-gray-600 mb-4">
-              Revetir provides the Services for your personal use. By using the Services, you agree to these Terms. IF YOU DO NOT WISH TO BE BOUND BY THESE TERMS OR YOUR PERSONAL INFORMATION TO BE PROCESSED IN ACCORDANCE WITH OUR PRIVACY POLICY (INCLUDING ALL ADDITIONAL TERMS), THEN DO NOT USE THE SERVICES.
+              REVETIR provides the Services for your personal use. By using the Services, you agree to these Terms. IF YOU DO NOT WISH TO BE BOUND BY THESE TERMS OR YOUR PERSONAL INFORMATION TO BE PROCESSED IN ACCORDANCE WITH OUR PRIVACY POLICY (INCLUDING ALL ADDITIONAL TERMS), THEN DO NOT USE THE SERVICES.
             </p>
             
             <h3 className="text-xl font-semibold mb-3">1.2 Modification.</h3>
             <p className="text-gray-600 mb-4">
-              Revetir reserves the right to modify or change any of these Terms at any time with prior notice to you where required by law. Please check back periodically to ensure you are aware of any updates or changes. You can determine when the Terms were last updated by checking the "last updated" date displayed at the top of these Terms. Your continued use of the Services following the posting of any changes to the Terms constitutes acceptance of those changes. If any change to the Terms is not acceptable to you, your sole remedy is to cease accessing, browsing and otherwise using the Services.
+              REVETIR reserves the right to modify or change any of these Terms at any time with prior notice to you where required by law. Please check back periodically to ensure you are aware of any updates or changes. You can determine when the Terms were last updated by checking the "last updated" date displayed at the top of these Terms. Your continued use of the Services following the posting of any changes to the Terms constitutes acceptance of those changes. If any change to the Terms is not acceptable to you, your sole remedy is to cease accessing, browsing and otherwise using the Services.
             </p>
           </section>
           
@@ -54,7 +54,7 @@ export default function TermsConditionsPage() {
             
             <h3 className="text-xl font-semibold mb-3">2.2 Modifications / Suspension of Services.</h3>
             <p className="text-gray-600 mb-4">
-              Revetir reserves the right at any time to, and from time to time may, modify, suspend or discontinue, temporarily or permanently, the Services or your access to the Services for any reason or no reason with or without notice. You agree that Revetir shall not be liable to you or to any third party for any modification, suspension or discontinuance of the Services.
+              REVETIR reserves the right at any time to, and from time to time may, modify, suspend or discontinue, temporarily or permanently, the Services or your access to the Services for any reason or no reason with or without notice. You agree that REVETIR shall not be liable to you or to any third party for any modification, suspension or discontinuance of the Services.
             </p>
           </section>
           
@@ -71,7 +71,7 @@ export default function TermsConditionsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">4. Trademark Information.</h2>
             <p className="text-gray-600 mb-4">
-              All names, graphics, designs, page headers, button icons, scripts, commercial markings, trade dress, service names, service marks, and logos used and displayed in connection with the Services are trademarks of Revetir or its licensors or suppliers (collectively, the "Trademarks"). The Trademarks may not be used to disparage or discredit Revetir, any third party of Revetir's or any third party products or services, or in any manner (in Revetir's sole judgment) that may damage any goodwill in the Trademarks or may cause confusion.
+              All names, graphics, designs, page headers, button icons, scripts, commercial markings, trade dress, service names, service marks, and logos used and displayed in connection with the Services are trademarks of REVETIR or its licensors or suppliers (collectively, the "Trademarks"). The Trademarks may not be used to disparage or discredit REVETIR, any third party of REVETIR's or any third party products or services, or in any manner (in REVETIR's sole judgment) that may damage any goodwill in the Trademarks or may cause confusion.
             </p>
           </section>
           
@@ -80,24 +80,24 @@ export default function TermsConditionsPage() {
             
             <h3 className="text-xl font-semibold mb-3">5.1 Ownership of Site Content.</h3>
             <p className="text-gray-600 mb-4">
-              You agree that all material, including without limitation information, data, software, text (including text found in descriptions and articles), design elements, graphics, images, photographs, videos, clips, logos, icons, Trademarks, and other content (collectively, "Content"), contained in or delivered via the Services or otherwise made available by Revetir in connection with the Services (collectively, "Site Content") may be protected by copyrights, trademarks, service marks, trade secrets, or other intellectual property and other proprietary rights and laws. Revetir may own the Site Content or portions of the Site Content may be made available to Revetir through arrangements with third parties.
+              You agree that all material, including without limitation information, data, software, text (including text found in descriptions and articles), design elements, graphics, images, photographs, videos, clips, logos, icons, Trademarks, and other content (collectively, "Content"), contained in or delivered via the Services or otherwise made available by REVETIR in connection with the Services (collectively, "Site Content") may be protected by copyrights, trademarks, service marks, trade secrets, or other intellectual property and other proprietary rights and laws. REVETIR may own the Site Content or portions of the Site Content may be made available to REVETIR through arrangements with third parties.
             </p>
             
             <h3 className="text-xl font-semibold mb-3">5.2 Your Use of Site Content.</h3>
             <p className="text-gray-600 mb-4">
-              Revetir grants you a personal, non-exclusive, non-transferable, revocable, limited license, strictly to do the following: to view; reproduce; print; cache; store; and distribute Site Content via a generally available consumer web browser. The foregoing license is granted on the condition that you comply with these Terms and that you do not (and do not permit any third party to) remove or obscure the copyright notice or other notices displayed on Site Content. You may not reproduce, license, rent, modify, copy, transmit, publicly display, print, cache, store, link to, frame, or distribute content retrieved from these Services for any purpose prohibited by these Terms, or for any commercial purpose whatsoever, without the prior written permission of Revetir or the copyright holder identified in the relevant copyright notice. Any rights not expressly granted herein are reserved.
+              REVETIR grants you a personal, non-exclusive, non-transferable, revocable, limited license, strictly to do the following: to view; reproduce; print; cache; store; and distribute Site Content via a generally available consumer web browser. The foregoing license is granted on the condition that you comply with these Terms and that you do not (and do not permit any third party to) remove or obscure the copyright notice or other notices displayed on Site Content. You may not reproduce, license, rent, modify, copy, transmit, publicly display, print, cache, store, link to, frame, or distribute content retrieved from these Services for any purpose prohibited by these Terms, or for any commercial purpose whatsoever, without the prior written permission of REVETIR or the copyright holder identified in the relevant copyright notice. Any rights not expressly granted herein are reserved.
             </p>
             
             <h3 className="text-xl font-semibold mb-3">5.3 Third-Party Content.</h3>
             <p className="text-gray-600 mb-4">
-              Portions of the Site Content may include content, imagery, or materials provided by third-party sources, including but not limited to media outlets, designers, or public archives. Revetir does not claim ownership of such third-party content and endeavors to respect all intellectual property rights applicable thereto. If you are a rights holder or an authorized representative of a rights holder and believe that any content appearing on the Services infringes upon your intellectual property or other proprietary rights, you may request removal by contacting us at care@revetir.com. Please include sufficient detail to identify the allegedly infringing material and provide evidence of your ownership or authorization to act on behalf of the rights holder.
+              Portions of the Site Content may include content, imagery, or materials provided by third-party sources, including but not limited to media outlets, designers, or public archives. REVETIR does not claim ownership of such third-party content and endeavors to respect all intellectual property rights applicable thereto. If you are a rights holder or an authorized representative of a rights holder and believe that any content appearing on the Services infringes upon your intellectual property or other proprietary rights, you may request removal by contacting us at care@revetir.com. Please include sufficient detail to identify the allegedly infringing material and provide evidence of your ownership or authorization to act on behalf of the rights holder.
             </p>
           </section>
           
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">6. Copyright Assignment and Transfer of User Content.</h2>
             <p className="text-gray-600 mb-4">
-              User hereby irrevocably and unconditionally assigns, conveys, delivers and transfers to Revetir (i) all of User's right, title, and interest in and to all Intellectual Property for all posted content, including product reviews, comments or suggestions, photographs, illustrations, artwork, videos, communications and/or other materials uploaded by User to Website ("User Content"); (ii) all of User's rights to benefits, priority rights, privileges, causes of action, common law rights, moral rights, and remedies relating thereto throughout the world, including, without limitation, all rights to (A) apply for and maintain all applications, registrations, renewals and extensions thereof, (B) sue, claim and recover for past, present and future infringement, misappropriation, or other violations of any Intellectual Property rights in any User Content, and (C) commercialize, exploit, or grant licenses or other interests thereto. For purposes of this Assignment, "Intellectual Property" shall mean any and all works of authorship, copyrights, moral rights, inventions, developments, concepts, improvements, designs, discoveries, know-how, ideas, software, trade secrets and compositions of matter and trade secrets (whether or not protectable under trade secrets law, patentable or registrable under patent, copyright or similar laws), patent rights, and any other intellectual property rights anywhere in the world and all goodwill associated with any of the foregoing and/or share it with other users. User represents and warrants that any User Content posted by you, is owned exclusively by you and that (i) you have all necessary rights to post such User Content via our Services, including the right to assign the Intellectual Property rights in such User Content to Revetir and (ii) any User Content you post, publish, display or transmit to others via our Services complies with applicable law. We may, but are not obligated to, monitor or review any User Content (unless required by law). We retain the right to remove any or all User Content for any or for no reason, including User Content that, in our sole discretion, violates these Terms. User acknowledges that it is not entitled to receive any compensation for the User Content.
+              User hereby irrevocably and unconditionally assigns, conveys, delivers and transfers to REVETIR (i) all of User's right, title, and interest in and to all Intellectual Property for all posted content, including product reviews, comments or suggestions, photographs, illustrations, artwork, videos, communications and/or other materials uploaded by User to Website ("User Content"); (ii) all of User's rights to benefits, priority rights, privileges, causes of action, common law rights, moral rights, and remedies relating thereto throughout the world, including, without limitation, all rights to (A) apply for and maintain all applications, registrations, renewals and extensions thereof, (B) sue, claim and recover for past, present and future infringement, misappropriation, or other violations of any Intellectual Property rights in any User Content, and (C) commercialize, exploit, or grant licenses or other interests thereto. For purposes of this Assignment, "Intellectual Property" shall mean any and all works of authorship, copyrights, moral rights, inventions, developments, concepts, improvements, designs, discoveries, know-how, ideas, software, trade secrets and compositions of matter and trade secrets (whether or not protectable under trade secrets law, patentable or registrable under patent, copyright or similar laws), patent rights, and any other intellectual property rights anywhere in the world and all goodwill associated with any of the foregoing and/or share it with other users. User represents and warrants that any User Content posted by you, is owned exclusively by you and that (i) you have all necessary rights to post such User Content via our Services, including the right to assign the Intellectual Property rights in such User Content to REVETIR and (ii) any User Content you post, publish, display or transmit to others via our Services complies with applicable law. We may, but are not obligated to, monitor or review any User Content (unless required by law). We retain the right to remove any or all User Content for any or for no reason, including User Content that, in our sole discretion, violates these Terms. User acknowledges that it is not entitled to receive any compensation for the User Content.
             </p>
           </section>
           
@@ -115,7 +115,7 @@ export default function TermsConditionsPage() {
             </p>
             <ul className="list-disc list-inside text-gray-600 space-y-2 ml-4">
               <li>Use the Services to post, upload, share, transmit, distribute, facilitate distribution or otherwise make available any unlawful, infringing, harmful, harassing, defamatory, derogatory, threatening, intimidating, fraudulent, tortious, vulgar or otherwise objectionable material of any kind, including unauthorized or unsolicited advertising, or collecting personal information from other users of the Services;</li>
-              <li>Impersonate any person or entity, including without limitation any representative of Revetir; falsely state or otherwise misrepresent your affiliation with any person or entity, or express or imply that Revetir endorses any statement you make;</li>
+              <li>Impersonate any person or entity, including without limitation any representative of REVETIR; falsely state or otherwise misrepresent your affiliation with any person or entity, or express or imply that REVETIR endorses any statement you make;</li>
               <li>Disseminate any viruses, worms, spyware, adware, or other malicious computer code, file or program that is harmful or invasive or may or is intended to damage or hijack the operation of, or monitor the use of, any hardware, software or equipment via or using the Services;</li>
               <li>Engage in or use any data mining, robots, scraping, or similar data gathering or extraction methods on or via the Services;</li>
               <li>Interfere with or disrupt the operation of the Services or others' use of the Services in any way (including without limitation by hacking or defacing any portion of the Services);</li>
@@ -123,7 +123,7 @@ export default function TermsConditionsPage() {
               <li>Merge the Services or Site Content with another program or create derivative works based on the Services or Site Content;</li>
               <li>Remove any copyright, trademark, or other proprietary rights notice from the Services or Site Content originating from the Services;</li>
               <li>Violate any applicable laws or regulations;</li>
-              <li>Engage in any activity that could interfere with, disrupt, negatively affect, or inhibit other users from fully using the Services, or that could damage, disable, overburden, impair or otherwise negatively affect the functionality of the Services or Revetir's network or computer systems; or</li>
+              <li>Engage in any activity that could interfere with, disrupt, negatively affect, or inhibit other users from fully using the Services, or that could damage, disable, overburden, impair or otherwise negatively affect the functionality of the Services or REVETIR's network or computer systems; or</li>
               <li>Assist, permit or encourage any person in engaging or to engage in any of the activities described above.</li>
             </ul>
           </section>
@@ -131,7 +131,7 @@ export default function TermsConditionsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">9. Indemnity.</h2>
             <p className="text-gray-600 mb-4">
-              You agree to defend, indemnify and hold Revetir and its respective affiliates, licensors, officers, directors, employees, agents, and representatives, harmless from any and all losses, costs, expenses or damage of any nature whatsoever, including, without limitation attorneys' fees and court costs, arising from any claim, cause of action, demand or suit by any third party, related to or arising out of your use of the Services or violation of these Terms. Revetir reserves the right to assume the exclusive defense and control of any matter which is subject to indemnification under this Section, and in such case, you agree to cooperate with all reasonable requests in assisting Revetir's defense of such matter.
+              You agree to defend, indemnify and hold REVETIR and its respective affiliates, licensors, officers, directors, employees, agents, and representatives, harmless from any and all losses, costs, expenses or damage of any nature whatsoever, including, without limitation attorneys' fees and court costs, arising from any claim, cause of action, demand or suit by any third party, related to or arising out of your use of the Services or violation of these Terms. REVETIR reserves the right to assume the exclusive defense and control of any matter which is subject to indemnification under this Section, and in such case, you agree to cooperate with all reasonable requests in assisting REVETIR's defense of such matter.
             </p>
           </section>
           
@@ -140,7 +140,7 @@ export default function TermsConditionsPage() {
             
             <h3 className="text-xl font-semibold mb-3">10.1 Termination of Your Use of the Services.</h3>
             <p className="text-gray-600 mb-4">
-              Revetir may terminate or block your use of our Services if you violate these Terms or are engaged in illegal or fraudulent use of the Services. You agree that any termination of your use the Services may be effected without prior notice. Further, you agree that Revetir shall not be liable to you or any third party for any termination of your use or otherwise access to the Services.
+              REVETIR may terminate or block your use of our Services if you violate these Terms or are engaged in illegal or fraudulent use of the Services. You agree that any termination of your use the Services may be effected without prior notice. Further, you agree that REVETIR shall not be liable to you or any third party for any termination of your use or otherwise access to the Services.
             </p>
             
             <h3 className="text-xl font-semibold mb-3">10.2 Survival After Termination.</h3>
@@ -165,7 +165,7 @@ export default function TermsConditionsPage() {
             
             <h3 className="text-xl font-semibold mb-3">11.2 Publications:</h3>
             <p className="text-gray-600 mb-4">
-              The opinions expressed in our published works are those of the author(s) and do not reflect the opinions of Atallah Group US Inc. (referred to as Revetir) and any of its affiliates. They are neither a legal interpretation nor a statement of any Revetir policy as the case may be. Neither Revetir nor the authors guarantee the accuracy or completeness of any information contained in any publication and neither Revetir or its authors shall be responsible for any errors, omissions, or claims for damages, including exemplary damages, with regard to the content, accuracy or sufficiency of the information contained in any publications. No part of any published work may be reproduced, stored in a retrieval system, or transmitted in any form or by any means, electronic, mechanical, photocopying, recording, or otherwise, without the written permission of Revetir and/or the publisher. All rights reserved.
+              The opinions expressed in our published works are those of the author(s) and do not reflect the opinions of Atallah Group US Inc. (referred to as REVETIR) and any of its affiliates. They are neither a legal interpretation nor a statement of any REVETIR policy as the case may be. Neither REVETIR nor the authors guarantee the accuracy or completeness of any information contained in any publication and neither REVETIR or its authors shall be responsible for any errors, omissions, or claims for damages, including exemplary damages, with regard to the content, accuracy or sufficiency of the information contained in any publications. No part of any published work may be reproduced, stored in a retrieval system, or transmitted in any form or by any means, electronic, mechanical, photocopying, recording, or otherwise, without the written permission of REVETIR and/or the publisher. All rights reserved.
             </p>
           </section>
           
@@ -198,7 +198,7 @@ export default function TermsConditionsPage() {
             
             <h4 className="text-lg font-semibold mb-2">14.1.1 Order Limitations</h4>
             <p className="text-gray-600 mb-4">
-              Revetir reserves the right, in its sole discretion, to limit the quantity of any product per order for new customers who have not previously shopped with Revetir. New customers may be limited to purchasing no more than one (1) unit of each item per order, or no more than one (1) item total, and will be refunded any monies paid for canceled items.
+              REVETIR reserves the right, in its sole discretion, to limit the quantity of any product per order for new customers who have not previously shopped with REVETIR. New customers may be limited to purchasing no more than one (1) unit of each item per order, or no more than one (1) item total, and will be refunded any monies paid for canceled items.
             </p>
             
             <h3 className="text-xl font-semibold mb-3">14.2 Payment.</h3>
@@ -214,15 +214,15 @@ export default function TermsConditionsPage() {
             <h3 className="text-xl font-semibold mb-3">14.4 Shipping.</h3>
             
             <p className="text-gray-600 mb-4">
-              Revetir offers free standard worldwide shipping for most orders, and expedited shipping to certain countries for an additional fee. Upon completing your order, an e-mail confirmation will be sent to your address on file. This e-mail will serve as an invoice and includes your order number. A standard processing time of up to five (5) business days is required before your order is shipped. Orders placed before 6:00 PM (Eastern Time) begin processing that day, and orders placed on weekends and holidays begin processing the following business day starting at 8:00 AM (Eastern Time). During peak periods, processing times may exceed 5 business days. Once your order has been shipped, you will receive an e-mail with your shipment's tracking information, allowing you to keep tabs on the progress of your delivery.
+              REVETIR offers free standard worldwide shipping for most orders, and expedited shipping to certain countries for an additional fee. Upon completing your order, an e-mail confirmation will be sent to your address on file. This e-mail will serve as an invoice and includes your order number. A standard processing time of up to five (5) business days is required before your order is shipped. Orders placed before 6:00 PM (Eastern Time) begin processing that day, and orders placed on weekends and holidays begin processing the following business day starting at 8:00 AM (Eastern Time). During peak periods, processing times may exceed 5 business days. Once your order has been shipped, you will receive an e-mail with your shipment's tracking information, allowing you to keep tabs on the progress of your delivery.
             </p>
             
-            <h4 className="text-lg font-semibold mb-2">14.4.1 Shipments from China — Importation and Tariff Acknowledgment</h4>
+            <h4 className="text-lg font-semibold mb-2">14.4.1 International Shipments — Importation and Tariff Acknowledgment</h4>
             <p className="text-gray-600 mb-4">
-              By placing an order for goods shipped from China, you acknowledge that this sale is facilitated by merchants outside the U.S., and that you are importing merchandise into the United States for personal, non-commercial use. You further acknowledge that you will be listed as the importer of record for U.S. Customs and Border Protection (CBP) purposes and that your order will be imported in accordance with all applicable U.S. customs regulations. Revetir is not responsible for shipments delayed or packages opened due to standard customs inspections, which have increased considerably for all international shipments under the Trump administration.
+              By placing an order for goods shipped internationally, you acknowledge that this sale is facilitated by merchants outside the U.S., and that you are importing merchandise into the United States for personal, non-commercial use. You further acknowledge that you will be listed as the importer of record for U.S. Customs and Border Protection (CBP) purposes and that your order will be imported in accordance with all applicable U.S. customs regulations. REVETIR is not responsible for shipments delayed or packages opened due to standard customs inspections, which have increased considerably for all international shipments under the Trump administration.
             </p>
             <p className="text-gray-600 mb-4">
-              Your order constitutes your agreement to authorize Revetir to appoint a designated carrier or customs broker as your unpaid agent for customs purposes, and to execute a power of attorney on your behalf applicable to a single non-commercial shipment. This authorization includes the execution of the following declaration, as required by CBP:
+              Your order constitutes your agreement to authorize REVETIR to appoint a designated carrier or customs broker as your unpaid agent for customs purposes, and to execute a power of attorney on your behalf applicable to a single non-commercial shipment. This authorization includes the execution of the following declaration, as required by CBP:
             </p>
             <p className="text-gray-600 mb-4 italic">
               "The designated carrier/customs broker is hereby authorized to execute, as an unpaid agent who has knowledge of the facts, pursuant to the provisions of section 485(f), Tariff Act of 1930, as amended, the consignee's and owner's declarations provided for in section 485(a) and (d), Tariff Act of 1930, as amended, and to enter on my behalf or for my account the goods described in the attached invoice which contains a true and complete statement of the facts concerning the shipment."
@@ -247,14 +247,14 @@ export default function TermsConditionsPage() {
               <li>Multiple B/Ls or AWBs to the same recipient on the same day may also be treated as a single shipment, subject to the total combined value.</li>
             </ul>
             <p className="text-gray-600 mb-4">
-              <strong>Important Note on Chinese-Origin Goods:</strong> U.S. Customs and Border Protection may apply additional scrutiny to shipments from China, and shipments containing goods subject to Section 301 tariffs may not qualify for duty exemption under Section 321, even if the total value is under $800. Revetir and its carriers will make reasonable efforts to identify and apply the correct import procedures, but ultimate responsibility for any duties, taxes, or delays rests with you as the importer.
+              <strong>Important Note on Chinese-Origin Goods:</strong> U.S. Customs and Border Protection may apply additional scrutiny to shipments from China, as well as shipments containing goods made wholly or partly in China. Such inspections may result in delays due to examination, repackaging, or, in rare cases, temporary seizure of merchandise. REVETIR and its carriers will make reasonable efforts to follow corrective procedures to facilitate delivery, but cannot guarantee outcomes or override decisions made by federal authorities.
             </p>
           </section>
           
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">15. Returns.</h2>
             <p className="text-gray-600 mb-4">
-              Revetir offers free worldwide returns for most orders. 
+              REVETIR offers free worldwide returns for most orders. 
               The following criteria must be met for a return:
             </p>
             <p className="text-gray-600 mb-4">
@@ -272,11 +272,11 @@ export default function TermsConditionsPage() {
               Intimate apparel and swimwear: Lingerie, hosiery, underwear, swimsuits, and bikini bottoms cannot be worn and must be returned with the original hygienic protection sticker still intact to be eligible for a refund.
             </p>
             <p className="text-gray-600 mb-4">
-              Revetir reserves the right to reject any returning products that do not comply with the above stated Return Policy. Rejected items may be held for payment of a reshipment fee to be sent back to the original shipping address without any refund being processed. In order to avoid this, please contact our Customer Care team to address any issues or concerns you have regarding the item(s) you wish to return.
+              REVETIR reserves the right to reject any returning products that do not comply with the above stated Return Policy. Rejected items may be held for payment of a reshipment fee to be sent back to the original shipping address without any refund being processed. In order to avoid this, please contact our Customer Care team to address any issues or concerns you have regarding the item(s) you wish to return.
             </p>
             <h3 className="text-xl font-semibold mb-3">15.1 Exchanges</h3>
             <p className="text-gray-600 mb-4">
-              Revetir does not offer direct exchanges. We ask that you return the merchandise for a full refund and place a new order for the preferred item(s).
+              REVETIR does not offer direct exchanges. We ask that you return the merchandise for a full refund and place a new order for the preferred item(s).
             </p>
             <h3 className="text-xl font-semibold mb-3">15.2 Damaged/Defective Goods</h3>
             <p className="text-gray-600 mb-4">
@@ -307,7 +307,7 @@ export default function TermsConditionsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">18. Personal Data.</h2>
             <p className="text-gray-600 mb-4">
-              Revetir's activity entails the processing of personal data in accordance with our U.S. Privacy Policy available here.
+              REVETIR's activity entails the processing of personal data in accordance with our U.S. Privacy Policy available here.
             </p>
           </section>
           
@@ -328,7 +328,7 @@ export default function TermsConditionsPage() {
             
             <h3 className="text-xl font-semibold mb-3">20.2 Supervision.</h3>
             <p className="text-gray-600 mb-4">
-              If you are the parent or guardian of a child under the age of 18, you should carefully supervise your child's use of the Services on our Website. It is the responsibility of parents or guardians, and not Revetir, to determine whether any part of this Site or any site linked to from this Website is appropriate for their children.
+              If you are the parent or guardian of a child under the age of 18, you should carefully supervise your child's use of the Services on our Website. It is the responsibility of parents or guardians, and not REVETIR, to determine whether any part of this Site or any site linked to from this Website is appropriate for their children.
             </p>
           </section>
           
@@ -349,7 +349,7 @@ export default function TermsConditionsPage() {
             
             <h3 className="text-xl font-semibold mb-3">22.2 Arbitration.</h3>
             <p className="text-gray-600 mb-4">
-              If the parties do not reach an agreed upon solution pursuant to the procedures outlined in the paragraph above, you and Revetir each agree that any Dispute will be settled by binding arbitration, except that you and Revetir each retain the right to bring an individual action in small claims court, the right to seek injunctive or other equitable relief in a court of competent jurisdiction to prevent the actual or threatened infringement, misappropriation or violation of the party's respective intellectual property rights, and the right to seek public injunctive relief in a court of competent jurisdiction. Any such small claims matter shall be brought in the state courts of the State of California or the United States District Court for the Central District of California, and you consent to the exclusive personal jurisdiction and venue in such courts.
+              If the parties do not reach an agreed upon solution pursuant to the procedures outlined in the paragraph above, you and REVETIR each agree that any Dispute will be settled by binding arbitration, except that you and REVETIR each retain the right to bring an individual action in small claims court, the right to seek injunctive or other equitable relief in a court of competent jurisdiction to prevent the actual or threatened infringement, misappropriation or violation of the party's respective intellectual property rights, and the right to seek public injunctive relief in a court of competent jurisdiction. Any such small claims matter shall be brought in the state courts of the State of California or the United States District Court for the Central District of California, and you consent to the exclusive personal jurisdiction and venue in such courts.
             </p>
             
             <h3 className="text-xl font-semibold mb-3">22.3 Scope of Arbitration.</h3>
@@ -359,17 +359,17 @@ export default function TermsConditionsPage() {
             
             <h3 className="text-xl font-semibold mb-3">22.4 Class Action Waiver; Individual Arbitration.</h3>
             <p className="text-gray-600 mb-4">
-              You and Revetir each waive the right to a trial by jury or to participate as a plaintiff or class in any purported class action or representative proceeding. Under no circumstances will you file, seek, or participate in a class action, mass action, or representative action in connection with a Dispute. Further, unless both you and Revetir otherwise agree in writing, the arbitrator may not consolidate more than one person's claims, and may not otherwise preside over any form of any class or representative proceeding. If this specific paragraph is held unenforceable, then the entirety of this Dispute Resolution section will be deemed void. Except as provided in the preceding sentence, this Dispute Resolution section will survive any termination of this Agreement.
+              You and REVETIR each waive the right to a trial by jury or to participate as a plaintiff or class in any purported class action or representative proceeding. Under no circumstances will you file, seek, or participate in a class action, mass action, or representative action in connection with a Dispute. Further, unless both you and REVETIR otherwise agree in writing, the arbitrator may not consolidate more than one person's claims, and may not otherwise preside over any form of any class or representative proceeding. If this specific paragraph is held unenforceable, then the entirety of this Dispute Resolution section will be deemed void. Except as provided in the preceding sentence, this Dispute Resolution section will survive any termination of this Agreement.
             </p>
             
             <h3 className="text-xl font-semibold mb-3">22.5 Arbitration Rules.</h3>
             <p className="text-gray-600 mb-4">
-              The arbitration will be administered by the American Arbitration Association (AAA) in accordance with the Consumer Arbitration Rules (the "AAA Rules") then in effect, except as modified by this Dispute Resolution section. (The AAA Rules are available www.adr.org) If for any reason, AAA is unable or unwilling to conduct the arbitration consistent with this Agreement, you and Revetir will pick another arbitrator pursuant to 9 U.S. Code § 5.
+              The arbitration will be administered by the American Arbitration Association (AAA) in accordance with the Consumer Arbitration Rules (the "AAA Rules") then in effect, except as modified by this Dispute Resolution section. (The AAA Rules are available www.adr.org) If for any reason, AAA is unable or unwilling to conduct the arbitration consistent with this Agreement, you and REVETIR will pick another arbitrator pursuant to 9 U.S. Code § 5.
             </p>
             
             <h3 className="text-xl font-semibold mb-3">22.6 Arbitration Procedure and Location.</h3>
             <p className="text-gray-600 mb-4">
-              If the value of the Dispute does not exceed 10,000 United States Dollars ("USD"), then the arbitration will be conducted solely on the basis of documents you and Revetir submit to the arbitrator, unless you request a hearing or the arbitrator determines that a hearing is necessary, in which case, such hearing shall be conducted by telephone, unless you and Revetir agree otherwise. If the value of the Dispute exceeds 10,000 USD, your right to a hearing will be determined by the AAA Rules. Any in-person arbitration hearing shall be conducted in Los Angeles County, California unless you and Revetir agree otherwise. Subject to the AAA Rules, the arbitrator will have the discretion to direct a reasonable exchange of information by the parties, consistent with the expedited nature of arbitration.
+              If the value of the Dispute does not exceed 10,000 United States Dollars ("USD"), then the arbitration will be conducted solely on the basis of documents you and REVETIR submit to the arbitrator, unless you request a hearing or the arbitrator determines that a hearing is necessary, in which case, such hearing shall be conducted by telephone, unless you and REVETIR agree otherwise. If the value of the Dispute exceeds 10,000 USD, your right to a hearing will be determined by the AAA Rules. Any in-person arbitration hearing shall be conducted in Los Angeles County, California unless you and REVETIR agree otherwise. Subject to the AAA Rules, the arbitrator will have the discretion to direct a reasonable exchange of information by the parties, consistent with the expedited nature of arbitration.
             </p>
             
             <h3 className="text-xl font-semibold mb-3">22.7 Arbitrator's Decision.</h3>

@@ -46,6 +46,31 @@ function formatAddress(address: HttpTypes.StoreCartAddress | null | undefined) {
   return ret
 }
 
+function calculateEstimatedDeliveryDate(description: string): string | null {
+  // Extract the maximum number from patterns like "7-14 days" or "14 days"
+  const match = description.match(/(\d+)(?:-(\d+))?\s*days?/i)
+
+  if (!match) {
+    return null
+  }
+
+  // Get the max number (second group if range exists, otherwise first group)
+  const maxDays = match[2] ? parseInt(match[2], 10) : parseInt(match[1], 10)
+
+  // Calculate the delivery date
+  const deliveryDate = new Date()
+  deliveryDate.setDate(deliveryDate.getDate() + maxDays)
+
+  // Format as "Day, Month Date" (e.g., "Monday, Nov 14")
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric'
+  })
+
+  return `Estimated delivery by ${formatter.format(deliveryDate)}`
+}
+
 const Shipping: React.FC<ShippingProps> = ({
   cart,
   availableShippingMethods,
@@ -231,6 +256,9 @@ const Shipping: React.FC<ShippingProps> = ({
                             {option.type?.description && (
                               <span className="text-sm text-ui-fg-muted">
                                 {option.type.description}
+                                {calculateEstimatedDeliveryDate(option.type.description) && (
+                                  <> | {calculateEstimatedDeliveryDate(option.type.description)}</>
+                                )}
                               </span>
                             )}
                           </div>
