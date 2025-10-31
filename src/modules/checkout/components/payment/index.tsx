@@ -5,7 +5,7 @@ import { Heading } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import Divider from "@modules/common/components/divider"
 import { useContext, useEffect, useState } from "react"
-import { CardElement, ExpressCheckoutElement, useElements, useStripe } from "@stripe/react-stripe-js"
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { StripeContext } from "../payment-wrapper/stripe-wrapper"
 import CustomPaymentSelector from "./custom-payment-selector"
 import { useAvailablePaymentMethods } from "./use-available-payment-methods"
@@ -91,27 +91,6 @@ const Payment = ({
     return installmentAmount
   }
 
-  // Express Checkout Element handles payment confirmation automatically
-  // This handler is called when the Express Checkout payment flow completes
-  const handleExpressCheckoutConfirm = async (event: any) => {
-    // Express Checkout Element manages the entire payment flow internally
-    // For wallets (Apple Pay/Google Pay): Shows branded button, collects payment, completes transaction
-    // For Klarna: Shows "Continue with Klarna" button, handles redirect, returns user after completion
-    // No additional confirmation needed here - Stripe handles everything
-    console.log('Express Checkout payment initiated:', event)
-  }
-
-  const handleExpressCheckoutReady = (event: any) => {
-    // Called when Express Checkout Element is ready
-    // Can be used to check which payment methods are available
-    console.log('Express Checkout ready:', event)
-  }
-
-  const handleExpressCheckoutClick = (event: any) => {
-    // Called when user clicks the Express Checkout button
-    console.log('Express Checkout clicked:', event)
-  }
-
   const renderPaymentDetails = (method: PaymentMethodType) => {
     const installmentAmount = calculateInstallment()
 
@@ -140,41 +119,25 @@ const Payment = ({
 
       case 'apple_pay':
         return (
-          <div className="mt-4">
-            <ExpressCheckoutElement
-              options={{
-                paymentMethods: {
-                  applePay: 'always',
-                  googlePay: 'never',
-                  link: 'never',
-                  paypal: 'never',
-                  amazonPay: 'never',
-                },
-              }}
-              onConfirm={handleExpressCheckoutConfirm}
-              onReady={handleExpressCheckoutReady}
-              onClick={handleExpressCheckoutClick}
-            />
+          <div className="space-y-2">
+            <p className="text-sm text-gray-700">
+              Complete your purchase securely with Apple Pay.
+            </p>
+            <p className="text-xs text-gray-500">
+              Click the payment button below to continue.
+            </p>
           </div>
         )
 
       case 'google_pay':
         return (
-          <div className="mt-4">
-            <ExpressCheckoutElement
-              options={{
-                paymentMethods: {
-                  applePay: 'never',
-                  googlePay: 'always',
-                  link: 'never',
-                  paypal: 'never',
-                  amazonPay: 'never',
-                },
-              }}
-              onConfirm={handleExpressCheckoutConfirm}
-              onReady={handleExpressCheckoutReady}
-              onClick={handleExpressCheckoutClick}
-            />
+          <div className="space-y-2">
+            <p className="text-sm text-gray-700">
+              Complete your purchase securely with Google Pay.
+            </p>
+            <p className="text-xs text-gray-500">
+              Click the payment button below to continue.
+            </p>
           </div>
         )
 
@@ -195,15 +158,12 @@ const Payment = ({
             <p className="text-xs text-gray-500">
               You will be redirected to complete your payment.
             </p>
-            <p className="text-xs text-gray-500 italic mt-2">
-              Note: Afterpay integration coming soon. Use card payment for now.
-            </p>
           </div>
         )
 
       case 'klarna':
         return (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <p className="text-sm text-gray-700">
               Pay now, in <span className="font-semibold">4 interest-free payments of ${installmentAmount}</span>, or over 3–12 months.{' '}
               <a
@@ -215,21 +175,9 @@ const Payment = ({
                 Learn more
               </a>
             </p>
-            <ExpressCheckoutElement
-              options={{
-                paymentMethods: {
-                  applePay: 'never',
-                  googlePay: 'never',
-                  link: 'never',
-                  paypal: 'never',
-                  amazonPay: 'never',
-                  // Klarna will show if available in Express Checkout
-                },
-              }}
-              onConfirm={handleExpressCheckoutConfirm}
-              onReady={handleExpressCheckoutReady}
-              onClick={handleExpressCheckoutClick}
-            />
+            <p className="text-xs text-gray-500">
+              Click the payment button below to continue.
+            </p>
           </div>
         )
 

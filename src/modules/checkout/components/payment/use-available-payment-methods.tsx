@@ -35,12 +35,13 @@ export const useAvailablePaymentMethods = (
       try {
         // Create a PaymentRequest to check device capabilities
         // Note: amount must be in cents (smallest currency unit)
+        // Medusa sometimes returns values with fractional cents, so we round to ensure integer
         const paymentRequest = stripe.paymentRequest({
           country: countryCode.toUpperCase(),
           currency: currency.toLowerCase(),
           total: {
             label: 'Total',
-            amount: cartTotal, // Cart total should already be in cents from Medusa
+            amount: Math.round(cartTotal), // Round to nearest cent to handle fractional values
           },
           requestPayerName: true,
           requestPayerEmail: true,
