@@ -22,78 +22,8 @@ const StripeWrapper: React.FC<StripeWrapperProps> = ({
 }) => {
   const options: StripeElementsOptions = {
     clientSecret: paymentSession!.data?.client_secret as string | undefined,
-    appearance: {
-      theme: 'stripe',
-      variables: {
-        fontFamily: 'Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif',
-        fontSizeBase: '16px',
-        colorPrimary: '#000000',
-        colorBackground: '#ffffff',
-        colorText: '#000000',
-        colorDanger: '#dc2626',
-        borderRadius: '8px',
-        spacingUnit: '4px',
-      },
-      rules: {
-        '.Tab': {
-          border: 'none',
-          borderRadius: '0',
-          padding: '6px 0',
-          marginBottom: '0',
-          backgroundColor: 'transparent',
-          boxShadow: 'none',
-          transition: 'none',
-        },
-        '.Tab:hover': {
-          backgroundColor: 'transparent',
-          boxShadow: 'none',
-        },
-        '.Tab--selected': {
-          backgroundColor: 'transparent',
-          border: 'none',
-        },
-        '.Tab--selected:hover': {
-          backgroundColor: 'transparent',
-        },
-        '.TabIcon': {
-          filter: 'grayscale(100%)',
-          opacity: '0.5',
-        },
-        '.TabIcon--selected': {
-          filter: 'grayscale(0%)',
-          opacity: '1',
-        },
-        '.TabLabel': {
-          fontWeight: '400',
-          fontSize: '16px',
-          lineHeight: '24px',
-        },
-        '.RadioIcon': {
-          border: '2px solid #000000',
-          borderRadius: '50%',
-        },
-        '.RadioIconInner': {
-          backgroundColor: '#000000',
-          borderRadius: '50%',
-        },
-        '.Input': {
-          border: '1px solid #e5e7eb',
-          borderRadius: '8px',
-          padding: '12px 16px',
-          fontSize: '16px',
-          backgroundColor: '#ffffff',
-        },
-        '.Input:focus': {
-          border: '1px solid #000000',
-          boxShadow: '0 0 0 1px #000000',
-        },
-        '.Label': {
-          fontSize: '14px',
-          fontWeight: '500',
-          marginBottom: '8px',
-        },
-      },
-    },
+    // Using custom UI with CardElement instead of PaymentElement
+    // Appearance API not needed for individual Elements
   }
 
   if (!stripeKey) {

@@ -1,14 +1,15 @@
 "use client"
 
-import { isStripe as isStripeFunc } from "@lib/constants"
 import { initiatePaymentSession } from "@lib/data/cart"
 import { Heading } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import Divider from "@modules/common/components/divider"
 import { useContext, useEffect, useState } from "react"
-import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
-import { StripePaymentElementChangeEvent } from "@stripe/stripe-js"
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { StripeContext } from "../payment-wrapper/stripe-wrapper"
+import CustomPaymentSelector from "./custom-payment-selector"
+import { useAvailablePaymentMethods } from "./use-available-payment-methods"
+import { PaymentMethodType } from "./payment-methods-config"
 
 const Payment = ({
   cart,
@@ -22,40 +23,17 @@ const Payment = ({
   )
   const stripeReady = useContext(StripeContext)
 
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [stripeComplete, setStripeComplete] = useState(false)
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("")
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethodType | null>(null)
 
   const stripe = stripeReady ? useStripe() : null
   const elements = stripeReady ? useElements() : null
 
-  const handlePaymentElementChange = async (
-    event: StripePaymentElementChangeEvent
-  ) => {
-    // Catches the selected payment method and sets it to state
-    if (event.value.type) {
-      setSelectedPaymentMethod(event.value.type)
-    }
-    
-    // Sets stripeComplete on form completion
-    setStripeComplete(event.complete)
+  const cartTotal = cart?.total || 0
+  const currency = cart?.currency_code || 'usd'
 
-    // Clears any errors on successful completion
-    if (event.complete) {
-      setError(null)
-    }
-  }
-
-  const setPaymentMethod = async (method: string) => {
-    setError(null)
-    setSelectedPaymentMethod(method)
-    if (isStripeFunc(method)) {
-      await initiatePaymentSession(cart, {
-        provider_id: method,
-      })
-    }
-  }
+  // Detect available payment methods (filters Apple Pay/Google Pay based on device)
+  const { availableMethods, isChecking } = useAvailablePaymentMethods(cartTotal, currency)
 
   const paidByGiftcard =
     cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
@@ -72,11 +50,76 @@ const Payment = ({
   }
 
   useEffect(() => {
-    if (!activeSession) {
+    if (!activeSession && stripeReady) {
       initStripe()
     }
-  }, [cart, activeSession])
+  }, [cart, activeSession, stripeReady])
 
+  // Auto-select first available method
+  useEffect(() => {
+    if (!selectedMethod && availableMethods.length > 0 && !isChecking) {
+      setSelectedMethod(availableMethods[0].id)
+    }
+  }, [availableMethods, isChecking, selectedMethod])
+
+  const handleMethodSelect = (method: PaymentMethodType) => {
+    setSelectedMethod(method)
+    setError(null)
+  }
+
+  const handleCardChange = (event: any) => {
+    if (event.error) {
+      setError(event.error.message)
+    } else if (event.complete) {
+      setError(null)
+    }
+  }
+
+  const renderPaymentDetails = (method: PaymentMethodType) => {
+    switch (method) {
+      case 'card':
+        return (
+          <div className="max-w-md">
+            <CardElement
+              options={{
+                style: {
+                  base: {
+                    fontSize: '16px',
+                    fontFamily: 'Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif',
+                    color: '#000000',
+                    '::placeholder': {
+                      color: '#9CA3AF',
+                    },
+                  },
+                },
+                hidePostalCode: false,
+              }}
+              onChange={handleCardChange}
+            />
+          </div>
+        )
+
+      case 'affirm':
+      case 'afterpay_clearpay':
+      case 'klarna':
+        return (
+          <div className="text-sm text-gray-600">
+            You will be redirected to complete your payment.
+          </div>
+        )
+
+      case 'apple_pay':
+      case 'google_pay':
+        return (
+          <div className="text-sm text-gray-600">
+            Click "Place Order" to complete payment.
+          </div>
+        )
+
+      default:
+        return null
+    }
+  }
 
   return (
     <div className="bg-white">
@@ -91,30 +134,23 @@ const Payment = ({
       <div>
         {!paidByGiftcard &&
           availablePaymentMethods?.length &&
-          stripeReady && (
-            <div className="mt-5 transition-all duration-150 ease-in-out">
-              <PaymentElement
-                onChange={handlePaymentElementChange}
-                options={{
-                  layout: {
-                    type: 'accordion',
-                    radios: true,
-                    paymentMethodLogoPosition: 'end',
-                    defaultCollapsed: false,
-                  },
-                  paymentMethodOrder: ['card', 'apple_pay', 'google_pay', 'affirm', 'afterpay_clearpay', 'klarna'],
-                  fields: {
-                    billingDetails: 'auto'
-                  },
-                  wallets: {
-                    applePay: 'auto',
-                    googlePay: 'auto'
-                  }
-                }}
+          stripeReady &&
+          !isChecking && (
+            <div className="transition-all duration-150 ease-in-out">
+              <CustomPaymentSelector
+                availableMethods={availableMethods}
+                selectedMethod={selectedMethod}
+                onMethodSelect={handleMethodSelect}
+                renderPaymentDetails={renderPaymentDetails}
               />
             </div>
-          )
-        }
+          )}
+
+        {isChecking && (
+          <div className="py-4 text-sm text-gray-500">
+            Loading payment methods...
+          </div>
+        )}
 
         <ErrorMessage
           error={error}

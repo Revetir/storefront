@@ -99,42 +99,39 @@ const StripePaymentButton = ({
 
     setSubmitting(true)
 
+    const clientSecret = paymentSession?.data?.client_secret as string
 
-    const { error: submitError } = await elements.submit()
-    if (submitError) {
-      setErrorMessage(submitError.message || null)
+    // Get the CardElement (we're using CardElement instead of PaymentElement now)
+    const cardElement = elements.getElement('card')
+
+    if (!cardElement) {
+      setErrorMessage("Payment method not properly initialized")
       setSubmitting(false)
       return
     }
 
-    const clientSecret = paymentSession?.data?.client_secret as string
-
+    // Use confirmCardPayment for CardElement
     await stripe
-    .confirmPayment({
-      elements,
-      clientSecret,
-      confirmParams: {
-        return_url: `${window.location.origin}/api/capture-payment/${cart.id}?country_code=${countryCode}`,
-        payment_method_data: {
-          billing_details: {
-            name:
-              cart.billing_address?.first_name +
-              " " +
-              cart.billing_address?.last_name,
-            address: {
-              city: cart.billing_address?.city ?? undefined,
-              country: cart.billing_address?.country_code ?? undefined,
-              line1: cart.billing_address?.address_1 ?? undefined,
-              line2: cart.billing_address?.address_2 ?? undefined,
-              postal_code: cart.billing_address?.postal_code ?? undefined,
-              state: cart.billing_address?.province ?? undefined,
-            },
-            email: cart.email,
-            phone: cart.billing_address?.phone ?? undefined,
+    .confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: cardElement,
+        billing_details: {
+          name:
+            cart.billing_address?.first_name +
+            " " +
+            cart.billing_address?.last_name,
+          address: {
+            city: cart.billing_address?.city ?? undefined,
+            country: cart.billing_address?.country_code ?? undefined,
+            line1: cart.billing_address?.address_1 ?? undefined,
+            line2: cart.billing_address?.address_2 ?? undefined,
+            postal_code: cart.billing_address?.postal_code ?? undefined,
+            state: cart.billing_address?.province ?? undefined,
           },
+          email: cart.email,
+          phone: cart.billing_address?.phone ?? undefined,
         },
       },
-      redirect: "if_required",
     })
     .then(({ error, paymentIntent }) => {
       if (error) {
