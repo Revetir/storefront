@@ -179,7 +179,7 @@ const Shipping: React.FC<ShippingProps> = ({
           level="h2"
           className="flex flex-row text-xl gap-x-2 items-baseline uppercase"
         >
-          Delivery
+          Delivery Method
         </Heading>
       </div>
           <div className="grid">

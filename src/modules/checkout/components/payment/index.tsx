@@ -11,7 +11,6 @@ import CustomPaymentSelector from "./custom-payment-selector"
 import { useAvailablePaymentMethods } from "./use-available-payment-methods"
 import { PaymentMethodType } from "./payment-methods-config"
 import { usePaymentContext } from "./payment-context"
-import Lock from "@modules/common/icons/lock"
 
 const Payment = ({
   cart,
@@ -34,7 +33,7 @@ const Payment = ({
 
   // Ensure cart total is in cents (smallest currency unit) and is an integer
   // Medusa returns amounts in cents, but we ensure it's a whole number for Stripe elements
-  const cartTotal = Math.round(cart?.total || 0)
+  const cartTotal = cart?.total || 0
 
   // Detect available payment methods (filters Apple Pay/Google Pay based on device)
   // Uses browser-based detection to check wallet availability
@@ -134,9 +133,6 @@ const Payment = ({
                 }}
               />
             )}
-            <p className="text-xs text-gray-500">
-              You will be redirected to complete your payment.
-            </p>
           </div>
         )
 
@@ -153,9 +149,6 @@ const Payment = ({
                 }}
               />
             )}
-            <p className="text-xs text-gray-500">
-              Click the payment button below to continue.
-            </p>
           </div>
         )
 
@@ -166,15 +159,12 @@ const Payment = ({
 
   return (
     <div className="bg-white">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <div className="flex items-center">
-          <Lock />
-        </div>
+      <div className="flex flex-row items-center gap-x-2 justify-left mb-6">
         <Heading
           level="h2"
           className="text-xl gap-x-2 items-baseline uppercase"
         >
-          Secure Payment
+          Payment Method
         </Heading>
       </div>
       <div>
