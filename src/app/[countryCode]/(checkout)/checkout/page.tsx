@@ -30,7 +30,9 @@ export default async function Checkout() {
         <PaymentWrapper cart={cart}>
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_416px] content-container gap-x-40 py-6">
             <CheckoutForm cart={cart} customer={customer} />
-            <CheckoutSummary cart={cart} />
+            <div className="lg:sticky lg:top-20 lg:self-start">
+              <CheckoutSummary cart={cart} />
+            </div>
           </div>
         </PaymentWrapper>
       </PaymentProvider>

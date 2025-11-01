@@ -9,7 +9,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 
 const CheckoutSummary = ({ cart }: { cart: any }) => {
   return (
-    <div className="sticky top-0 flex flex-col-reverse lg:flex-col gap-y-8 py-8 lg:py-0 ">
+    <div className="flex flex-col-reverse lg:flex-col gap-y-8 py-8 lg:py-0 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
       <div className="w-full bg-white flex flex-col">
         <Heading
           level="h2"
@@ -31,7 +31,7 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
         <Divider className="my-6" />
         <footer className="w-full bg-white pb-4">
           <div className="flex flex-col items-center gap-y-2">
-            <div className="text-gray-400 text-xs text-center">
+            <div className="text-black text-xs text-center">
               REVETIR, 2 Park Avenue, 20th Floor, New York, NY 10016
             </div>
             <div className="flex flex-wrap justify-center items-center text-gray-400 text-xs gap-x-4">
