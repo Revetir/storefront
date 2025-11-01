@@ -271,7 +271,7 @@ const StripePaymentButton = ({
           size="large"
           isLoading={submitting}
           data-testid={dataTestId}
-          className="uppercase"
+          className="w-full uppercase"
         >
           {buttonText}
         </Button>
@@ -325,7 +325,7 @@ const ManualTestPaymentButton = ({ notReady, cart }: { notReady: boolean, cart: 
         onClick={handlePayment}
         size="large"
         data-testid="submit-order-button"
-        className="uppercase"
+        className="w-full uppercase"
       >
         Place order
       </Button>

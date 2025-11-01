@@ -75,7 +75,7 @@ const StripePaymentContent = ({ cart, activeSession }: { cart: any, activeSessio
               options={{
                 style: {
                   base: {
-                    fontSize: '16px',
+                    fontSize: '14px',
                     fontFamily: 'Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif',
                     color: '#000000',
                     '::placeholder': {

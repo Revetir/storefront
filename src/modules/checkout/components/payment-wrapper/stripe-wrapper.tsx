@@ -25,6 +25,12 @@ const StripeWrapper: React.FC<StripeWrapperProps> = ({
     // Using clientSecret (not mode: 'payment') because we already have a PaymentIntent from backend
     // This is required for ExpressCheckoutElement to work properly with existing PaymentIntents
     // The amount/currency are already defined in the PaymentIntent on the server side
+    appearance: {
+      variables: {
+        fontSizeBase: '14px',
+        fontFamily: 'Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif',
+      }
+    }
   }
 
   if (!stripeKey) {
