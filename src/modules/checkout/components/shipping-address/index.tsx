@@ -395,7 +395,7 @@ const ShippingAddress = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label htmlFor="shipping_address.first_name" className="block text-sm font-medium text-gray-700 mb-1">
-            First Name*
+            First Name<span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -417,7 +417,7 @@ const ShippingAddress = ({
         </div>
         <div>
           <label htmlFor="shipping_address.last_name" className="block text-sm font-medium text-gray-700 mb-1">
-            Last Name*
+            Last Name<span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -439,7 +439,7 @@ const ShippingAddress = ({
         </div>
         <div>
           <label htmlFor="shipping_address.address_1" className="block text-sm font-medium text-gray-700 mb-1">
-            Street Address*
+            Street Address<span className="text-red-500">*</span>
           </label>
           <div className={errors["shipping_address.address_1"] ? 'border-red-500 border rounded-md' : ''}>
             <AddressAutocomplete
@@ -492,7 +492,7 @@ const ShippingAddress = ({
         </div>
         <div>
           <label htmlFor="shipping_address.city" className="block text-sm font-medium text-gray-700 mb-1">
-            City*
+            City<span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -515,7 +515,7 @@ const ShippingAddress = ({
         <div className="flex gap-4">
           <div className="w-3/5">
             <label htmlFor="shipping_address.province" className="block text-sm font-medium text-gray-700 mb-1">
-              State*
+              State<span className="text-red-500">*</span>
             </label>
             <select
               id="shipping_address.province"
@@ -544,7 +544,7 @@ const ShippingAddress = ({
           </div>
           <div className="w-2/5">
             <label htmlFor="shipping_address.postal_code" className="block text-sm font-medium text-gray-700 mb-1">
-              Zip Code*
+              Zip Code<span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -567,7 +567,7 @@ const ShippingAddress = ({
         </div>
         <div>
           <label htmlFor="shipping_address.country_code" className="block text-sm font-medium text-gray-700 mb-1">
-            Country*
+            Country<span className="text-red-500">*</span>
           </label>
           <select
             id="shipping_address.country_code"
@@ -607,7 +607,7 @@ const ShippingAddress = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email*
+            Email<span className="text-red-500">*</span>
           </label>
           <input
             type="email"
@@ -631,7 +631,7 @@ const ShippingAddress = ({
         </div>
         <div className="w-3/5">
           <label htmlFor="shipping_address.phone" className="block text-sm font-medium text-gray-700 mb-1">
-            Phone*
+            Phone<span className="text-red-500">*</span>
           </label>
           <input
             type="tel"

@@ -4,7 +4,7 @@ import compareAddresses from "@lib/util/compare-addresses"
 import { HttpTypes } from "@medusajs/types"
 import { Heading, useToggleState } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
-import BillingAddress from "../billing_address"
+import BillingAddress from "../billing-address"
 import ShippingAddress from "../shipping-address"
 
 const Addresses = ({

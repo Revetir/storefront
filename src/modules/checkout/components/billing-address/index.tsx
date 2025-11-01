@@ -131,7 +131,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label htmlFor="billing_address.first_name" className="block text-sm font-medium text-gray-700 mb-1">
-            First Name*
+            First Name<span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -154,7 +154,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
         </div>
         <div>
           <label htmlFor="billing_address.last_name" className="block text-sm font-medium text-gray-700 mb-1">
-            Last Name*
+            Last Name<span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -177,7 +177,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
         </div>
         <div>
           <label htmlFor="billing_address.address_1" className="block text-sm font-medium text-gray-700 mb-1">
-            Street Address*
+            Street Address<span className="text-red-500">*</span>
           </label>
           <div className={errors["billing_address.address_1"] ? 'border-red-500 border rounded-md' : ''}>
             <AddressAutocomplete
@@ -232,7 +232,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
         </div>
         <div>
           <label htmlFor="billing_address.city" className="block text-sm font-medium text-gray-700 mb-1">
-            City*
+            City<span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -256,7 +256,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
         <div className="flex gap-4">
           <div className="w-3/5">
             <label htmlFor="billing_address.province" className="block text-sm font-medium text-gray-700 mb-1">
-              State*
+              State<span className="text-red-500">*</span>
             </label>
             <select
               id="billing_address.province"
@@ -285,7 +285,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           </div>
           <div className="w-2/5">
             <label htmlFor="billing_address.postal_code" className="block text-sm font-medium text-gray-700 mb-1">
-              Zip Code*
+              Zip Code<span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -309,7 +309,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
         </div>
         <div>
           <label htmlFor="billing_address.country_code" className="block text-sm font-medium text-gray-700 mb-1">
-            Country*
+            Country<span className="text-red-500">*</span>
           </label>
           <select
             id="billing_address.country_code"
