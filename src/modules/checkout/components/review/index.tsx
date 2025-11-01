@@ -34,6 +34,15 @@ const Review = ({ cart }: { cart: any }) => {
       return
     }
 
+    // CRITICAL: Submit elements for validation before confirming payment
+    // This ensures all payment data is validated client-side first
+    const submitResult = await elements.submit()
+    if (submitResult?.error) {
+      setErrorMessage(submitResult.error.message || 'Failed to submit payment')
+      console.error('Elements submit error:', submitResult.error)
+      return
+    }
+
     // Get the client secret from the cart's payment session
     const paymentSession = cart.payment_collection?.payment_sessions?.find(
       (session: any) => session.provider_id === "pp_stripe_stripe"
@@ -79,6 +88,37 @@ const Review = ({ cart }: { cart: any }) => {
 
   const handleExpressCheckoutClick = (event: any) => {
     console.log('Express Checkout clicked:', event)
+
+    // CRITICAL: Must call event.resolve() for payment sheet to open
+    // This configures what data the Express Checkout element will collect
+    const options = {
+      emailRequired: true, // Collect email (cart already has it, but wallets need confirmation)
+      phoneNumberRequired: false, // Optional - set to true if you want to collect phone
+      shippingAddressRequired: true, // Required since we have physical products
+      allowedShippingCountries: ['US'], // Limit to US for now
+      shippingRates: cart.shipping_methods?.map((method: any) => ({
+        id: method.shipping_option_id || method.id,
+        displayName: method.name || 'Standard Shipping',
+        amount: Math.round((method.amount || 0) * 100), // Convert to cents
+        deliveryEstimate: {
+          minimum: { unit: 'day', value: 3 },
+          maximum: { unit: 'day', value: 7 }
+        }
+      })) || [
+        {
+          id: 'standard',
+          displayName: 'Standard Shipping',
+          amount: 0,
+          deliveryEstimate: {
+            minimum: { unit: 'day', value: 3 },
+            maximum: { unit: 'day', value: 7 }
+          }
+        }
+      ]
+    }
+
+    // Resolve the click event with our options - this opens the payment sheet
+    event.resolve(options)
   }
 
   // Determine which payment method to show in ExpressCheckoutElement

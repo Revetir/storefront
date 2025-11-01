@@ -27,7 +27,7 @@ export default function CheckoutLayout({
         </nav>
       </div>
       <div className="relative pt-16 flex-1" data-testid="checkout-container">{children}</div>
-      <footer className="w-full bg-white py-4">
+      <footer className="w-full bg-white py-4 lg:mt-6">
         <div className="flex flex-col items-center gap-y-2">
           <div className="text-black text-xs text-center">
             REVETIR, 2 Park Avenue, 20th Floor, New York, NY 10016
