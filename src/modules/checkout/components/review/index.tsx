@@ -46,8 +46,8 @@ const Review = ({ cart }: { cart: any }) => {
     }
 
     // Confirm the payment with proper return URL
-    // When using ExpressCheckoutElement with mode: 'payment', we need to pass the clientSecret
-    // to link the payment to our backend Payment Intent
+    // The clientSecret links this to the PaymentIntent already created on our backend
+    // Elements was initialized with the clientSecret, so it knows the payment details
     const { error } = await stripe.confirmPayment({
       elements: elements,
       clientSecret: clientSecret,

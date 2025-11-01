@@ -9,7 +9,6 @@ type StripeWrapperProps = {
   paymentSession: HttpTypes.StorePaymentSession
   stripeKey?: string
   stripePromise: Promise<Stripe | null> | null
-  cart: HttpTypes.StoreCart
   children: React.ReactNode
 }
 
@@ -19,20 +18,13 @@ const StripeWrapper: React.FC<StripeWrapperProps> = ({
   paymentSession,
   stripeKey,
   stripePromise,
-  cart,
   children,
 }) => {
-  // Convert cart total to cents (smallest currency unit) for Stripe
-  // Medusa v2 returns amounts as decimal dollars (e.g., 813.75), but Stripe expects cents (e.g., 81375)
-  const cartTotal = Math.round((cart?.total || 0) * 100)
-
   const options: StripeElementsOptions = {
-    mode: 'payment',
-    amount: cartTotal,
-    currency: 'usd',
-    // Note: When using ExpressCheckoutElement, mode/amount/currency are required
-    // When using clientSecret with regular payments, these are optional
-    // We include both to support all payment methods
+    clientSecret: paymentSession!.data?.client_secret as string,
+    // Using clientSecret (not mode: 'payment') because we already have a PaymentIntent from backend
+    // This is required for ExpressCheckoutElement to work properly with existing PaymentIntents
+    // The amount/currency are already defined in the PaymentIntent on the server side
   }
 
   if (!stripeKey) {

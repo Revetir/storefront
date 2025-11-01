@@ -10,7 +10,6 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
   return (
     <div className="sticky top-0 flex flex-col-reverse lg:flex-col gap-y-8 py-8 lg:py-0 ">
       <div className="w-full bg-white flex flex-col">
-        <Divider className="my-6 lg:hidden" />
         <Heading
           level="h2"
           className="flex flex-row text-xl items-baseline uppercase mb-4"
@@ -18,7 +17,9 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
           Review
         </Heading>
         <Divider className="mb-6" />
-        <ItemsPreviewTemplate cart={cart} />
+        <div className="[&_table_tbody_tr]:border-b-0">
+          <ItemsPreviewTemplate cart={cart} />
+        </div>
         <Divider className="my-4" />
         <CartTotals totals={cart} isCheckoutPage={true} />
         <div className="my-6">

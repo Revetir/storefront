@@ -81,10 +81,10 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.gstatic.com https://r.stripe.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.gstatic.com https://r.stripe.com https://js.radar.com",
               "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.google.com https://pay.google.com",
-              "connect-src 'self' https://api.stripe.com https://r.stripe.com https://pay.google.com https://*.stripe.com",
-              "style-src 'self' 'unsafe-inline'",
+              "connect-src 'self' https://api.stripe.com https://r.stripe.com https://pay.google.com https://*.stripe.com https://api.radar.io https://*.radar.io",
+              "style-src 'self' 'unsafe-inline' https://js.radar.com",
               "img-src 'self' data: https:",
               "font-src 'self' data:",
             ].join('; '),

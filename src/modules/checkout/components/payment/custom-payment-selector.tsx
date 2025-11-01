@@ -57,7 +57,7 @@ const CustomPaymentSelector: React.FC<CustomPaymentSelectorProps> = ({
 
           {/* Conditionally render payment details below the selected radio */}
           {selectedMethod === method.id && (
-            <div className="ml-8 mt-2 mb-4 animate-fadeIn">
+            <div className="ml-8 animate-fadeIn">
               {renderPaymentDetails(method.id)}
             </div>
           )}

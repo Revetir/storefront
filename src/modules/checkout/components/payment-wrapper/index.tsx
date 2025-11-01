@@ -34,7 +34,6 @@ const PaymentWrapper: React.FC<PaymentWrapperProps> = ({ cart, children }) => {
         paymentSession={paymentSession}
         stripeKey={stripeKey}
         stripePromise={stripePromise}
-        cart={cart}
       >
         {children}
       </StripeWrapper>
