@@ -2,13 +2,15 @@
 
 import { ExpressCheckoutElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import { placeOrder } from "@lib/data/cart"
-import { useState } from "react"
+import { useState, useContext } from "react"
 
 import PaymentButton from "../payment-button"
 import { usePaymentContext } from "../payment/payment-context"
 import ErrorMessage from "../error-message"
+import { StripeContext } from "../payment-wrapper/stripe-wrapper"
 
-const Review = ({ cart }: { cart: any }) => {
+// Inner component that safely uses Stripe hooks - only rendered when inside Elements context
+const StripeReviewContent = ({ cart }: { cart: any }) => {
   const { selectedPaymentMethod } = usePaymentContext()
   const stripe = useStripe()
   const elements = useElements()
@@ -198,6 +200,26 @@ const Review = ({ cart }: { cart: any }) => {
       )}
     </>
   )
+}
+
+// Outer component that checks if we're in Stripe context
+const Review = ({ cart }: { cart: any }) => {
+  const stripeReady = useContext(StripeContext)
+  const { selectedPaymentMethod } = usePaymentContext()
+
+  // Express Checkout methods require Stripe context
+  const isExpressCheckoutMethod =
+    selectedPaymentMethod === 'apple_pay' ||
+    selectedPaymentMethod === 'google_pay' ||
+    selectedPaymentMethod === 'klarna'
+
+  // Only render Stripe-specific content if we're inside Stripe Elements context
+  if (stripeReady && isExpressCheckoutMethod) {
+    return <StripeReviewContent cart={cart} />
+  }
+
+  // For non-express checkout methods (card, afterpay), use PaymentButton
+  return <PaymentButton cart={cart} data-testid="submit-order-button" />
 }
 
 export default Review

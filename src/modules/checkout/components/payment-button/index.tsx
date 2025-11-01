@@ -5,13 +5,14 @@ import { placeOrder } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useContext } from "react"
 import ErrorMessage from "../error-message"
 import { useParams } from "next/navigation"
 import { validateCheckout, triggerFieldErrors, scrollToTop } from "../../utils/validate-checkout"
 import { usePaymentContext } from "../payment/payment-context"
 import { PaymentMethodType } from "../payment/payment-methods-config"
 import AfterpayButton from "../afterpay-button"
+import { StripeContext } from "../payment-wrapper/stripe-wrapper"
 
 
 type PaymentButtonProps = {
@@ -41,15 +42,25 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     (cart.shipping_methods?.length ?? 0) < 1
 
   const paymentSession = cart.payment_collection?.payment_sessions?.[0]
+  const stripeReady = useContext(StripeContext)
 
   switch (true) {
     case isStripe(paymentSession?.provider_id):
+      // Only render StripePaymentButton if we're inside Elements context
+      if (stripeReady && paymentSession) {
+        return (
+          <StripePaymentButton
+            notReady={notReady}
+            cart={cart}
+            data-testid={dataTestId}
+          />
+        )
+      }
+      // Show loading state while waiting for Stripe to initialize
       return (
-        <StripePaymentButton
-          notReady={notReady}
-          cart={cart}
-          data-testid={dataTestId}
-        />
+        <Button disabled className="uppercase" data-testid={dataTestId}>
+          Loading payment...
+        </Button>
       )
     case isManual(paymentSession?.provider_id):
       return (
