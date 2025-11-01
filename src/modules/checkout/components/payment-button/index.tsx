@@ -22,28 +22,11 @@ type PaymentButtonProps = {
 /**
  * Get the button text based on the selected payment method
  *
- * Future Enhancement:
- * - For Apple Pay, Google Pay, and Klarna: Replace text buttons with branded button images
- *   from /images folder (e.g., "Continue with Klarna" branded button)
- * - Current implementation uses text for all payment methods
+ * Note: This component only handles Card and Afterpay payments.
+ * Klarna, Apple Pay, and Google Pay are handled by ExpressCheckoutElement in Review component.
  */
 const getButtonText = (paymentMethod: PaymentMethodType | null): string => {
-  switch (paymentMethod) {
-    case 'afterpay_clearpay':
-      return 'Pay with Afterpay'
-    case 'klarna':
-      // TODO: Replace with branded Klarna button image in future
-      return 'Continue with Klarna'
-    case 'apple_pay':
-      // TODO: Replace with Apple Pay button image in future
-      return 'Pay with Apple Pay'
-    case 'google_pay':
-      // TODO: Replace with Google Pay button image in future
-      return 'Pay with Google Pay'
-    case 'card':
-    default:
-      return 'Place order'
-  }
+  return paymentMethod === 'afterpay_clearpay' ? 'Pay with Afterpay' : 'Place order'
 }
 
 const PaymentButton: React.FC<PaymentButtonProps> = ({
@@ -135,7 +118,7 @@ const StripePaymentButton = ({
     const clientSecret = paymentSession?.data?.client_secret as string
 
     /**
-     * Payment Method Handling Strategy:
+     * Payment Method Handling Strategy (Card and Afterpay only):
      *
      * CARD PAYMENTS:
      * - Uses CardElement with stripe.confirmCardPayment()
@@ -146,8 +129,8 @@ const StripePaymentButton = ({
      * - User is redirected to Afterpay's site to complete payment
      * - After completion, user returns to our return_url
      *
-     * APPLE PAY / GOOGLE PAY / KLARNA:
-     * - Handled via ExpressCheckoutElement in review component
+     * Note: Klarna, Apple Pay, and Google Pay are handled by ExpressCheckoutElement
+     * in the Review component and never reach this code path.
      */
 
     // Handle Afterpay payment flow
@@ -168,14 +151,14 @@ const StripePaymentButton = ({
 
       const shippingDetails = {
         name: `${cart.shipping_address?.first_name} ${cart.shipping_address?.last_name}`,
-        phone: cart.shipping_address?.phone ?? undefined,
+        phone: cart.shipping_address?.phone ?? '',
         address: {
-          line1: cart.shipping_address?.address_1 ?? undefined,
-          line2: cart.shipping_address?.address_2 ?? undefined,
-          city: cart.shipping_address?.city ?? undefined,
-          state: cart.shipping_address?.province ?? undefined,
-          postal_code: cart.shipping_address?.postal_code ?? undefined,
-          country: cart.shipping_address?.country_code ?? undefined,
+          line1: cart.shipping_address?.address_1 ?? '',
+          line2: cart.shipping_address?.address_2 ?? '',
+          city: cart.shipping_address?.city ?? '',
+          state: cart.shipping_address?.province ?? '',
+          postal_code: cart.shipping_address?.postal_code ?? '',
+          country: cart.shipping_address?.country_code ?? '',
         },
       }
 

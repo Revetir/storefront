@@ -2,6 +2,7 @@ import { Heading } from "@medusajs/ui"
 
 import ItemsPreviewTemplate from "@modules/cart/templates/preview"
 import DiscountCode from "@modules/checkout/components/discount-code"
+import Review from "@modules/checkout/components/review"
 import CartTotals from "@modules/common/components/cart-totals"
 import Divider from "@modules/common/components/divider"
 
@@ -14,13 +15,17 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
           level="h2"
           className="flex flex-row text-xl items-baseline uppercase"
         >
-          In your Bag
+          Review
         </Heading>
         <Divider className="my-6" />
-        <CartTotals totals={cart} isCheckoutPage={true} />
         <ItemsPreviewTemplate cart={cart} />
+        <CartTotals totals={cart} isCheckoutPage={true} />
         <div className="my-6">
           <DiscountCode cart={cart} />
+        </div>
+        {/* Review button - shown on mobile below summary, on desktop in second column */}
+        <div className="lg:hidden">
+          <Review cart={cart} />
         </div>
       </div>
     </div>

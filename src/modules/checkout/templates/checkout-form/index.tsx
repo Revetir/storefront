@@ -34,7 +34,10 @@ export default async function CheckoutForm({
 
         <Payment cart={cart} availablePaymentMethods={paymentMethods} />
 
-        <Review cart={cart} />
+        {/* Review shown on desktop in left column, on mobile it appears in checkout-summary */}
+        <div className="hidden lg:block">
+          <Review cart={cart} />
+        </div>
       </div>
     </PaymentProvider>
   )

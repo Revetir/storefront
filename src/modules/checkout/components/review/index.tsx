@@ -126,7 +126,7 @@ const Review = ({ cart }: { cart: any }) => {
             link: 'never' as const,
             paypal: 'never' as const,
             amazonPay: 'never' as const,
-            // Klarna will show automatically if available - no 'always' option
+            klarna: 'auto' as const,
           },
         }
       default:
