@@ -166,16 +166,9 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
           {/* Preview mode: quantity x unit price below */}
           {type === "preview" && item.quantity >= 2 && (
-            <span className="flex gap-x-1 items-baseline absolute bottom-1 right-0 whitespace-nowrap">
-              <Text className="text-ui-fg-muted leading-none">{item.quantity} x </Text>
-              <div className="leading-none">
-                <LineItemUnitPrice
-                  item={item}
-                  style="tight"
-                  currencyCode={currencyCode}
-                />
-              </div>
-            </span>
+            <Text className="flex items-baseline absolute bottom-1 right-0 whitespace-nowrap text-ui-fg-muted leading-none">
+              ({item.quantity}x <LineItemUnitPrice item={item} style="tight" currencyCode={currencyCode} />)
+            </Text>
           )}
 
           {/* Full mode mobile: quantity controls and delete button at bottom right */}

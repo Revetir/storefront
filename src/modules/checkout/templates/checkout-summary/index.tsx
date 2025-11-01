@@ -23,7 +23,7 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
         </div>
         <Divider className="my-4" />
         <CartTotals totals={cart} isCheckoutPage={true} />
-        <div className="my-6">
+        <div className="my-4">
           <DiscountCode cart={cart} />
         </div>
         {/* Review button - shown in summary column (both mobile and desktop) */}
