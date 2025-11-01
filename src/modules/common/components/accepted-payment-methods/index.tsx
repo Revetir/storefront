@@ -10,7 +10,7 @@ import Lock from "@modules/common/icons/lock"
 
 const AcceptedPaymentMethods = () => {
   return (
-    <div className="flex items-center gap-1.5 mt-4">
+    <div className="flex items-center justify-center gap-1.5 mt-4">
       {/* SECURE PAYMENT text with lock icon */}
       <div className="flex items-center gap-1">
         <div className="flex items-center">

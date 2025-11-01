@@ -23,11 +23,16 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
         </div>
         <Divider className="my-4" />
         <CartTotals totals={cart} isCheckoutPage={true} />
-        <div className="my-4">
+
+        {/* Discount code checkout */}
+        {/* <div className="my-4">
           <DiscountCode cart={cart} />
-        </div>
+        </div> */}
+
         {/* Review button - shown in summary column (both mobile and desktop) */}
-        <Review cart={cart} />
+        <div className="mt-4">
+          <Review cart={cart} />
+        </div>
         <Divider className="my-6" />
         <footer className="w-full bg-white pb-4">
           <div className="flex flex-col items-center gap-y-2">
