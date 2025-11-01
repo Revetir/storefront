@@ -203,7 +203,8 @@ const Payment = ({
   const stripeReady = useContext(StripeContext)
 
   // Only render Stripe-specific content if we're inside Stripe Elements context
-  if (stripeReady && availablePaymentMethods?.length) {
+  // AND we have an active payment session (which means Elements has a client secret)
+  if (stripeReady && activeSession && availablePaymentMethods?.length) {
     return <StripePaymentContent cart={cart} activeSession={activeSession} />
   }
 
