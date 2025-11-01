@@ -34,13 +34,6 @@ const Review = ({ cart }: { cart: any }) => {
       return
     }
 
-    // Submit the elements for validation
-    const submitResult = await elements.submit()
-    if (submitResult?.error) {
-      setErrorMessage(submitResult.error.message || 'Failed to submit payment')
-      return
-    }
-
     // Get the client secret from the cart's payment session
     const paymentSession = cart.payment_collection?.payment_sessions?.find(
       (session: any) => session.provider_id === "pp_stripe_stripe"
@@ -53,10 +46,11 @@ const Review = ({ cart }: { cart: any }) => {
     }
 
     // Confirm the payment with proper return URL
-    // This works for all express checkout methods (Apple Pay, Google Pay, Klarna)
+    // When using ExpressCheckoutElement with mode: 'payment', we need to pass the clientSecret
+    // to link the payment to our backend Payment Intent
     const { error } = await stripe.confirmPayment({
       elements: elements,
-      clientSecret,
+      clientSecret: clientSecret,
       confirmParams: {
         return_url: `${window.location.origin}${window.location.pathname}`,
       },
