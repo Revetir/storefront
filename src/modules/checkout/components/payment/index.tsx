@@ -12,24 +12,15 @@ import { useAvailablePaymentMethods } from "./use-available-payment-methods"
 import { PaymentMethodType } from "./payment-methods-config"
 import { usePaymentContext } from "./payment-context"
 
-const Payment = ({
-  cart,
-  availablePaymentMethods,
-}: {
-  cart: any
-  availablePaymentMethods: any[]
-}) => {
-  const activeSession = cart.payment_collection?.payment_sessions?.find(
-    (paymentSession: any) => paymentSession.status === "pending"
-  )
-  const stripeReady = useContext(StripeContext)
+// Inner component that safely uses Stripe hooks - only rendered when inside Elements context
+const StripePaymentContent = ({ cart, activeSession }: { cart: any, activeSession: any }) => {
   const { setSelectedPaymentMethod } = usePaymentContext()
-
   const [error, setError] = useState<string | null>(null)
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethodType | null>(null)
 
-  const stripe = stripeReady ? useStripe() : null
-  const elements = stripeReady ? useElements() : null
+  // Safe to call hooks here - we're inside Elements context
+  const stripe = useStripe()
+  const elements = useElements()
 
   // Convert cart total to cents (smallest currency unit) for Stripe
   // Medusa v2 returns amounts as decimal dollars (e.g., 813.75), but Stripe expects cents (e.g., 81375)
@@ -55,10 +46,10 @@ const Payment = ({
   }
 
   useEffect(() => {
-    if (!activeSession && stripeReady) {
+    if (!activeSession && stripe) {
       initStripe()
     }
-  }, [cart, activeSession, stripeReady])
+  }, [cart, activeSession, stripe])
 
   // Auto-select first available method
   useEffect(() => {
@@ -172,8 +163,6 @@ const Payment = ({
       <Divider className="mb-6" />
       <div>
         {!paidByGiftcard &&
-          availablePaymentMethods?.length &&
-          stripeReady &&
           !isChecking && (
             <div className="transition-all duration-150 ease-in-out">
               <CustomPaymentSelector
@@ -195,6 +184,43 @@ const Payment = ({
           error={error}
           data-testid="payment-method-error-message"
         />
+      </div>
+    </div>
+  )
+}
+
+// Outer component that checks if we're in Stripe context
+const Payment = ({
+  cart,
+  availablePaymentMethods,
+}: {
+  cart: any
+  availablePaymentMethods: any[]
+}) => {
+  const activeSession = cart.payment_collection?.payment_sessions?.find(
+    (paymentSession: any) => paymentSession.status === "pending"
+  )
+  const stripeReady = useContext(StripeContext)
+
+  // Only render Stripe-specific content if we're inside Stripe Elements context
+  if (stripeReady && availablePaymentMethods?.length) {
+    return <StripePaymentContent cart={cart} activeSession={activeSession} />
+  }
+
+  // Fallback for non-Stripe payments or when Stripe isn't ready
+  return (
+    <div className="bg-white">
+      <div className="flex flex-row items-center gap-x-2 justify-left mb-4">
+        <Heading
+          level="h2"
+          className="text-xl gap-x-2 items-baseline uppercase"
+        >
+          Payment Method
+        </Heading>
+      </div>
+      <Divider className="mb-6" />
+      <div className="py-4 text-sm text-gray-500">
+        Loading payment options...
       </div>
     </div>
   )
