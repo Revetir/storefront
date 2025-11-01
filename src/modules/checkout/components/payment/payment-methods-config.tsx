@@ -25,7 +25,7 @@ export interface PaymentMethodConfig {
 export const PAYMENT_METHODS: PaymentMethodConfig[] = [
   {
     id: 'card',
-    label: 'Pay with Credit or Debit Card',
+    label: 'Pay with credit or debit card',
     icons: [Visa, Mastercard, Amex, Discover],
     requiresElement: true,
     requiresDeviceSupport: false,

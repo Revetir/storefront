@@ -174,14 +174,15 @@ const Shipping: React.FC<ShippingProps> = ({
 
   return (
     <div className="bg-white">
-      <div className="flex flex-row items-center justify-between mb-6">
+      <div className="flex flex-row items-center justify-between mb-4">
         <Heading
           level="h2"
           className="flex flex-row text-xl gap-x-2 items-baseline uppercase"
         >
-          Delivery Method
+          Shipping Method
         </Heading>
       </div>
+      <Divider className="mb-6" />
           <div className="grid">
             <div className="flex flex-col">
             </div>
@@ -252,7 +253,7 @@ const Shipping: React.FC<ShippingProps> = ({
                         />
                         <div className="flex flex-col flex-1">
                           <span className="text-base-regular">
-                            {price} | {option.name}
+                            {price} / {option.name}
                           </span>
                           {estimatedDelivery && (
                             <span className="text-sm text-ui-fg-muted">
@@ -338,7 +339,6 @@ const Shipping: React.FC<ShippingProps> = ({
               data-testid="delivery-option-error-message"
             />
           </div>
-      <Divider className="mt-8" />
     </div>
   )
 }

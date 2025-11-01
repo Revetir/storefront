@@ -22,7 +22,7 @@ const Addresses = ({
 
   return (
     <div className="bg-white">
-      <div className="flex flex-row items-center justify-between mb-6">
+      <div className="flex flex-row items-center justify-between mb-4">
         <Heading
           level="h2"
           className="flex flex-row text-xl gap-x-2 items-baseline uppercase"
@@ -30,6 +30,7 @@ const Addresses = ({
           Shipping Address
         </Heading>
       </div>
+      <Divider className="mb-6" />
       <div className="pb-8">
         <ShippingAddress
           customer={customer}
@@ -42,16 +43,16 @@ const Addresses = ({
           <div>
             <Heading
               level="h2"
-              className="text-xl gap-x-4 pb-6 pt-8 uppercase"
+              className="text-xl gap-x-4 pb-4 pt-8 uppercase"
             >
               Billing address
             </Heading>
+            <Divider className="mb-6" />
 
             <BillingAddress cart={cart} />
           </div>
         )}
       </div>
-      <Divider className="mt-8" />
     </div>
   )
 }

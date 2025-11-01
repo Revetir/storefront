@@ -161,7 +161,7 @@ const Payment = ({
 
   return (
     <div className="bg-white">
-      <div className="flex flex-row items-center gap-x-2 justify-left mb-6">
+      <div className="flex flex-row items-center gap-x-2 justify-left mb-4">
         <Heading
           level="h2"
           className="text-xl gap-x-2 items-baseline uppercase"
@@ -169,6 +169,7 @@ const Payment = ({
           Payment Method
         </Heading>
       </div>
+      <Divider className="mb-6" />
       <div>
         {!paidByGiftcard &&
           availablePaymentMethods?.length &&
@@ -195,7 +196,6 @@ const Payment = ({
           data-testid="payment-method-error-message"
         />
       </div>
-      <Divider className="mt-8" />
     </div>
   )
 }

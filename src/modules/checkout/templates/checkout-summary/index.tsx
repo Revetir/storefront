@@ -13,12 +13,13 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
         <Divider className="my-6 lg:hidden" />
         <Heading
           level="h2"
-          className="flex flex-row text-xl items-baseline uppercase"
+          className="flex flex-row text-xl items-baseline uppercase mb-4"
         >
           Review
         </Heading>
-        <Divider className="my-6" />
+        <Divider className="mb-6" />
         <ItemsPreviewTemplate cart={cart} />
+        <Divider className="my-4" />
         <CartTotals totals={cart} isCheckoutPage={true} />
         <div className="my-6">
           <DiscountCode cart={cart} />

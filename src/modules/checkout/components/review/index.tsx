@@ -29,52 +29,47 @@ const Review = ({ cart }: { cart: any }) => {
     // For Klarna: Shows "Continue with Klarna" button, handles redirect, returns user after completion
     console.log('Express Checkout payment initiated:', event)
 
-    // For Klarna and other redirect-based payments, we need to confirm the payment
-    // which will trigger the redirect to Klarna's authentication page
-    if (event.expressPaymentType === 'klarna') {
-      console.log('Klarna payment flow - confirming payment intent')
-
-      if (!stripe || !elements) {
-        setErrorMessage('Stripe is not initialized')
-        return
-      }
-
-      const submitResult = await elements.submit()
-      if (submitResult?.error) {
-        setErrorMessage(submitResult.error.message || 'Failed to submit payment')
-        return
-      }
-
-      // Get the client secret from the cart's payment session
-      const paymentSession = cart.payment_collection?.payment_sessions?.find(
-        (session: any) => session.provider_id === "pp_stripe_stripe"
-      )
-      const clientSecret = paymentSession?.data?.client_secret as string
-
-      if (!clientSecret) {
-        setErrorMessage('Payment session not found')
-        return
-      }
-
-      // Confirm the Klarna payment - this will redirect to Klarna
-      const { error } = await stripe.confirmPayment({
-        elements: elements,
-        clientSecret,
-        confirmParams: {
-          return_url: `${window.location.origin}${window.location.pathname}`,
-        },
-      })
-
-      if (error) {
-        setErrorMessage(error.message || 'Payment failed')
-        console.error('Klarna payment error:', error)
-      }
-      // If successful, user will be redirected to Klarna and back
+    if (!stripe || !elements) {
+      setErrorMessage('Stripe is not initialized')
       return
     }
 
-    // For wallets (Apple Pay/Google Pay), payment is already confirmed
-    // After successful payment, place the order
+    // Submit the elements for validation
+    const submitResult = await elements.submit()
+    if (submitResult?.error) {
+      setErrorMessage(submitResult.error.message || 'Failed to submit payment')
+      return
+    }
+
+    // Get the client secret from the cart's payment session
+    const paymentSession = cart.payment_collection?.payment_sessions?.find(
+      (session: any) => session.provider_id === "pp_stripe_stripe"
+    )
+    const clientSecret = paymentSession?.data?.client_secret as string
+
+    if (!clientSecret) {
+      setErrorMessage('Payment session not found')
+      return
+    }
+
+    // Confirm the payment with proper return URL
+    // This works for all express checkout methods (Apple Pay, Google Pay, Klarna)
+    const { error } = await stripe.confirmPayment({
+      elements: elements,
+      clientSecret,
+      confirmParams: {
+        return_url: `${window.location.origin}${window.location.pathname}`,
+      },
+      redirect: 'if_required', // Only redirect if 3DS or similar authentication is needed
+    })
+
+    if (error) {
+      setErrorMessage(error.message || 'Payment failed')
+      console.error('Express Checkout payment error:', error)
+      return
+    }
+
+    // If payment succeeded without redirect, place the order
     try {
       await placeOrder()
     } catch (err: any) {
