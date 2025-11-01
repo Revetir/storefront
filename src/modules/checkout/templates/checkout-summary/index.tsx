@@ -23,10 +23,8 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
         <div className="my-6">
           <DiscountCode cart={cart} />
         </div>
-        {/* Review button - shown on mobile below summary, on desktop in second column */}
-        <div className="lg:hidden">
-          <Review cart={cart} />
-        </div>
+        {/* Review button - shown in summary column (both mobile and desktop) */}
+        <Review cart={cart} />
       </div>
     </div>
   )

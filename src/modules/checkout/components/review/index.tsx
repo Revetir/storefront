@@ -1,6 +1,5 @@
 "use client"
 
-import { Heading, Text } from "@medusajs/ui"
 import { ExpressCheckoutElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import { placeOrder } from "@lib/data/cart"
 import { useState } from "react"
@@ -144,25 +143,7 @@ const Review = ({ cart }: { cart: any }) => {
   }
 
   return (
-    <div className="bg-white">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <Heading
-          level="h2"
-          className="flex flex-row text-xl gap-x-2 items-baseline uppercase"
-        >
-          Review
-        </Heading>
-      </div>
-      <div className="flex items-start gap-x-1 w-full mb-6">
-        <div className="w-full">
-          <Text className="txt-medium-plus text-ui-fg-base mb-1">
-            {isExpressCheckoutMethod
-              ? "By clicking the payment button below, you acknowledge that you have understood and accepted our Terms of Sale."
-              : "By clicking Place Order, you acknowledge that you have understood and accepted our Terms of Sale."
-            }
-          </Text>
-        </div>
-      </div>
+    <>
       {isExpressCheckoutMethod ? (
         <div className="w-full">
           {stripe && elements ? (
@@ -186,7 +167,7 @@ const Review = ({ cart }: { cart: any }) => {
       ) : (
         <PaymentButton cart={cart} data-testid="submit-order-button" />
       )}
-    </div>
+    </>
   )
 }
 
