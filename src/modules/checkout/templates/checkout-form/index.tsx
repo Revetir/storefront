@@ -5,7 +5,6 @@ import Addresses from "@modules/checkout/components/addresses"
 import Payment from "@modules/checkout/components/payment"
 import Review from "@modules/checkout/components/review"
 import Shipping from "@modules/checkout/components/shipping"
-import { PaymentProvider } from "@modules/checkout/components/payment/payment-context"
 
 export default async function CheckoutForm({
   cart,
@@ -26,19 +25,17 @@ export default async function CheckoutForm({
   }
 
   return (
-    <PaymentProvider>
-      <div className="w-full grid grid-cols-1 gap-y-8">
-        <Addresses cart={cart} customer={customer} />
+    <div className="w-full grid grid-cols-1 gap-y-8">
+      <Addresses cart={cart} customer={customer} />
 
-        <Shipping cart={cart} availableShippingMethods={shippingMethods} />
+      <Shipping cart={cart} availableShippingMethods={shippingMethods} />
 
-        <Payment cart={cart} availablePaymentMethods={paymentMethods} />
+      <Payment cart={cart} availablePaymentMethods={paymentMethods} />
 
-        {/* Review shown on desktop in left column, on mobile it appears in checkout-summary */}
-        <div className="hidden lg:block">
-          <Review cart={cart} />
-        </div>
+      {/* Review shown on desktop in left column, on mobile it appears in checkout-summary */}
+      <div className="hidden lg:block">
+        <Review cart={cart} />
       </div>
-    </PaymentProvider>
+    </div>
   )
 }
