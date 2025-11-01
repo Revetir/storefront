@@ -41,15 +41,14 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
       }
 
       // Fallback to frontend category lookup (for shoes and products without measurements)
+      // Uses getProductTemplateCategory which handles unisex detection (products in both mens-shoes and womens-shoes)
       if (product.categories && product.categories.length > 0) {
-        const { mapCategoryToTemplate } = require("@lib/data/sizing-templates")
-        for (const category of product.categories) {
-          const templateName = await mapCategoryToTemplate(category.name, category.id)
-          if (templateName) {
-            const template = getSizingTemplate(templateName)
-            setSizingTemplate(template)
-            return
-          }
+        const { getProductTemplateCategory } = require("@lib/util/sizing-utils")
+        const templateName = await getProductTemplateCategory(product)
+        if (templateName) {
+          const template = getSizingTemplate(templateName)
+          setSizingTemplate(template)
+          return
         }
       }
 

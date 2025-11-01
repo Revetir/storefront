@@ -62,7 +62,7 @@ const nextConfig = {
           },
         ],
       },
-      /*{
+      {
         source: '/(.*)',
         headers: [
           {
@@ -90,7 +90,7 @@ const nextConfig = {
             ].join('; '),
           },
         ],
-      }*/
+      },
       // Add iOS-specific headers for better image handling
       {
         source: '/_next/image(.*)',
