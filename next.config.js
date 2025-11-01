@@ -91,7 +91,6 @@ const nextConfig = {
           },
         ],
       }*/
-      ,
       // Add iOS-specific headers for better image handling
       {
         source: '/_next/image(.*)',
