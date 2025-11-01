@@ -9,7 +9,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 
 const CheckoutSummary = ({ cart }: { cart: any }) => {
   return (
-    <div className="flex flex-col-reverse lg:flex-col gap-y-8 py-8 lg:py-0 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
+    <div className="overflow-x-hidden flex flex-col-reverse lg:flex-col gap-y-8 py-8 lg:py-0 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
       <div className="w-full bg-white flex flex-col">
         <Heading
           level="h2"
