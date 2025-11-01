@@ -34,23 +34,6 @@ const StripePaymentContent = ({ cart, activeSession }: { cart: any, activeSessio
   const paidByGiftcard =
     cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
 
-  const initStripe = async () => {
-    try {
-      await initiatePaymentSession(cart, {
-        provider_id: "pp_stripe_stripe",
-      })
-    } catch (err) {
-      console.error("Failed to initialize Stripe session:", err)
-      setError("Failed to initialize payment. Please try again.")
-    }
-  }
-
-  useEffect(() => {
-    if (!activeSession && stripe) {
-      initStripe()
-    }
-  }, [cart, activeSession, stripe])
-
   // Auto-select first available method
   useEffect(() => {
     if (!selectedMethod && availableMethods.length > 0 && !isChecking) {
@@ -201,10 +184,28 @@ const Payment = ({
     (paymentSession: any) => paymentSession.status === "pending"
   )
   const stripeReady = useContext(StripeContext)
+  const [error, setError] = useState<string | null>(null)
+
+  // Initialize payment session if it doesn't exist (runs outside Elements context)
+  useEffect(() => {
+    const initStripe = async () => {
+      if (!activeSession && availablePaymentMethods?.length > 0) {
+        try {
+          await initiatePaymentSession(cart, {
+            provider_id: "pp_stripe_stripe",
+          })
+        } catch (err) {
+          console.error("Failed to initialize Stripe session:", err)
+          setError("Failed to initialize payment. Please try again.")
+        }
+      }
+    }
+
+    initStripe()
+  }, [cart.id, activeSession, availablePaymentMethods])
 
   // Only render Stripe-specific content if we're inside Stripe Elements context
-  // AND we have an active payment session (which means Elements has a client secret)
-  if (stripeReady && activeSession && availablePaymentMethods?.length) {
+  if (stripeReady && availablePaymentMethods?.length) {
     return <StripePaymentContent cart={cart} activeSession={activeSession} />
   }
 
@@ -221,7 +222,7 @@ const Payment = ({
       </div>
       <Divider className="mb-6" />
       <div className="py-4 text-sm text-gray-500">
-        Loading payment options...
+        {error || "Loading payment options..."}
       </div>
     </div>
   )
