@@ -49,6 +49,10 @@ function ProductPreview({
   }
 
   const brands = getBrandsArray((product as any)?.brands)
+  const brandLabel = brands
+    .map((brand) => brand?.name?.trim())
+    .filter((name): name is string => Boolean(name))
+    .join(" × ")
   const productUrl = getProductUrl((product as any)?.brands, product.handle)
 
   const handleMouseEnter = useCallback(() => {
@@ -94,16 +98,11 @@ function ProductPreview({
 
         {/* Product info - using CSS Grid for consistent alignment */}
         <div className="mt-3 flex-1 grid grid-rows-[auto_auto_1fr] gap-1">
-          {/* Brand - fixed height for alignment */}
-          <div className="h-5 flex items-center">
-            {brands.length > 0 && (
-              <p className="text-ui-fg-muted text-small font-medium leading-snug truncate">
-                {brands.map((brand, idx, arr) => (
-                  <React.Fragment key={brand.slug}>
-                    <span className="uppercase">{brand.name}</span>
-                    {idx < arr.length - 1 && <span> x </span>}
-                  </React.Fragment>
-                ))}
+          {/* Brand - wraps on small screens, remains aligned on larger breakpoints */}
+          <div className="flex items-start sm:h-5 sm:items-center">
+            {brands.length > 0 && brandLabel && (
+              <p className="w-full max-w-full text-ui-fg-muted text-[11px] font-medium uppercase leading-tight tracking-wide break-words sm:text-small sm:leading-snug">
+                {brandLabel}
               </p>
             )}
           </div>
@@ -111,7 +110,7 @@ function ProductPreview({
           {/* Title - first line aligned, allows second line */}
           <div className="min-h-[1.5rem] flex items-start">
             <Text 
-              className="text-ui-fg-subtle leading-snug line-clamp-2" 
+              className="text-ui-fg-subtle leading-snug break-words sm:line-clamp-2" 
               data-testid="product-title"
             >
               {product.title}

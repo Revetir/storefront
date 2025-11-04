@@ -226,7 +226,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
         <div
           className="flex flex-col gap-y-4"
           style={{
-            paddingTop: 'calc(50vh - 25vw)'
+            paddingTop: '10vh'
           }}
         >
           {images.map((image, index) => {
@@ -235,6 +235,9 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                 key={image.id}
                 className="relative aspect-square w-full overflow-hidden shadow-none bg-ui-bg-subtle px-0 py-0"
                 id={image.id}
+                style={{
+                  width: "min(100%, 80vh, 1200px)",
+                }}
               >
                 {!!image.url && (
                   <Image
