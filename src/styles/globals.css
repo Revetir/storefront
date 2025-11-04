@@ -218,8 +218,7 @@
   }
 
   /* Disable image drag-and-drop site-wide */
-  img {
-    user-drag: none;
+img {
     -webkit-user-drag: none;
     pointer-events: auto;
   }

@@ -224,7 +224,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
       {/* Desktop: Vertical scrolling gallery with first image centered - xl+ (1280px+) */}
       <div className="hidden xl:block w-full">
         <div
-          className="flex flex-col gap-y-4"
+          className="flex flex-col gap-y-4 items-center"
           style={{
             paddingTop: '10vh'
           }}

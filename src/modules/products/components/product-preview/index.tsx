@@ -99,9 +99,9 @@ function ProductPreview({
         {/* Product info - using CSS Grid for consistent alignment */}
         <div className="mt-3 flex-1 grid grid-rows-[auto_auto_1fr] gap-1">
           {/* Brand - wraps on small screens, remains aligned on larger breakpoints */}
-          <div className="flex items-start sm:h-5 sm:items-center">
+          <div className="flex items-start lg:h-5 lg:items-center">
             {brands.length > 0 && brandLabel && (
-              <p className="w-full max-w-full text-ui-fg-muted text-[11px] font-medium uppercase leading-tight tracking-wide break-words sm:text-small sm:leading-snug">
+              <p className="w-full max-w-full text-ui-fg-muted text-sm font-medium uppercase leading-tight tracking-wide break-words sm:text-small sm:leading-snug">
                 {brandLabel}
               </p>
             )}
@@ -110,7 +110,7 @@ function ProductPreview({
           {/* Title - first line aligned, allows second line */}
           <div className="min-h-[1.5rem] flex items-start">
             <Text 
-              className="text-ui-fg-subtle leading-snug break-words sm:line-clamp-2" 
+              className="text-ui-fg-subtle leading-snug break-words text-xs sm:text-base sm:line-clamp-2" 
               data-testid="product-title"
             >
               {product.title}
