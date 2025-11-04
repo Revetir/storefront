@@ -99,9 +99,9 @@ function ProductPreview({
         {/* Product info - using CSS Grid for consistent alignment */}
         <div className="mt-3 flex-1 grid grid-rows-[auto_auto_1fr] gap-1">
           {/* Brand - wraps on small screens, remains aligned on xl+ breakpoints */}
-          <div className="flex items-start xl:h-5 xl:items-center">
+          <div className="flex items-start h-5 items-center">
             {brands.length > 0 && brandLabel && (
-              <p className="w-full max-w-full text-ui-fg-muted text-sm font-medium uppercase leading-tight tracking-wide break-words sm:text-small sm:leading-snug md:text-md lg:text-lg lg:leading-snug">
+              <p className="w-full max-w-full text-ui-fg-muted text-sm font-medium uppercase leading-tight tracking-wide break-words sm:text-small md:leading-snug md:text-medium">
                 {brandLabel}
               </p>
             )}

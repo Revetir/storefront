@@ -91,7 +91,7 @@ export default function CustomerCareLayout({
 
   const renderNavSection = (pages: typeof shoppingPages, title: string) => (
     <div className="mb-6">
-      <h3 className="text-md font-semibold mb-3 text-gray-800">{title}</h3>
+      <h3 className="text-medium font-semibold mb-3 text-gray-800">{title}</h3>
       <nav className="space-y-1">
         {pages.map((page) => {
           const isActive = pathname.endsWith(page.href)
