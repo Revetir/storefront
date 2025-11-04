@@ -131,7 +131,7 @@ export function Pagination({
 
   // Render the component
   return (
-    <div className="flex justify-center w-full mt-12 mb-12">
+    <div className="flex justify-center w-full mt-12 mb-8">
       <div
         className="flex items-end mb-5 w-[80%] justify-center"
         style={{ columnGap: "clamp(0.25rem, 4vw, 1.25rem)" }}
