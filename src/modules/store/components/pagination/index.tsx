@@ -50,7 +50,7 @@ export function Pagination({
     <button
       key={p}
       className={clx(
-        "mt-5 uppercase text-sm font-sans px-2 py-1 cursor-pointer",
+        "mt-5 uppercase text-lg font-sans px-5 py-1 cursor-pointer",
         {
           "font-bold underline text-black": isCurrent,
           "text-gray-700 hover:text-black": !isCurrent,
@@ -131,8 +131,14 @@ export function Pagination({
 
   // Render the component
   return (
-    <div className="flex justify-center w-full mt-12">
-      <div className="flex gap-3 items-end" data-testid={dataTestid}>{renderPageButtons()}</div>
+    <div className="flex justify-center w-full mt-12 mb-12">
+      <div
+        className="flex items-end mb-5 w-full max-w-[80%] justify-center"
+        style={{ columnGap: "clamp(0.25rem, 4vw, 1.25rem)" }}
+        data-testid={dataTestid}
+      >
+        {renderPageButtons()}
+      </div>
     </div>
   )
 }

@@ -108,7 +108,7 @@ export default function ContactUsPage() {
       </p>
 
       {/* Contact Form */}
-      <div className="bg-white p-6 rounded-lg shadow-sm">
+      <div className="bg-white p-6 rounded-lg">
           {submitStatus.type && (
             <div
               className={`p-4 rounded-md mb-6 ${
