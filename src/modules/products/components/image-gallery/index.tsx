@@ -4,6 +4,7 @@ import { HttpTypes } from "@medusajs/types"
 import { Container } from "@medusajs/ui"
 import Image from "next/image"
 import { useState, useRef, useEffect } from "react"
+import ZoomModal from "./zoom-modal"
 
 type ImageGalleryProps = {
   images: HttpTypes.StoreProductImage[]
@@ -19,6 +20,10 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
   const [scrollLeft, setScrollLeft] = useState(0)
+
+  // State for zoom modal
+  const [zoomModalOpen, setZoomModalOpen] = useState(false)
+  const [zoomInitialIndex, setZoomInitialIndex] = useState(0)
 
   const getAltText = (index: number) => {
     const brand = (product as any).brands?.[0]?.name || "Product"
@@ -44,6 +49,14 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
 
   const handleMouseUp = () => {
     setIsDragging(false)
+  }
+
+  // Handle image click for zoom (only trigger if not dragging)
+  const handleImageClick = (index: number) => {
+    if (!isDragging) {
+      setZoomInitialIndex(index)
+      setZoomModalOpen(true)
+    }
   }
 
   const handleMouseMove = (e: React.MouseEvent, container: HTMLDivElement | null) => {
@@ -117,8 +130,9 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
             return (
               <Container
                 key={image.id}
-                className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden shadow-none bg-white px-0 py-0"
+                className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden shadow-none bg-white px-0 py-0 cursor-zoom-in"
                 id={image.id}
+                onClick={() => handleImageClick(index)}
               >
                 {!!image.url && (
                   <Image
@@ -176,8 +190,9 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
             return (
               <Container
                 key={image.id}
-                className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden shadow-none bg-white px-0 py-0"
+                className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden shadow-none bg-white px-0 py-0 cursor-zoom-in"
                 id={image.id}
+                onClick={() => handleImageClick(index)}
               >
                 {!!image.url && (
                   <Image
@@ -187,7 +202,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     className="absolute inset-0 rounded-rounded"
                     alt={getAltText(index)}
                     fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1024px) 50vw, 50vw"
                     style={{
                       objectFit: "contain",
                     }}
@@ -228,12 +243,13 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
             return (
               <div
                 key={image.id}
-                className="w-full flex items-center justify-center"
+                className="w-full flex items-center justify-center cursor-zoom-in"
                 style={{
                   minHeight: '90vh',
                   height: '90vh',
                   marginBottom: '10vh'
                 }}
+                onClick={() => handleImageClick(index)}
               >
                 <Container
                   className="relative w-full h-full overflow-hidden shadow-none bg-white px-0 py-0 flex items-center justify-center"
@@ -269,6 +285,15 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
           })}
         </div>
       </div>
+
+      {/* Zoom Modal */}
+      <ZoomModal
+        images={images}
+        initialIndex={zoomInitialIndex}
+        isOpen={zoomModalOpen}
+        onClose={() => setZoomModalOpen(false)}
+        getAltText={getAltText}
+      />
     </div>
   )
 }
