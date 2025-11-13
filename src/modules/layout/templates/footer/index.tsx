@@ -13,12 +13,7 @@ export default function Footer() {
   return (
     <footer className="no-border w-full bg-white pt-4 pb-4">
       <div className="content-container flex flex-col w-full">
-        {/* Newsletter signup - mobile only, inline version */}
-        <div className="lg:hidden">
-          <NewsletterSignup variant="inline" />
-        </div>
-
-        <Divider className="my-6 lg:my-0" />
+        <Divider className="my-6 lg:hidden" />
 
         {/* Top basic links section */}
         <div className="no-border pt-6 pb-1 hidden lg:block">
@@ -36,7 +31,7 @@ export default function Footer() {
               onClick={() => setIsNewsletterModalOpen(true)}
               className="hover:text-ui-fg-base cursor-pointer"
             >
-              Email Signup
+              EMAIL SIGNUP
             </button>
             <LocalizedClientLink href="/partnerships" className="hover:text-ui-fg-base">
               Partnerships
@@ -72,7 +67,12 @@ export default function Footer() {
           close={() => setIsNewsletterModalOpen(false)}
         />
 
-        <Divider className="my-6 lg:block hidden" />
+        {/* Newsletter signup - mobile only, inline version */}
+        <div className="lg:hidden">
+          <NewsletterSignup variant="inline" />
+        </div>
+
+        <Divider className="my-6" />
 
         {/* Bottom footer text and copyright on same line with normal case */}
         <div className="flex flex-wrap justify-center items-center text-gray-400 text-xs no-border py-2 mt-0 gap-x-6 gap-y-2">

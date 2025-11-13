@@ -2,9 +2,10 @@
 
 import React, { useState } from "react"
 import { clx } from "@medusajs/ui"
-import Input from "@modules/common/components/input"
+import NewsletterInput from "@modules/common/components/newsletter-input"
+import MedusaRadio from "@modules/common/components/radio"
 import Modal from "@modules/common/components/modal"
-import { Button } from "@medusajs/ui"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 type NewsletterSignupProps = {
   variant?: "inline" | "modal"
@@ -117,7 +118,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
     return (
       <form onSubmit={handleSubmit} className="w-full">
         {variant === "inline" && !showGenderOptions && (
-          <div className="mb-4">
+          <div className="mb-4 text-center">
             <p className="text-xs uppercase mb-2 font-semibold tracking-wide">EMAIL SIGNUP</p>
             <p className="text-xs text-gray-600 mb-3">
               Sign up for newsletters and personalized shopping reminders about your Wishlist and Shopping Bag.
@@ -125,59 +126,50 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
           </div>
         )}
 
-        <div className={clx("space-y-4", variant === "modal" && "flex flex-col lg:flex-row lg:items-end lg:gap-4 lg:space-y-0")}>
-          <div className={clx("flex-1", variant === "inline" && "w-full")}>
-            <Input
-              label="Email address"
-              name="email"
-              type="email"
-              required
-              value={formState.email}
-              onChange={(e) => setFormState({ ...formState, email: e.target.value })}
-              onFocus={handleEmailFocus}
-            />
-          </div>
+        <div className="flex flex-col items-center space-y-4">
+          <NewsletterInput
+            name="email"
+            type="email"
+            placeholder="Email address"
+            required
+            value={formState.email}
+            onChange={(e) => setFormState({ ...formState, email: e.target.value })}
+            onFocus={handleEmailFocus}
+            className="max-w-md"
+          />
 
           {showGenderOptions && (
             <>
-              <div className={clx("flex gap-4", variant === "modal" && "lg:flex-row lg:items-center lg:mb-2")}>
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="menswear"
-                    checked={formState.genderPreference === "menswear"}
-                    onChange={(e) => setFormState({ ...formState, genderPreference: e.target.value as "menswear" | "womenswear" })}
-                    className="mr-2"
-                  />
+              <div className="flex justify-center gap-6">
+                <label
+                  className="flex items-center gap-2 cursor-pointer"
+                  onClick={() => setFormState({ ...formState, genderPreference: "menswear" })}
+                >
+                  <MedusaRadio checked={formState.genderPreference === "menswear"} />
                   <span className="text-sm">Menswear</span>
                 </label>
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="womenswear"
-                    checked={formState.genderPreference === "womenswear"}
-                    onChange={(e) => setFormState({ ...formState, genderPreference: e.target.value as "menswear" | "womenswear" })}
-                    className="mr-2"
-                  />
+                <label
+                  className="flex items-center gap-2 cursor-pointer"
+                  onClick={() => setFormState({ ...formState, genderPreference: "womenswear" })}
+                >
+                  <MedusaRadio checked={formState.genderPreference === "womenswear"} />
                   <span className="text-sm">Womenswear</span>
                 </label>
               </div>
 
-              <Button
+              <button
                 type="submit"
                 disabled={submitState.loading}
-                className={clx("w-full uppercase text-sm", variant === "modal" && "lg:w-auto")}
+                className="w-full max-w-md border border-black bg-white text-black py-2 px-4 text-sm font-normal hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitState.loading ? "Subscribing..." : "Subscribe"}
-              </Button>
+              </button>
             </>
           )}
         </div>
 
         {submitState.error && (
-          <p className="text-red-500 text-xs mt-2">{submitState.error}</p>
+          <p className="text-red-500 text-xs mt-2 text-center">{submitState.error}</p>
         )}
       </form>
     )
@@ -185,35 +177,34 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
 
   if (variant === "modal") {
     return (
-      <Modal isOpen={isOpen} close={close || (() => {})} size="medium">
-        <Modal.Title>
-          <div className="text-left pt-2 pb-4">
-            <h1 className="text-2xl font-medium uppercase tracking-wide text-black">EMAIL SIGNUP</h1>
-          </div>
-        </Modal.Title>
-
-        <div className="border-b border-gray-200 w-full mb-4"></div>
-
-        <Modal.Body>
-          <div className="w-full max-w-xl mx-auto px-2">
-            {!submitState.success && (
-              <div className="mb-6">
-                <p className="text-sm text-gray-600">
-                  Sign up for newsletters and personalized shopping reminders about your Wishlist and Shopping Bag.
-                </p>
-              </div>
-            )}
-            {renderForm()}
-          </div>
-        </Modal.Body>
+      <Modal isOpen={isOpen} close={close || (() => {})} size="small">
+        <div className="p-6">
+          {!submitState.success && (
+            <p className="text-sm text-gray-600 text-center mb-6">
+              Sign up for new product drops and exclusive discounts.
+            </p>
+          )}
+          {renderForm()}
+          {!submitState.success && showGenderOptions && (
+            <p className="text-xs text-gray-500 text-center mt-6">
+              You may unsubscribe at any time. To find out more, please visit our{" "}
+              <LocalizedClientLink href="/privacy-policy" className="underline">
+                Privacy Policy
+              </LocalizedClientLink>
+              .
+            </p>
+          )}
+        </div>
       </Modal>
     )
   }
 
   // Inline variant for mobile footer
   return (
-    <div className="w-full py-6 px-4 bg-white">
-      {renderForm()}
+    <div className="w-full py-6 px-4 bg-white flex justify-center">
+      <div className="w-full max-w-md">
+        {renderForm()}
+      </div>
     </div>
   )
 }
