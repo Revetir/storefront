@@ -230,8 +230,9 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                 key={image.id}
                 className="w-full flex items-center justify-center"
                 style={{
-                  minHeight: '100vh',
-                  height: '100vh'
+                  minHeight: '90vh',
+                  height: '90vh',
+                  paddingBottom: '10vh'
                 }}
               >
                 <Container
@@ -251,7 +252,6 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                       style={{
                         objectFit: "contain",
                         maxWidth: "100%",
-                        maxHeight: "90vh",
                         width: "auto",
                         height: "auto",
                       }}
