@@ -121,7 +121,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
           <div className="mb-4 text-center">
             <p className="text-xs uppercase mb-2 font-semibold tracking-wide">EMAIL SIGNUP</p>
             <p className="text-xs text-gray-600 mb-3">
-              Sign up for new product drops and exclusive discounts.
+              Sign up for new product drops and exclusive discounts
             </p>
           </div>
         )}
@@ -183,10 +183,10 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
         size="small"
         panelClassName="!fixed !bottom-20 !left-1/2 !-translate-x-1/2 !top-auto !max-h-[calc(100vh-200px)] !overflow-y-auto"
       >
-        <div className="p-6">
+        <div className="p-4">
           {!submitState.success && (
             <p className="text-sm text-gray-600 text-center mb-6">
-              Sign up for new product drops and exclusive discounts.
+              Sign up for new product drops and exclusive discounts
             </p>
           )}
           {renderForm()}
