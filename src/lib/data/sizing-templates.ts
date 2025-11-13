@@ -140,6 +140,36 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
     size_chart: {}
   },
 
+  // Shorts template with SVG diagram
+  {
+    category: "Shorts",
+    diagram_component: "ShortsDiagram",
+    units: "cm",
+    measurement_points: {
+      waist: {
+        x_percent: 47,
+        y_percent: 20,
+        label: "Waist"
+      },
+      rise: {
+        x_percent: 90,
+        y_percent: 35,
+        label: "Rise"
+      },
+      inseam: {
+        x_percent: 56,
+        y_percent: 59,
+        label: "Inseam"
+      },
+      leg_opening: {
+        x_percent: 26,
+        y_percent: 78,
+        label: "Leg Opening"
+      }
+    },
+    size_chart: {}
+  },
+
   // Shoes categories render a conversion chart (EU/US/UK/JP) in the modal
   // The modal provides a custom renderer; size_chart remains empty
   {

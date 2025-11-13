@@ -7,7 +7,7 @@ import { PaymentMethodType, PaymentMethodConfig } from "./payment-methods-config
 
 interface CustomPaymentSelectorProps {
   availableMethods: PaymentMethodConfig[]
-  selectedMethod: PaymentMethodType | null
+  selectedMethod: PaymentMethodType | null | undefined
   onMethodSelect: (method: PaymentMethodType) => void
   renderPaymentDetails: (method: PaymentMethodType) => React.ReactNode
 }

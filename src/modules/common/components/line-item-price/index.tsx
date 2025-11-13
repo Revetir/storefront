@@ -15,9 +15,9 @@ const LineItemPrice = ({
   currencyCode,
 }: LineItemPriceProps) => {
   const { subtotal, original_subtotal } = item
-  const originalPrice = original_subtotal
-  const currentPrice = subtotal
-  const hasReducedPrice = currentPrice < originalPrice
+  const originalPrice = original_subtotal ?? 0
+  const currentPrice = subtotal ?? 0
+  const hasReducedPrice = currentPrice < originalPrice && currentPrice > 0
 
   return (
     <div className="flex flex-col gap-x-2 text-ui-fg-subtle items-end">

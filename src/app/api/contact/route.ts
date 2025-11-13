@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
           subject,
           message,
         },
-      })
+      }) as Response
 
       // If backend returns an error, bubble it up
       if (!resp.ok) {

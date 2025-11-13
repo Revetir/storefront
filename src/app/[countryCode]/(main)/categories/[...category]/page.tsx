@@ -33,5 +33,5 @@ export default async function LegacyCategoryRedirectPage(props: Props) {
   
   // Redirect to new category URL
   const newUrl = `/${countryCode}/${gender}/${categorySlug}`
-  redirect(newUrl, 301)
+  redirect(newUrl)
 }
