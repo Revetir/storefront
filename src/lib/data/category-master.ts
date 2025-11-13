@@ -137,6 +137,12 @@ function applyTemplateAssignments(): void {
   CategoryMaster.setTemplate({ handle: "mens-t-shirts" }, "T-Shirts")
   CategoryMaster.setTemplate({ handle: "womens-t-shirts" }, "T-Shirts")
 
+  // POLOS
+  // TODO: Create dedicated polo diagram with collar-specific measurements when design is ready
+  // Temporarily using T-Shirts template until polo-specific diagram is implemented
+  CategoryMaster.setTemplate({ handle: "mens-polos" }, "T-Shirts")
+  CategoryMaster.setTemplate({ handle: "womens-polos" }, "T-Shirts")
+
   // SWEATERS
   CategoryMaster.setTemplate({ handle: "mens-sweaters" }, "Sweaters")
   CategoryMaster.setTemplate({ handle: "womens-sweaters" }, "Sweaters")
