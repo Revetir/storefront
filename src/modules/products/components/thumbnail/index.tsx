@@ -32,7 +32,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   return (
     <Container
       className={clx(
-        "relative w-full h-full aspect-[1/1] p-0 overflow-hidden shadow-none bg-ui-bg-subtle ",
+        "relative w-full h-full aspect-[1/1] p-0 overflow-hidden shadow-none bg-white ",
         className
       )}
       data-testid={dataTestid}
@@ -67,7 +67,7 @@ const ImageOrPlaceholder = ({
     <Image
       src={image}
       alt={getAltText()}
-      className="absolute inset-0 object-cover object-center"
+      className="absolute inset-0 object-contain object-center"
       draggable={false}
       quality={80}
       sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"

@@ -117,7 +117,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
             return (
               <Container
                 key={image.id}
-                className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden shadow-none bg-ui-bg-subtle px-0 py-0"
+                className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden shadow-none bg-white px-0 py-0"
                 id={image.id}
               >
                 {!!image.url && (
@@ -130,7 +130,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 50vw"
                     style={{
-                      objectFit: "cover",
+                      objectFit: "contain",
                     }}
                     quality={95}
                     placeholder="blur"
@@ -176,7 +176,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
             return (
               <Container
                 key={image.id}
-                className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden shadow-none bg-ui-bg-subtle px-0 py-0"
+                className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden shadow-none bg-white px-0 py-0"
                 id={image.id}
               >
                 {!!image.url && (
@@ -189,7 +189,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 50vw"
                     style={{
-                      objectFit: "cover",
+                      objectFit: "contain",
                     }}
                     quality={95}
                     placeholder="blur"
@@ -233,10 +233,11 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
             return (
               <Container
                 key={image.id}
-                className="relative aspect-square w-full overflow-hidden shadow-none bg-ui-bg-subtle px-0 py-0"
+                className="relative w-full overflow-hidden shadow-none bg-white px-0 py-0"
                 id={image.id}
                 style={{
-                  width: "min(100%, 80vh, 1200px)",
+                  maxWidth: "100%",
+                  maxHeight: "85vh",
                 }}
               >
                 {!!image.url && (
@@ -244,12 +245,16 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     src={image.url}
                     priority={index <= 2 ? true : false}
                     loading={index <= 2 ? undefined : "lazy"}
-                    className="absolute inset-0 rounded-rounded"
+                    className="rounded-rounded"
                     alt={getAltText(index)}
-                    fill
+                    width={3000}
+                    height={3000}
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 50vw"
                     style={{
-                      objectFit: "cover",
+                      objectFit: "contain",
+                      width: "100%",
+                      height: "auto",
+                      maxHeight: "85vh",
                     }}
                     quality={95}
                     placeholder="blur"
