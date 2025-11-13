@@ -45,17 +45,6 @@ const ZoomModal = ({
             block: "start",
           })
         }
-
-        // Center mobile images horizontally (for 200vw width)
-        const container = scrollContainerRef.current
-        if (container && window.innerWidth < 1280) {
-          // Mobile/tablet: center the 200vw wide image
-          const imageWrapper = container.querySelector('.mobile-image-wrapper') as HTMLElement
-          if (imageWrapper) {
-            const centerX = (imageWrapper.scrollWidth - container.clientWidth) / 2
-            container.scrollLeft = centerX
-          }
-        }
       }, 50)
     } else {
       document.body.style.overflow = ""
@@ -212,11 +201,14 @@ const ZoomModal = ({
       {/* Scrollable image container - continuous scroll, no snap */}
       <div
         ref={scrollContainerRef}
-        className="w-full h-full overflow-auto touch-pan-x touch-pan-y"
+        className="w-full h-full overflow-y-auto overflow-x-hidden"
         onClick={handleContentClick}
+        style={{
+          WebkitOverflowScrolling: 'touch',
+        }}
       >
-        {/* Desktop: 90% width centered container | Mobile: 200vw width for zoom */}
-        <div className="xl:w-[90%] w-[200vw] xl:mx-auto mx-0 mobile-image-wrapper">
+        {/* Desktop: 90% width centered container | Mobile: 100% width with pinch-zoom */}
+        <div className="xl:w-[90%] w-full xl:mx-auto mx-0">
           {images.map((image, index) => (
             <div
               key={image.id}
@@ -224,6 +216,9 @@ const ZoomModal = ({
                 imageRefs.current[index] = el
               }}
               className="w-full flex items-center justify-center py-8"
+              style={{
+                touchAction: 'pan-y pinch-zoom',
+              }}
             >
               {!!image.url && (
                 <Image
@@ -232,11 +227,10 @@ const ZoomModal = ({
                   width={6000}
                   height={6000}
                   quality={100}
-                  sizes="(max-width: 1280px) 200vw, 90vw"
-                  className="xl:w-auto xl:h-auto w-full h-auto xl:max-w-full max-w-none"
+                  sizes="(max-width: 1280px) 100vw, 90vw"
+                  className="xl:w-auto xl:h-auto w-full h-auto max-w-full"
                   style={{
                     objectFit: "contain",
-                    touchAction: "manipulation",
                   }}
                   priority={index <= 2}
                   loading={index <= 2 ? undefined : "lazy"}
