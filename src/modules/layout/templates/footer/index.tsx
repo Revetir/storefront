@@ -13,8 +13,6 @@ export default function Footer() {
   return (
     <footer className="no-border w-full bg-white pt-4 pb-4">
       <div className="content-container flex flex-col w-full">
-        <Divider className="my-6 lg:hidden" />
-
         {/* Top basic links section */}
         <div className="no-border pt-6 pb-1 hidden lg:block">
           <nav className="flex flex-nowrap justify-between lg:flex-wrap lg:justify-center lg:gap-x-9 gap-y-4 text-black txt-xsmall uppercase text-center">
@@ -72,7 +70,7 @@ export default function Footer() {
           <NewsletterSignup variant="inline" />
         </div>
 
-        <Divider className="my-6" />
+        <Divider className="my-6 lg:hidden" />
 
         {/* Bottom footer text and copyright on same line with normal case */}
         <div className="flex flex-wrap justify-center items-center text-gray-400 text-xs no-border py-2 mt-0 gap-x-6 gap-y-2">

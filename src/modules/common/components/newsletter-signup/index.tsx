@@ -177,7 +177,12 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
 
   if (variant === "modal") {
     return (
-      <Modal isOpen={isOpen} close={close || (() => {})} size="small">
+      <Modal
+        isOpen={isOpen}
+        close={close || (() => {})}
+        size="small"
+        panelClassName="!fixed !bottom-32 !left-1/2 !-translate-x-1/2 !top-auto !max-h-[calc(100vh-200px)] !overflow-y-auto"
+      >
         <div className="p-6">
           {!submitState.success && (
             <p className="text-sm text-gray-600 text-center mb-6">
@@ -187,7 +192,8 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
           {renderForm()}
           {!submitState.success && showGenderOptions && (
             <p className="text-xs text-gray-500 text-center mt-6">
-              You may unsubscribe at any time. To find out more, please visit our{" "}
+              You may unsubscribe at any time.<br />
+              To find out more, please visit our{" "}
               <LocalizedClientLink href="/privacy-policy" className="underline">
                 Privacy Policy
               </LocalizedClientLink>
@@ -204,6 +210,11 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
     <div className="w-full py-6 px-4 bg-white flex justify-center">
       <div className="w-full max-w-md">
         {renderForm()}
+        {!submitState.success && showGenderOptions && (
+          <p className="text-xs text-gray-500 text-center mt-4">
+            You may unsubscribe at any time.
+          </p>
+        )}
       </div>
     </div>
   )
