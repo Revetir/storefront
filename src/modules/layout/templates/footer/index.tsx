@@ -1,14 +1,25 @@
 "use client"
 
+import { useState } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import PrivacyChoicesTrigger from "@modules/common/components/privacy-choices-trigger"
 import Divider from "@modules/common/components/divider"
+import NewsletterSignup from "@modules/common/components/newsletter-signup"
 import { trackSocialClick } from "@lib/util/analytics"
 
 export default function Footer() {
+  const [isNewsletterModalOpen, setIsNewsletterModalOpen] = useState(false)
+
   return (
     <footer className="no-border w-full bg-white pt-4 pb-4">
       <div className="content-container flex flex-col w-full">
+        {/* Newsletter signup - mobile only, inline version */}
+        <div className="lg:hidden">
+          <NewsletterSignup variant="inline" />
+        </div>
+
+        <Divider className="my-6 lg:my-0" />
+
         {/* Top basic links section */}
         <div className="no-border pt-6 pb-1 hidden lg:block">
           <nav className="flex flex-nowrap justify-between lg:flex-wrap lg:justify-center lg:gap-x-9 gap-y-4 text-black txt-xsmall uppercase text-center">
@@ -21,6 +32,12 @@ export default function Footer() {
             <LocalizedClientLink href="/customer-care/about-us" className="hover:text-ui-fg-base">
               About Us
             </LocalizedClientLink>
+            <button
+              onClick={() => setIsNewsletterModalOpen(true)}
+              className="hover:text-ui-fg-base cursor-pointer"
+            >
+              Email Signup
+            </button>
             <LocalizedClientLink href="/partnerships" className="hover:text-ui-fg-base">
               Partnerships
             </LocalizedClientLink>
@@ -48,7 +65,14 @@ export default function Footer() {
           </nav>
         </div>
 
-        <Divider className="my-6 lg:hidden" />
+        {/* Newsletter modal - desktop only */}
+        <NewsletterSignup
+          variant="modal"
+          isOpen={isNewsletterModalOpen}
+          close={() => setIsNewsletterModalOpen(false)}
+        />
+
+        <Divider className="my-6 lg:block hidden" />
 
         {/* Bottom footer text and copyright on same line with normal case */}
         <div className="flex flex-wrap justify-center items-center text-gray-400 text-xs no-border py-2 mt-0 gap-x-6 gap-y-2">

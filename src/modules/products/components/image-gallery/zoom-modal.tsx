@@ -50,11 +50,14 @@ const ZoomModal = ({
         const container = scrollContainerRef.current
         if (container && window.innerWidth < 640) {
           // Small mobile: center the 200vw wide image
-          setTimeout(() => {
-            const scrollableWidth = container.scrollWidth - container.clientWidth
-            const centerX = scrollableWidth / 2
-            container.scrollLeft = centerX
-          }, 100)
+          // Use double requestAnimationFrame for reliable DOM measurement
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              const scrollableWidth = container.scrollWidth - container.clientWidth
+              const centerX = scrollableWidth / 2
+              container.scrollLeft = centerX
+            })
+          })
         }
       }, 50)
     } else {

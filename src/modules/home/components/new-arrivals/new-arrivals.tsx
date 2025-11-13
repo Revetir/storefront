@@ -106,12 +106,12 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                       href={getProductUrl((product as any).brands, product.handle || '')}
                       className="group hover:opacity-80 transition-opacity"
                     >
-                    <div className="aspect-square relative mb-4">
+                    <div className="aspect-square relative mb-4 bg-white">
                       <Image
                         src={product.thumbnail || "/images/imgi_1_elementor-placeholder-image.png"}
                         alt={`${(product as any).brands?.[0]?.name || 'Product'} ${product.title}`}
                         fill
-                        className="rounded-md object-cover"
+                        className="rounded-md object-contain"
                         priority={index < 3} // Priority loading for first 3 visible products
                         quality={80}
                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
