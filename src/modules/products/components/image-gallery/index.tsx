@@ -232,7 +232,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                 style={{
                   minHeight: '90vh',
                   height: '90vh',
-                  paddingBottom: '10vh'
+                  marginBottom: '10vh'
                 }}
               >
                 <Container
