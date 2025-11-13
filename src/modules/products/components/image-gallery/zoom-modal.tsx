@@ -23,7 +23,7 @@ const ZoomModal = ({
 }: ZoomModalProps) => {
   const [mounted, setMounted] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const [currentImageIndex, setCurrentImageIndex] = useState(initialIndex)
+  const imageRefs = useRef<(HTMLDivElement | null)[]>([])
 
   // Handle mounting for portal
   useEffect(() => {
@@ -31,14 +31,19 @@ const ZoomModal = ({
     return () => setMounted(false)
   }, [])
 
-  // Lock body scroll when modal is open
+  // Lock body scroll when modal is open and scroll to initial image
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden"
 
       // Scroll to the initial image on open
       setTimeout(() => {
-        scrollToImage(initialIndex)
+        if (imageRefs.current[initialIndex]) {
+          imageRefs.current[initialIndex]?.scrollIntoView({
+            behavior: "auto",
+            block: "start",
+          })
+        }
       }, 50)
     } else {
       document.body.style.overflow = ""
@@ -62,51 +67,42 @@ const ZoomModal = ({
       } else if (e.key === "ArrowUp") {
         e.preventDefault()
         scrollByAmount(-window.innerHeight * 0.8)
-      } else if (e.key === "ArrowRight") {
+      } else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
         e.preventDefault()
-        const nextIndex = Math.min(currentImageIndex + 1, images.length - 1)
-        scrollToImage(nextIndex)
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault()
-        const prevIndex = Math.max(currentImageIndex - 1, 0)
-        scrollToImage(prevIndex)
+        // Find current visible image and scroll to next/previous
+        const container = scrollContainerRef.current
+        if (!container) return
+
+        const scrollTop = container.scrollTop
+        let targetIndex = 0
+
+        // Find which image is currently most visible
+        imageRefs.current.forEach((ref, index) => {
+          if (ref) {
+            const rect = ref.getBoundingClientRect()
+            if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+              targetIndex = index
+            }
+          }
+        })
+
+        // Navigate to next or previous
+        if (e.key === "ArrowRight") {
+          targetIndex = Math.min(targetIndex + 1, images.length - 1)
+        } else {
+          targetIndex = Math.max(targetIndex - 1, 0)
+        }
+
+        imageRefs.current[targetIndex]?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        })
       }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isOpen, currentImageIndex, images.length, onClose])
-
-  // Track scroll position to update current image index
-  useEffect(() => {
-    if (!isOpen || !scrollContainerRef.current) return
-
-    const handleScroll = () => {
-      if (!scrollContainerRef.current) return
-
-      const scrollTop = scrollContainerRef.current.scrollTop
-      const viewportHeight = window.innerHeight
-
-      // Calculate which image is most visible
-      const newIndex = Math.round(scrollTop / viewportHeight)
-      setCurrentImageIndex(Math.min(newIndex, images.length - 1))
-    }
-
-    const container = scrollContainerRef.current
-    container.addEventListener("scroll", handleScroll)
-
-    return () => container.removeEventListener("scroll", handleScroll)
-  }, [isOpen, images.length])
-
-  const scrollToImage = (index: number) => {
-    if (!scrollContainerRef.current) return
-
-    const viewportHeight = window.innerHeight
-    scrollContainerRef.current.scrollTo({
-      top: index * viewportHeight,
-      behavior: "smooth",
-    })
-  }
+  }, [isOpen, images.length, onClose])
 
   const scrollByAmount = (amount: number) => {
     if (!scrollContainerRef.current) return
@@ -118,34 +114,40 @@ const ZoomModal = ({
   }
 
   const handleNavigationClick = (index: number) => {
-    scrollToImage(index)
+    imageRefs.current[index]?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    })
   }
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    // Only close if clicking directly on the overlay (not on images or navigation)
-    if (e.target === e.currentTarget) {
-      onClose()
+  const handleContentClick = (e: React.MouseEvent) => {
+    // Close modal when clicking anywhere (images or whitespace)
+    // Only prevent closing if clicking on navigation number buttons
+    const target = e.target as HTMLElement
+
+    // Check if click is on a navigation number button (not the X button)
+    if (target.closest('button[aria-label^="Go to image"]')) {
+      return
     }
+
+    onClose()
   }
 
   if (!mounted || !isOpen) return null
 
   return createPortal(
-    <div
-      className="fixed inset-0 z-[100] bg-black/95 cursor-zoom-out"
-      onClick={handleOverlayClick}
-    >
+    <div className="fixed inset-0 z-[100] bg-white cursor-zoom-out">
       {/* Close button - top right */}
       <button
         onClick={onClose}
-        className="fixed top-6 right-6 z-[102] text-white hover:text-gray-300 transition-colors cursor-pointer"
+        className="fixed top-8 right-8 z-[102] text-black hover:text-gray-600 transition-colors cursor-pointer"
         aria-label="Close zoom view"
       >
-        <X className="w-8 h-8" />
+        <X className="w-10 h-10" />
       </button>
 
-      {/* Desktop-only numbered navigation - right edge */}
-      <div className="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-[102] flex-col items-end gap-2">
+      {/* Desktop-only numbered navigation - right 5% column */}
+      <div className="hidden xl:flex fixed right-8 top-1/2 -translate-y-1/2 z-[102] flex-col items-end gap-3">
         {images.map((_, index) => (
           <button
             key={index}
@@ -153,11 +155,10 @@ const ZoomModal = ({
               e.stopPropagation()
               handleNavigationClick(index)
             }}
-            className={`text-lg font-sans uppercase px-3 py-1 cursor-pointer transition-colors ${
-              index === currentImageIndex
-                ? "font-bold underline text-white"
-                : "text-gray-400 hover:text-white"
-            }`}
+            className="text-lg font-sans uppercase px-3 py-1 cursor-pointer transition-colors text-black hover:text-gray-600"
+            style={{
+              fontWeight: 700,
+            }}
             aria-label={`Go to image ${index + 1}`}
           >
             {index + 1}
@@ -165,40 +166,41 @@ const ZoomModal = ({
         ))}
       </div>
 
-      {/* Scrollable image container */}
+      {/* Scrollable image container - continuous scroll, no snap */}
       <div
         ref={scrollContainerRef}
-        className="w-full h-full overflow-y-auto overflow-x-hidden snap-y snap-mandatory"
-        onClick={handleOverlayClick}
+        className="w-full h-full overflow-y-auto overflow-x-hidden"
+        onClick={handleContentClick}
       >
-        {images.map((image, index) => (
-          <div
-            key={image.id}
-            className="w-full h-screen flex items-center justify-center snap-start"
-          >
-            {!!image.url && (
-              <div className="relative w-full h-full flex items-center justify-center p-8 xl:pr-32">
+        {/* Desktop: 90% width container with right column for navigation */}
+        <div className="xl:w-[90%] w-full mx-0">
+          {images.map((image, index) => (
+            <div
+              key={image.id}
+              ref={(el) => {
+                imageRefs.current[index] = el
+              }}
+              className="w-full flex items-center justify-center py-8"
+            >
+              {!!image.url && (
                 <Image
                   src={image.url}
                   alt={getAltText(index)}
-                  width={4000}
-                  height={4000}
+                  width={6000}
+                  height={6000}
                   quality={100}
-                  sizes="100vw"
-                  className="object-contain max-w-full max-h-full"
+                  sizes="(max-width: 1280px) 100vw, 90vw"
+                  className="w-auto h-auto max-w-full"
                   style={{
-                    width: "auto",
-                    height: "auto",
-                    maxWidth: "100%",
-                    maxHeight: "100%",
+                    objectFit: "contain",
                   }}
-                  priority={index === initialIndex || index === initialIndex + 1 || index === initialIndex - 1}
-                  loading={index === initialIndex || index === initialIndex + 1 || index === initialIndex - 1 ? undefined : "lazy"}
+                  priority={index <= 2}
+                  loading={index <= 2 ? undefined : "lazy"}
                 />
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>,
     document.body
