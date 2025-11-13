@@ -4,7 +4,7 @@ import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
 import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { X } from "@medusajs/icons"
+import X from "@modules/common/icons/x"
 
 type ZoomModalProps = {
   images: HttpTypes.StoreProductImage[]
@@ -24,6 +24,7 @@ const ZoomModal = ({
   const [mounted, setMounted] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const imageRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [currentVisibleIndex, setCurrentVisibleIndex] = useState(initialIndex)
 
   // Handle mounting for portal
   useEffect(() => {
@@ -44,6 +45,17 @@ const ZoomModal = ({
             block: "start",
           })
         }
+
+        // Center mobile images horizontally (for 200vw width)
+        const container = scrollContainerRef.current
+        if (container && window.innerWidth < 1280) {
+          // Mobile/tablet: center the 200vw wide image
+          const imageWrapper = container.querySelector('.mobile-image-wrapper') as HTMLElement
+          if (imageWrapper) {
+            const centerX = (imageWrapper.scrollWidth - container.clientWidth) / 2
+            container.scrollLeft = centerX
+          }
+        }
       }, 50)
     } else {
       document.body.style.overflow = ""
@@ -53,6 +65,51 @@ const ZoomModal = ({
       document.body.style.overflow = ""
     }
   }, [isOpen, initialIndex])
+
+  // Track visible image index based on scroll position
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleScroll = () => {
+      const container = scrollContainerRef.current
+      if (!container) return
+
+      // Find which image is currently most visible (centered in viewport)
+      let mostVisibleIndex = 0
+      let maxVisibility = 0
+
+      imageRefs.current.forEach((ref, index) => {
+        if (ref) {
+          const rect = ref.getBoundingClientRect()
+          const viewportCenter = window.innerHeight / 2
+
+          // Calculate how much of the image is visible near the center
+          const distanceFromCenter = Math.abs((rect.top + rect.bottom) / 2 - viewportCenter)
+          const visibility = Math.max(0, window.innerHeight - distanceFromCenter)
+
+          if (visibility > maxVisibility) {
+            maxVisibility = visibility
+            mostVisibleIndex = index
+          }
+        }
+      })
+
+      setCurrentVisibleIndex(mostVisibleIndex)
+    }
+
+    const container = scrollContainerRef.current
+    if (container) {
+      container.addEventListener('scroll', handleScroll, { passive: true })
+      // Initial check
+      handleScroll()
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll)
+      }
+    }
+  }, [isOpen])
 
   // Keyboard navigation
   useEffect(() => {
@@ -69,24 +126,9 @@ const ZoomModal = ({
         scrollByAmount(-window.innerHeight * 0.8)
       } else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
         e.preventDefault()
-        // Find current visible image and scroll to next/previous
-        const container = scrollContainerRef.current
-        if (!container) return
+        // Navigate to next or previous from current visible index
+        let targetIndex = currentVisibleIndex
 
-        const scrollTop = container.scrollTop
-        let targetIndex = 0
-
-        // Find which image is currently most visible
-        imageRefs.current.forEach((ref, index) => {
-          if (ref) {
-            const rect = ref.getBoundingClientRect()
-            if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
-              targetIndex = index
-            }
-          }
-        })
-
-        // Navigate to next or previous
         if (e.key === "ArrowRight") {
           targetIndex = Math.min(targetIndex + 1, images.length - 1)
         } else {
@@ -102,7 +144,7 @@ const ZoomModal = ({
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isOpen, images.length, onClose])
+  }, [isOpen, images.length, onClose, currentVisibleIndex])
 
   const scrollByAmount = (amount: number) => {
     if (!scrollContainerRef.current) return
@@ -137,13 +179,13 @@ const ZoomModal = ({
 
   return createPortal(
     <div className="fixed inset-0 z-[100] bg-white cursor-zoom-out">
-      {/* Close button - top right */}
+      {/* Close button - top right (responsive positioning) */}
       <button
         onClick={onClose}
-        className="fixed top-8 right-8 z-[102] text-black hover:text-gray-600 transition-colors cursor-pointer"
+        className="fixed top-4 right-4 xl:top-6 xl:right-6 z-[102] text-black hover:text-gray-600 transition-colors cursor-pointer"
         aria-label="Close zoom view"
       >
-        <X className="w-10 h-10" />
+        <X size="24" />
       </button>
 
       {/* Desktop-only numbered navigation - right 5% column */}
@@ -155,10 +197,11 @@ const ZoomModal = ({
               e.stopPropagation()
               handleNavigationClick(index)
             }}
-            className="text-lg font-sans uppercase px-3 py-1 cursor-pointer transition-colors text-black hover:text-gray-600"
-            style={{
-              fontWeight: 700,
-            }}
+            className={`text-lg font-sans uppercase px-3 py-1 cursor-pointer transition-colors ${
+              index === currentVisibleIndex
+                ? 'text-black font-bold'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
             aria-label={`Go to image ${index + 1}`}
           >
             {index + 1}
@@ -169,11 +212,11 @@ const ZoomModal = ({
       {/* Scrollable image container - continuous scroll, no snap */}
       <div
         ref={scrollContainerRef}
-        className="w-full h-full overflow-y-auto overflow-x-hidden"
+        className="w-full h-full overflow-auto touch-pan-x touch-pan-y"
         onClick={handleContentClick}
       >
-        {/* Desktop: 90% width container with right column for navigation */}
-        <div className="xl:w-[90%] w-full mx-0">
+        {/* Desktop: 90% width centered container | Mobile: 200vw width for zoom */}
+        <div className="xl:w-[90%] w-[200vw] xl:mx-auto mx-0 mobile-image-wrapper">
           {images.map((image, index) => (
             <div
               key={image.id}
@@ -189,10 +232,11 @@ const ZoomModal = ({
                   width={6000}
                   height={6000}
                   quality={100}
-                  sizes="(max-width: 1280px) 100vw, 90vw"
-                  className="w-auto h-auto max-w-full"
+                  sizes="(max-width: 1280px) 200vw, 90vw"
+                  className="xl:w-auto xl:h-auto w-full h-auto xl:max-w-full max-w-none"
                   style={{
                     objectFit: "contain",
+                    touchAction: "manipulation",
                   }}
                   priority={index <= 2}
                   loading={index <= 2 ? undefined : "lazy"}
