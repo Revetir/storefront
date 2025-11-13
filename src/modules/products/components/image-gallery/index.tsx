@@ -223,48 +223,48 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
 
       {/* Desktop: Vertical scrolling gallery with first image centered - xl+ (1280px+) */}
       <div className="hidden xl:block w-full">
-        <div
-          className="flex flex-col gap-y-4 items-center"
-          style={{
-            paddingTop: '10vh'
-          }}
-        >
+        <div className="flex flex-col items-center">
           {images.map((image, index) => {
             return (
-              <Container
+              <div
                 key={image.id}
-                className="relative w-full overflow-hidden shadow-none bg-white px-0 py-0"
-                id={image.id}
+                className="w-full flex items-center justify-center"
                 style={{
-                  maxWidth: "100%",
-                  maxHeight: "85vh",
+                  minHeight: '100vh',
+                  height: '100vh'
                 }}
               >
-                {!!image.url && (
-                  <Image
-                    src={image.url}
-                    priority={index <= 2 ? true : false}
-                    loading={index <= 2 ? undefined : "lazy"}
-                    className="rounded-rounded"
-                    alt={getAltText(index)}
-                    width={3000}
-                    height={3000}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 50vw"
-                    style={{
-                      objectFit: "contain",
-                      width: "100%",
-                      height: "auto",
-                      maxHeight: "85vh",
-                    }}
-                    quality={95}
-                    placeholder="blur"
-                    blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
-                      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><filter id="b"><feGaussianBlur stdDeviation="12" /></filter><image preserveAspectRatio="none" filter="url(#b)" href="${image.url}" width="100%" height="100%"/></svg>`
-                    ).toString('base64')}`}
-                    onDragStart={(e) => e.preventDefault()}
-                  />
-                )}
-              </Container>
+                <Container
+                  className="relative w-full h-full overflow-hidden shadow-none bg-white px-0 py-0 flex items-center justify-center"
+                  id={image.id}
+                >
+                  {!!image.url && (
+                    <Image
+                      src={image.url}
+                      priority={index <= 2 ? true : false}
+                      loading={index <= 2 ? undefined : "lazy"}
+                      className="rounded-rounded"
+                      alt={getAltText(index)}
+                      width={3000}
+                      height={3000}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 50vw"
+                      style={{
+                        objectFit: "contain",
+                        maxWidth: "100%",
+                        maxHeight: "90vh",
+                        width: "auto",
+                        height: "auto",
+                      }}
+                      quality={95}
+                      placeholder="blur"
+                      blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
+                        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><filter id="b"><feGaussianBlur stdDeviation="12" /></filter><image preserveAspectRatio="none" filter="url(#b)" href="${image.url}" width="100%" height="100%"/></svg>`
+                      ).toString('base64')}`}
+                      onDragStart={(e) => e.preventDefault()}
+                    />
+                  )}
+                </Container>
+              </div>
             )
           })}
         </div>
