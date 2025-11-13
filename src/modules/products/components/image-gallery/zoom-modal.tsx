@@ -45,6 +45,17 @@ const ZoomModal = ({
             block: "start",
           })
         }
+
+        // Center small mobile images horizontally (for 200vw auto-zoom)
+        const container = scrollContainerRef.current
+        if (container && window.innerWidth < 640) {
+          // Small mobile: center the 200vw wide image
+          setTimeout(() => {
+            const scrollableWidth = container.scrollWidth - container.clientWidth
+            const centerX = scrollableWidth / 2
+            container.scrollLeft = centerX
+          }, 100)
+        }
       }, 50)
     } else {
       document.body.style.overflow = ""
@@ -201,23 +212,20 @@ const ZoomModal = ({
       {/* Scrollable image container - continuous scroll, no snap */}
       <div
         ref={scrollContainerRef}
-        className="w-full h-full overflow-y-auto overflow-x-hidden"
+        className="w-full h-full overflow-auto"
         onClick={handleContentClick}
-        style={{
-          WebkitOverflowScrolling: 'touch',
-        }}
       >
-        {/* Desktop: 90% width centered container | Mobile: 100% width with pinch-zoom */}
-        <div className="xl:w-[90%] w-full xl:mx-auto mx-0">
+        {/* Small mobile: 200vw auto-zoom | Larger mobile: 100vw | Desktop: 90% centered */}
+        <div className="xl:w-[90%] sm:w-full w-[200vw] xl:mx-auto mx-0">
           {images.map((image, index) => (
             <div
               key={image.id}
               ref={(el) => {
                 imageRefs.current[index] = el
               }}
-              className="w-full flex items-center justify-center py-8"
+              className="w-full flex items-center justify-center py-16"
               style={{
-                touchAction: 'pan-y pinch-zoom',
+                touchAction: 'pan-x pan-y pinch-zoom',
               }}
             >
               {!!image.url && (
@@ -227,8 +235,8 @@ const ZoomModal = ({
                   width={6000}
                   height={6000}
                   quality={100}
-                  sizes="(max-width: 1280px) 100vw, 90vw"
-                  className="xl:w-auto xl:h-auto w-full h-auto max-w-full"
+                  sizes="(max-width: 640px) 200vw, (max-width: 1280px) 100vw, 90vw"
+                  className="xl:w-auto xl:h-auto w-full h-auto xl:max-w-full max-w-none"
                   style={{
                     objectFit: "contain",
                   }}
