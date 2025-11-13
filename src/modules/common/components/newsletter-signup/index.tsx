@@ -121,7 +121,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
           <div className="mb-4 text-center">
             <p className="text-xs uppercase mb-2 font-semibold tracking-wide">EMAIL SIGNUP</p>
             <p className="text-xs text-gray-600 mb-3">
-              Sign up for newsletters and personalized shopping reminders about your Wishlist and Shopping Bag.
+              Sign up for new product drops and exclusive discounts.
             </p>
           </div>
         )}
@@ -181,7 +181,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
         isOpen={isOpen}
         close={close || (() => {})}
         size="small"
-        panelClassName="!fixed !bottom-32 !left-1/2 !-translate-x-1/2 !top-auto !max-h-[calc(100vh-200px)] !overflow-y-auto"
+        panelClassName="!fixed !bottom-20 !left-1/2 !-translate-x-1/2 !top-auto !max-h-[calc(100vh-200px)] !overflow-y-auto"
       >
         <div className="p-6">
           {!submitState.success && (
@@ -192,7 +192,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
           {renderForm()}
           {!submitState.success && showGenderOptions && (
             <p className="text-xs text-gray-500 text-center mt-6">
-              You may unsubscribe at any time.<br />
+              We never sell your information and you may unsubscribe at any time.<br />
               To find out more, please visit our{" "}
               <LocalizedClientLink href="/privacy-policy" className="underline">
                 Privacy Policy
@@ -212,7 +212,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
         {renderForm()}
         {!submitState.success && showGenderOptions && (
           <p className="text-xs text-gray-500 text-center mt-4">
-            You may unsubscribe at any time.
+            We never sell your information and you may unsubscribe at any time.
           </p>
         )}
       </div>

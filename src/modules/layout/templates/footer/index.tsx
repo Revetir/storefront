@@ -65,12 +65,13 @@ export default function Footer() {
           close={() => setIsNewsletterModalOpen(false)}
         />
 
+        {/* Divider above email signup and footer group - mobile only */}
+        <Divider className="my-6 lg:hidden" />
+
         {/* Newsletter signup - mobile only, inline version */}
         <div className="lg:hidden">
           <NewsletterSignup variant="inline" />
         </div>
-
-        <Divider className="my-6 lg:hidden" />
 
         {/* Bottom footer text and copyright on same line with normal case */}
         <div className="flex flex-wrap justify-center items-center text-gray-400 text-xs no-border py-2 mt-0 gap-x-6 gap-y-2">
