@@ -5,6 +5,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import PrivacyChoicesTrigger from "@modules/common/components/privacy-choices-trigger"
 import Divider from "@modules/common/components/divider"
 import NewsletterSignup from "@modules/common/components/newsletter-signup"
+import SocialIcons from "@modules/common/components/social-icons"
 import { trackSocialClick } from "@lib/util/analytics"
 
 export default function Footer() {
@@ -66,11 +67,16 @@ export default function Footer() {
         />
 
         {/* Divider above email signup and footer group - mobile only */}
-        <Divider className="my-6 lg:hidden" />
+        <Divider className="mt-6 mb-3 lg:hidden" />
 
         {/* Newsletter signup - mobile only, inline version */}
         <div className="lg:hidden">
           <NewsletterSignup variant="inline" />
+        </div>
+
+        {/* Social media icons - mobile only */}
+        <div className="lg:hidden py-3">
+          <SocialIcons />
         </div>
 
         {/* Bottom footer text and copyright on same line with normal case */}
