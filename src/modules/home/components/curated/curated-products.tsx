@@ -15,7 +15,7 @@ const CuratedProducts = () => {
                   src="/images/streetwear_outfit.jpg"
                   alt="Model wearing Streetwear outfit"
                   fill
-                  className="object-contain rounded-md"
+                  className="object-cover rounded-md"
                   priority={true}
                   quality={80}
                   sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -31,7 +31,7 @@ const CuratedProducts = () => {
                 src="/images/dark_luxury_outfit.jpg"
                 alt="Model wearing Dark Luxury outfit"
                 fill
-                className="object-contain rounded-md"
+                className="object-cover rounded-md"
                 priority={true}
                 quality={80}
                 sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -47,7 +47,7 @@ const CuratedProducts = () => {
                 src="/images/retro_americana_outfit.jpg"
                 alt="Model wearing Retro Americana outfit"
                 fill
-                className="object-contain rounded-md"
+                className="object-cover rounded-md"
                 quality={80}
                 sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />
@@ -62,7 +62,7 @@ const CuratedProducts = () => {
                 src="/images/minimalist_outfit.png"
                 alt="Model wearing Minimalist outfit"
                 fill
-                className="object-contain rounded-md"
+                className="object-cover rounded-md"
                 quality={80}
                 sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />
