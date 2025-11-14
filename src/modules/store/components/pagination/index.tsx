@@ -72,10 +72,10 @@ export function Pagination({
     <button
       key={p}
       className={clx(
-        "mt-5 uppercase text-lg font-sans px-3 sm:px-4 lg:px-5 py-2 cursor-pointer min-w-[40px] sm:min-w-[48px]",
+        "mt-5 uppercase text-sm font-sans px-2 sm:px-4 lg:px-5 py-1.5 sm:py-2 cursor-pointer min-w-[36px] sm:min-w-[48px]",
         {
           "font-bold text-black border-b-2 border-b-black": isCurrent,
-          "text-gray-700 hover:text-black": !isCurrent,
+          "text-gray-700 hover:text-black hover:border-b-2 hover:border-b-gray-400": !isCurrent,
         },
         isPending && "opacity-50 cursor-not-allowed"
       )}
@@ -99,7 +99,7 @@ export function Pagination({
       <button
         key="back"
         className={clx(
-          "mt-5 uppercase text-lg font-sans px-3 sm:px-4 lg:px-5 py-2 cursor-pointer whitespace-nowrap",
+          "mt-5 uppercase text-sm font-sans px-2 sm:px-4 lg:px-5 py-1.5 sm:py-2 cursor-pointer whitespace-nowrap",
           "text-gray-700 hover:text-black",
           isPending && "opacity-50 cursor-not-allowed"
         )}
@@ -120,7 +120,7 @@ export function Pagination({
       <button
         key="next"
         className={clx(
-          "mt-5 uppercase text-lg font-sans px-3 sm:px-4 lg:px-5 py-2 cursor-pointer whitespace-nowrap",
+          "mt-5 uppercase text-sm font-sans px-2 sm:px-4 lg:px-5 py-1.5 sm:py-2 cursor-pointer whitespace-nowrap",
           "text-gray-700 hover:text-black",
           isPending && "opacity-50 cursor-not-allowed"
         )}
@@ -210,7 +210,7 @@ export function Pagination({
     <div className="flex justify-center w-full mt-12 mb-8">
       <div
         className="flex items-end mb-5 w-[80%] justify-center"
-        style={{ columnGap: "clamp(0.25rem, 4vw, 1.25rem)" }}
+        style={{ columnGap: "clamp(0.125rem, 4vw, 1.25rem)" }}
         data-testid={dataTestid}
       >
         {renderBackButton()}
