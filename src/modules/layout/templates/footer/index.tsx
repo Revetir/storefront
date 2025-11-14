@@ -75,7 +75,7 @@ export default function Footer() {
         </div>
 
         {/* Social media icons - mobile only */}
-        <div className="lg:hidden py-3">
+        <div className="lg:hidden pb-3">
           <SocialIcons />
         </div>
 
