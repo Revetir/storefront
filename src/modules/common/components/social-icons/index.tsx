@@ -19,7 +19,6 @@ const SocialIcons: React.FC<SocialIconsProps> = ({ className = "" }) => {
         rel="noopener noreferrer"
         aria-label="Facebook"
         onClick={() => trackSocialClick({ platform: 'facebook' })}
-        className="hover:opacity-60 transition-opacity"
       >
         <svg
           width={iconSize}
@@ -42,7 +41,6 @@ const SocialIcons: React.FC<SocialIconsProps> = ({ className = "" }) => {
         rel="noopener noreferrer"
         aria-label="Instagram"
         onClick={() => trackSocialClick({ platform: 'instagram' })}
-        className="hover:opacity-60 transition-opacity"
       >
         <svg
           width={iconSize}
@@ -65,7 +63,6 @@ const SocialIcons: React.FC<SocialIconsProps> = ({ className = "" }) => {
         rel="noopener noreferrer"
         aria-label="TikTok"
         onClick={() => trackSocialClick({ platform: 'tiktok' })}
-        className="hover:opacity-60 transition-opacity"
       >
         <svg
           width={iconSize}

@@ -268,6 +268,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                       style={{
                         objectFit: "contain",
                         maxWidth: "100%",
+                        maxHeight: "100%",
                         width: "auto",
                         height: "auto",
                       }}

@@ -50,10 +50,10 @@ export function Pagination({
     <button
       key={p}
       className={clx(
-        "mt-5 uppercase text-lg font-sans px-3 sm:px-4 lg:px-5 py-1 cursor-pointer",
+        "mt-5 uppercase text-lg font-sans px-3 sm:px-4 lg:px-5 py-2 cursor-pointer border border-gray-300 min-w-[40px] sm:min-w-[48px]",
         {
-          "font-bold underline text-black": isCurrent,
-          "text-gray-700 hover:text-black": !isCurrent,
+          "font-bold text-black border-b-2 border-b-black": isCurrent,
+          "text-gray-700 hover:text-black hover:border-gray-400": !isCurrent,
         },
         isPending && "opacity-50 cursor-not-allowed"
       )}
@@ -68,6 +68,48 @@ export function Pagination({
       {label}
     </button>
   )
+
+  // Function to render BACK button
+  const renderBackButton = () => {
+    if (page <= 1) return null
+
+    return (
+      <button
+        key="back"
+        className={clx(
+          "mt-5 uppercase text-lg font-sans px-3 sm:px-4 lg:px-5 py-2 cursor-pointer border border-gray-300",
+          "text-gray-700 hover:text-black hover:border-gray-400",
+          isPending && "opacity-50 cursor-not-allowed"
+        )}
+        disabled={isPending}
+        onClick={() => handlePageChange(page - 1)}
+        onMouseEnter={() => prefetchPage(page - 1)}
+      >
+        &lt; BACK
+      </button>
+    )
+  }
+
+  // Function to render NEXT button
+  const renderNextButton = () => {
+    if (page >= totalPages) return null
+
+    return (
+      <button
+        key="next"
+        className={clx(
+          "mt-5 uppercase text-lg font-sans px-3 sm:px-4 lg:px-5 py-2 cursor-pointer border border-gray-300",
+          "text-gray-700 hover:text-black hover:border-gray-400",
+          isPending && "opacity-50 cursor-not-allowed"
+        )}
+        disabled={isPending}
+        onClick={() => handlePageChange(page + 1)}
+        onMouseEnter={() => prefetchPage(page + 1)}
+      >
+        NEXT &gt;
+      </button>
+    )
+  }
 
   // Function to render ellipsis
   const renderEllipsis = (key: string) => (
@@ -137,7 +179,9 @@ export function Pagination({
         style={{ columnGap: "clamp(0.25rem, 4vw, 1.25rem)" }}
         data-testid={dataTestid}
       >
+        {renderBackButton()}
         {renderPageButtons()}
+        {renderNextButton()}
       </div>
     </div>
   )
