@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { getNewestProducts } from '@lib/data/products'
 import { HttpTypes } from '@medusajs/types'
 import { getAlgoliaProductPrice, isAlgoliaProduct } from '@lib/util/get-algolia-product-price'
@@ -20,12 +20,6 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
   const [products, setProducts] = useState(initialProducts)
   const [isLoading, setIsLoading] = useState(false)
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024)
-  const [isAutoScrollPaused, setIsAutoScrollPaused] = useState(false)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null)
-  const scrollAnimationRef = useRef<number | null>(null)
-  const lastUserScrollTime = useRef<number>(0)
-  const pauseCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Track window width for responsive carousel
   useEffect(() => {
@@ -41,98 +35,8 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
     return 3 // desktop
   }
 
-  // Check if user interaction has ended and resume auto-scroll
+  // Auto-slide effect - responsive advancement
   useEffect(() => {
-    if (windowWidth >= 768) return
-
-    pauseCheckIntervalRef.current = setInterval(() => {
-      const timeSinceLastScroll = Date.now() - lastUserScrollTime.current
-      if (isAutoScrollPaused && timeSinceLastScroll >= 3000) {
-        setIsAutoScrollPaused(false)
-      }
-    }, 100)
-
-    return () => {
-      if (pauseCheckIntervalRef.current) {
-        clearInterval(pauseCheckIntervalRef.current)
-      }
-    }
-  }, [windowWidth, isAutoScrollPaused])
-
-  // Constant continuous auto-scroll for mobile - barbershop sign style
-  useEffect(() => {
-    if (windowWidth >= 768 || !scrollContainerRef.current || isAutoScrollPaused) {
-      if (scrollAnimationRef.current) {
-        cancelAnimationFrame(scrollAnimationRef.current)
-        scrollAnimationRef.current = null
-      }
-      return
-    }
-
-    const container = scrollContainerRef.current
-    let lastTimestamp = Date.now()
-
-    const animate = () => {
-      if (!scrollContainerRef.current || isAutoScrollPaused) return
-
-      const now = Date.now()
-      const deltaTime = now - lastTimestamp
-      lastTimestamp = now
-
-      const container = scrollContainerRef.current
-      const scrollWidth = container.scrollWidth
-
-      // Scroll speed: Complete entire carousel (half of duplicated content) in 10 seconds
-      // Since we duplicate products, actual scroll width is 2x, so we use scrollWidth/2
-      const totalDuration = 10000 // 10 seconds for smooth barbershop effect
-      const scrollSpeed = (scrollWidth / 2) / totalDuration // pixels per millisecond
-
-      // Increment scroll position
-      const newScrollLeft = container.scrollLeft + (deltaTime * scrollSpeed)
-
-      // Seamless infinite loop: when we reach halfway point (end of first set), reset to 0
-      const halfwayPoint = scrollWidth / 2
-
-      if (newScrollLeft >= halfwayPoint) {
-        // Reset to beginning for seamless loop
-        container.scrollLeft = newScrollLeft - halfwayPoint
-      } else {
-        container.scrollLeft = newScrollLeft
-      }
-
-      scrollAnimationRef.current = requestAnimationFrame(animate)
-    }
-
-    scrollAnimationRef.current = requestAnimationFrame(animate)
-
-    return () => {
-      if (scrollAnimationRef.current) {
-        cancelAnimationFrame(scrollAnimationRef.current)
-        scrollAnimationRef.current = null
-      }
-    }
-  }, [windowWidth, isAutoScrollPaused])
-
-  // Handle user scroll to pause auto-scroll temporarily
-  const handleScroll = () => {
-    if (windowWidth < 768) {
-      lastUserScrollTime.current = Date.now()
-      if (!isAutoScrollPaused) {
-        setIsAutoScrollPaused(true)
-        if (scrollAnimationRef.current) {
-          cancelAnimationFrame(scrollAnimationRef.current)
-          scrollAnimationRef.current = null
-        }
-      }
-    }
-  }
-
-  // Auto-slide effect for tablet/desktop - responsive advancement
-  useEffect(() => {
-    if (windowWidth < 768) {
-      return // Don't use this effect on mobile
-    }
-
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => {
         const productsPerSlide = getProductsPerSlide()
@@ -178,73 +82,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
   }, [])
 
   const productsPerSlide = getProductsPerSlide()
-  // For mobile: duplicate products for seamless infinite scroll
-  // For tablet/desktop: use sliced products with discrete jumps
-  const visibleProducts = windowWidth < 768
-    ? [...products, ...products] // Duplicate for infinite scroll
-    : products.slice(currentIndex, currentIndex + productsPerSlide)
-
-  const renderProduct = (product: HttpTypes.StoreProduct, index: number) => {
-    // Get proper pricing data like product preview does
-    let cheapestPrice
-    if (isAlgoliaProduct(product)) {
-      cheapestPrice = getAlgoliaProductPrice(product, countryCode)
-    } else {
-      const priceResult = getProductPrice({ product })
-      cheapestPrice = priceResult.cheapestPrice
-    }
-
-    return (
-      <Link
-        key={product.id}
-        href={getProductUrl((product as any).brands, product.handle || '')}
-        className="group hover:opacity-80 transition-opacity flex-shrink-0 md:flex-shrink"
-        style={windowWidth < 768 ? { width: '100%' } : undefined}
-      >
-        <div className="aspect-square relative mb-4 bg-white">
-          <Image
-            src={product.thumbnail || "/images/imgi_1_elementor-placeholder-image.png"}
-            alt={`${(product as any).brands?.[0]?.name || 'Product'} ${product.title}`}
-            fill
-            className="rounded-md object-contain"
-            priority={index < 3} // Priority loading for first 3 visible products
-            quality={80}
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
-        </div>
-        <div className="text-left">
-          <p className="text-sm text-gray-500 mb-1 uppercase tracking-wide">
-            {(product as any).brands?.[0]?.name || 'Product'}
-          </p>
-          <h3 className="font-medium text-lg mb-1">{product.title}</h3>
-          <div className="text-gray-600">
-            {cheapestPrice ? (
-              <>
-                {cheapestPrice.price_type === "sale" && "original_price" in cheapestPrice && cheapestPrice.original_price && (
-                  <Text
-                    className="line-through text-ui-fg-muted"
-                    data-testid="original-price"
-                  >
-                    {cheapestPrice.original_price}
-                  </Text>
-                )}
-                <Text
-                  className={clx("text-ui-fg-muted", {
-                    "text-ui-fg-interactive": cheapestPrice.price_type === "sale",
-                  })}
-                  data-testid="price"
-                >
-                  {cheapestPrice.calculated_price}
-                </Text>
-              </>
-            ) : (
-              'Price not available'
-            )}
-          </div>
-        </div>
-      </Link>
-    )
-  }
+  const visibleProducts = products.slice(currentIndex, currentIndex + productsPerSlide)
 
   return (
     <section className="w-full px-4 md:px-16 py-10 select-none">
@@ -255,25 +93,70 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
             <h2 className="text-2xl font-light text-center md:text-left" style={{ color: '#333' }}>SHOP NEW ARRIVALS</h2>
           </div>
 
-          {/* Products Grid/Scroll - Right Side */}
+          {/* Products Grid - Right Side */}
           <div className="md:w-2/3 lg:w-2/3">
-            <div className="relative">
-              {/* Mobile: Horizontal Scroll */}
-              <div
-                ref={scrollContainerRef}
-                onScroll={handleScroll}
-                className="md:hidden flex gap-6 overflow-x-auto no-scrollbar"
-                style={{
-                  WebkitOverflowScrolling: 'touch',
-                  willChange: 'scroll-position',
-                }}
-              >
-                {visibleProducts.map((product, index) => renderProduct(product, index))}
-              </div>
+            <div className="relative overflow-hidden">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-transform duration-500 ease-in-out">
+                {visibleProducts.map((product, index) => {
+                  // Get proper pricing data like product preview does
+                  let cheapestPrice
+                  if (isAlgoliaProduct(product)) {
+                    cheapestPrice = getAlgoliaProductPrice(product, countryCode)
+                  } else {
+                    const priceResult = getProductPrice({ product })
+                    cheapestPrice = priceResult.cheapestPrice
+                  }
 
-              {/* Tablet/Desktop: Grid */}
-              <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 transition-transform duration-500 ease-in-out">
-                {visibleProducts.map((product, index) => renderProduct(product, index))}
+                  return (
+                    <Link
+                      key={product.id}
+                      href={getProductUrl((product as any).brands, product.handle || '')}
+                      className="group hover:opacity-80 transition-opacity"
+                    >
+                    <div className="aspect-square relative mb-4 bg-white">
+                      <Image
+                        src={product.thumbnail || "/images/imgi_1_elementor-placeholder-image.png"}
+                        alt={`${(product as any).brands?.[0]?.name || 'Product'} ${product.title}`}
+                        fill
+                        className="rounded-md object-contain"
+                        priority={index < 3} // Priority loading for first 3 visible products
+                        quality={80}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm text-gray-500 mb-1 uppercase tracking-wide">
+                        {(product as any).brands?.[0]?.name || 'Product'}
+                      </p>
+                      <h3 className="font-medium text-lg mb-1">{product.title}</h3>
+                      <div className="text-gray-600">
+                        {cheapestPrice ? (
+                          <>
+                            {cheapestPrice.price_type === "sale" && "original_price" in cheapestPrice && cheapestPrice.original_price && (
+                              <Text
+                                className="line-through text-ui-fg-muted"
+                                data-testid="original-price"
+                              >
+                                {cheapestPrice.original_price}
+                              </Text>
+                            )}
+                            <Text
+                              className={clx("text-ui-fg-muted", {
+                                "text-ui-fg-interactive": cheapestPrice.price_type === "sale",
+                              })}
+                              data-testid="price"
+                            >
+                              {cheapestPrice.calculated_price}
+                            </Text>
+                          </>
+                        ) : (
+                          'Price not available'
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                  )
+                })}
               </div>
             </div>
           </div>
