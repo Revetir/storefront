@@ -5,7 +5,6 @@ import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 
 const Hero = () => {
-  const imageUrl = "/images/sale_banner.svg";
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -28,11 +27,11 @@ const Hero = () => {
           gap: "3rem",
         }}
       >
-        {/* Sale Image with Split Clickable Areas */}
-        <div style={{ width: "100%", position: "relative", maxWidth: "1240px", margin: "0 auto" }}>
+        {/* Sale Image with Split Clickable Areas - Desktop (768px+) */}
+        <div className="hidden md:block" style={{ width: "100%", position: "relative", maxWidth: "1240px", margin: "0 auto" }}>
           <div style={{ position: "relative", width: "100%", aspectRatio: "1240/620" }}>
             <Image
-              src={imageUrl}
+              src="/images/sale_banner.svg"
               alt="Designer Fashion Sale - Up To 80% Off Men and Women's Styles"
               fill
               sizes="(max-width: 1280px) 100vw, 1240px"
@@ -75,6 +74,53 @@ const Hero = () => {
           </LocalizedClientLink>
         </div>
 
+        {/* Sale Image Vertical - Mobile (<768px) */}
+        <div className="md:hidden" style={{ width: "100%", position: "relative", margin: "0 auto" }}>
+          <div style={{ position: "relative", width: "100%", aspectRatio: "620/1240" }}>
+            <Image
+              src="/images/sale_banner_vertical.svg"
+              alt="Designer Fashion Sale - Up To 80% Off Men and Women's Styles"
+              fill
+              sizes="100vw"
+              style={{
+                objectFit: "contain",
+                borderRadius: 8,
+              }}
+              priority
+            />
+          </div>
+
+          {/* Top Clickable Area - Men's */}
+          <LocalizedClientLink href="/men">
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "50%",
+                cursor: "pointer",
+              }}
+              aria-label="Shop Menswear"
+            />
+          </LocalizedClientLink>
+
+          {/* Bottom Clickable Area - Women's */}
+          <LocalizedClientLink href="/women">
+            <div
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                width: "100%",
+                height: "50%",
+                cursor: "pointer",
+              }}
+              aria-label="Shop Womenswear"
+            />
+          </LocalizedClientLink>
+        </div>
+
         {/* Mobile: Single Expandable Button (below md: 768px) */}
         <nav
           className="md:hidden w-full"
@@ -93,7 +139,7 @@ const Hero = () => {
                 textAlign: "center",
                 textTransform: "uppercase",
                 fontWeight: "300",
-                fontSize: "2rem",
+                fontSize: "clamp(1.25rem, 5vw, 2rem)",
                 color: "#000",
                 backgroundColor: "transparent",
                 border: "1px solid #000",
@@ -126,17 +172,21 @@ const Hero = () => {
               <LocalizedClientLink
                 href="/men"
                 style={{
-                  flex: 1,
-                  padding: "1.5rem 1rem",
+                  flex: "1 1 50%",
+                  width: "50%",
+                  padding: "1.5rem 0.5rem",
                   textAlign: "center",
                   textTransform: "uppercase",
                   fontWeight: "300",
-                  fontSize: "2rem",
+                  fontSize: "clamp(0.875rem, 3.5vw, 1.5rem)",
                   color: "#000",
                   textDecoration: "none",
                   cursor: "pointer",
                   borderRight: "1px solid #000",
                   transition: "background-color 200ms ease",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                 }}
                 aria-label="Shop menswear"
               >
@@ -145,16 +195,20 @@ const Hero = () => {
               <LocalizedClientLink
                 href="/women"
                 style={{
-                  flex: 1,
-                  padding: "1.5rem 1rem",
+                  flex: "1 1 50%",
+                  width: "50%",
+                  padding: "1.5rem 0.5rem",
                   textAlign: "center",
                   textTransform: "uppercase",
                   fontWeight: "300",
-                  fontSize: "2rem",
+                  fontSize: "clamp(0.875rem, 3.5vw, 1.5rem)",
                   color: "#000",
                   textDecoration: "none",
                   cursor: "pointer",
                   transition: "background-color 200ms ease",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                 }}
                 aria-label="Shop womenswear"
               >
@@ -177,18 +231,26 @@ const Hero = () => {
             href="/men"
             style={{
               flex: 1,
-              padding: "2rem 3rem",
+              padding: "2rem 1.5rem",
               textAlign: "center",
               textTransform: "uppercase",
               fontWeight: "300",
-              fontSize: "2.5rem",
+              fontSize: "clamp(1.5rem, 2.5vw, 2.5rem)",
               color: "#000",
               textDecoration: "none",
               cursor: "pointer",
               border: "1px solid #000",
               transition: "background-color 200ms ease, color 200ms ease",
+              backgroundColor: "transparent",
             }}
-            className="hover:bg-black hover:text-white"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#000";
+              e.currentTarget.style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = "#000";
+            }}
             aria-label="Shop menswear"
           >
             SHOP MENSWEAR
@@ -197,18 +259,26 @@ const Hero = () => {
             href="/women"
             style={{
               flex: 1,
-              padding: "2rem 3rem",
+              padding: "2rem 1.5rem",
               textAlign: "center",
               textTransform: "uppercase",
               fontWeight: "300",
-              fontSize: "2.5rem",
+              fontSize: "clamp(1.5rem, 2.5vw, 2.5rem)",
               color: "#000",
               textDecoration: "none",
               cursor: "pointer",
               border: "1px solid #000",
               transition: "background-color 200ms ease, color 200ms ease",
+              backgroundColor: "transparent",
             }}
-            className="hover:bg-black hover:text-white"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#000";
+              e.currentTarget.style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = "#000";
+            }}
             aria-label="Shop womenswear"
           >
             SHOP WOMENSWEAR
