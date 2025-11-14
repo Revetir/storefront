@@ -137,11 +137,11 @@ const BottomCTA = () => {
           href="/men"
           style={{
             flex: 1,
-            padding: "1.5rem 1rem",
+            padding: "1rem 0.75rem",
             textAlign: "center",
             textTransform: "uppercase",
             fontWeight: "300",
-            fontSize: "clamp(1.25rem, 2vw, 2rem)",
+            fontSize: "clamp(1rem, 1.75vw, 1.5rem)",
             color: "#000",
             textDecoration: "none",
             cursor: "pointer",
@@ -165,11 +165,11 @@ const BottomCTA = () => {
           href="/women"
           style={{
             flex: 1,
-            padding: "1.5rem 1rem",
+            padding: "1rem 0.75rem",
             textAlign: "center",
             textTransform: "uppercase",
             fontWeight: "300",
-            fontSize: "clamp(1.25rem, 2vw, 2rem)",
+            fontSize: "clamp(1rem, 1.75vw, 1.5rem)",
             color: "#000",
             textDecoration: "none",
             cursor: "pointer",

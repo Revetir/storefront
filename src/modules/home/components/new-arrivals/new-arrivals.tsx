@@ -59,7 +59,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
     }
   }, [windowWidth, isAutoScrollPaused])
 
-  // Constant continuous auto-scroll for mobile
+  // Constant continuous auto-scroll for mobile - barbershop sign style
   useEffect(() => {
     if (windowWidth >= 768 || !scrollContainerRef.current || isAutoScrollPaused) {
       if (scrollAnimationRef.current) {
@@ -70,53 +70,37 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
     }
 
     const container = scrollContainerRef.current
-    const startTime = Date.now()
-    const startScrollLeft = container.scrollLeft
+    let lastTimestamp = Date.now()
 
     const animate = () => {
       if (!scrollContainerRef.current || isAutoScrollPaused) return
 
-      const currentTime = Date.now()
-      const elapsed = currentTime - startTime
+      const now = Date.now()
+      const deltaTime = now - lastTimestamp
+      lastTimestamp = now
 
-      // Calculate scroll speed: one product width (100vw on mobile) in 3000ms
       const container = scrollContainerRef.current
-      const productWidth = container.clientWidth
-      const scrollSpeed = productWidth / 3000 // pixels per millisecond
-
-      const newScrollLeft = startScrollLeft + (elapsed * scrollSpeed)
-
-      // Check if we've reached the end (for infinite loop)
       const scrollWidth = container.scrollWidth
-      const clientWidth = container.clientWidth
-      const maxScroll = scrollWidth - clientWidth
 
-      if (newScrollLeft >= maxScroll) {
-        // Loop back to start for infinite scroll
-        container.scrollLeft = 0
-        // Restart animation from beginning
-        return requestAnimationFrame(() => {
-          const newStartTime = Date.now()
-          const newAnimate = () => {
-            if (!scrollContainerRef.current || isAutoScrollPaused) return
-            const newCurrentTime = Date.now()
-            const newElapsed = newCurrentTime - newStartTime
-            const newScrollLeft = newElapsed * scrollSpeed
+      // Scroll speed: Complete entire carousel (half of duplicated content) in 10 seconds
+      // Since we duplicate products, actual scroll width is 2x, so we use scrollWidth/2
+      const totalDuration = 10000 // 10 seconds for smooth barbershop effect
+      const scrollSpeed = (scrollWidth / 2) / totalDuration // pixels per millisecond
 
-            if (newScrollLeft >= maxScroll) {
-              scrollContainerRef.current.scrollLeft = 0
-              scrollAnimationRef.current = requestAnimationFrame(() => animate())
-            } else {
-              scrollContainerRef.current.scrollLeft = newScrollLeft
-              scrollAnimationRef.current = requestAnimationFrame(newAnimate)
-            }
-          }
-          scrollAnimationRef.current = requestAnimationFrame(newAnimate)
-        })
+      // Increment scroll position
+      const newScrollLeft = container.scrollLeft + (deltaTime * scrollSpeed)
+
+      // Seamless infinite loop: when we reach halfway point (end of first set), reset to 0
+      const halfwayPoint = scrollWidth / 2
+
+      if (newScrollLeft >= halfwayPoint) {
+        // Reset to beginning for seamless loop
+        container.scrollLeft = newScrollLeft - halfwayPoint
       } else {
         container.scrollLeft = newScrollLeft
-        scrollAnimationRef.current = requestAnimationFrame(animate)
       }
+
+      scrollAnimationRef.current = requestAnimationFrame(animate)
     }
 
     scrollAnimationRef.current = requestAnimationFrame(animate)
@@ -194,7 +178,11 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
   }, [])
 
   const productsPerSlide = getProductsPerSlide()
-  const visibleProducts = windowWidth < 768 ? products : products.slice(currentIndex, currentIndex + productsPerSlide)
+  // For mobile: duplicate products for seamless infinite scroll
+  // For tablet/desktop: use sliced products with discrete jumps
+  const visibleProducts = windowWidth < 768
+    ? [...products, ...products] // Duplicate for infinite scroll
+    : products.slice(currentIndex, currentIndex + productsPerSlide)
 
   const renderProduct = (product: HttpTypes.StoreProduct, index: number) => {
     // Get proper pricing data like product preview does
@@ -277,6 +265,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                 className="md:hidden flex gap-6 overflow-x-auto no-scrollbar"
                 style={{
                   WebkitOverflowScrolling: 'touch',
+                  willChange: 'scroll-position',
                 }}
               >
                 {visibleProducts.map((product, index) => renderProduct(product, index))}
