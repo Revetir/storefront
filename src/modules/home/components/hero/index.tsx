@@ -1,11 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 
 const Hero = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    if (!isExpanded) return;
+
+    const handleScroll = () => {
+      setIsExpanded(false);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isExpanded]);
 
   return (
     <section
@@ -74,46 +88,47 @@ const Hero = () => {
           </LocalizedClientLink>
         </div>
 
-        {/* Sale Image Vertical - Mobile (<768px) */}
+        {/* Sale Image Compact - Mobile (<768px) */}
         <div className="md:hidden" style={{ width: "100%", position: "relative", margin: "0 auto" }}>
-          <div style={{ position: "relative", width: "100%", aspectRatio: "620/1240" }}>
+          <div style={{ position: "relative", width: "100%" }}>
             <Image
-              src="/images/sale_banner_vertical.svg"
+              src="/images/sale_banner_compact.svg"
               alt="Designer Fashion Sale - Up To 80% Off Men and Women's Styles"
-              fill
-              sizes="100vw"
+              width={620}
+              height={0}
               style={{
-                objectFit: "contain",
+                width: "100%",
+                height: "auto",
                 borderRadius: 8,
               }}
               priority
             />
           </div>
 
-          {/* Top Clickable Area - Men's */}
+          {/* Left Clickable Area - Men's */}
           <LocalizedClientLink href="/men">
             <div
               style={{
                 position: "absolute",
                 top: 0,
                 left: 0,
-                width: "100%",
-                height: "50%",
+                width: "50%",
+                height: "100%",
                 cursor: "pointer",
               }}
               aria-label="Shop Menswear"
             />
           </LocalizedClientLink>
 
-          {/* Bottom Clickable Area - Women's */}
+          {/* Right Clickable Area - Women's */}
           <LocalizedClientLink href="/women">
             <div
               style={{
                 position: "absolute",
-                bottom: 0,
-                left: 0,
-                width: "100%",
-                height: "50%",
+                top: 0,
+                right: 0,
+                width: "50%",
+                height: "100%",
                 cursor: "pointer",
               }}
               aria-label="Shop Womenswear"
