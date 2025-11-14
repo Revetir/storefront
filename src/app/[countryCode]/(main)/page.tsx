@@ -1,11 +1,11 @@
 import { Metadata } from "next"
 import dynamic from "next/dynamic"
 import Hero from "@modules/home/components/hero"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import EditorialGrid from "@modules/home/components/editorial/editorial-grid"
 import { getNewestProducts } from "@lib/data/products"
+import BottomCTA from "@modules/home/components/bottom-cta"
 
 // Dynamic imports for below-the-fold components
 const NewsSection = dynamic(() => import("@modules/home/components/news/news"), {
@@ -92,51 +92,7 @@ export default async function Home(props: {
         <NewArrivals countryCode={countryCode} initialProducts={initialProducts} />
       </div>
 
-      <nav
-        style={{
-          display: "flex",
-          width: "100%",
-          maxWidth: 1280,
-          margin: "4rem auto 0 auto",
-          userSelect: "none",
-        }}
-        aria-label="Shop Menswear or Womenswear links"
-      >
-        <LocalizedClientLink
-          href="/men"
-          style={{
-            flex: 1,
-            padding: "2rem 0",
-            textAlign: "center",
-            textTransform: "uppercase",
-            fontWeight: "600",
-            fontSize: "1.75rem",
-            color: "#333",
-            textDecoration: "none",
-            cursor: "pointer",
-          }}
-          aria-label="Shop Menswear Sale"
-        >
-          Shop Menswear
-        </LocalizedClientLink>
-        <LocalizedClientLink
-          href="/women"
-          style={{
-            flex: 1,
-            padding: "2rem 0",
-            textAlign: "center",
-            textTransform: "uppercase",
-            fontWeight: "600",
-            fontSize: "1.75rem",
-            color: "#333",
-            textDecoration: "none",
-            cursor: "pointer",
-          }}
-          aria-label="Shop Womenswear Sale"
-        >
-          Shop Womenswear
-        </LocalizedClientLink>
-      </nav>
+      <BottomCTA />
     </>
   )
 }

@@ -90,7 +90,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
         <div className="flex flex-col md:flex-row md:items-center">
           {/* Header - Left Side */}
           <div className="md:w-1/3 lg:w-1/3 mb-6 md:mb-0">
-            <h2 className="text-2xl font-light text-center md:text-left" style={{ color: '#333' }}>Shop New Arrivals</h2>
+            <h2 className="text-2xl font-light text-center md:text-left" style={{ color: '#333' }}>SHOP NEW ARRIVALS</h2>
           </div>
 
           {/* Products Grid - Right Side */}
