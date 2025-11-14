@@ -107,7 +107,7 @@ export function Pagination({
         onClick={() => handlePageChange(page - 1)}
         onMouseEnter={() => prefetchPage(page - 1)}
       >
-        &lt; BACK
+        ‹ BACK
       </button>
     )
   }
@@ -128,7 +128,7 @@ export function Pagination({
         onClick={() => handlePageChange(page + 1)}
         onMouseEnter={() => prefetchPage(page + 1)}
       >
-        NEXT &gt;
+        NEXT ›
       </button>
     )
   }
@@ -155,50 +155,68 @@ export function Pagination({
         )
       )
     } else {
-      // Determine how many pages to show based on responsive breakpoint
-      const halfVisible = Math.floor(maxVisiblePages / 2)
+      // On small mobile (3 pages max), just show the pages without ellipses or last page
+      if (maxVisiblePages === 3) {
+        // Calculate which 3 pages to show centered around current page
+        let startPage = Math.max(1, page - 1)
+        let endPage = Math.min(totalPages, startPage + 2)
 
-      // Calculate threshold for showing first/last pages with ellipses
-      const nearStart = page <= halfVisible + 1
-      const nearEnd = page >= totalPages - halfVisible
-
-      if (nearStart) {
-        // Show first N pages, ..., lastpage
-        buttons.push(
-          ...arrayRange(1, maxVisiblePages).map((p) => renderPageButton(p, p, p === page))
-        )
-        buttons.push(renderEllipsis("ellipsis1"))
-        buttons.push(
-          renderPageButton(totalPages, totalPages, totalPages === page)
-        )
-      } else if (nearEnd) {
-        // Show 1, ..., last N pages
-        buttons.push(renderPageButton(1, 1, 1 === page))
-        buttons.push(renderEllipsis("ellipsis2"))
-        buttons.push(
-          ...arrayRange(totalPages - maxVisiblePages + 1, totalPages).map((p) =>
-            renderPageButton(p, p, p === page)
-          )
-        )
-      } else {
-        // Show 1, ..., surrounding pages, ..., lastpage
-        buttons.push(renderPageButton(1, 1, 1 === page))
-        buttons.push(renderEllipsis("ellipsis3"))
-
-        // Show current page and surrounding pages
-        const surroundingPages = Math.min(maxVisiblePages - 2, 3) // Reserve space for first, last, and ellipses
-        const startPage = page - Math.floor(surroundingPages / 2)
-        const endPage = page + Math.floor(surroundingPages / 2)
+        // Adjust if we're near the end
+        if (endPage === totalPages) {
+          startPage = Math.max(1, endPage - 2)
+        }
 
         buttons.push(
           ...arrayRange(startPage, endPage).map((p) =>
             renderPageButton(p, p, p === page)
           )
         )
-        buttons.push(renderEllipsis("ellipsis4"))
-        buttons.push(
-          renderPageButton(totalPages, totalPages, totalPages === page)
-        )
+      } else {
+        // Desktop/tablet logic with ellipses
+        const halfVisible = Math.floor(maxVisiblePages / 2)
+
+        // Calculate threshold for showing first/last pages with ellipses
+        const nearStart = page <= halfVisible + 1
+        const nearEnd = page >= totalPages - halfVisible
+
+        if (nearStart) {
+          // Show first N pages, ..., lastpage
+          buttons.push(
+            ...arrayRange(1, maxVisiblePages).map((p) => renderPageButton(p, p, p === page))
+          )
+          buttons.push(renderEllipsis("ellipsis1"))
+          buttons.push(
+            renderPageButton(totalPages, totalPages, totalPages === page)
+          )
+        } else if (nearEnd) {
+          // Show 1, ..., last N pages
+          buttons.push(renderPageButton(1, 1, 1 === page))
+          buttons.push(renderEllipsis("ellipsis2"))
+          buttons.push(
+            ...arrayRange(totalPages - maxVisiblePages + 1, totalPages).map((p) =>
+              renderPageButton(p, p, p === page)
+            )
+          )
+        } else {
+          // Show 1, ..., surrounding pages, ..., lastpage
+          buttons.push(renderPageButton(1, 1, 1 === page))
+          buttons.push(renderEllipsis("ellipsis3"))
+
+          // Show current page and surrounding pages
+          const surroundingPages = Math.min(maxVisiblePages - 2, 3) // Reserve space for first, last, and ellipses
+          const startPage = page - Math.floor(surroundingPages / 2)
+          const endPage = page + Math.floor(surroundingPages / 2)
+
+          buttons.push(
+            ...arrayRange(startPage, endPage).map((p) =>
+              renderPageButton(p, p, p === page)
+            )
+          )
+          buttons.push(renderEllipsis("ellipsis4"))
+          buttons.push(
+            renderPageButton(totalPages, totalPages, totalPages === page)
+          )
+        }
       }
     }
 

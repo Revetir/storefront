@@ -1,12 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 
 const Hero = () => {
-  const imageUrl =
-    "/images/sale_banner.svg";
+  const imageUrl = "/images/sale_banner.svg";
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <section
@@ -75,49 +75,143 @@ const Hero = () => {
           </LocalizedClientLink>
         </div>
 
-        {/* Links Container */}
+        {/* Mobile: Single Expandable Button (below md: 768px) */}
         <nav
+          className="md:hidden w-full"
           style={{
-            display: "flex",
-            width: "100%",
-            maxWidth: 1280,
+            maxWidth: "1280px",
             userSelect: "none",
           }}
-          aria-label="Shop Menswear or Womenswear links"
+          aria-label="Shop menswear or womenswear"
+        >
+          {!isExpanded ? (
+            <button
+              onClick={() => setIsExpanded(true)}
+              style={{
+                width: "100%",
+                padding: "1.5rem 2rem",
+                textAlign: "center",
+                textTransform: "uppercase",
+                fontWeight: "300",
+                fontSize: "2rem",
+                color: "#000",
+                backgroundColor: "transparent",
+                border: "1px solid #000",
+                cursor: "pointer",
+                transition: "all 300ms ease-in-out",
+              }}
+              aria-label="Shop all collections"
+              aria-expanded={isExpanded}
+            >
+              <span
+                style={{
+                  display: "inline-block",
+                  transition: "opacity 300ms ease-in-out, transform 300ms ease-in-out",
+                }}
+              >
+                SHOP ALL
+              </span>
+            </button>
+          ) : (
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                border: "1px solid #000",
+                animation: "fadeIn 300ms ease-in-out",
+              }}
+              role="group"
+              aria-label="Shop by category"
+            >
+              <LocalizedClientLink
+                href="/men"
+                style={{
+                  flex: 1,
+                  padding: "1.5rem 1rem",
+                  textAlign: "center",
+                  textTransform: "uppercase",
+                  fontWeight: "300",
+                  fontSize: "2rem",
+                  color: "#000",
+                  textDecoration: "none",
+                  cursor: "pointer",
+                  borderRight: "1px solid #000",
+                  transition: "background-color 200ms ease",
+                }}
+                aria-label="Shop menswear"
+              >
+                MENSWEAR
+              </LocalizedClientLink>
+              <LocalizedClientLink
+                href="/women"
+                style={{
+                  flex: 1,
+                  padding: "1.5rem 1rem",
+                  textAlign: "center",
+                  textTransform: "uppercase",
+                  fontWeight: "300",
+                  fontSize: "2rem",
+                  color: "#000",
+                  textDecoration: "none",
+                  cursor: "pointer",
+                  transition: "background-color 200ms ease",
+                }}
+                aria-label="Shop womenswear"
+              >
+                WOMENSWEAR
+              </LocalizedClientLink>
+            </div>
+          )}
+        </nav>
+
+        {/* Desktop: Two Separate Buttons (md: 768px and above) */}
+        <nav
+          className="hidden md:flex w-full gap-6"
+          style={{
+            maxWidth: "1280px",
+            userSelect: "none",
+          }}
+          aria-label="Shop menswear or womenswear"
         >
           <LocalizedClientLink
             href="/men"
             style={{
               flex: 1,
-              padding: "2rem 0",
+              padding: "2rem 3rem",
               textAlign: "center",
               textTransform: "uppercase",
-              fontWeight: "600",
-              fontSize: "1.75rem",
-              color: "#333",
+              fontWeight: "300",
+              fontSize: "2.5rem",
+              color: "#000",
               textDecoration: "none",
               cursor: "pointer",
+              border: "1px solid #000",
+              transition: "background-color 200ms ease, color 200ms ease",
             }}
-            aria-label="Shop Menswear"
+            className="hover:bg-black hover:text-white"
+            aria-label="Shop menswear"
           >
-            Shop Menswear
+            SHOP MENSWEAR
           </LocalizedClientLink>
           <LocalizedClientLink
             href="/women"
             style={{
               flex: 1,
-              padding: "2rem 0",
+              padding: "2rem 3rem",
               textAlign: "center",
               textTransform: "uppercase",
-              fontWeight: "600",
-              fontSize: "1.75rem",
-              color: "#333",
+              fontWeight: "300",
+              fontSize: "2.5rem",
+              color: "#000",
               textDecoration: "none",
               cursor: "pointer",
+              border: "1px solid #000",
+              transition: "background-color 200ms ease, color 200ms ease",
             }}
-            aria-label="Shop Womenswear"
+            className="hover:bg-black hover:text-white"
+            aria-label="Shop womenswear"
           >
-            Shop Womenswear
+            SHOP WOMENSWEAR
           </LocalizedClientLink>
         </nav>
       </div>
