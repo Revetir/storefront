@@ -2,7 +2,7 @@
 
 import { clx } from "@medusajs/ui"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useTransition } from "react"
+import { useTransition, useState, useEffect } from "react"
 
 export function Pagination({
   page,
@@ -17,6 +17,28 @@ export function Pagination({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
+  const [maxVisiblePages, setMaxVisiblePages] = useState(7)
+
+  // Detect screen size and set max visible pages
+  useEffect(() => {
+    const updateMaxPages = () => {
+      const width = window.innerWidth
+      if (width < 640) {
+        // Small mobile: 3 pages
+        setMaxVisiblePages(3)
+      } else if (width < 1024) {
+        // Large mobile/tablet: 4 pages
+        setMaxVisiblePages(4)
+      } else {
+        // Desktop: 7 pages
+        setMaxVisiblePages(7)
+      }
+    }
+
+    updateMaxPages()
+    window.addEventListener('resize', updateMaxPages)
+    return () => window.removeEventListener('resize', updateMaxPages)
+  }, [])
 
   // Helper function to generate an array of numbers within a range
   const arrayRange = (start: number, stop: number) =>
@@ -50,10 +72,10 @@ export function Pagination({
     <button
       key={p}
       className={clx(
-        "mt-5 uppercase text-lg font-sans px-3 sm:px-4 lg:px-5 py-2 cursor-pointer border border-gray-300 min-w-[40px] sm:min-w-[48px]",
+        "mt-5 uppercase text-lg font-sans px-3 sm:px-4 lg:px-5 py-2 cursor-pointer min-w-[40px] sm:min-w-[48px]",
         {
           "font-bold text-black border-b-2 border-b-black": isCurrent,
-          "text-gray-700 hover:text-black hover:border-gray-400": !isCurrent,
+          "text-gray-700 hover:text-black": !isCurrent,
         },
         isPending && "opacity-50 cursor-not-allowed"
       )}
@@ -77,8 +99,8 @@ export function Pagination({
       <button
         key="back"
         className={clx(
-          "mt-5 uppercase text-lg font-sans px-3 sm:px-4 lg:px-5 py-2 cursor-pointer border border-gray-300",
-          "text-gray-700 hover:text-black hover:border-gray-400",
+          "mt-5 uppercase text-lg font-sans px-3 sm:px-4 lg:px-5 py-2 cursor-pointer whitespace-nowrap",
+          "text-gray-700 hover:text-black",
           isPending && "opacity-50 cursor-not-allowed"
         )}
         disabled={isPending}
@@ -98,8 +120,8 @@ export function Pagination({
       <button
         key="next"
         className={clx(
-          "mt-5 uppercase text-lg font-sans px-3 sm:px-4 lg:px-5 py-2 cursor-pointer border border-gray-300",
-          "text-gray-700 hover:text-black hover:border-gray-400",
+          "mt-5 uppercase text-lg font-sans px-3 sm:px-4 lg:px-5 py-2 cursor-pointer whitespace-nowrap",
+          "text-gray-700 hover:text-black",
           isPending && "opacity-50 cursor-not-allowed"
         )}
         disabled={isPending}
@@ -125,39 +147,51 @@ export function Pagination({
   const renderPageButtons = () => {
     const buttons = []
 
-    if (totalPages <= 7) {
-      // Show all pages
+    if (totalPages <= maxVisiblePages) {
+      // Show all pages if total is within the max visible limit
       buttons.push(
         ...arrayRange(1, totalPages).map((p) =>
           renderPageButton(p, p, p === page)
         )
       )
     } else {
-      // Handle different cases for displaying pages and ellipses
-      if (page <= 4) {
-        // Show 1, 2, 3, 4, 5, ..., lastpage
+      // Determine how many pages to show based on responsive breakpoint
+      const halfVisible = Math.floor(maxVisiblePages / 2)
+
+      // Calculate threshold for showing first/last pages with ellipses
+      const nearStart = page <= halfVisible + 1
+      const nearEnd = page >= totalPages - halfVisible
+
+      if (nearStart) {
+        // Show first N pages, ..., lastpage
         buttons.push(
-          ...arrayRange(1, 5).map((p) => renderPageButton(p, p, p === page))
+          ...arrayRange(1, maxVisiblePages).map((p) => renderPageButton(p, p, p === page))
         )
         buttons.push(renderEllipsis("ellipsis1"))
         buttons.push(
           renderPageButton(totalPages, totalPages, totalPages === page)
         )
-      } else if (page >= totalPages - 3) {
-        // Show 1, ..., lastpage - 4, lastpage - 3, lastpage - 2, lastpage - 1, lastpage
+      } else if (nearEnd) {
+        // Show 1, ..., last N pages
         buttons.push(renderPageButton(1, 1, 1 === page))
         buttons.push(renderEllipsis("ellipsis2"))
         buttons.push(
-          ...arrayRange(totalPages - 4, totalPages).map((p) =>
+          ...arrayRange(totalPages - maxVisiblePages + 1, totalPages).map((p) =>
             renderPageButton(p, p, p === page)
           )
         )
       } else {
-        // Show 1, ..., page - 1, page, page + 1, ..., lastpage
+        // Show 1, ..., surrounding pages, ..., lastpage
         buttons.push(renderPageButton(1, 1, 1 === page))
         buttons.push(renderEllipsis("ellipsis3"))
+
+        // Show current page and surrounding pages
+        const surroundingPages = Math.min(maxVisiblePages - 2, 3) // Reserve space for first, last, and ellipses
+        const startPage = page - Math.floor(surroundingPages / 2)
+        const endPage = page + Math.floor(surroundingPages / 2)
+
         buttons.push(
-          ...arrayRange(page - 1, page + 1).map((p) =>
+          ...arrayRange(startPage, endPage).map((p) =>
             renderPageButton(p, p, p === page)
           )
         )
