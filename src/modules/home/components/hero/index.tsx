@@ -89,16 +89,17 @@ const Hero = () => {
         </div>
 
         {/* Sale Image Compact - Mobile (<768px) */}
-        <div className="md:hidden" style={{ width: "100%", position: "relative", margin: "0 auto" }}>
+        <div className="md:hidden" style={{ width: "100%", position: "relative", margin: "0 auto", padding: "0 0.5rem" }}>
           <div style={{ position: "relative", width: "100%" }}>
             <Image
-              src="/images/sale_banner_compact.svg"
+              src="/images/sale_banner_vertical_final.svg"
               alt="Designer Fashion Sale - Up To 80% Off Men and Women's Styles"
               width={620}
               height={0}
               style={{
                 width: "100%",
                 height: "auto",
+                objectFit: "contain",
                 borderRadius: 8,
               }}
               priority
@@ -258,11 +259,11 @@ const Hero = () => {
               transition: "background-color 200ms ease, color 200ms ease",
               backgroundColor: "transparent",
             }}
-            onMouseEnter={(e) => {
+            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
               e.currentTarget.style.backgroundColor = "#000";
               e.currentTarget.style.color = "#fff";
             }}
-            onMouseLeave={(e) => {
+            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
               e.currentTarget.style.backgroundColor = "transparent";
               e.currentTarget.style.color = "#000";
             }}
@@ -286,11 +287,11 @@ const Hero = () => {
               transition: "background-color 200ms ease, color 200ms ease",
               backgroundColor: "transparent",
             }}
-            onMouseEnter={(e) => {
+            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
               e.currentTarget.style.backgroundColor = "#000";
               e.currentTarget.style.color = "#fff";
             }}
-            onMouseLeave={(e) => {
+            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
               e.currentTarget.style.backgroundColor = "transparent";
               e.currentTarget.style.color = "#000";
             }}

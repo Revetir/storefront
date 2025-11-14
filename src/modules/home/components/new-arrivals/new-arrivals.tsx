@@ -19,13 +19,28 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [products, setProducts] = useState(initialProducts)
   const [isLoading, setIsLoading] = useState(false)
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024)
 
-  // Auto-slide effect - replace all three products at once
+  // Track window width for responsive carousel
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  // Determine how many products to show and advance based on screen size
+  const getProductsPerSlide = () => {
+    if (windowWidth < 768) return 1 // mobile
+    if (windowWidth < 1024) return 2 // tablet
+    return 3 // desktop
+  }
+
+  // Auto-slide effect - responsive advancement
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => {
-        // Move by 3 positions (replace all three products)
-        const nextIndex = prevIndex + 3
+        const productsPerSlide = getProductsPerSlide()
+        const nextIndex = prevIndex + productsPerSlide
         if (nextIndex >= products.length) {
           // Loop back to the beginning
           return 0
@@ -35,7 +50,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
     }, 3000) // Change slide every 3 seconds
 
     return () => clearInterval(interval)
-  }, [products.length])
+  }, [products.length, windowWidth])
 
   const handleNext = async () => {
     if (isLoading) return
@@ -66,30 +81,22 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
     }
   }, [])
 
-  const visibleProducts = products.slice(currentIndex, currentIndex + 3)
+  const productsPerSlide = getProductsPerSlide()
+  const visibleProducts = products.slice(currentIndex, currentIndex + productsPerSlide)
 
   return (
     <section className="w-full px-4 md:px-16 py-10 select-none">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row lg:items-center">
+        <div className="flex flex-col md:flex-row md:items-center">
           {/* Header - Left Side */}
-          <div className="lg:w-1/3">
-            <h2 className="text-3xl font-bold text-left mb-4" style={{ color: '#333' }}>NEW ARRIVALS</h2>
-            <Link 
-              href="/store?sortBy=created_at"
-              className="inline-block px-6 py-3 rounded-md transition-colors w-fit"
-              style={{ backgroundColor: '#333', color: 'white' }}
-              onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#555'}
-              onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#333'}
-            >
-              SHOP ALL
-            </Link>
+          <div className="md:w-1/3 lg:w-1/3 mb-6 md:mb-0">
+            <h2 className="text-2xl font-light text-center md:text-left" style={{ color: '#333' }}>Shop New Arrivals</h2>
           </div>
 
           {/* Products Grid - Right Side */}
-          <div className="lg:w-2/3">
+          <div className="md:w-2/3 lg:w-2/3">
             <div className="relative overflow-hidden">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 transition-transform duration-500 ease-in-out">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-transform duration-500 ease-in-out">
                 {visibleProducts.map((product, index) => {
                   // Get proper pricing data like product preview does
                   let cheapestPrice
