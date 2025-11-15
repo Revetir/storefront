@@ -221,6 +221,23 @@ img {
     background-color: #d1d5db; /* light gray */
     color: inherit;
   }
+
+  /* Infinite scroll animation */
+  @keyframes scroll-left {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Respect reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .infinite-scroll-track {
+      animation: none !important;
+    }
+  }
 }
 
 

@@ -92,7 +92,7 @@ const Hero = () => {
         <div className="md:hidden" style={{ width: "100%", position: "relative", margin: "0 auto", padding: "0 0.5rem" }}>
           <div style={{ position: "relative", width: "100%" }}>
             <Image
-              src="/images/sale_banner_vertical_final.svg"
+              src="/images/sale_banner_vertical_final_actual.svg"
               alt="Designer Fashion Sale - Up To 80% Off Men and Women's Styles"
               width={620}
               height={0}
