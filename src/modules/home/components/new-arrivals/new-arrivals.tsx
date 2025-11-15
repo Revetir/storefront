@@ -120,6 +120,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
     }
 
     e.preventDefault()
+    e.stopPropagation()
   }, [scrollOffset])
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
@@ -183,6 +184,44 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
       className="w-full py-10 select-none relative overflow-hidden"
       style={{ backgroundColor: '#fff' }}
     >
+      {/* Desktop: Horizontal heading with parallel bars */}
+      <div className="hidden md:flex items-start gap-6 px-4 mb-8">
+        {/* Heading section with bars */}
+        <div className="flex flex-col" style={{ width: 'clamp(280px, 25vw, 350px)' }}>
+          {/* Top bar */}
+          <div className="w-full h-[1px] bg-black mb-3"></div>
+
+          {/* NEW ARRIVALS text */}
+          <h2 className="text-4xl font-bold tracking-tight mb-auto">NEW ARRIVALS</h2>
+
+          {/* VIEW ALL link */}
+          <Link
+            href="/men"
+            className="text-sm uppercase tracking-wide hover:underline mb-3 inline-block"
+          >
+            VIEW ALL
+          </Link>
+
+          {/* Bottom bar */}
+          <div className="w-full h-[1px] bg-black"></div>
+        </div>
+      </div>
+
+      {/* Mobile: Vertical spine heading */}
+      <div className="md:hidden absolute left-0 top-0 bottom-0 flex items-center z-10 pl-2">
+        <div className="flex flex-col items-center border-t border-r border-b border-black py-4 px-2">
+          {'NEW ARRIVALS'.split('').map((letter, index) => (
+            <span
+              key={index}
+              className="text-sm font-bold tracking-wider"
+              style={{ writingMode: 'horizontal-tb' }}
+            >
+              {letter === ' ' ? '\u00A0' : letter}
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* Scrolling Product Cards */}
       <div
         ref={scrollTrackRef}
@@ -192,7 +231,8 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
         <div
           className="hidden md:block"
           style={{
-            cursor: isDragging ? 'grabbing' : 'grab'
+            cursor: isDragging ? 'grabbing' : 'grab',
+            userSelect: 'none'
           }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -232,6 +272,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                     e.preventDefault()
                   }
                 }}
+                onDragStart={(e) => e.preventDefault()}
               >
                 <div className="aspect-square relative mb-4 bg-white rounded-md">
                   <Image
@@ -283,7 +324,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
 
         {/* Mobile: Native horizontal scrolling */}
         <div className="md:hidden overflow-x-auto new-arrivals-scroll pb-4">
-          <div className="flex gap-8 px-4">
+          <div className="flex gap-8 pl-20 pr-4">
             {products.map((product, index) => {
               // Get proper pricing data
               let cheapestPrice
