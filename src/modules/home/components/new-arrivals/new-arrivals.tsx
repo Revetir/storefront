@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { getNewestProducts } from '@lib/data/products'
 import { HttpTypes } from '@medusajs/types'
 import { getAlgoliaProductPrice, isAlgoliaProduct } from '@lib/util/get-algolia-product-price'
@@ -18,11 +18,20 @@ interface NewArrivalsProps {
 const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
   const [products, setProducts] = useState(initialProducts)
   const [isLoading, setIsLoading] = useState(false)
-  const [isPaused, setIsPaused] = useState(false)
+
+  // Scroll state
+  const [scrollOffset, setScrollOffset] = useState(0)
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true)
+  const [isDragging, setIsDragging] = useState(false)
+  const [velocity, setVelocity] = useState(0)
+
+  // Refs
   const scrollTrackRef = useRef<HTMLDivElement>(null)
-  const [touchStart, setTouchStart] = useState<number | null>(null)
-  const [touchDelta, setTouchDelta] = useState(0)
-  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const animationFrameRef = useRef<number | null>(null)
+  const lastInteractionRef = useRef<number>(Date.now())
+  const dragStartRef = useRef<{ x: number; offset: number; time: number } | null>(null)
+  const lastDragRef = useRef<{ x: number; time: number } | null>(null)
+  const velocityRef = useRef(0)
 
   // Load 30 products on mount
   useEffect(() => {
@@ -45,137 +54,294 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
       }
     }
     loadProducts()
-  }, [countryCode])
+  }, [countryCode, products.length])
 
-  // Handle touch start
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.touches[0].clientX)
-    setIsPaused(true)
-    if (pauseTimeoutRef.current) {
-      clearTimeout(pauseTimeoutRef.current)
-    }
-  }
+  // Calculate total width for infinite scroll
+  const cardWidth = 350 // approximate max card width including gap
+  const totalWidth = products.length * cardWidth
 
-  // Handle touch move
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStart === null) return
-    const currentTouch = e.touches[0].clientX
-    setTouchDelta(touchStart - currentTouch)
-  }
-
-  // Handle touch end - resume scrolling after delay
-  const handleTouchEnd = () => {
-    setTouchStart(null)
-    setTouchDelta(0)
-
-    // Resume auto-scroll after 3 seconds of no interaction
-    pauseTimeoutRef.current = setTimeout(() => {
-      setIsPaused(false)
-    }, 3000)
-  }
-
-  // Manual scroll controls
-  const handlePause = () => {
-    setIsPaused(!isPaused)
-  }
-
-  const handleScrollLeft = () => {
-    if (scrollTrackRef.current) {
-      scrollTrackRef.current.scrollBy({ left: -320, behavior: 'smooth' })
-      setIsPaused(true)
-      if (pauseTimeoutRef.current) {
-        clearTimeout(pauseTimeoutRef.current)
-      }
-      pauseTimeoutRef.current = setTimeout(() => {
-        setIsPaused(false)
-      }, 3000)
-    }
-  }
-
-  const handleScrollRight = () => {
-    if (scrollTrackRef.current) {
-      scrollTrackRef.current.scrollBy({ left: 320, behavior: 'smooth' })
-      setIsPaused(true)
-      if (pauseTimeoutRef.current) {
-        clearTimeout(pauseTimeoutRef.current)
-      }
-      pauseTimeoutRef.current = setTimeout(() => {
-        setIsPaused(false)
-      }, 3000)
-    }
-  }
-
-  // Cleanup timeout on unmount
+  // Auto-scroll and momentum animation loop
   useEffect(() => {
+    const animate = () => {
+      const now = Date.now()
+      const timeSinceInteraction = now - lastInteractionRef.current
+
+      // Resume auto-scroll after 3 seconds of no interaction
+      if (!isAutoScrolling && timeSinceInteraction > 3000 && !isDragging) {
+        setIsAutoScrolling(true)
+      }
+
+      setScrollOffset(prevOffset => {
+        let newOffset = prevOffset
+
+        if (isAutoScrolling && !isDragging) {
+          // Auto-scroll: faster speed (2s per product = ~175px/s for 350px cards)
+          const autoScrollSpeed = 1.5 // pixels per frame at 60fps (~90px/s)
+          newOffset = prevOffset + autoScrollSpeed
+        } else if (velocityRef.current !== 0) {
+          // Apply momentum with medium decay
+          newOffset = prevOffset + velocityRef.current
+          velocityRef.current *= 0.92 // Medium decay (8% reduction per frame)
+
+          // Stop momentum when velocity is very small
+          if (Math.abs(velocityRef.current) < 0.1) {
+            velocityRef.current = 0
+            setVelocity(0)
+          } else {
+            setVelocity(velocityRef.current)
+          }
+        }
+
+        // Handle infinite loop: reset when we've scrolled through 2/3 of the tripled array
+        if (newOffset >= totalWidth * 2) {
+          return newOffset - totalWidth
+        } else if (newOffset < 0) {
+          return totalWidth + newOffset
+        }
+
+        return newOffset
+      })
+
+      animationFrameRef.current = requestAnimationFrame(animate)
+    }
+
+    animationFrameRef.current = requestAnimationFrame(animate)
+
     return () => {
-      if (pauseTimeoutRef.current) {
-        clearTimeout(pauseTimeoutRef.current)
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
       }
     }
+  }, [isAutoScrolling, isDragging, totalWidth])
+
+  // Pause auto-scroll and update last interaction time
+  const pauseAutoScroll = useCallback(() => {
+    setIsAutoScrolling(false)
+    lastInteractionRef.current = Date.now()
   }, [])
+
+  // Mouse/Desktop drag handlers
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // Prevent dragging on links/buttons
+    if ((e.target as HTMLElement).closest('a')) return
+
+    setIsDragging(true)
+    pauseAutoScroll()
+    velocityRef.current = 0
+    setVelocity(0)
+
+    dragStartRef.current = {
+      x: e.clientX,
+      offset: scrollOffset,
+      time: Date.now()
+    }
+    lastDragRef.current = {
+      x: e.clientX,
+      time: Date.now()
+    }
+
+    e.preventDefault()
+  }, [scrollOffset, pauseAutoScroll])
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDragging || !dragStartRef.current || !lastDragRef.current) return
+
+    const deltaX = e.clientX - dragStartRef.current.x
+    const newOffset = dragStartRef.current.offset - deltaX
+
+    setScrollOffset(newOffset)
+
+    // Calculate velocity for momentum
+    const timeDelta = Date.now() - lastDragRef.current.time
+    if (timeDelta > 0) {
+      const xDelta = e.clientX - lastDragRef.current.x
+      velocityRef.current = -(xDelta / timeDelta) * 16 // Convert to pixels per frame
+    }
+
+    lastDragRef.current = {
+      x: e.clientX,
+      time: Date.now()
+    }
+    lastInteractionRef.current = Date.now()
+
+    e.preventDefault()
+  }, [isDragging])
+
+  const handleMouseUp = useCallback(() => {
+    if (!isDragging) return
+
+    setIsDragging(false)
+    dragStartRef.current = null
+    lastInteractionRef.current = Date.now()
+
+    // Velocity is already set from handleMouseMove
+    setVelocity(velocityRef.current)
+  }, [isDragging])
+
+  const handleMouseLeave = useCallback(() => {
+    if (isDragging) {
+      setIsDragging(false)
+      dragStartRef.current = null
+      lastInteractionRef.current = Date.now()
+    }
+  }, [isDragging])
+
+  // Touch/Mobile swipe handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    pauseAutoScroll()
+    setIsDragging(true)
+    velocityRef.current = 0
+    setVelocity(0)
+
+    dragStartRef.current = {
+      x: e.touches[0].clientX,
+      offset: scrollOffset,
+      time: Date.now()
+    }
+    lastDragRef.current = {
+      x: e.touches[0].clientX,
+      time: Date.now()
+    }
+  }, [scrollOffset, pauseAutoScroll])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!dragStartRef.current || !lastDragRef.current) return
+
+    const touch = e.touches[0]
+    const deltaX = touch.clientX - dragStartRef.current.x
+    const newOffset = dragStartRef.current.offset - deltaX
+
+    setScrollOffset(newOffset)
+
+    // Calculate velocity for momentum
+    const timeDelta = Date.now() - lastDragRef.current.time
+    if (timeDelta > 0) {
+      const xDelta = touch.clientX - lastDragRef.current.x
+      velocityRef.current = -(xDelta / timeDelta) * 16 // Convert to pixels per frame
+    }
+
+    lastDragRef.current = {
+      x: touch.clientX,
+      time: Date.now()
+    }
+    lastInteractionRef.current = Date.now()
+  }, [])
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false)
+    dragStartRef.current = null
+    lastInteractionRef.current = Date.now()
+
+    // Velocity is already set from handleTouchMove
+    setVelocity(velocityRef.current)
+  }, [])
+
+  // Hover handlers for desktop
+  const handleMouseEnter = useCallback(() => {
+    pauseAutoScroll()
+  }, [pauseAutoScroll])
+
+  // Global mouse up listener (in case mouse up happens outside component)
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      if (isDragging) {
+        setIsDragging(false)
+        dragStartRef.current = null
+        lastInteractionRef.current = Date.now()
+      }
+    }
+
+    window.addEventListener('mouseup', handleGlobalMouseUp)
+    return () => window.removeEventListener('mouseup', handleGlobalMouseUp)
+  }, [isDragging])
 
   // Triple the products array for seamless infinite loop
   const infiniteProducts = [...products, ...products, ...products]
 
-  // Calculate animation duration based on number of products (medium speed)
-  // Approximately 3-4 seconds per product for smooth viewing
-  const animationDuration = products.length * 3.5
+  // Microticker state
+  const [topTickerOffset, setTopTickerOffset] = useState(0)
+  const [bottomTickerOffset, setBottomTickerOffset] = useState(0)
+  const tickerAnimationRef = useRef<number | null>(null)
+
+  // Ticker text (repeated for seamless loop)
+  const tickerText = 'NEW ARRIVALS ▪ JUST DROPPED ▪ NEW IN ▪ UPDATED DAILY ▪ RESTOCKED'
+  const tickerContent = Array.from({ length: 10 }).map(() => tickerText).join(' ▪ ')
+
+  // Ticker auto-scroll animation (50% slower than product scroll)
+  useEffect(() => {
+    const animateTickers = () => {
+      const tickerSpeed = 0.75 // 50% of product auto-scroll speed (1.5)
+
+      setTopTickerOffset(prev => {
+        // Top ticker scrolls left (same direction as products)
+        const newOffset = prev + tickerSpeed
+        // Reset when scrolled one full repetition
+        if (newOffset >= 5000) return 0
+        return newOffset
+      })
+
+      setBottomTickerOffset(prev => {
+        // Bottom ticker scrolls right (opposite direction)
+        const newOffset = prev - tickerSpeed
+        // Reset when scrolled one full repetition
+        if (newOffset <= -5000) return 0
+        return newOffset
+      })
+
+      tickerAnimationRef.current = requestAnimationFrame(animateTickers)
+    }
+
+    tickerAnimationRef.current = requestAnimationFrame(animateTickers)
+
+    return () => {
+      if (tickerAnimationRef.current) {
+        cancelAnimationFrame(tickerAnimationRef.current)
+      }
+    }
+  }, [])
 
   return (
     <section
       className="w-full py-10 select-none relative overflow-hidden"
       style={{ backgroundColor: '#fff' }}
     >
-      {/* Background Pattern - "NEW ARRIVALS" repeated text */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 200px,
-            rgba(0, 0, 0, 0.02) 200px,
-            rgba(0, 0, 0, 0.02) 400px
-          )`,
-          zIndex: 0
-        }}
-      >
+      {/* Top Microticker Strip - Scrolls Left */}
+      <div className="w-full overflow-hidden mb-4" style={{ userSelect: 'none' }}>
         <div
-          className="absolute inset-0 flex flex-wrap items-center justify-center"
+          className="whitespace-nowrap text-sm font-bold tracking-wider py-2"
           style={{
-            transform: 'rotate(-15deg) scale(1.5)',
-            opacity: 0.04,
-            fontWeight: 700,
-            fontSize: 'clamp(2rem, 5vw, 4rem)',
-            letterSpacing: '0.2em',
-            lineHeight: 2,
-            color: '#000',
-            userSelect: 'none'
+            transform: `translateX(-${topTickerOffset}px)`,
+            willChange: 'transform',
+            color: '#000'
           }}
         >
-          {Array.from({ length: 50 }).map((_, i) => (
-            <span key={i} style={{ margin: '0 2rem' }}>NEW ARRIVALS</span>
-          ))}
+          {tickerContent}
         </div>
       </div>
 
       {/* Scrolling Product Cards */}
       <div
-        className="relative"
-        style={{ zIndex: 1 }}
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
+        ref={scrollTrackRef}
+        className="relative overflow-hidden"
+        style={{
+          zIndex: 1,
+          cursor: isDragging ? 'grabbing' : 'grab'
+        }}
+        onMouseEnter={handleMouseEnter}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
         <div
-          ref={scrollTrackRef}
-          className="infinite-scroll-track flex gap-8 px-4"
+          className="flex gap-8 px-4"
           style={{
-            animation: isPaused ? 'none' : `scroll-left ${animationDuration}s linear infinite`,
+            transform: `translateX(-${scrollOffset}px)`,
             willChange: 'transform',
-            transform: touchDelta !== 0 ? `translateX(-${touchDelta}px)` : undefined
+            transition: isDragging ? 'none' : undefined
           }}
         >
           {infiniteProducts.map((product, index) => {
@@ -195,9 +361,16 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                 className="group hover:opacity-80 transition-opacity flex-shrink-0"
                 style={{
                   width: 'clamp(280px, 25vw, 350px)',
+                  pointerEvents: isDragging ? 'none' : 'auto'
+                }}
+                onClick={(e) => {
+                  // Prevent navigation if this was a drag
+                  if (dragStartRef.current && Math.abs(velocityRef.current) > 0.5) {
+                    e.preventDefault()
+                  }
                 }}
               >
-                <div className="aspect-square relative mb-4 bg-white">
+                <div className="aspect-square relative mb-4 bg-white rounded-md shadow-sm">
                   <Image
                     src={product.thumbnail || "/images/imgi_1_elementor-placeholder-image.png"}
                     alt={`${(product as any).brands?.[0]?.name || 'Product'} ${product.title}`}
@@ -206,6 +379,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                     loading="lazy"
                     quality={80}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    draggable={false}
                   />
                 </div>
                 <div className="text-left">
@@ -244,52 +418,23 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
         </div>
       </div>
 
-      {/* Controls */}
-      <div
-        className="flex items-center justify-center gap-4 mt-8"
-        style={{ zIndex: 2, position: 'relative' }}
-      >
-        <button
-          onClick={handleScrollLeft}
-          className="p-3 rounded-full border border-gray-300 hover:bg-gray-100 transition-colors"
-          aria-label="Scroll left"
+      {/* Bottom Microticker Strip - Scrolls Right */}
+      <div className="w-full overflow-hidden mt-4" style={{ userSelect: 'none' }}>
+        <div
+          className="whitespace-nowrap text-sm font-bold tracking-wider py-2"
+          style={{
+            transform: `translateX(${bottomTickerOffset}px)`,
+            willChange: 'transform',
+            color: '#000'
+          }}
         >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="12,4 6,10 12,16" />
-          </svg>
-        </button>
-
-        <button
-          onClick={handlePause}
-          className="p-3 rounded-full border border-gray-300 hover:bg-gray-100 transition-colors"
-          aria-label={isPaused ? "Play" : "Pause"}
-        >
-          {isPaused ? (
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <polygon points="5,3 5,17 15,10" />
-            </svg>
-          ) : (
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <rect x="5" y="3" width="3" height="14" />
-              <rect x="12" y="3" width="3" height="14" />
-            </svg>
-          )}
-        </button>
-
-        <button
-          onClick={handleScrollRight}
-          className="p-3 rounded-full border border-gray-300 hover:bg-gray-100 transition-colors"
-          aria-label="Scroll right"
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="8,4 14,10 8,16" />
-          </svg>
-        </button>
+          {tickerContent}
+        </div>
       </div>
 
       {/* Screen reader announcement for auto-scrolling */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
-        {isPaused ? 'Scrolling paused' : 'Auto-scrolling active'}
+        {isAutoScrolling ? 'Auto-scrolling active. Hover or touch to pause.' : 'Scrolling paused'}
       </div>
     </section>
   )
