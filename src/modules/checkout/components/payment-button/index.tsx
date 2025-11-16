@@ -58,7 +58,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       }
       // Show loading state while waiting for Stripe to initialize
       return (
-        <Button disabled className="uppercase !rounded-none !bg-white !text-black !border !border-black hover:!bg-black hover:!text-white" data-testid={dataTestId}>
+        <Button disabled className="uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200" data-testid={dataTestId}>
           Loading payment...
         </Button>
       )
@@ -67,7 +67,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         <ManualTestPaymentButton notReady={notReady} cart={cart} data-testid={dataTestId} />
       )
     default:
-      return <Button disabled className="uppercase !rounded-none !bg-white !text-black !border !border-black hover:!bg-black hover:!text-white">Select a payment method</Button>
+      return <Button disabled className="uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200">Select a payment method</Button>
   }
 }
 
@@ -271,7 +271,7 @@ const StripePaymentButton = ({
           size="large"
           isLoading={submitting}
           data-testid={dataTestId}
-          className="w-full uppercase !rounded-none !bg-white !text-black !border !border-black hover:!bg-black hover:!text-white"
+          className="w-full uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200"
         >
           {buttonText}
         </Button>
@@ -325,7 +325,7 @@ const ManualTestPaymentButton = ({ notReady, cart }: { notReady: boolean, cart: 
         onClick={handlePayment}
         size="large"
         data-testid="submit-order-button"
-        className="w-full uppercase !rounded-none !bg-white !text-black !border !border-black hover:!bg-black hover:!text-white"
+        className="w-full uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200"
       >
         Place order
       </Button>

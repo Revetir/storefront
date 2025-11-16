@@ -408,7 +408,7 @@ const ShippingAddress = ({
             required
             data-testid="shipping-first-name-input"
             className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-              errors["shipping_address.first_name"] ? 'border-red-500' : 'border-gray-300'
+              errors["shipping_address.first_name"] ? 'border-red-500' : 'border-black'
             }`}
           />
           {errors["shipping_address.first_name"] && (
@@ -430,7 +430,7 @@ const ShippingAddress = ({
             required
             data-testid="shipping-last-name-input"
             className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-              errors["shipping_address.last_name"] ? 'border-red-500' : 'border-gray-300'
+              errors["shipping_address.last_name"] ? 'border-red-500' : 'border-black'
             }`}
           />
           {errors["shipping_address.last_name"] && (
@@ -471,7 +471,7 @@ const ShippingAddress = ({
               value={formData["shipping_address.address_2"]}
               onChange={handleChange}
               data-testid="shipping-address-2-input"
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full px-3 py-2 border border-black focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             />
           </div>
           <div className="w-3/5">
@@ -486,7 +486,7 @@ const ShippingAddress = ({
               onChange={handleChange}
               autoComplete="organization"
               data-testid="shipping-company-input"
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full px-3 py-2 border border-black focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             />
           </div>
         </div>
@@ -505,7 +505,7 @@ const ShippingAddress = ({
             required
             data-testid="shipping-city-input"
             className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-              errors["shipping_address.city"] ? 'border-red-500' : 'border-gray-300'
+              errors["shipping_address.city"] ? 'border-red-500' : 'border-black'
             }`}
           />
           {errors["shipping_address.city"] && (
@@ -528,7 +528,7 @@ const ShippingAddress = ({
               required
               data-testid="shipping-province-input"
               className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-                errors["shipping_address.province"] ? 'border-red-500' : 'border-gray-300'
+                errors["shipping_address.province"] ? 'border-red-500' : 'border-black'
               }`}
             >
               <option value="">Select a state</option>
@@ -557,7 +557,7 @@ const ShippingAddress = ({
               required
               data-testid="shipping-postal-code-input"
               className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-                errors["shipping_address.postal_code"] ? 'border-red-500' : 'border-gray-300'
+                errors["shipping_address.postal_code"] ? 'border-red-500' : 'border-black'
               }`}
             />
             {errors["shipping_address.postal_code"] && (
@@ -580,7 +580,7 @@ const ShippingAddress = ({
             required
             data-testid="shipping-country-select"
             className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-              errors["shipping_address.country_code"] ? 'border-red-500' : 'border-gray-300'
+              errors["shipping_address.country_code"] ? 'border-red-500' : 'border-black'
             }`}
           >
             <option value="">Select a country</option>
@@ -622,7 +622,7 @@ const ShippingAddress = ({
             required
             data-testid="shipping-email-input"
             className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-              errors["email"] ? 'border-red-500' : 'border-gray-300'
+              errors["email"] ? 'border-red-500' : 'border-black'
             }`}
           />
           {errors["email"] && (
@@ -645,7 +645,7 @@ const ShippingAddress = ({
             required
             data-testid="shipping-phone-input"
             className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-              errors["shipping_address.phone"] ? 'border-red-500' : 'border-gray-300'
+              errors["shipping_address.phone"] ? 'border-red-500' : 'border-black'
             }`}
           />
           {errors["shipping_address.phone"] && (

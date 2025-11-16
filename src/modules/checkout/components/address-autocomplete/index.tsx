@@ -307,8 +307,8 @@ const AddressAutocomplete = React.forwardRef<
             height: auto !important;
             margin-top: 0 !important;
             background-color: transparent !important;
-            border: 1px solid rgb(209, 213, 219) !important;
-            border-radius: 0.375rem !important;
+            border: 1px solid black !important;
+            border-radius: 0 !important;
             appearance: none !important;
             box-sizing: border-box !important;
             font-size: 0.875rem !important;

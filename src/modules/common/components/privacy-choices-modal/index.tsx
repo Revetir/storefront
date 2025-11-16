@@ -148,7 +148,7 @@ const PrivacyChoicesModal: React.FC<PrivacyChoicesModalProps> = ({
               <Button
                 variant="secondary"
                 onClick={handleAcceptAll}
-                className="text-sm !rounded-none !bg-white !text-black !border !border-black hover:!bg-black hover:!text-white"
+                className="text-sm !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200"
               >
                 Accept All
               </Button>
@@ -222,7 +222,7 @@ const PrivacyChoicesModal: React.FC<PrivacyChoicesModalProps> = ({
           <div className="flex justify-end w-full">
             <Button
               onClick={handleSavePreferences}
-              className="text-sm !rounded-none !bg-white !text-black !border !border-black hover:!bg-black hover:!text-white"
+              className="text-sm !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200"
             >
               Confirm my choices
             </Button>

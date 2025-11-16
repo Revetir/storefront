@@ -133,9 +133,9 @@ export default function ContactUsPage() {
                 onChange={handleInputChange}
                 onInvalid={handleInvalid}
                 required
-                className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent ${
-                  errors.request ? 'border-red-500' : 'border-gray-300'
-                }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                    errors.request ? 'border-red-500' : 'border-black'
+                  }`}
               >
                 <option value="" disabled>How can we help you?</option>
                 <option value="I want to modify or cancel my order">I want to modify or cancel my order</option>
@@ -167,7 +167,7 @@ export default function ContactUsPage() {
                   onInvalid={handleInvalid}
                   required
                   className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-                    errors.name ? 'border-red-500' : 'border-gray-300'
+                    errors.name ? 'border-red-500' : 'border-black'
                   }`}
                 />
                 {errors.name && (
@@ -185,7 +185,7 @@ export default function ContactUsPage() {
                   name="orderNumber"
                   value={formData.orderNumber}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-full px-3 py-2 border border-black focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                 />
               </div>
             </div>
@@ -203,9 +203,9 @@ export default function ContactUsPage() {
                 onBlur={handleBlur}
                 onInvalid={handleInvalid}
                 required
-                className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-                  errors.email ? 'border-red-500' : 'border-gray-300'
-                }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                    errors.email ? 'border-red-500' : 'border-black'
+                  }`}
               />
               {errors.email && (
                 <p className="text-red-500 text-xs mt-1">{errors.email}</p>
@@ -238,9 +238,9 @@ export default function ContactUsPage() {
                 onInvalid={handleInvalid}
                 required
                 rows={6}
-                className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-                  errors.message ? 'border-red-500' : 'border-gray-300'
-                }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                    errors.message ? 'border-red-500' : 'border-black'
+                  }`}
               />
               {errors.message && (
                 <p className="text-red-500 text-xs mt-1">Please enter a message</p>
@@ -250,7 +250,7 @@ export default function ContactUsPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-black text-white py-2 px-6 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full uppercase bg-black text-white py-2 px-6 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSubmitting ? "Sending..." : "Send"}
             </button>

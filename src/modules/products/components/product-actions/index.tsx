@@ -134,9 +134,9 @@ export default function ProductActions({
         product_name: product.title,
         brand: (product as any)?.brands?.[0]?.name,
         variant_id: selectedVariant.id,
-        variant_name: selectedVariant.title,
-        price: selectedVariant.calculated_price?.calculated_amount,
-        currency: selectedVariant.calculated_price?.currency_code,
+        variant_name: selectedVariant.title ?? undefined,
+        price: selectedVariant.calculated_price?.calculated_amount ?? undefined,
+        currency: selectedVariant.calculated_price?.currency_code ?? undefined,
         quantity: 1,
       })
     } catch (error) {
@@ -182,7 +182,7 @@ export default function ProductActions({
           !isValidVariant
         }
         variant="primary"
-        className="w-full h-10"
+        className="w-full h-10 !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200"
         isLoading={isAdding}
         data-testid="add-product-button"
       >

@@ -50,7 +50,7 @@ const Summary = ({ cart }: SummaryProps) => {
         data-testid="checkout-button"
         onClick={handleCheckoutClick}
       >
-        <Button className="mt-2 w-full h-10 uppercase !rounded-none !bg-white !text-black !border !border-black hover:!bg-black hover:!text-white">Continue to checkout</Button>
+        <Button className="mt-2 w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200">Continue to checkout</Button>
       </LocalizedClientLink>
       <AcceptedPaymentMethods />
     </div>

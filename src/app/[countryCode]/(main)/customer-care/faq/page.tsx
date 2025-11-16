@@ -218,13 +218,13 @@ export default function FAQPage() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold mb-10">Frequently Asked Questions</h1>
+      <h1 className="text-3xl font-bold mb-10">FAQ</h1>
 
         {/* FAQ Categories */}
         <div className="space-y-8">
           {faqData.map((category, categoryIndex) => (
             <div key={categoryIndex} id={`category-${categoryIndex}`}>
-              <h2 className="text-2xl font-semibold mb-6 text-gray-900 border-b border-gray-200 pb-2">
+              <h2 className="text-2xl font-semibold mb-6 text-gray-900 border-b border-black pb-2">
                 {category.title}
               </h2>
               
@@ -236,7 +236,7 @@ export default function FAQPage() {
                   return (
                     <div
                       key={itemIndex}
-                      className="border border-gray-200 overflow-hidden"
+                      className="border border-black overflow-hidden"
                     >
                       <button
                         onClick={() => toggleItem(categoryIndex, itemIndex)}

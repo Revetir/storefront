@@ -232,7 +232,7 @@ const CartDropdown = ({
                     </div>
                     <LocalizedClientLink href="/bag" passHref>
                       <Button
-                        className="w-full uppercase !rounded-none !bg-white !text-black !border !border-black hover:!bg-black hover:!text-white"
+                        className="w-full uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200"
                         size="large"
                         data-testid="go-to-cart-button"
                       >

@@ -11,21 +11,21 @@ const Menu = ({ className }: { className?: string }) => {
       className={className}
     >
       <path
-        d="M3 12H21"
+        d="M3 12.5H21"
         stroke="currentColor"
         strokeWidth="1"
         strokeLinecap="square"
         strokeLinejoin="miter"
       />
       <path
-        d="M3 6H21"
+        d="M3 6.5H21"
         stroke="currentColor"
         strokeWidth="1"
         strokeLinecap="square"
         strokeLinejoin="miter"
       />
       <path
-        d="M3 18H21"
+        d="M3 18.5H21"
         stroke="currentColor"
         strokeWidth="1"
         strokeLinecap="square"

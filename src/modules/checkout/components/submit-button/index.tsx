@@ -20,7 +20,7 @@ export function SubmitButton({
   return (
     <Button
       size="large"
-      className={className}
+      className={`!rounded-none ${className || ''}`}
       type="submit"
       isLoading={pending}
       variant={variant || "primary"}

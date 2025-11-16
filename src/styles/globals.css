@@ -247,6 +247,11 @@ img {
     color: inherit;
   }
 
+  /* Custom list markers */
+  li::marker {
+    content: "▪ ";
+  }
+
   /* Infinite scroll animation */
   @keyframes scroll-left {
     0% {

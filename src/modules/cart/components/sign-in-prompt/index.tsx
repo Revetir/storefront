@@ -14,7 +14,7 @@ const SignInPrompt = () => {
       </div>
       <div className="flex-shrink-0">
         <LocalizedClientLink href="/account">
-          <Button variant="secondary" className="h-10 uppercase whitespace-nowrap" data-testid="sign-in-button">
+          <Button variant="secondary" className="h-10 uppercase whitespace-nowrap !rounded-none !border !border-black" data-testid="sign-in-button">
             Sign in
           </Button>
         </LocalizedClientLink>
