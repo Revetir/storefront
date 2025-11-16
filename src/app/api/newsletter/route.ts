@@ -33,35 +33,22 @@ export async function POST(request: NextRequest) {
 
     // Proxy to Medusa backend
     try {
-      const resp = await sdk.client.fetch(`/store/newsletter`, {
+      const data = await sdk.client.fetch(`/store/newsletter`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: {
           email,
           gender_preference,
         },
-      }) as Response
+      })
 
-      // If backend returns an error, bubble it up
-      if (!resp.ok) {
-        let errText: string | undefined
-        try {
-          const data = await resp.json()
-          errText = (data as any)?.error
-        } catch {}
-        return NextResponse.json(
-          { error: errText || "Failed to subscribe. Please try again." },
-          { status: resp.status }
-        )
-      }
-
-      const data = await resp.json()
       return NextResponse.json(data, { status: 200 })
     } catch (err: any) {
       console.error("Failed to proxy newsletter subscription:", err)
+      // SDK throws FetchError with status property for HTTP errors
+      const status = err?.status || 500
       return NextResponse.json(
         { error: err?.message || "Failed to subscribe. Please try again." },
-        { status: 500 }
+        { status }
       )
     }
   } catch (error) {

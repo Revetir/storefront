@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const { request: requestType, name, email, orderNumber, subject, message } = body
 
     // Validate required fields
-    if (!requestType || !name || !email || !subject || !message) {
+    if (!requestType || !name || !email || !message) {
       return NextResponse.json(
         { error: "All required fields must be filled" },
         { status: 400 }
@@ -25,9 +25,8 @@ export async function POST(request: NextRequest) {
 
     // Proxy to Medusa backend to send via Resend provider
     try {
-      const resp = await sdk.client.fetch(`/store/contact`, {
+      await sdk.client.fetch(`/store/contact`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: {
           request: requestType,
           name,
@@ -36,32 +35,21 @@ export async function POST(request: NextRequest) {
           subject,
           message,
         },
-      }) as Response
+      })
 
-      // If backend returns an error, bubble it up
-      if (!resp.ok) {
-        let errText: string | undefined
-        try {
-          const data = await resp.json()
-          errText = (data as any)?.error
-        } catch {}
-        return NextResponse.json(
-          { error: errText || "Failed to send message. Please try again." },
-          { status: resp.status }
-        )
-      }
+      return NextResponse.json(
+        { message: "Message sent successfully!" },
+        { status: 200 }
+      )
     } catch (err: any) {
       console.error("Failed to proxy contact message:", err)
+      // SDK throws FetchError with status property for HTTP errors
+      const status = err?.status || 500
       return NextResponse.json(
         { error: err?.message || "Failed to send message. Please try again." },
-        { status: 500 }
+        { status }
       )
     }
-
-    return NextResponse.json(
-      { message: "Message sent successfully!" },
-      { status: 200 }
-    )
   } catch (error) {
     console.error("Contact form error:", error)
     return NextResponse.json(
