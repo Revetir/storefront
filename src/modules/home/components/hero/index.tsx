@@ -89,10 +89,10 @@ const Hero = () => {
         </div>
 
         {/* Sale Image Compact - Mobile (<768px) */}
-        <div className="md:hidden" style={{ width: "100%", position: "relative", margin: "0 auto", padding: "0 0.5rem" }}>
-          <div style={{ position: "relative", width: "100%" }}>
+        <div className="md:hidden" style={{ width: "100%", position: "relative", margin: "0 auto", padding: "0 0.25rem" }}>
+          <div style={{ position: "relative", width: "100%", overflow: "visible" }}>
             <Image
-              src="/images/sale_banner_vertical_final_actual.svg"
+              src="/images/sale_banner_vertical_lol.svg"
               alt="Designer Fashion Sale - Up To 80% Off Men and Women's Styles"
               width={620}
               height={0}
@@ -100,7 +100,6 @@ const Hero = () => {
                 width: "100%",
                 height: "auto",
                 objectFit: "contain",
-                borderRadius: 8,
               }}
               priority
             />
@@ -112,8 +111,8 @@ const Hero = () => {
               style={{
                 position: "absolute",
                 top: 0,
-                left: 0,
-                width: "50%",
+                left: "0.25rem",
+                width: "calc(50% - 0.25rem)",
                 height: "100%",
                 cursor: "pointer",
               }}
@@ -127,8 +126,8 @@ const Hero = () => {
               style={{
                 position: "absolute",
                 top: 0,
-                right: 0,
-                width: "50%",
+                right: "0.25rem",
+                width: "calc(50% - 0.25rem)",
                 height: "100%",
                 cursor: "pointer",
               }}

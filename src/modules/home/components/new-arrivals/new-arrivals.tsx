@@ -54,11 +54,11 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
     loadProducts()
   }, [countryCode, products.length])
 
-  // Calculate total width for infinite scroll
+  // Calculate max scroll width (no infinite scroll)
   const cardWidth = 350 // approximate max card width including gap
-  const totalWidth = products.length * cardWidth
+  const maxScroll = Math.max(0, (products.length * cardWidth) - (typeof window !== 'undefined' ? window.innerWidth : 1440))
 
-  // Momentum animation loop
+  // Momentum animation loop with boundaries
   useEffect(() => {
     const animate = () => {
       setScrollOffset(prevOffset => {
@@ -78,11 +78,13 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
           }
         }
 
-        // Handle infinite loop: reset when we've scrolled through 2/3 of the tripled array
-        if (newOffset >= totalWidth * 2) {
-          return newOffset - totalWidth
-        } else if (newOffset < 0) {
-          return totalWidth + newOffset
+        // Enforce scroll boundaries (no infinite loop)
+        if (newOffset < 0) {
+          velocityRef.current = 0
+          return 0
+        } else if (newOffset > maxScroll) {
+          velocityRef.current = 0
+          return maxScroll
         }
 
         return newOffset
@@ -98,7 +100,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [isDragging, totalWidth])
+  }, [isDragging, maxScroll])
 
   // Mouse/Desktop drag handlers
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -174,64 +176,60 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
     return () => window.removeEventListener('mouseup', handleGlobalMouseUp)
   }, [isDragging])
 
-  // Triple the products array for seamless infinite loop
-  const infiniteProducts = [...products, ...products, ...products]
-
   return (
     <section
       className="w-full py-10 select-none relative overflow-hidden"
       style={{ backgroundColor: '#fff' }}
     >
-      {/* Scrolling Product Cards */}
-      <div
-        ref={scrollTrackRef}
-        className="relative overflow-hidden md:overflow-visible"
-      >
-        {/* Desktop: Custom drag scrolling */}
+      {/* Desktop: Fixed header and scrolling products side by side */}
+      <div className="hidden md:flex gap-8 px-4">
+        {/* Fixed Desktop Header - matches image height only */}
+        <div className="flex-shrink-0 flex flex-col aspect-square" style={{ width: 'clamp(280px, 25vw, 350px)' }}>
+          {/* Top bar */}
+          <div className="w-full h-[1px] bg-black"></div>
+
+          {/* NEW ARRIVALS text - close to top bar */}
+          <h2 className="text-4xl font-medium tracking-tight mt-3">NEW ARRIVALS</h2>
+
+          {/* White space between */}
+          <div className="flex-1"></div>
+
+          {/* VIEW ALL link - close to bottom bar */}
+          <Link
+            href="/men"
+            className="text-sm uppercase tracking-wide hover:underline mb-3 inline-block"
+          >
+            VIEW ALL
+          </Link>
+
+          {/* Bottom bar */}
+          <div className="w-full h-[1px] bg-black"></div>
+        </div>
+
+        {/* Scrolling Product Cards Container */}
         <div
-          className="hidden md:block"
-          style={{
-            cursor: isDragging ? 'grabbing' : 'grab',
-            userSelect: 'none'
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeave}
+          ref={scrollTrackRef}
+          className="relative overflow-hidden flex-1"
         >
           <div
-            className="flex gap-8 px-4"
             style={{
-              transform: `translateX(-${scrollOffset}px)`,
-              willChange: 'transform',
-              transition: isDragging ? 'none' : undefined
+              cursor: isDragging ? 'grabbing' : 'grab',
+              userSelect: 'none'
             }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseLeave}
           >
-          {/* Desktop: Horizontal heading with parallel bars - inline with products */}
-          <div className="flex-shrink-0 flex flex-col" style={{ width: 'clamp(280px, 25vw, 350px)' }}>
-            {/* Top bar */}
-            <div className="w-full h-[1px] bg-black"></div>
-
-            {/* NEW ARRIVALS text - close to top bar */}
-            <h2 className="text-4xl font-medium tracking-tight mt-3">NEW ARRIVALS</h2>
-
-            {/* White space between */}
-            <div className="flex-1"></div>
-
-            {/* VIEW ALL link - close to bottom bar */}
-            <Link
-              href="/men"
-              className="text-sm uppercase tracking-wide hover:underline mb-3 inline-block"
-              onClick={(e) => e.stopPropagation()}
+            <div
+              className="flex gap-8"
+              style={{
+                transform: `translateX(-${scrollOffset}px)`,
+                willChange: 'transform',
+                transition: isDragging ? 'none' : undefined
+              }}
             >
-              VIEW ALL
-            </Link>
-
-            {/* Bottom bar */}
-            <div className="w-full h-[1px] bg-black"></div>
-          </div>
-
-          {infiniteProducts.map((product, index) => {
+          {products.map((product, index) => {
             // Get proper pricing data
             let cheapestPrice
             if (isAlgoliaProduct(product)) {
@@ -306,11 +304,13 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
               </Link>
             )
           })}
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Mobile: Native horizontal scrolling with vertical spine */}
-        <div className="md:hidden flex gap-0">
+      {/* Mobile: Native horizontal scrolling with vertical spine */}
+      <div className="md:hidden flex gap-0">
           {/* Mobile: Vertical spine heading - occupies space */}
           <div className="flex-shrink-0 flex items-stretch pl-2">
             <div className="flex flex-col items-center justify-center border-t border-r border-b border-black py-4 px-2">
@@ -396,7 +396,6 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
             </div>
           </div>
         </div>
-      </div>
     </section>
   )
 }
