@@ -256,7 +256,7 @@ img {
   .ais-Hits ol li::marker,
   .ais-Hits-list li::marker,
   .ais-Hits-item::marker {
-    content: none;
+    content: "" !important;
   }
 
   /* Remove default ordered list bullets/numbers from Algolia hits */

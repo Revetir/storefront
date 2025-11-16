@@ -227,12 +227,12 @@ const ProductHit = ({ hit }: { hit: any }) => {
 
   return (
     <div className="flex flex-row gap-x-2 mt-4 relative">
-      <img 
-        src={hit.thumbnail} 
+      <img
+        src={hit.thumbnail}
         alt={`${hit.type || 'Product'} ${hit.title}`}
-        width={60} 
-        height={60} 
-        style={{ objectFit: 'cover', objectPosition: 'center', borderRadius: 4 }}
+        width={60}
+        height={60}
+        style={{ objectFit: 'contain', objectPosition: 'center', borderRadius: 4 }}
         loading="lazy"
       />
       <div className="flex flex-col gap-y-1">
