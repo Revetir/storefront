@@ -253,7 +253,7 @@ img {
   }
 
   /* Disable custom list markers in search modal */
-  .ais-Hits-item li::marker {
+  .ais-Hits li::marker {
     content: none;
   }
 

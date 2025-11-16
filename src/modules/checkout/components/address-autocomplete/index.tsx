@@ -269,9 +269,15 @@ const AddressAutocomplete = React.forwardRef<
     // Determine if label should be floating
     const labelFloating = isFocused || hasValue
 
+    const hasFloatingLabel = Boolean(label)
+
     return (
       <div className="flex flex-col w-full">
-        <div className="flex relative w-full txt-compact-medium address-autocomplete-container">
+        <div
+          className={`flex relative w-full address-autocomplete-container ${
+            hasFloatingLabel ? "address-autocomplete-container--with-label" : ""
+          }`}
+        >
           <div
             ref={containerRef}
             className="w-full"
@@ -294,31 +300,42 @@ const AddressAutocomplete = React.forwardRef<
           )}
         </div>
         <style jsx global>{`
-          /* Hide Radar's default placeholder */
+          /* Default placeholder styling */
           .address-autocomplete-container .radar-autocomplete-input::placeholder {
+            opacity: 1 !important;
+            color: var(--ui-fg-muted, #6b7280) !important;
+          }
+
+          /* Hide placeholder when floating label is enabled */
+          .address-autocomplete-container.address-autocomplete-container--with-label
+            .radar-autocomplete-input::placeholder {
             opacity: 0 !important;
           }
 
           /* Style Radar input to match other form inputs */
           .address-autocomplete-container .radar-autocomplete-input {
-            padding-top: 1rem !important;
-            padding-bottom: 0.25rem !important;
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
+            padding: 0.5rem 0.75rem !important;
             display: block !important;
             width: 100% !important;
-            min-height: 2.75rem !important;
-            height: 2.75rem !important;
             margin-top: 0 !important;
-            background-color: transparent !important;
-            border: 1px solid var(--ui-border-base) !important;
+            background-color: var(--ui-bg-field, #ffffff) !important;
+            border: 1px solid var(--ui-border-base, #d1d5db) !important;
             border-radius: 0 !important;
             appearance: none !important;
             box-sizing: border-box !important;
-            font-family: inherit !important;
-            font-size: 0.875rem !important;
-            line-height: 1.25rem !important;
-            color: var(--ui-fg-base) !important;
+            font-family: var(
+                --font-sans,
+                "Satoshi",
+                "Segoe UI",
+                "Roboto",
+                "Helvetica Neue",
+                "Ubuntu",
+                sans-serif
+              ) !important;
+            font-size: 1rem !important;
+            line-height: 1.5rem !important;
+            font-weight: 400 !important;
+            color: var(--ui-fg-base, #111827) !important;
             transition:
               box-shadow 0.2s ease,
               border-color 0.2s ease,
@@ -332,9 +349,9 @@ const AddressAutocomplete = React.forwardRef<
 
           .address-autocomplete-container .radar-autocomplete-input:focus {
             outline: none !important;
-            ring: 0 !important;
-            box-shadow: var(--borders-interactive-with-active) !important;
-            border-color: var(--ui-border-interactive) !important;
+            border-color: transparent !important;
+            box-shadow: 0 0 0 2px #000000 !important;
+            background-color: var(--ui-bg-field, #ffffff) !important;
           }
 
           /* Hide search icon completely */
