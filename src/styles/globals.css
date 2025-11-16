@@ -276,14 +276,21 @@ img {
 }
 
 /* Override markers for Algolia search results - must be outside @layer base */
-.ais-Hits-item::marker {
-  content: "" !important;
+ol.ais-Hits-list {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
-.ais-Hits-list,
-.ais-Hits-item {
+li.ais-Hits-item {
   list-style: none !important;
   list-style-type: none !important;
+  display: block !important;
+}
+
+li.ais-Hits-item::marker {
+  content: none !important;
+  display: none !important;
 }
 
 
