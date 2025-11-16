@@ -417,8 +417,15 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
       <div className="lg:hidden flex flex-col gap-0">
           {/* Horizontal Header Section */}
           <div className="flex items-center justify-between px-4 mb-6">
-            {/* Left: NEW ARRIVALS heading */}
-            <h2 className="text-2xl font-medium tracking-tight">NEW ARRIVALS</h2>
+            {/* Left: NEW ARRIVALS heading - hidden when expanded on mobile */}
+            <h2
+              className="text-2xl font-medium tracking-tight transition-opacity duration-300 md:opacity-100"
+              style={{
+                opacity: isExpanded ? 0 : 1,
+              }}
+            >
+              NEW ARRIVALS
+            </h2>
 
             {/* Right: Category buttons - separated on md, combined on mobile */}
             <nav
@@ -454,7 +461,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                     style={{
                       display: "flex",
                       border: "1px solid #000",
-                      animation: "fadeIn 300ms ease-in-out",
+                      animation: "slideInFromRight 300ms ease-out",
                     }}
                     role="group"
                     aria-label="Shop new arrivals by category"
@@ -476,7 +483,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                       }}
                       aria-label="Shop new menswear"
                     >
-                      NEW MENSWEAR
+                      MENSWEAR
                     </Link>
                     <Link
                       href="/women"
@@ -494,7 +501,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                       }}
                       aria-label="Shop new womenswear"
                     >
-                      NEW WOMENSWEAR
+                      WOMENSWEAR
                     </Link>
                   </div>
                 )}
