@@ -30,6 +30,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
   const dragStartRef = useRef<{ x: number; offset: number; time: number } | null>(null)
   const lastDragRef = useRef<{ x: number; time: number } | null>(null)
   const velocityRef = useRef(0)
+  const lastDragDistanceRef = useRef(0)
 
   // Load 30 products on mount
   useEffect(() => {
@@ -149,12 +150,17 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
   const handleMouseUp = useCallback(() => {
     if (!isDragging) return
 
+    // Store drag distance BEFORE clearing dragStartRef
+    if (dragStartRef.current) {
+      lastDragDistanceRef.current = Math.abs(scrollOffset - dragStartRef.current.offset)
+    }
+
     setIsDragging(false)
     dragStartRef.current = null
 
     // Velocity is already set from handleMouseMove
     setVelocity(velocityRef.current)
-  }, [isDragging])
+  }, [isDragging, scrollOffset])
 
   const handleMouseLeave = useCallback(() => {
     if (isDragging) {
@@ -162,6 +168,61 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
       dragStartRef.current = null
     }
   }, [isDragging])
+
+  // Touch handlers for tablet support
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0]
+    setIsDragging(true)
+    velocityRef.current = 0
+    setVelocity(0)
+
+    dragStartRef.current = {
+      x: touch.clientX,
+      offset: scrollOffset,
+      time: Date.now()
+    }
+    lastDragRef.current = {
+      x: touch.clientX,
+      time: Date.now()
+    }
+  }, [scrollOffset])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isDragging || !dragStartRef.current || !lastDragRef.current) return
+
+    const touch = e.touches[0]
+    const deltaX = touch.clientX - dragStartRef.current.x
+    const newOffset = dragStartRef.current.offset - deltaX
+
+    setScrollOffset(newOffset)
+
+    // Calculate velocity for momentum
+    const timeDelta = Date.now() - lastDragRef.current.time
+    if (timeDelta > 0) {
+      const xDelta = touch.clientX - lastDragRef.current.x
+      velocityRef.current = -(xDelta / timeDelta) * 16
+    }
+
+    lastDragRef.current = {
+      x: touch.clientX,
+      time: Date.now()
+    }
+
+    e.preventDefault()
+  }, [isDragging, scrollOffset])
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isDragging) return
+
+    // Store drag distance for onClick check
+    if (dragStartRef.current) {
+      lastDragDistanceRef.current = Math.abs(scrollOffset - dragStartRef.current.offset)
+    }
+
+    setIsDragging(false)
+    dragStartRef.current = null
+    setVelocity(velocityRef.current)
+  }, [isDragging, scrollOffset])
 
   // Global mouse up listener (in case mouse up happens outside component)
   useEffect(() => {
@@ -184,7 +245,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
       {/* Desktop: Fixed header and scrolling products side by side */}
       <div className="hidden md:flex gap-8 px-4">
         {/* Fixed Desktop Header - matches image height only */}
-        <div className="flex-shrink-0 flex flex-col aspect-square" style={{ width: 'clamp(280px, 25vw, 350px)' }}>
+        <div className="flex-shrink-0 flex flex-col aspect-square self-start" style={{ width: 'clamp(280px, 25vw, 350px)' }}>
           {/* Top bar */}
           <div className="w-full h-[1px] bg-black"></div>
 
@@ -220,6 +281,9 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseLeave}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             <div
               className="flex gap-8"
@@ -249,13 +313,12 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                   pointerEvents: isDragging ? 'none' : 'auto'
                 }}
                 onClick={(e) => {
-                  // Prevent navigation if this was a drag (moved more than 5px)
-                  if (dragStartRef.current) {
-                    const dragDistance = Math.abs(scrollOffset - dragStartRef.current.offset)
-                    if (dragDistance > 5) {
-                      e.preventDefault()
-                    }
+                  // Prevent navigation if dragged more than 10px
+                  if (lastDragDistanceRef.current > 10) {
+                    e.preventDefault()
                   }
+                  // Reset after brief delay
+                  setTimeout(() => { lastDragDistanceRef.current = 0 }, 100)
                 }}
                 onDragStart={(e) => e.preventDefault()}
               >
