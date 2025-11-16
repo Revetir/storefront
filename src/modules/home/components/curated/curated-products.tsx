@@ -4,10 +4,38 @@ import Link from "next/link"
 const CuratedProducts = () => {
   return (
     <section className="w-full px-4 md:px-8 py-10 select-none">
-      <h2 className="text-2xl font-light mb-6 text-center sm:text-left" style={{ color: '#333' }}>
-        SHOP BY WARDROBE
+      {/* Mobile/Tablet Header - with SHOP ALL button */}
+      <div className="lg:hidden flex items-center justify-between mb-6">
+        <h2 className="text-3xl font-light" style={{ color: '#333' }}>
+          CURATED WARDROBES
+        </h2>
+        <Link href="/coming-soon">
+          <button
+            style={{
+              padding: "0.5rem 1rem",
+              textAlign: "center",
+              textTransform: "uppercase",
+              fontWeight: "300",
+              fontSize: "0.75rem",
+              color: "#000",
+              backgroundColor: "transparent",
+              border: "1px solid #000",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+            }}
+            aria-label="Shop all curated wardrobes"
+          >
+            SHOP ALL
+          </button>
+        </Link>
+      </div>
+
+      {/* Desktop Header - matches NEW ARRIVALS styling */}
+      <h2 className="hidden lg:block text-4xl font-medium tracking-tight mb-6">
+        CURATED WARDROBES
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <Link href="/coming-soon">
           <div className="flex flex-col">
               <div className="relative w-full h-[800px]">
