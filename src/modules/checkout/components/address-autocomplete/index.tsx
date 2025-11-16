@@ -301,21 +301,28 @@ const AddressAutocomplete = React.forwardRef<
 
           /* Style Radar input to match other form inputs */
           .address-autocomplete-container .radar-autocomplete-input {
-            padding: 0.5rem 0.75rem !important;
+            padding-top: 1rem !important;
+            padding-bottom: 0.25rem !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
             display: block !important;
             width: 100% !important;
-            min-height: 42px !important;
-            height: auto !important;
+            min-height: 2.75rem !important;
+            height: 2.75rem !important;
             margin-top: 0 !important;
             background-color: transparent !important;
-            border: 1px solid black !important;
+            border: 1px solid var(--ui-border-base) !important;
             border-radius: 0 !important;
             appearance: none !important;
             box-sizing: border-box !important;
+            font-family: inherit !important;
             font-size: 0.875rem !important;
-            line-height: 1.5rem !important;
+            line-height: 1.25rem !important;
             color: var(--ui-fg-base) !important;
-            transition: all 0.2s ease !important;
+            transition:
+              box-shadow 0.2s ease,
+              border-color 0.2s ease,
+              background-color 0.2s ease !important;
           }
 
           /* Ensure border is visible and matches other inputs */
@@ -326,7 +333,7 @@ const AddressAutocomplete = React.forwardRef<
           .address-autocomplete-container .radar-autocomplete-input:focus {
             outline: none !important;
             ring: 0 !important;
-            box-shadow: 0 0 0 2px var(--ui-border-interactive) !important;
+            box-shadow: var(--borders-interactive-with-active) !important;
             border-color: var(--ui-border-interactive) !important;
           }
 

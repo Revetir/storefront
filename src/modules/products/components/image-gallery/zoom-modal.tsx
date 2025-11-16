@@ -109,8 +109,6 @@ const ZoomModal = ({
     const container = scrollContainerRef.current
     if (container) {
       container.addEventListener('scroll', handleScroll, { passive: true })
-      // Initial check
-      handleScroll()
     }
 
     return () => {

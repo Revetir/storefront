@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 import { clx } from "@medusajs/ui"
 import NewsletterInput from "@modules/common/components/newsletter-input"
 import MedusaRadio from "@modules/common/components/radio"
@@ -29,6 +30,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
   isOpen = false,
   close,
 }) => {
+  const pathname = usePathname()
   const [formState, setFormState] = useState<FormState>({
     email: "",
     genderPreference: "menswear",
@@ -39,6 +41,17 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
     success: false,
   })
   const [showGenderOptions, setShowGenderOptions] = useState(variant === "modal")
+
+  // Reset inline/mobile state whenever navigation occurs so the expanded view doesn't persist.
+  useEffect(() => {
+    if (variant !== "inline") {
+      return
+    }
+
+    setShowGenderOptions(false)
+    setFormState({ email: "", genderPreference: "menswear" })
+    setSubmitState({ loading: false, error: null, success: false })
+  }, [pathname, variant])
 
   const handleEmailFocus = () => {
     if (variant === "inline") {

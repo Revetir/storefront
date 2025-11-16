@@ -11,7 +11,7 @@ const EmptyCartMessage = () => {
         Shopping Bag
       </Heading>
       <Text className="text-base-regular mt-4 mb-6 max-w-[32rem]">
-        Your shopping bag is empty.
+        Your bag is empty, but it doesn't have to be.
       </Text>
       <div className="flex gap-4">
         <LocalizedClientLink href="/men">

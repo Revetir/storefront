@@ -182,7 +182,7 @@ export default function ProductActions({
           !isValidVariant
         }
         variant="primary"
-        className="w-full h-10 !rounded-none !bg-black !text-white btn-black after:!rounded-none [&>span>div]:!rounded-none"
+        className="w-full h-10 !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 after:!rounded-none [&>span>div]:!rounded-none"
         isLoading={isAdding}
         data-testid="add-product-button"
       >

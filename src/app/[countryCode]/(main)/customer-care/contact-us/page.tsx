@@ -250,7 +250,7 @@ export default function ContactUsPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full uppercase bg-black text-white py-2 px-6 btn-black focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full uppercase bg-black text-white py-2 px-6 hover:bg-neutral-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? "Sending..." : "Send"}
             </button>
