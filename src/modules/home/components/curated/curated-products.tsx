@@ -18,7 +18,7 @@ const CuratedProducts = () => {
         THE EDIT - launching in <CountdownTimer />
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <Link href="/coming-soon">
           <div className="flex flex-col">
               <div className="relative w-full h-[600px] sm:h-[500px] md:h-[700px] lg:h-[800px]">
@@ -51,7 +51,7 @@ const CuratedProducts = () => {
             <h3 className="text-center mt-2 text-lg font-medium uppercase">Dark Luxury</h3>
           </div>
         </Link>
-        <Link href="/coming-soon" className="hidden sm:block">
+        <Link href="/coming-soon" className="hidden md:block">
           <div className="flex flex-col">
             <div className="relative w-full h-[600px] sm:h-[500px] md:h-[700px] lg:h-[800px]">
               <Image
@@ -66,7 +66,7 @@ const CuratedProducts = () => {
             <h3 className="text-center mt-2 text-lg font-medium uppercase">Retro Americana</h3>
           </div>
         </Link>
-        <Link href="/coming-soon" className="hidden md:block">
+        <Link href="/coming-soon" className="hidden lg:block">
           <div className="flex flex-col">
             <div className="relative w-full h-[600px] sm:h-[500px] md:h-[700px] lg:h-[800px]">
               <Image
