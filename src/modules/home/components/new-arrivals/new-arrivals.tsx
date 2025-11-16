@@ -19,6 +19,9 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
   const [products, setProducts] = useState(initialProducts)
   const [isLoading, setIsLoading] = useState(false)
 
+  // Mobile SHOP ALL button state
+  const [isExpanded, setIsExpanded] = useState(false)
+
   // Scroll state
   const [scrollOffset, setScrollOffset] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
@@ -26,11 +29,27 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
 
   // Refs
   const scrollTrackRef = useRef<HTMLDivElement>(null)
+  const dragContainerRef = useRef<HTMLDivElement>(null)
   const animationFrameRef = useRef<number | null>(null)
   const dragStartRef = useRef<{ x: number; offset: number; time: number } | null>(null)
   const lastDragRef = useRef<{ x: number; time: number } | null>(null)
   const velocityRef = useRef(0)
   const lastDragDistanceRef = useRef(0)
+
+  // Collapse button on scroll (mobile)
+  useEffect(() => {
+    if (!isExpanded) return
+
+    const handleScroll = () => {
+      setIsExpanded(false)
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+    }
+  }, [isExpanded])
 
   // Load 30 products on mount
   useEffect(() => {
@@ -170,7 +189,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
   }, [isDragging])
 
   // Touch handlers for tablet support
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+  const handleTouchStart = useCallback((e: TouchEvent) => {
     const touch = e.touches[0]
     setIsDragging(true)
     velocityRef.current = 0
@@ -187,7 +206,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
     }
   }, [scrollOffset])
 
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+  const handleTouchMove = useCallback((e: TouchEvent) => {
     if (!isDragging || !dragStartRef.current || !lastDragRef.current) return
 
     const touch = e.touches[0]
@@ -237,13 +256,29 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
     return () => window.removeEventListener('mouseup', handleGlobalMouseUp)
   }, [isDragging])
 
+  // Attach touch listeners with passive: false to allow preventDefault
+  useEffect(() => {
+    const element = dragContainerRef.current
+    if (!element) return
+
+    element.addEventListener('touchstart', handleTouchStart as any, { passive: false })
+    element.addEventListener('touchmove', handleTouchMove as any, { passive: false })
+    element.addEventListener('touchend', handleTouchEnd as any, { passive: false })
+
+    return () => {
+      element.removeEventListener('touchstart', handleTouchStart as any)
+      element.removeEventListener('touchmove', handleTouchMove as any)
+      element.removeEventListener('touchend', handleTouchEnd as any)
+    }
+  }, [handleTouchStart, handleTouchMove, handleTouchEnd])
+
   return (
     <section
       className="w-full py-10 select-none relative overflow-hidden"
       style={{ backgroundColor: '#fff' }}
     >
       {/* Desktop: Fixed header and scrolling products side by side */}
-      <div className="hidden md:flex gap-8 px-4">
+      <div className="hidden lg:flex gap-8 px-4">
         {/* Fixed Desktop Header - matches image height only */}
         <div className="flex-shrink-0 flex flex-col aspect-square self-start" style={{ width: 'clamp(280px, 25vw, 350px)' }}>
           {/* Top bar */}
@@ -255,13 +290,21 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
           {/* White space between */}
           <div className="flex-1"></div>
 
-          {/* VIEW ALL link - close to bottom bar */}
-          <Link
-            href="/men"
-            className="text-sm uppercase tracking-wide hover:underline mb-3 inline-block"
-          >
-            VIEW ALL
-          </Link>
+          {/* Shop links - close to bottom bar */}
+          <div className="flex justify-between items-center gap-4 mb-3">
+            <Link
+              href="/men"
+              className="uppercase tracking-wide hover:underline text-[clamp(0.625rem,1.2vw,0.875rem)]"
+            >
+              SHOP MENSWEAR
+            </Link>
+            <Link
+              href="/women"
+              className="uppercase tracking-wide hover:underline text-[clamp(0.625rem,1.2vw,0.875rem)]"
+            >
+              SHOP WOMENSWEAR
+            </Link>
+          </div>
 
           {/* Bottom bar */}
           <div className="w-full h-[1px] bg-black"></div>
@@ -273,6 +316,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
           className="relative overflow-hidden flex-1"
         >
           <div
+            ref={dragContainerRef}
             style={{
               cursor: isDragging ? 'grabbing' : 'grab',
               userSelect: 'none'
@@ -281,9 +325,6 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseLeave}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
           >
             <div
               className="flex gap-8"
@@ -372,25 +413,143 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
         </div>
       </div>
 
-      {/* Mobile: Native horizontal scrolling with vertical spine */}
-      <div className="md:hidden flex gap-0">
-          {/* Mobile: Vertical spine heading - occupies space */}
-          <div className="flex-shrink-0 flex items-stretch pl-2">
-            <div className="flex flex-col items-center justify-center border-t border-r border-b border-black py-4 px-2">
-              {'NEW ARRIVALS'.split('').map((letter, index) => (
-                <span
-                  key={index}
-                  className="text-sm font-medium tracking-wider"
-                  style={{ writingMode: 'horizontal-tb' }}
+      {/* Mobile/Tablet: Horizontal header with scrolling products */}
+      <div className="lg:hidden flex flex-col gap-0">
+          {/* Horizontal Header Section */}
+          <div className="flex items-center justify-between px-4 mb-6">
+            {/* Left: NEW ARRIVALS heading */}
+            <h2 className="text-2xl font-medium tracking-tight">NEW ARRIVALS</h2>
+
+            {/* Right: Category buttons - separated on md, combined on mobile */}
+            <nav
+              className="flex-shrink-0"
+              style={{ userSelect: "none" }}
+              aria-label="Shop new arrivals"
+            >
+              {/* Mobile: Expandable SHOP ALL button */}
+              <div className="md:hidden">
+                {!isExpanded ? (
+                  <button
+                    onClick={() => setIsExpanded(true)}
+                    style={{
+                      padding: "0.5rem 1rem",
+                      textAlign: "center",
+                      textTransform: "uppercase",
+                      fontWeight: "300",
+                      fontSize: "0.75rem",
+                      color: "#000",
+                      backgroundColor: "transparent",
+                      border: "1px solid #000",
+                      cursor: "pointer",
+                      transition: "all 300ms ease-in-out",
+                      whiteSpace: "nowrap",
+                    }}
+                    aria-label="Shop all new arrivals"
+                    aria-expanded={isExpanded}
+                  >
+                    SHOP ALL
+                  </button>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      border: "1px solid #000",
+                      animation: "fadeIn 300ms ease-in-out",
+                    }}
+                    role="group"
+                    aria-label="Shop new arrivals by category"
+                  >
+                    <Link
+                      href="/men"
+                      style={{
+                        padding: "0.5rem 0.75rem",
+                        textAlign: "center",
+                        textTransform: "uppercase",
+                        fontWeight: "300",
+                        fontSize: "0.65rem",
+                        color: "#000",
+                        textDecoration: "none",
+                        cursor: "pointer",
+                        borderRight: "1px solid #000",
+                        transition: "background-color 200ms ease",
+                        whiteSpace: "nowrap",
+                      }}
+                      aria-label="Shop new menswear"
+                    >
+                      NEW MENSWEAR
+                    </Link>
+                    <Link
+                      href="/women"
+                      style={{
+                        padding: "0.5rem 0.75rem",
+                        textAlign: "center",
+                        textTransform: "uppercase",
+                        fontWeight: "300",
+                        fontSize: "0.65rem",
+                        color: "#000",
+                        textDecoration: "none",
+                        cursor: "pointer",
+                        transition: "background-color 200ms ease",
+                        whiteSpace: "nowrap",
+                      }}
+                      aria-label="Shop new womenswear"
+                    >
+                      NEW WOMENSWEAR
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Tablet (md): Separate buttons */}
+              <div
+                className="hidden md:flex gap-2"
+                role="group"
+                aria-label="Shop new arrivals by category"
+              >
+                <Link
+                  href="/men"
+                  style={{
+                    padding: "0.5rem 0.75rem",
+                    textAlign: "center",
+                    textTransform: "uppercase",
+                    fontWeight: "300",
+                    fontSize: "0.65rem",
+                    color: "#000",
+                    textDecoration: "none",
+                    cursor: "pointer",
+                    border: "1px solid #000",
+                    transition: "background-color 200ms ease",
+                    whiteSpace: "nowrap",
+                  }}
+                  aria-label="Shop new menswear"
                 >
-                  {letter === ' ' ? '\u00A0' : letter}
-                </span>
-              ))}
-            </div>
+                  SHOP MENSWEAR
+                </Link>
+                <Link
+                  href="/women"
+                  style={{
+                    padding: "0.5rem 0.75rem",
+                    textAlign: "center",
+                    textTransform: "uppercase",
+                    fontWeight: "300",
+                    fontSize: "0.65rem",
+                    color: "#000",
+                    textDecoration: "none",
+                    cursor: "pointer",
+                    border: "1px solid #000",
+                    transition: "background-color 200ms ease",
+                    whiteSpace: "nowrap",
+                  }}
+                  aria-label="Shop new womenswear"
+                >
+                  SHOP WOMENSWEAR
+                </Link>
+              </div>
+            </nav>
           </div>
 
           {/* Scrolling products container */}
-          <div className="overflow-x-auto new-arrivals-scroll pb-4 flex-1">
+          <div className="overflow-x-auto new-arrivals-scroll pb-4">
             <div className="flex gap-8 px-4">
             {products.map((product, index) => {
               // Get proper pricing data
