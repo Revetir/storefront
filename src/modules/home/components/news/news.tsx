@@ -19,7 +19,7 @@ const NewsSection = () => {
               />
             </div>
             <div className="text-left">
-              <h3 className="text-lg font-semibold mb-2">NINE FRAMES, a LEMAIRE homage to cinema</h3>
+              <h3 className="text-lg font-light uppercase mb-2">NINE FRAMES, a LEMAIRE homage to cinema</h3>
               <p className="text-sm text-gray-600">October 13, 2025</p>
             </div>
           </div>
@@ -36,7 +36,7 @@ const NewsSection = () => {
               />
             </div>
             <div className="text-left">
-              <h3 className="text-lg font-semibold mb-2">Gentle Monster Enchants With Futuristic Tea House</h3>
+              <h3 className="text-lg font-light uppercase mb-2">Gentle Monster Enchants With Futuristic Tea House</h3>
               <p className="text-sm text-gray-600">October 12, 2025</p>
             </div>
           </div>
@@ -53,7 +53,7 @@ const NewsSection = () => {
               />
             </div>
             <div className="text-left">
-              <h3 className="text-lg font-semibold mb-2">The End Of An Era: Demna at Balenciaga</h3>
+              <h3 className="text-lg font-light uppercase mb-2">The End Of An Era: Demna at Balenciaga</h3>
               <p className="text-sm text-gray-600">October 10, 2025</p>
             </div>
           </div>

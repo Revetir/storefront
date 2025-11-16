@@ -1,5 +1,7 @@
 "use client"
 
+import CountdownTimer from "./countdown-timer"
+
 const ComingSoon = () => {
   return (
     <div
@@ -20,18 +22,19 @@ const ComingSoon = () => {
           fontWeight: "300",
           color: "#333",
           marginBottom: "1rem",
+          textTransform: "uppercase",
         }}
       >
         A new way to shop is almost here...
       </h1>
       <p
         style={{
-          fontSize: "clamp(1rem, 2vw, 1.25rem)",
+          fontSize: "clamp(1.5rem, 4vw, 2.5rem)",
           fontWeight: "300",
-          color: "#666",
+          color: "#333",
         }}
       >
-        Please check back soon.
+        <CountdownTimer />
       </p>
     </div>
   )

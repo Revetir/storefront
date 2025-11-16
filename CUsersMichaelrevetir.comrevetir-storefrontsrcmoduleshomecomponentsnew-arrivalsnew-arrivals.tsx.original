@@ -27,6 +27,10 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
   const [isDragging, setIsDragging] = useState(false)
   const [velocity, setVelocity] = useState(0)
 
+  // Scroll-jacking state
+  const [isAtPageBottom, setIsAtPageBottom] = useState(false)
+  const hasDragInteracted = useRef(false)
+
   // Refs
   const scrollTrackRef = useRef<HTMLDivElement>(null)
   const dragContainerRef = useRef<HTMLDivElement>(null)
@@ -172,6 +176,11 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
     // Store drag distance BEFORE clearing dragStartRef
     if (dragStartRef.current) {
       lastDragDistanceRef.current = Math.abs(scrollOffset - dragStartRef.current.offset)
+
+      // Track that user has interacted via drag (disable scroll-jacking)
+      if (lastDragDistanceRef.current > 10) {
+        hasDragInteracted.current = true
+      }
     }
 
     setIsDragging(false)
@@ -236,6 +245,11 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
     // Store drag distance for onClick check
     if (dragStartRef.current) {
       lastDragDistanceRef.current = Math.abs(scrollOffset - dragStartRef.current.offset)
+
+      // Track that user has interacted via drag (disable scroll-jacking)
+      if (lastDragDistanceRef.current > 10) {
+        hasDragInteracted.current = true
+      }
     }
 
     setIsDragging(false)
@@ -272,6 +286,84 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
     }
   }, [handleTouchStart, handleTouchMove, handleTouchEnd])
 
+  // Page bottom detection (desktop only)
+  useEffect(() => {
+    // Only on desktop (lg+)
+    const checkIfDesktop = () => window.innerWidth >= 1024
+
+    const handleScroll = () => {
+      if (!checkIfDesktop()) {
+        setIsAtPageBottom(false)
+        return
+      }
+
+      const scrollHeight = document.documentElement.scrollHeight
+      const scrollTop = window.scrollY
+      const clientHeight = window.innerHeight
+
+      // User is at or past the bottom (with small threshold)
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 10
+      setIsAtPageBottom(atBottom)
+    }
+
+    handleScroll() // Initial check
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
+  // Wheel event listener for scroll-jacking (desktop only)
+  useEffect(() => {
+    const checkIfDesktop = () => window.innerWidth >= 1024
+
+    const handleWheel = (e: WheelEvent) => {
+      // Only activate on desktop
+      if (!checkIfDesktop()) return
+
+      // Don't hijack if user has dragged manually
+      if (hasDragInteracted.current) return
+
+      // Don't hijack if currently dragging
+      if (isDragging) return
+
+      // Only hijack when at page bottom
+      if (!isAtPageBottom) return
+
+      const currentScrollOffset = scrollOffset
+      const canScrollRight = currentScrollOffset < maxScroll
+      const canScrollLeft = currentScrollOffset > 0
+
+      // Scrolling down (deltaY > 0) - try to scroll products right
+      if (e.deltaY > 0 && canScrollRight) {
+        e.preventDefault()
+        const newOffset = Math.min(currentScrollOffset + e.deltaY * 2, maxScroll)
+        setScrollOffset(newOffset)
+        velocityRef.current = 0 // Stop any momentum
+        return
+      }
+
+      // Scrolling up (deltaY < 0) - try to scroll products left
+      if (e.deltaY < 0 && canScrollLeft) {
+        e.preventDefault()
+        const newOffset = Math.max(currentScrollOffset + e.deltaY * 2, 0)
+        setScrollOffset(newOffset)
+        velocityRef.current = 0 // Stop any momentum
+        return
+      }
+
+      // If we can't scroll horizontally anymore, allow normal vertical scroll
+      // (no preventDefault, browser handles it naturally)
+    }
+
+    window.addEventListener('wheel', handleWheel, { passive: false })
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel)
+    }
+  }, [isAtPageBottom, isDragging, scrollOffset, maxScroll])
+
   return (
     <section
       className="w-full py-10 select-none relative overflow-hidden"
@@ -285,7 +377,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
           <div className="w-full h-[1px] bg-black"></div>
 
           {/* NEW ARRIVALS text - close to top bar */}
-          <h2 className="text-4xl font-light mt-3">NEW ARRIVALS</h2>
+          <h2 className="text-4xl font-medium tracking-tight mt-3">NEW ARRIVALS</h2>
 
           {/* White space between */}
           <div className="flex-1"></div>
@@ -418,7 +510,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
           {/* Horizontal Header Section */}
           <div className="flex items-center justify-between px-4 mb-6">
             {/* Left: NEW IN on mobile, NEW ARRIVALS on tablet */}
-            <h2 className="text-3xl font-light">
+            <h2 className="text-3xl font-medium tracking-tight">
               <span className="md:hidden">NEW IN</span>
               <span className="hidden md:inline">NEW ARRIVALS</span>
             </h2>
