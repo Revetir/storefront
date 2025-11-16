@@ -257,6 +257,13 @@ img {
     content: none;
   }
 
+  /* Remove default list styling inside Algolia hits */
+  .ais-Hits-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
   /* Disable custom list markers in category sidebar */
   nav ul li::marker {
     content: none;

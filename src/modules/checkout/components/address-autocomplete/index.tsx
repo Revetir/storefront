@@ -64,11 +64,16 @@ const AddressAutocomplete = React.forwardRef<
     const [hasValue, setHasValue] = useState(false)
     const isSelectingRef = useRef(false)
     const onAddressSelectRef = useRef(onAddressSelect)
+    const onChangeRef = useRef(onChange)
 
     // Keep the ref updated without causing effect re-runs
     useEffect(() => {
       onAddressSelectRef.current = onAddressSelect
     }, [onAddressSelect])
+
+    useEffect(() => {
+      onChangeRef.current = onChange
+    }, [onChange])
 
     // Memoize the selection handler with stable identity
     // Don't include onAddressSelect in deps to prevent autocomplete recreation
@@ -169,7 +174,8 @@ const AddressAutocomplete = React.forwardRef<
 
             // Forward input changes to parent's onChange handler
             // Create a synthetic React event to match the onChange signature
-            if (onChange) {
+            const changeHandler = onChangeRef.current
+            if (changeHandler) {
               const syntheticEvent = {
                 target: {
                   name: name,
@@ -181,7 +187,7 @@ const AddressAutocomplete = React.forwardRef<
                 },
               } as React.ChangeEvent<HTMLInputElement>
 
-              onChange(syntheticEvent)
+              changeHandler(syntheticEvent)
             }
           }
 
@@ -269,15 +275,9 @@ const AddressAutocomplete = React.forwardRef<
     // Determine if label should be floating
     const labelFloating = isFocused || hasValue
 
-    const hasFloatingLabel = Boolean(label)
-
     return (
       <div className="flex flex-col w-full">
-        <div
-          className={`flex relative w-full address-autocomplete-container ${
-            hasFloatingLabel ? "address-autocomplete-container--with-label" : ""
-          }`}
-        >
+        <div className="flex relative w-full txt-compact-medium address-autocomplete-container">
           <div
             ref={containerRef}
             className="w-full"
@@ -300,23 +300,18 @@ const AddressAutocomplete = React.forwardRef<
           )}
         </div>
         <style jsx global>{`
-          /* Default placeholder styling */
+          /* Hide Radar's default placeholder */
           .address-autocomplete-container .radar-autocomplete-input::placeholder {
-            opacity: 1 !important;
-            color: var(--ui-fg-muted, #6b7280) !important;
-          }
-
-          /* Hide placeholder when floating label is enabled */
-          .address-autocomplete-container.address-autocomplete-container--with-label
-            .radar-autocomplete-input::placeholder {
             opacity: 0 !important;
           }
 
           /* Style Radar input to match other form inputs */
           .address-autocomplete-container .radar-autocomplete-input {
-            padding: 0.5rem 0.75rem !important;
+            padding: 0.75rem 0.75rem !important;
             display: block !important;
             width: 100% !important;
+            height: 2.75rem !important;
+            min-height: 2.75rem !important;
             margin-top: 0 !important;
             background-color: var(--ui-bg-field, #ffffff) !important;
             border: 1px solid var(--ui-border-base, #d1d5db) !important;
@@ -333,7 +328,7 @@ const AddressAutocomplete = React.forwardRef<
                 sans-serif
               ) !important;
             font-size: 1rem !important;
-            line-height: 1.5rem !important;
+            line-height: 1.25rem !important;
             font-weight: 400 !important;
             color: var(--ui-fg-base, #111827) !important;
             transition:
