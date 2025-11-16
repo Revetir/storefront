@@ -515,7 +515,7 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
             <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 flex-shrink-0">
               <button
                 onClick={handleApplyFilters}
-                className="w-full py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
+                className="w-full py-3 bg-black text-white text-sm font-medium uppercase btn-black"
               >
                 {getButtonText()}
               </button>

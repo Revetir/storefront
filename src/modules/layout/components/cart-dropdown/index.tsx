@@ -232,7 +232,7 @@ const CartDropdown = ({
                     </div>
                     <LocalizedClientLink href="/bag" passHref>
                       <Button
-                        className="w-full uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200"
+                        className="w-full uppercase !rounded-none !bg-black !text-white btn-black"
                         size="large"
                         data-testid="go-to-cart-button"
                       >
@@ -256,9 +256,11 @@ const CartDropdown = ({
                         <rect x="6" y="10" width="20" height="18" stroke="currentColor" strokeWidth="2" fill="none"/>
                         <path d="M10 10 L10 8 C10 5.79 11.79 4 14 4 L18 4 C20.21 4 22 5.79 22 8 L22 10" stroke="currentColor" strokeWidth="2" fill="none"/>
                       </svg>
-                      <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs font-medium">0</span>
+                      <span className="absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs font-medium">
+                        0
+                      </span>
                     </div>
-                    <span>Your shopping bag is empty.</span>
+                    <span>Your shopping bag is empty</span>
                     {/* <div>
                       <div className="flex gap-2">
                         <LocalizedClientLink href="/categories/men">

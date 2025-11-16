@@ -63,7 +63,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       }
       // Show loading state while waiting for Stripe to initialize
       return (
-        <Button disabled className="uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200" data-testid={dataTestId}>
+        <Button disabled className="uppercase !rounded-none !bg-black !text-white btn-black" data-testid={dataTestId}>
           Loading payment...
         </Button>
       )
@@ -277,7 +277,7 @@ const StripePaymentButton = ({
           size="large"
           isLoading={submitting}
           data-testid={dataTestId}
-          className="w-full uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200 cursor-pointer"
+          className="w-full uppercase !rounded-none !bg-black !text-white btn-black cursor-pointer"
         >
           {buttonText}
         </Button>
@@ -331,7 +331,7 @@ const ManualTestPaymentButton = ({ notReady, cart }: { notReady: boolean, cart: 
         onClick={handlePayment}
         size="large"
         data-testid="submit-order-button"
-        className="w-full uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200 cursor-pointer"
+        className="w-full uppercase !rounded-none !bg-black !text-white btn-black cursor-pointer"
       >
         Place order
       </Button>

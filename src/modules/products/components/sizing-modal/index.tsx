@@ -668,7 +668,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               <div className="fixed bottom-0 left-0 right-0 p-4 flex justify-center bg-white">
                 <button
                   onClick={close}
-                  className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
+                  className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase btn-black"
                 >
                   Close
                 </button>
@@ -758,7 +758,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               <div className="fixed bottom-0 left-0 right-0 p-4 flex justify-center bg-white">
                 <button
                   onClick={close}
-                  className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase hover:bg-gray-800 transition-colors"
+                  className="w-[90%] py-3 bg-black text-white text-sm font-medium uppercase btn-black"
                 >
                   Close
                 </button>

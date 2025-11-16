@@ -39,7 +39,7 @@ const Login = ({ setCurrentView }: Props) => {
           />
         </div>
         <ErrorMessage error={message} data-testid="login-error-message" />
-        <SubmitButton data-testid="sign-in-button" className="w-full mt-6 !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200">
+        <SubmitButton data-testid="sign-in-button" className="w-full mt-6 !bg-black !text-white btn-black">
           Sign in
         </SubmitButton>
       </form>
