@@ -252,22 +252,6 @@ img {
     content: "▪ ";
   }
 
-  /* Disable custom list markers in search modal */
-  .ais-Hits ol li::marker,
-  .ais-Hits-list li::marker,
-  .ais-Hits-item::marker {
-    display: none !important;
-  }
-
-  /* Remove default ordered list bullets/numbers from Algolia hits */
-  .ais-Hits-list,
-  .ais-Hits-item {
-    list-style: none !important;
-    list-style-type: none !important;
-    margin: 0;
-    padding: 0;
-  }
-
   /* Disable custom list markers in category sidebar */
   nav ul li::marker {
     content: none;
@@ -289,6 +273,17 @@ img {
       animation: none !important;
     }
   }
+}
+
+/* Override markers for Algolia search results - must be outside @layer base */
+.ais-Hits-item::marker {
+  content: "" !important;
+}
+
+.ais-Hits-list,
+.ais-Hits-item {
+  list-style: none !important;
+  list-style-type: none !important;
 }
 
 
