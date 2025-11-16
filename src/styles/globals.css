@@ -262,7 +262,8 @@ img {
   /* Remove default ordered list bullets/numbers from Algolia hits */
   .ais-Hits-list,
   .ais-Hits-item {
-    list-style: none;
+    list-style: none !important;
+    list-style-type: none !important;
     margin: 0;
     padding: 0;
   }
