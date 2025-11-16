@@ -253,12 +253,15 @@ img {
   }
 
   /* Disable custom list markers in search modal */
-  .ais-Hits li::marker {
+  .ais-Hits ol li::marker,
+  .ais-Hits-list li::marker,
+  .ais-Hits-item::marker {
     content: none;
   }
 
-  /* Remove default list styling inside Algolia hits */
-  .ais-Hits-list {
+  /* Remove default ordered list bullets/numbers from Algolia hits */
+  .ais-Hits-list,
+  .ais-Hits-item {
     list-style: none;
     margin: 0;
     padding: 0;

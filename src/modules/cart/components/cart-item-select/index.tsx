@@ -42,7 +42,7 @@ const CartItemSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
           onFocus={() => innerRef.current?.focus()}
           onBlur={() => innerRef.current?.blur()}
           className={clx(
-            "relative flex items-center txt-compact-small border text-ui-fg-base group rounded-none px-2 py-1",
+            "relative flex items-center justify-center border text-ui-fg-subtle group rounded-none px-2 py-1 text-base-regular",
             className,
             {
               "text-ui-fg-subtle": isPlaceholder,
@@ -53,10 +53,10 @@ const CartItemSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
             ref={innerRef}
             {...props}
             className={clx(
-              "appearance-none bg-transparent border-none w-full h-full text-center transition-colors duration-150 outline-none font-medium text-base leading-tight pr-6",
+              "appearance-none bg-transparent border-none w-full h-full text-center transition-colors duration-150 outline-none pr-6 text-base-regular",
               {
-                "text-ui-fg-subtle": isPlaceholder,
-                "text-ui-fg-base": !isPlaceholder,
+                "text-ui-fg-muted": isPlaceholder,
+                "text-ui-fg-subtle": !isPlaceholder,
               }
             )}
           >
