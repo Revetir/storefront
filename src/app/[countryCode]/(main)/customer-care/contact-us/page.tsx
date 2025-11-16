@@ -134,7 +134,7 @@ export default function ContactUsPage() {
                 onInvalid={handleInvalid}
                 required
                   className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-                    errors.request ? 'border-red-500' : 'border-black'
+                    errors.request ? 'border-red-500' : 'border-gray-300'
                   }`}
               >
                 <option value="" disabled>How can we help you?</option>
@@ -167,7 +167,7 @@ export default function ContactUsPage() {
                   onInvalid={handleInvalid}
                   required
                   className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-                    errors.name ? 'border-red-500' : 'border-black'
+                    errors.name ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
                 {errors.name && (
@@ -185,7 +185,7 @@ export default function ContactUsPage() {
                   name="orderNumber"
                   value={formData.orderNumber}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-black focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                 />
               </div>
             </div>
@@ -204,7 +204,7 @@ export default function ContactUsPage() {
                 onInvalid={handleInvalid}
                 required
                   className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-                    errors.email ? 'border-red-500' : 'border-black'
+                    errors.email ? 'border-red-500' : 'border-gray-300'
                   }`}
               />
               {errors.email && (
@@ -239,7 +239,7 @@ export default function ContactUsPage() {
                 required
                 rows={6}
                   className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-                    errors.message ? 'border-red-500' : 'border-black'
+                    errors.message ? 'border-red-500' : 'border-gray-300'
                   }`}
               />
               {errors.message && (

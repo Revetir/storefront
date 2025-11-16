@@ -32,6 +32,13 @@ const ZoomModal = ({
     return () => setMounted(false)
   }, [])
 
+  // Ensure visible index matches selected image whenever modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentVisibleIndex(initialIndex)
+    }
+  }, [initialIndex, isOpen])
+
   // Lock body scroll when modal is open and scroll to initial image
   useEffect(() => {
     if (isOpen) {
@@ -77,27 +84,26 @@ const ZoomModal = ({
       const container = scrollContainerRef.current
       if (!container) return
 
-      // Find which image is currently most visible (centered in viewport)
-      let mostVisibleIndex = 0
-      let maxVisibility = 0
+      const containerCenter = container.scrollTop + container.clientHeight / 2
+      let closestIndex = 0
+      let minDistance = Infinity
 
       imageRefs.current.forEach((ref, index) => {
-        if (ref) {
-          const rect = ref.getBoundingClientRect()
-          const viewportCenter = window.innerHeight / 2
+        if (!ref) {
+          return
+        }
 
-          // Calculate how much of the image is visible near the center
-          const distanceFromCenter = Math.abs((rect.top + rect.bottom) / 2 - viewportCenter)
-          const visibility = Math.max(0, window.innerHeight - distanceFromCenter)
+        const elementTop = ref.offsetTop
+        const elementCenter = elementTop + ref.offsetHeight / 2
+        const distanceFromCenter = Math.abs(elementCenter - containerCenter)
 
-          if (visibility > maxVisibility) {
-            maxVisibility = visibility
-            mostVisibleIndex = index
-          }
+        if (distanceFromCenter < minDistance) {
+          minDistance = distanceFromCenter
+          closestIndex = index
         }
       })
 
-      setCurrentVisibleIndex(mostVisibleIndex)
+      setCurrentVisibleIndex(closestIndex)
     }
 
     const container = scrollContainerRef.current

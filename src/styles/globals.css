@@ -252,6 +252,16 @@ img {
     content: "▪ ";
   }
 
+  /* Disable custom list markers in search modal */
+  .ais-Hits-list li::marker {
+    content: none;
+  }
+
+  /* Disable custom list markers in category sidebar */
+  nav ul li::marker {
+    content: none;
+  }
+
   /* Infinite scroll animation */
   @keyframes scroll-left {
     0% {

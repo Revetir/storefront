@@ -84,7 +84,7 @@ const Register = ({ setCurrentView }: Props) => {
           </LocalizedClientLink>
           .
         </span>
-        <SubmitButton className="w-full mt-6" data-testid="register-button">
+        <SubmitButton className="w-full mt-6 uppercase" data-testid="register-button">
           Join
         </SubmitButton>
       </form>

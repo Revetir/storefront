@@ -86,7 +86,7 @@ export default function PromotionsPage() {
                 </div>
               </div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="bg-white/90 backdrop-blur-sm p-8 text-center max-w-md">
+                <div className="bg-white/90 border border-black backdrop-blur-sm p-8 text-center max-w-md">
                   <h3 className="text-lg font-semibold mb-4">Member-Only Access</h3>
                   <p className="text-gray-600 mb-6">
                     Log in or create an account to view exclusive member promotions

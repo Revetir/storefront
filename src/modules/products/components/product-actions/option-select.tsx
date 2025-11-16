@@ -59,7 +59,7 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
     <div className="flex flex-col gap-y-3">
       {/* <span className="text-sm">{title}</span> */}
       <div
-        className="flex flex-wrap justify-between gap-2"
+        className="flex flex-wrap justify-between gap-4"
         data-testid={dataTestId}
       >
         {sortedOptions.map((v) => {

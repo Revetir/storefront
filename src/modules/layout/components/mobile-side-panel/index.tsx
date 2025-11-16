@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import X from "@modules/common/icons/x"
 import ChevronDown from "@modules/common/icons/chevron-down"
 import ChevronRight from "@modules/common/icons/chevron-right"
@@ -28,6 +28,7 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
   const [activeSubPanel, setActiveSubPanel] = useState<string | null>(null)
   const [activeNestedPanel, setActiveNestedPanel] = useState<string | null>(null)
   const [subPanelStack, setSubPanelStack] = useState<Array<{type: string, categoryId?: string}>>([])
+  const [filteredCategories, setFilteredCategories] = useState<Category[]>(categories)
 
   const toggleCategory = (categoryId: string) => {
     const newExpanded = new Set(expandedCategories)
@@ -119,7 +120,56 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
     return result
   }
 
-  const allCategories = flattenCategories(categories)
+  // Helper function to filter the tree so we only display categories that have products
+  const filterCategoryTree = (cats: Category[], availableHandles: Set<string>): Category[] => {
+    return cats
+      .map(cat => {
+        const filteredChildren = cat.children && cat.children.length > 0
+          ? filterCategoryTree(cat.children, availableHandles)
+          : []
+
+        if (availableHandles.has(cat.handle) || filteredChildren.length > 0) {
+          return {
+            ...cat,
+            children: filteredChildren
+          }
+        }
+
+        return null
+      })
+      .filter(Boolean) as Category[]
+  }
+
+  useEffect(() => {
+    let isMounted = true
+
+    const fetchVisibleCategories = async () => {
+      try {
+        const { getAvailableCategories } = await import("@lib/util/algolia-facets")
+        const categoryFacets = await getAvailableCategories()
+
+        const availableHandles = new Set(categoryFacets.map((facet) => facet.handle))
+        const filtered = filterCategoryTree(categories, availableHandles)
+
+        if (isMounted) {
+          setFilteredCategories(filtered.length > 0 ? filtered : categories)
+        }
+      } catch (error) {
+        console.error("[MobileSidePanel] Error filtering categories:", error)
+        if (isMounted) {
+          setFilteredCategories(categories)
+        }
+      }
+    }
+
+    fetchVisibleCategories()
+
+    return () => {
+      isMounted = false
+    }
+  }, [categories])
+
+  const allCategories = flattenCategories(filteredCategories)
 
   if (!isOpen) return null
 
@@ -145,7 +195,7 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
             <div className="space-y-16">
               {/* Clothing Categories Group */}
               <div className="space-y-3">
-                {categories.map((category: Category) => {
+                {filteredCategories.map((category: Category) => {
                   const hasChildren = category.children && category.children.length > 0
                   
                   return (
@@ -333,7 +383,7 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                       return 'Brands'
                     }
                     if (currentPanel.type === 'category' && currentPanel.categoryId) {
-                      const selectedCategory = findCategoryById(categories, currentPanel.categoryId)
+                      const selectedCategory = findCategoryById(filteredCategories, currentPanel.categoryId)
                       return selectedCategory ? selectedCategory.name : 'Category'
                     }
                     return 'Category'
@@ -358,7 +408,7 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                     const previousPanel = subPanelStack.length > 1 ? subPanelStack[0] : null
                     let genderPath = 'men' // default
                     if (previousPanel && previousPanel.type === 'category' && previousPanel.categoryId) {
-                      const parentCat = findCategoryById(categories, previousPanel.categoryId)
+                      const parentCat = findCategoryById(filteredCategories, previousPanel.categoryId)
                       if (parentCat?.handle === 'women') {
                         genderPath = 'women'
                       }
@@ -382,7 +432,7 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
 
                   // Category panel
                   if (currentPanel.type === 'category' && currentPanel.categoryId) {
-                    const selectedCategory = findCategoryById(categories, currentPanel.categoryId)
+                    const selectedCategory = findCategoryById(filteredCategories, currentPanel.categoryId)
 
                     // Check if this is a gender root category (men or women)
                     const isGenderRoot = selectedCategory?.handle === 'men' || selectedCategory?.handle === 'women'

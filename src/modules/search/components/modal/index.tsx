@@ -100,7 +100,7 @@ export default function SearchModal() {
         <div
           ref={dropdownRef}
           style={dropdownStyle}
-          className="bg-white border border-black !rounded-none !shadow-none p-0 pb-8 flex flex-col justify-between max-h-[80vh] overflow-hidden" // flex column for vertical centering, max height for mobile
+          className="bg-white border border-black !rounded-none !shadow-none p-0 pb-2 flex flex-col justify-between max-h-[80vh] overflow-hidden" // flex column for vertical centering, max height for mobile
         >
           <InstantSearch
             key={gender}
@@ -157,9 +157,7 @@ export default function SearchModal() {
               </div>
             </div>
             {/* Results area, with horizontal padding to match modal sides */}
-            <div className="max-h-96 overflow-y-auto px-4 pb-4 md:px-8" style={{ marginTop: "16px" }}>
-              <SearchResults gender={gender} />
-            </div>
+            <ResultsContainer gender={gender} />
           </InstantSearch>
         </div>,
         document.body
@@ -294,13 +292,27 @@ const BrandHit = ({ hit, gender }: { hit: any, gender: "menswear" | "womenswear"
 // Component to conditionally show products section only if there are product results
 function ProductSection() {
   const { hits } = useHits();
-  
+
   if (hits.length === 0) return null;
-  
+
   return (
     <div>
       <h4 className="text-xs uppercase text-gray-500 font-bold tracking-wide mb-3">PRODUCTS</h4>
       <Hits hitComponent={ProductHit} />
+    </div>
+  );
+}
+
+// Wrapper component that only renders the results container when there's a query
+function ResultsContainer({ gender }: { gender: "menswear" | "womenswear" }) {
+  const { query } = useSearchBox();
+
+  // Don't render the container at all if there's no query
+  if (!query.trim()) return null;
+
+  return (
+    <div className="max-h-96 overflow-y-auto px-4 pb-4 md:px-8" style={{ marginTop: "16px" }}>
+      <SearchResults gender={gender} />
     </div>
   );
 }

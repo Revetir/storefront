@@ -304,6 +304,7 @@ const AddressAutocomplete = React.forwardRef<
             padding: 0.5rem 0.75rem !important;
             display: block !important;
             width: 100% !important;
+            min-height: 42px !important;
             height: auto !important;
             margin-top: 0 !important;
             background-color: transparent !important;
@@ -312,7 +313,7 @@ const AddressAutocomplete = React.forwardRef<
             appearance: none !important;
             box-sizing: border-box !important;
             font-size: 0.875rem !important;
-            line-height: 1.25rem !important;
+            line-height: 1.5rem !important;
             color: var(--ui-fg-base) !important;
             transition: all 0.2s ease !important;
           }

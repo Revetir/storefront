@@ -23,7 +23,7 @@ const NewsletterInput = React.forwardRef<HTMLInputElement, NewsletterInputProps>
         onFocus={onFocus}
         placeholder={placeholder}
         required={required}
-        className={`w-full h-10 px-3 py-2 border border-black focus:border-black focus:outline-none transition-colors ${className}`}
+        className={`w-full h-10 px-3 py-2 border border-gray-300 focus:border-black focus:outline-none transition-colors ${className}`}
       />
     )
   }

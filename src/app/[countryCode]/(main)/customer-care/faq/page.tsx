@@ -224,7 +224,7 @@ export default function FAQPage() {
         <div className="space-y-8">
           {faqData.map((category, categoryIndex) => (
             <div key={categoryIndex} id={`category-${categoryIndex}`}>
-              <h2 className="text-2xl font-semibold mb-6 text-gray-900 border-b border-black pb-2">
+              <h2 className="text-2xl font-semibold mb-6 text-gray-900 border-b border-gray-200 pb-2">
                 {category.title}
               </h2>
               
@@ -236,11 +236,11 @@ export default function FAQPage() {
                   return (
                     <div
                       key={itemIndex}
-                      className="border border-black overflow-hidden"
+                      className="border border-gray-200 overflow-hidden"
                     >
                       <button
                         onClick={() => toggleItem(categoryIndex, itemIndex)}
-                        className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-inset transition-colors"
+                        className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50"
                       >
                         <div className="flex justify-between items-center">
                           <h3 className="font-medium text-gray-900 pr-4">
@@ -265,7 +265,7 @@ export default function FAQPage() {
                       </button>
                       
                       {isOpen && (
-                        <div className="px-6 pb-4 bg-gray-50">
+                        <div className="px-6 pb-4">
                           <p className="text-gray-700 leading-relaxed">
                             {item.answer}
                           </p>

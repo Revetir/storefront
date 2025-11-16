@@ -244,8 +244,19 @@ const CartDropdown = ({
               ) : (
                 <div>
                   <div className="flex py-16 flex-col gap-y-4 items-center justify-center">
-                    <div className="bg-gray-900 text-small-regular flex items-center justify-center w-6 h-6 text-white">
-                      <span>0</span>
+                    <div className="relative">
+                      <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 32 32"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="text-gray-900"
+                      >
+                        <rect x="6" y="10" width="20" height="18" stroke="currentColor" strokeWidth="2" fill="none"/>
+                        <path d="M10 10 L10 8 C10 5.79 11.79 4 14 4 L18 4 C20.21 4 22 5.79 22 8 L22 10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      </svg>
+                      <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs font-medium">0</span>
                     </div>
                     <span>Your shopping bag is empty.</span>
                     {/* <div>

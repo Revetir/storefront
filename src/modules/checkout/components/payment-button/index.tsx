@@ -44,6 +44,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   const paymentSession = cart.payment_collection?.payment_sessions?.[0]
   const stripeReady = useContext(StripeContext)
 
+  // Avoid rendering any fallback button while the payment session is still loading.
+  if (!paymentSession) {
+    return null
+  }
+
   switch (true) {
     case isStripe(paymentSession?.provider_id):
       // Only render StripePaymentButton if we're inside Elements context
@@ -67,7 +72,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         <ManualTestPaymentButton notReady={notReady} cart={cart} data-testid={dataTestId} />
       )
     default:
-      return <Button disabled className="uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200">Select a payment method</Button>
+      // Unknown payment providers should simply not render a button instead of flashing the generic CTA.
+      return null
   }
 }
 
@@ -271,7 +277,7 @@ const StripePaymentButton = ({
           size="large"
           isLoading={submitting}
           data-testid={dataTestId}
-          className="w-full uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200"
+          className="w-full uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200 cursor-pointer"
         >
           {buttonText}
         </Button>
@@ -325,7 +331,7 @@ const ManualTestPaymentButton = ({ notReady, cart }: { notReady: boolean, cart: 
         onClick={handlePayment}
         size="large"
         data-testid="submit-order-button"
-        className="w-full uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200"
+        className="w-full uppercase !rounded-none !bg-black !text-white hover:!bg-gray-800 transition-colors duration-200 cursor-pointer"
       >
         Place order
       </Button>
