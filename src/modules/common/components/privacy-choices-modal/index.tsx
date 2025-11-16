@@ -148,7 +148,7 @@ const PrivacyChoicesModal: React.FC<PrivacyChoicesModalProps> = ({
               <Button
                 variant="secondary"
                 onClick={handleAcceptAll}
-                className="text-sm"
+                className="text-sm !rounded-none !bg-white !text-black !border !border-black hover:!bg-black hover:!text-white"
               >
                 Accept All
               </Button>
@@ -163,14 +163,14 @@ const PrivacyChoicesModal: React.FC<PrivacyChoicesModalProps> = ({
                     <div className="flex items-center gap-2">
                       <span>{option.title}</span>
                       {option.required && (
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1">
                           Required
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-3">
                       {option.required ? (
-                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded font-medium">
+                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 font-medium">
                           Always Active
                         </span>
                       ) : option.id === "analytics" || option.id === "marketing" ? (
@@ -222,7 +222,7 @@ const PrivacyChoicesModal: React.FC<PrivacyChoicesModalProps> = ({
           <div className="flex justify-end w-full">
             <Button
               onClick={handleSavePreferences}
-              className="text-sm"
+              className="text-sm !rounded-none !bg-white !text-black !border !border-black hover:!bg-black hover:!text-white"
             >
               Confirm my choices
             </Button>

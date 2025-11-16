@@ -87,8 +87,8 @@ export default function SearchModal() {
         className="hover:text-black bg-transparent p-0 m-0 border-0 outline-none cursor-pointer"
       >
         {/* Mobile: Show icon */}
-        <div className="md:hidden p-2 hover:bg-gray-100 rounded-full">
-          <Search className="w-5 h-5 text-gray-700" />
+        <div className="md:hidden p-2 hover:opacity-70 transition-opacity">
+          <Search className="w-5 h-5 text-black" />
         </div>
         
         {/* Desktop: Show text */}
@@ -307,9 +307,10 @@ function ProductSection() {
 
 function SearchResults({ gender }: { gender: "menswear" | "womenswear" }) {
   const { query } = useSearchBox();
+  const { hits: productHits } = useHits();
   const [brandHits, setBrandHits] = useState<any[]>([]);
   const [isLoadingBrands, setIsLoadingBrands] = useState(false);
-  
+
   // Search brands when query changes
   useEffect(() => {
     if (!query.trim()) {
@@ -328,7 +329,7 @@ function SearchResults({ gender }: { gender: "menswear" | "womenswear" }) {
             hitsPerPage: 3,
           }
         }]);
-        
+
         setBrandHits(response.results[0]?.hits || []);
       } catch (error) {
         console.error('Error searching brands:', error);
@@ -340,9 +341,14 @@ function SearchResults({ gender }: { gender: "menswear" | "womenswear" }) {
 
     searchBrands();
   }, [query]);
-  
+
   if (!query.trim()) return null;
-  
+
+  // Only render the container with padding if there are results to show
+  const hasResults = brandHits.length > 0 || productHits.length > 0;
+
+  if (!hasResults) return null;
+
   return (
     <div className="space-y-6">
       {/* Brands Section - only shows if there are brand results */}
@@ -354,7 +360,7 @@ function SearchResults({ gender }: { gender: "menswear" | "womenswear" }) {
           ))}
         </div>
       )}
-      
+
       {/* Products Section - only shows if there are product results */}
       <ProductSection />
     </div>

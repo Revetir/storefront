@@ -12,7 +12,7 @@ const SearchDisabledBanner: React.FC = () => {
   }
 
   return (
-    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+    <div className="bg-yellow-50 border border-yellow-200 p-4 mb-4">
       <div className="flex items-start">
         <div className="flex-shrink-0">
           <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
@@ -33,7 +33,7 @@ const SearchDisabledBanner: React.FC = () => {
             <button
               type="button"
               onClick={openPrivacyChoices}
-              className="bg-yellow-50 text-yellow-800 hover:bg-yellow-100 px-3 py-2 rounded-md text-sm font-medium border border-yellow-300 transition-colors"
+              className="bg-yellow-50 text-yellow-800 hover:bg-yellow-100 px-3 py-2 text-sm font-medium border border-yellow-300 transition-colors"
             >
               Update Privacy Settings
             </button>

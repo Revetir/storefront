@@ -13,23 +13,23 @@ const Menu = ({ className }: { className?: string }) => {
       <path
         d="M3 12H21"
         stroke="currentColor"
-        strokeWidth="1.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        strokeWidth="1"
+        strokeLinecap="square"
+        strokeLinejoin="miter"
       />
       <path
         d="M3 6H21"
         stroke="currentColor"
-        strokeWidth="1.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        strokeWidth="1"
+        strokeLinecap="square"
+        strokeLinejoin="miter"
       />
       <path
         d="M3 18H21"
         stroke="currentColor"
-        strokeWidth="1.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        strokeWidth="1"
+        strokeLinecap="square"
+        strokeLinejoin="miter"
       />
     </svg>
   )

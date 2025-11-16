@@ -88,7 +88,7 @@ const CountdownTimer = ({ className = "", style = {}, asButton = false }: Countd
         aria-label="Product launching countdown"
         disabled
       >
-        LAUNCHING IN {timeRemaining}
+        LAUNCHES IN {timeRemaining}
       </button>
     )
   }

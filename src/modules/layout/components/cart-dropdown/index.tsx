@@ -232,7 +232,7 @@ const CartDropdown = ({
                     </div>
                     <LocalizedClientLink href="/bag" passHref>
                       <Button
-                        className="w-full uppercase"
+                        className="w-full uppercase !rounded-none !bg-white !text-black !border !border-black hover:!bg-black hover:!text-white"
                         size="large"
                         data-testid="go-to-cart-button"
                       >
@@ -244,7 +244,7 @@ const CartDropdown = ({
               ) : (
                 <div>
                   <div className="flex py-16 flex-col gap-y-4 items-center justify-center">
-                    <div className="bg-gray-900 text-small-regular flex items-center justify-center w-6 h-6 rounded-full text-white">
+                    <div className="bg-gray-900 text-small-regular flex items-center justify-center w-6 h-6 text-white">
                       <span>0</span>
                     </div>
                     <span>Your shopping bag is empty.</span>

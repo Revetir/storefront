@@ -22,7 +22,7 @@ export default function EditorialArchive() {
               <Link href={`/editorial/${article.slug}`} className="block">
                 {/* Image */}
                 {article.image && (
-                  <div className="relative w-full h-[300px] mb-4 overflow-hidden rounded-lg">
+                  <div className="relative w-full h-[300px] mb-4 overflow-hidden">
                     <Image
                       src={article.image}
                       alt={article.title}

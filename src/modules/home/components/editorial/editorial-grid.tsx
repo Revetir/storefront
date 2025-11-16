@@ -20,7 +20,7 @@ const EditorialSection = () => {
                   alt={editorial.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  className="rounded-md object-cover"
+                  className="object-cover"
                 />
               </Link>
             </div>

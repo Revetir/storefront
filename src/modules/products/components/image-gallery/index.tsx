@@ -139,7 +139,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     src={image.url}
                     priority={index <= 2 ? true : false}
                     loading={index <= 2 ? undefined : "lazy"}
-                    className="absolute inset-0 rounded-rounded"
+                    className="absolute inset-0"
                     alt={getAltText(index)}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1280px) 50vw, 50vw"
@@ -165,7 +165,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
             {images.map((_, index) => (
               <div
                 key={index}
-                className={`h-1 rounded-full transition-all duration-300 ${
+                className={`h-1 transition-all duration-300 ${
                   index === currentImageIndex 
                     ? 'bg-black w-8' 
                     : 'bg-gray-300 w-4'
@@ -199,7 +199,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                     src={image.url}
                     priority={index <= 2 ? true : false}
                     loading={index <= 2 ? undefined : "lazy"}
-                    className="absolute inset-0 rounded-rounded"
+                    className="absolute inset-0"
                     alt={getAltText(index)}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw, (max-width: 1024px) 50vw, 50vw"
@@ -225,7 +225,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
             {images.map((_, index) => (
               <div
                 key={index}
-                className={`h-1 rounded-full transition-all duration-300 ${
+                className={`h-1 transition-all duration-300 ${
                   index === currentImageIndex 
                     ? 'bg-black w-8' 
                     : 'bg-gray-300 w-4'
@@ -260,7 +260,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
                       src={image.url}
                       priority={index <= 2 ? true : false}
                       loading={index <= 2 ? undefined : "lazy"}
-                      className="rounded-rounded"
+                      className=""
                       alt={getAltText(index)}
                       width={3000}
                       height={3000}

@@ -34,9 +34,9 @@ export default function NavClient({ regions, customer, categories, brands, cart 
           <div className="flex items-center gap-x-1.5 sm:gap-x-4 lg:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="p-1 sm:p-2 hover:bg-gray-100 rounded-full"
+              className="p-1 sm:p-2 hover:opacity-70 transition-opacity"
             >
-              <Menu className="w-5 h-5 text-gray-700" />
+              <Menu className="w-5 h-5 text-black" />
             </button>
 
             <SearchModal />
@@ -87,8 +87,8 @@ export default function NavClient({ regions, customer, categories, brands, cart 
 
           {/* Right Section - Mobile Icons */}
           <div className="flex lg:hidden items-center gap-x-1.5 sm:gap-x-4">
-            <LocalizedClientLink href="/account" className="p-1 sm:p-2 hover:bg-gray-100 rounded-full">
-              <User className="w-5 h-5 text-gray-700" />
+            <LocalizedClientLink href="/account" className="p-1 sm:p-2 hover:opacity-70 transition-opacity">
+              <User className="w-5 h-5 text-black" />
             </LocalizedClientLink>
 
             <CartButtonClient cart={cart} />

@@ -236,7 +236,7 @@ export default function FAQPage() {
                   return (
                     <div
                       key={itemIndex}
-                      className="border border-gray-200 rounded-lg overflow-hidden"
+                      className="border border-gray-200 overflow-hidden"
                     >
                       <button
                         onClick={() => toggleItem(categoryIndex, itemIndex)}

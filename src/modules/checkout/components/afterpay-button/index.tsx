@@ -23,7 +23,7 @@ const AfterpayButton: React.FC<AfterpayButtonProps> = ({
       onClick={onClick}
       disabled={disabled || isLoading}
       aria-label="Cash App Afterpay"
-      className="w-full relative flex items-center justify-center h-[48px] rounded-lg cursor-pointer border-0 bg-[#101010] disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+      className="w-full relative flex items-center justify-center h-[48px] cursor-pointer border-0 bg-[#101010] disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
     >
       {isLoading ? (
         <div className="flex items-center justify-center">

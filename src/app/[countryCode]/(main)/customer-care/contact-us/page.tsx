@@ -108,10 +108,10 @@ export default function ContactUsPage() {
       </p>
 
       {/* Contact Form */}
-      <div className="bg-white p-6 rounded-lg">
+      <div className="bg-white p-6">
           {submitStatus.type && (
             <div
-              className={`p-4 rounded-md mb-6 ${
+              className={`p-4 mb-6 ${
                 submitStatus.type === "success"
                   ? "bg-green-50 text-green-800 border border-green-200"
                   : "bg-red-50 text-red-800 border border-red-200"
@@ -133,7 +133,7 @@ export default function ContactUsPage() {
                 onChange={handleInputChange}
                 onInvalid={handleInvalid}
                 required
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent ${
+                className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent ${
                   errors.request ? 'border-red-500' : 'border-gray-300'
                 }`}
               >
@@ -166,7 +166,7 @@ export default function ContactUsPage() {
                   onChange={handleInputChange}
                   onInvalid={handleInvalid}
                   required
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                  className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
                     errors.name ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -185,7 +185,7 @@ export default function ContactUsPage() {
                   name="orderNumber"
                   value={formData.orderNumber}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                 />
               </div>
             </div>
@@ -203,7 +203,7 @@ export default function ContactUsPage() {
                 onBlur={handleBlur}
                 onInvalid={handleInvalid}
                 required
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
                   errors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -222,7 +222,7 @@ export default function ContactUsPage() {
                 name="subject"
                 value={formData.subject}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                className="w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
               />
             </div>
 
@@ -238,7 +238,7 @@ export default function ContactUsPage() {
                 onInvalid={handleInvalid}
                 required
                 rows={6}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
                   errors.message ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -250,7 +250,7 @@ export default function ContactUsPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-black text-white py-2 px-6 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-black text-white py-2 px-6 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSubmitting ? "Sending..." : "Send"}
             </button>

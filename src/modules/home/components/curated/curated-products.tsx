@@ -15,7 +15,7 @@ const CuratedProducts = () => {
 
       {/* Desktop Header - with countdown timer */}
       <h2 className="hidden lg:block text-4xl font-light mb-6">
-        THE EDIT - launching in <CountdownTimer />
+        THE EDIT - launches in <CountdownTimer />
       </h2>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -26,7 +26,7 @@ const CuratedProducts = () => {
                   src="/images/streetwear_outfit.jpg"
                   alt="Model wearing Streetwear outfit"
                   fill
-                  className="object-cover rounded-md"
+                  className="object-cover"
                   priority={true}
                   quality={80}
                   sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -42,7 +42,7 @@ const CuratedProducts = () => {
                 src="/images/dark_luxury_outfit.jpg"
                 alt="Model wearing Dark Luxury outfit"
                 fill
-                className="object-cover rounded-md"
+                className="object-cover"
                 priority={true}
                 quality={80}
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -58,7 +58,7 @@ const CuratedProducts = () => {
                 src="/images/retro_americana_outfit.jpg"
                 alt="Model wearing Retro Americana outfit"
                 fill
-                className="object-cover rounded-md"
+                className="object-cover"
                 quality={80}
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />
@@ -73,7 +73,7 @@ const CuratedProducts = () => {
                 src="/images/minimalist_outfit.png"
                 alt="Model wearing Minimalist outfit"
                 fill
-                className="object-cover rounded-md"
+                className="object-cover"
                 quality={80}
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />

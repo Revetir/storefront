@@ -189,12 +189,12 @@ export default function ProductActions({
         {
           // 1) Multi-variant & none selected → prompt selection
           product.variants && product.variants.length > 1 && (!selectedVariant || !isValidVariant)
-            ? "Select a size"
+            ? "SELECT A SIZE"
             // 2) Out of stock (including no-variants scenario) → show out-of-stock
             : !inStock
-            ? "Out of Stock"
+            ? "OUT OF STOCK"
             // 3) Otherwise → ready to add
-            : "Add to bag"
+            : "ADD TO BAG"
         }
       </Button>
 

@@ -61,7 +61,7 @@ export default function EditorialPage({ params }: EditorialPageProps) {
         <span className="font-normal"> | {article.date}</span>
       </p>
       {article.image && (
-        <img src={article.image} alt={article.title} className="rounded-md my-6 mx-auto block" />
+        <img src={article.image} alt={article.title} className="my-6 mx-auto block" />
       )}
       <div dangerouslySetInnerHTML={{ __html: article.content }} />
       {/* You can extend this to render other media types as needed */}

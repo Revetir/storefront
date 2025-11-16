@@ -23,7 +23,7 @@ export default function PartnershipsPage() {
         <div className="mb-12">
           <h2 className="text-2xl font-semibold mb-6">Partnership Opportunities</h2>
           <div className="grid gap-8 md:grid-cols-2">
-            <div className="border border-gray-200 rounded-lg p-6">
+            <div className="border border-gray-200 p-6">
               <h3 className="font-semibold text-lg mb-3">Brand Collaborations</h3>
               <p className="text-gray-600 mb-4">
                 Partner with us to bring your collections to a curated global audience through our selective retail platform.
@@ -35,7 +35,7 @@ export default function PartnershipsPage() {
               </ul>
             </div>
             
-            <div className="border border-gray-200 rounded-lg p-6">
+            <div className="border border-gray-200 p-6">
               <h3 className="font-semibold text-lg mb-3">Affiliate Partnerships</h3>
               <p className="text-gray-600 mb-4">
               Join our affiliate network and earn competitive commissions by sharing Revetir’s curated selection of conscious luxury with your audience.
@@ -47,7 +47,7 @@ export default function PartnershipsPage() {
               </ul>
             </div>
             
-            <div className="border border-gray-200 rounded-lg p-6">
+            <div className="border border-gray-200 p-6">
               <h3 className="font-semibold text-lg mb-3">Supplier Partnerships</h3>
               <p className="text-gray-600 mb-4">
                 We’re seeking experienced manufacturers with impeccable attention to detail and transparent business practices. 
@@ -70,7 +70,7 @@ export default function PartnershipsPage() {
           <div className="space-y-2">
               <p><strong>partnerships@revetir.com</strong></p>
           </div>
-          <div className="bg-gray-50 rounded-lg p-6 mt-4"> 
+          <div className="bg-gray-50 p-6 mt-4"> 
               <p className="text-sm text-gray-600">
                 Please include in your email:
               </p>

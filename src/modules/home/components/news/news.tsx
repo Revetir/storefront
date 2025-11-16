@@ -15,7 +15,7 @@ const NewsSection = () => {
                 alt="Lemaire Nine Frames Video Thumbnail"
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
-                className="rounded-md object-cover"
+                className="object-cover"
               />
             </div>
             <div className="text-left">
@@ -32,7 +32,7 @@ const NewsSection = () => {
                 alt="Gentle Monster Tea House Article"
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
-                className="rounded-md object-cover"
+                className="object-cover"
               />
             </div>
             <div className="text-left">
@@ -49,7 +49,7 @@ const NewsSection = () => {
                 alt="Demna Leaves Balenciaga News Article"
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
-                className="rounded-md object-cover"
+                className="object-cover"
               />
             </div>
             <div className="text-left">

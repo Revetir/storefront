@@ -29,7 +29,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   }
 
   return (
-    <div className={clx("border border-gray-200 rounded-lg", className)}>
+    <div className={clx("border border-gray-200", className)}>
       <button
         type="button"
         onClick={handleToggle}

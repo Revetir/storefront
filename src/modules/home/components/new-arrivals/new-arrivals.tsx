@@ -363,12 +363,12 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                 }}
                 onDragStart={(e) => e.preventDefault()}
               >
-                <div className="aspect-square relative mb-4 bg-white rounded-md">
+                <div className="aspect-square relative mb-4 bg-white">
                   <Image
                     src={product.thumbnail || "/images/imgi_1_elementor-placeholder-image.png"}
                     alt={`${(product as any).brands?.[0]?.name || 'Product'} ${product.title}`}
                     fill
-                    className="rounded-md object-contain"
+                    className="object-contain"
                     loading="lazy"
                     quality={80}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
@@ -573,12 +573,12 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                     width: 'clamp(280px, 25vw, 350px)',
                   }}
                 >
-                  <div className="aspect-square relative mb-4 bg-white rounded-md">
+                  <div className="aspect-square relative mb-4 bg-white">
                     <Image
                       src={product.thumbnail || "/images/imgi_1_elementor-placeholder-image.png"}
                       alt={`${(product as any).brands?.[0]?.name || 'Product'} ${product.title}`}
                       fill
-                      className="rounded-md object-contain"
+                      className="object-contain"
                       loading="lazy"
                       quality={80}
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

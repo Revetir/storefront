@@ -67,7 +67,7 @@ const Modal = ({
                     "!max-w-full !max-h-full !h-[100dvh] !w-screen !p-0 xsmall:!max-w-full xsmall:!max-h-full xsmall:!h-[100dvh] xsmall:!w-screen xsmall:!p-0 lg:!max-w-4xl lg:!max-h-[688px] lg:!h-[688px] lg:!p-5": size === "large",
                     // For search modals, sharp and rectangular, no shadow, no border-radius
                     "bg-white": search,
-                    "bg-white shadow-xl border rounded-rounded": !search,
+                    "bg-white shadow-xl border": !search,
                   },
                   search && "!rounded-none !shadow-none !border-none p-0",
                   panelClassName

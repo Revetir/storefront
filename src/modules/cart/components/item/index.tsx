@@ -174,7 +174,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
           {/* Full mode mobile: quantity controls and delete button at bottom right */}
           {type === "full" && (
             <div className="lg:hidden absolute bottom-1 right-0 flex items-center gap-1.5">
-              <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden">
+              <div className="flex items-center border border-ui-border-base overflow-hidden">
                 <button
                   onClick={() => changeQuantity(Math.max(1, item.quantity - 1))}
                   disabled={item.quantity <= 1 || updating}

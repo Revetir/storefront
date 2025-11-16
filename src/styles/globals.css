@@ -169,7 +169,7 @@
 
   /* Ensure the grid container itself doesn't have any conflicting styles */
   .contrast-btn {
-    @apply px-4 py-2 border border-black rounded-full hover:bg-black hover:text-white transition-colors duration-200 ease-in;
+    @apply px-4 py-2 border border-black hover:bg-black hover:text-white transition-colors duration-200 ease-in;
   }
 
   .text-xsmall-regular {

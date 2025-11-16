@@ -30,7 +30,7 @@ export default function AccessibilityPage() {
               or notice any content, feature, or function that you believe is not fully accessible to people who are differently abled, please:
             </p>
             
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
+            <div className="bg-gray-50 border border-gray-200 p-6 mb-6">
               <p className="text-gray-700 mb-3">
                 Write to us at <a href="mailto:care@revetir.com" className="text-blue-600 hover:underline">care@revetir.com</a>
               </p>
