@@ -117,40 +117,26 @@ export default function SearchModal({ isOpen: externalIsOpen, setIsOpen: externa
             {/* Gender buttons row, with top padding for vertical centering */}
             <div style={{ display: "flex", alignItems: "center", gap: "1rem", padding: "16px 16px 0 16px" }} className="md:px-8 md:pt-8">
               <button
-                style={{
-                  background: "none",
-                  border: "none",
-                  fontWeight: gender === "menswear" ? "bold" : "normal",
-                  textDecoration: gender === "menswear" ? "underline" : "none",
-                  cursor: "pointer",
-                  textTransform: "uppercase",
-                  fontFamily: 'inherit', // inherit from nav
-                  fontSize: '0.75rem', // text-xs
-                  letterSpacing: '0.05em', // uppercase spacing
-                  color: '#374151', // text-gray-700
-                }}
                 onClick={() => setGender("menswear")}
                 type="button"
-                className="uppercase text-xs font-sans text-gray-700 hover:text-black"
+                className={`uppercase text-xs font-sans text-gray-700 hover:text-black hover:underline bg-transparent border-0 cursor-pointer ${gender === "menswear" ? "font-bold underline" : "font-normal"}`}
+                style={{
+                  fontFamily: 'inherit',
+                  fontSize: '0.75rem',
+                  letterSpacing: '0.05em',
+                }}
               >
                 MENSWEAR
               </button>
               <button
+                onClick={() => setGender("womenswear")}
+                type="button"
+                className={`uppercase text-xs font-sans text-gray-700 hover:text-black hover:underline bg-transparent border-0 cursor-pointer ${gender === "womenswear" ? "font-bold underline" : "font-normal"}`}
                 style={{
-                  background: "none",
-                  border: "none",
-                  fontWeight: gender === "womenswear" ? "bold" : "normal",
-                  textDecoration: gender === "womenswear" ? "underline" : "none",
-                  cursor: "pointer",
-                  textTransform: "uppercase",
                   fontFamily: 'inherit',
                   fontSize: '0.75rem',
                   letterSpacing: '0.05em',
-                  color: '#374151',
                 }}
-                onClick={() => setGender("womenswear")}
-                type="button"
-                className="uppercase text-xs font-sans text-gray-700 hover:text-black"
               >
                 WOMENSWEAR
               </button>

@@ -17,29 +17,29 @@ export default function Footer() {
         {/* Top basic links section */}
         <div className="no-border pt-6 pb-1 hidden lg:block">
           <nav className="flex flex-nowrap justify-between lg:flex-wrap lg:justify-center lg:gap-x-9 gap-y-4 text-black txt-xsmall uppercase text-center">
-            <LocalizedClientLink href="/customer-care/contact-us" className="hover:text-ui-fg-base">
+            <LocalizedClientLink href="/customer-care/contact-us" className="hover:text-ui-fg-base hover:underline">
               Customer Care
             </LocalizedClientLink>
-            <LocalizedClientLink href="/customer-care/promotions" className="hover:text-ui-fg-base">
+            <LocalizedClientLink href="/customer-care/promotions" className="hover:text-ui-fg-base hover:underline">
               Promotions
             </LocalizedClientLink>
-            <LocalizedClientLink href="/customer-care/about-us" className="hover:text-ui-fg-base">
+            <LocalizedClientLink href="/customer-care/about-us" className="hover:text-ui-fg-base hover:underline">
               About Us
             </LocalizedClientLink>
             <button
               onClick={() => setIsNewsletterModalOpen(true)}
-              className="hover:text-ui-fg-base cursor-pointer"
+              className="hover:text-ui-fg-base hover:underline cursor-pointer"
             >
               EMAIL SIGNUP
             </button>
-            <LocalizedClientLink href="/partnerships" className="hover:text-ui-fg-base">
+            <LocalizedClientLink href="/partnerships" className="hover:text-ui-fg-base hover:underline">
               Partnerships
             </LocalizedClientLink>
             <a
               href="https://instagram.com/shoprevetir"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-ui-fg-base"
+              className="hover:text-ui-fg-base hover:underline"
               onClick={() => trackSocialClick({ platform: 'instagram' })}
             >
               Instagram
@@ -48,12 +48,12 @@ export default function Footer() {
               href="https://tiktok.com/@shoprevetir"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-ui-fg-base"
+              className="hover:text-ui-fg-base hover:underline"
               onClick={() => trackSocialClick({ platform: 'tiktok' })}
             >
               TikTok
             </a>
-            <LocalizedClientLink href="/editorial/archive" className="hover:text-ui-fg-base">
+            <LocalizedClientLink href="/editorial/archive" className="hover:text-ui-fg-base hover:underline">
               Editorial Archive
             </LocalizedClientLink>
           </nav>
@@ -82,16 +82,16 @@ export default function Footer() {
         {/* Bottom footer text and copyright on same line with normal case */}
         <div className="flex flex-wrap justify-center items-center text-gray-400 text-xs no-border py-2 mt-0 gap-x-6 gap-y-2">
           <span className="whitespace-nowrap">© 2025 REVETIR</span>
-          <LocalizedClientLink href="/terms-conditions" className="hover:text-ui-fg-base">
+          <LocalizedClientLink href="/terms-conditions" className="hover:text-ui-fg-base hover:underline">
             Terms & Conditions
           </LocalizedClientLink>
-          <LocalizedClientLink href="/privacy-policy" className="hover:text-ui-fg-base">
+          <LocalizedClientLink href="/privacy-policy" className="hover:text-ui-fg-base hover:underline">
             Privacy Policy
           </LocalizedClientLink>
-          <PrivacyChoicesTrigger className="hover:text-ui-fg-base">
+          <PrivacyChoicesTrigger className="hover:text-ui-fg-base hover:underline">
             Your Privacy Choices
           </PrivacyChoicesTrigger>
-          <LocalizedClientLink href="/customer-care/accessibility" className="hover:text-ui-fg-base">
+          <LocalizedClientLink href="/customer-care/accessibility" className="hover:text-ui-fg-base hover:underline">
             Accessibility
           </LocalizedClientLink>
         </div>
