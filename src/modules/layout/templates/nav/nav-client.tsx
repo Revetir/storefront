@@ -25,6 +25,7 @@ interface NavClientProps {
 
 export default function NavClient({ regions, customer, categories, brands, cart }: NavClientProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   return (
     <>
@@ -44,14 +45,20 @@ export default function NavClient({ regions, customer, categories, brands, cart 
 
           {/* Left Section - Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-x-8 text-xs uppercase text-gray-700">
-            <LocalizedClientLink href="/men" className="hover:text-black">
+            <LocalizedClientLink
+              href="/men"
+              className={`hover:text-black hover:underline transition-opacity ${isSearchOpen ? 'opacity-50 pointer-events-none' : ''}`}
+            >
               Menswear
             </LocalizedClientLink>
-            <LocalizedClientLink href="/women" className="hover:text-black">
+            <LocalizedClientLink
+              href="/women"
+              className={`hover:text-black hover:underline transition-opacity ${isSearchOpen ? 'opacity-50 pointer-events-none' : ''}`}
+            >
               Womenswear
             </LocalizedClientLink>
-            
-            <SearchModal />
+
+            <SearchModal isOpen={isSearchOpen} setIsOpen={setIsSearchOpen} />
           </div>
 
           {/* Center Logo */}
@@ -72,7 +79,7 @@ export default function NavClient({ regions, customer, categories, brands, cart 
           <div className="hidden lg:flex items-center gap-x-8 text-xs uppercase text-gray-700">
             <div className="relative group">
               <button className="hover:text-black cursor-pointer">ENGLISH</button>
-              <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-26 bg-white border border-gray-200 !rounded-none shadow-lg z-50 flex flex-col items-center text-xs text-gray-400 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-opacity duration-200">
+              <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-26 bg-white border border-gray-200 !rounded-none shadow-lg z-50 flex flex-col items-center text-xs text-gray-400 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200">
                 <span className="py-2 px-4 text-center cursor-not-allowed select-none w-full">Français</span>
                 <span className="py-2 px-4 text-center cursor-not-allowed select-none w-full">中文</span>
               </div>

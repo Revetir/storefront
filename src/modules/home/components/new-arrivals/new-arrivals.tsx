@@ -294,13 +294,13 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
           <div className="flex justify-between items-center gap-4 mb-3">
             <Link
               href="/men"
-              className="uppercase tracking-wide hover:underline text-[clamp(0.625rem,1.2vw,0.875rem)]"
+              className="uppercase tracking-wide text-gray-700 hover:underline hover:text-black text-[clamp(0.625rem,1.2vw,0.875rem)]"
             >
               SHOP MENSWEAR
             </Link>
             <Link
               href="/women"
-              className="uppercase tracking-wide hover:underline text-[clamp(0.625rem,1.2vw,0.875rem)]"
+              className="uppercase tracking-wide text-gray-700 hover:underline hover:text-black text-[clamp(0.625rem,1.2vw,0.875rem)]"
             >
               SHOP WOMENSWEAR
             </Link>

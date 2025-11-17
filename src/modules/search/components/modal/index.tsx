@@ -25,8 +25,15 @@ function useOnClickOutside(ref: React.RefObject<HTMLElement>, handler: () => voi
   }, [ref, handler]);
 }
 
-export default function SearchModal() {
-  const [isOpen, setIsOpen] = useState(false)
+interface SearchModalProps {
+  isOpen?: boolean;
+  setIsOpen?: (isOpen: boolean) => void;
+}
+
+export default function SearchModal({ isOpen: externalIsOpen, setIsOpen: externalSetIsOpen }: SearchModalProps = {}) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false)
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen
+  const setIsOpen = externalSetIsOpen || setInternalIsOpen
   const pathname = usePathname()
   const [gender, setGender] = useState<"menswear" | "womenswear">("menswear");
   const buttonRef = useRef<HTMLButtonElement>(null);

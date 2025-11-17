@@ -97,6 +97,14 @@
   input[type="search"]::-webkit-search-results-decoration {
     -webkit-appearance: none;
   }
+
+  /* Remove iOS Safari default rounded corners */
+  input,
+  textarea,
+  select {
+    -webkit-border-radius: 0;
+    border-radius: 0;
+  }
 }
 
 @layer components {
@@ -249,7 +257,7 @@ img {
 
   /* Custom list markers */
   li::marker {
-    content: "▪ ";
+    content: "· ";
   }
 
   /* Disable custom list markers in category sidebar */

@@ -274,7 +274,6 @@ const StripePaymentButton = ({
         <Button
           disabled={disabled || notReady}
           onClick={handlePayment}
-          size="large"
           isLoading={submitting}
           data-testid={dataTestId}
           className="w-full uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer"
@@ -329,7 +328,6 @@ const ManualTestPaymentButton = ({ notReady, cart }: { notReady: boolean, cart: 
         disabled={notReady}
         isLoading={submitting}
         onClick={handlePayment}
-        size="large"
         data-testid="submit-order-button"
         className="w-full uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer"
       >
