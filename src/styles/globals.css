@@ -238,6 +238,13 @@
     @apply font-sans;
   }
 
+  /* Global underline offset for all underlined elements */
+  .underline,
+  .hover\:underline:hover {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
   /* Disable image drag-and-drop site-wide */
 img {
     -webkit-user-drag: none;

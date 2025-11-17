@@ -91,13 +91,13 @@ export default function SearchModal({ isOpen: externalIsOpen, setIsOpen: externa
         ref={buttonRef}
         onClick={() => setIsOpen(true)}
         type="button"
-        className="hover:text-black bg-transparent p-0 m-0 border-0 outline-none cursor-pointer"
+        className="hover:text-black hover:underline bg-transparent p-0 m-0 border-0 outline-none cursor-pointer"
       >
         {/* Mobile: Show icon */}
         <div className="md:hidden p-2 hover:opacity-70 transition-opacity">
           <Search className="w-5 h-5 text-black" />
         </div>
-        
+
         {/* Desktop: Show text */}
         <div className="hidden md:block text-xs uppercase text-gray-700">
           Search
