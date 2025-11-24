@@ -1,24 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Read(//c/Users/Michael/revetir.com/revetir/**)",
-      "Bash(if exist node_modules rmdir /s /q node_modules)",
-      "Bash(if exist package-lock.json del /f package-lock.json)",
-      "Bash(npm install:*)",
-      "Bash(test:*)",
-      "Bash(npx tsc:*)",
-      "Read(//c/Users/Michael/Downloads/claid/**)",
-      "Bash(find:*)",
-      "Bash(cat:*)",
-      "Bash(npm run build:*)",
-      "Bash(if exist \"src\\scripts\" dir /b /s \"src\\scripts\")",
-      "Bash(npm run cli:login:*)",
-      "Bash(dir:*)",
-      "Bash(if exist \"C:\\Users\\Michael\\revetir.com\\revetir\\scripts\" dir /b \"C:\\Users\\Michael\\revetir.com\\revetir\\scripts\")",
-      "Bash(python3:*)",
-      "Bash(node:*)",
-      "Read(//c/Users/Michael/node_modules/ts-node/dist/transpilers/**)",
-      "Read(//c/Users/Michael/node_modules/**)"
+      "Bash(powershell -Command \"(Get-Content ''C:\\Users\\Michael\\scripts\\claid-automation\\logs\\claid_20251118_025113.log'' | Select-String -Pattern ''✓ Success'').Count\")",
+      "Bash(powershell -Command:*)",
+      "Read(//c/Users/Michael/revetir.com/revetir/scripts/**)",
+      "Read(//c/Users/Michael/revetir.com/revetir/data/product-batch/output/**)",
+      "Read(//c/Users/Michael/revetir.com/revetir/src/migration-scripts/**)",
+      "Read(//c/Users/Michael/scripts/claid-automation/**)",
+      "Read(//c/Users/Michael/scripts/autoclaid/**)",
+      "Bash(python -m py_compile:*)",
+      "Bash(comm:*)",
+      "Bash(xargs:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

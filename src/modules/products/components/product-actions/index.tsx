@@ -149,6 +149,10 @@ export default function ProductActions({
 
   return (
     <div className="flex flex-col gap-y-2" ref={actionsRef}>
+      <ProductPrice product={product} variant={selectedVariant} countryCode={countryCode} />
+
+      <p className="text-xs text-gray-500 mb-5">Enjoy complimentary shipping and returns within the United States</p>
+
       {/* Variant selectors */}
       {(product.variants?.length ?? 0) > 1 && (
         <div className="flex flex-col gap-y-4">
@@ -163,13 +167,8 @@ export default function ProductActions({
               disabled={!!disabled || isAdding}
             />
           ))}
-          <Divider />
         </div>
       )}
-
-      <ProductPrice product={product} variant={selectedVariant} countryCode={countryCode} />
-
-      <p className="text-xs text-gray-500 mb-5">Enjoy complimentary shipping and returns within the United States</p>
 
       <Button
         onClick={handleAddToCart}

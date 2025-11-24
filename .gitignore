@@ -56,3 +56,4 @@ dump.rdb
 /playwright/.cache/
 /playwright/.auth
 nul
+.claude/settings.local.json

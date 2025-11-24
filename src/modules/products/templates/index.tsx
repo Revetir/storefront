@@ -74,14 +74,14 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       <div className="hidden md:block xl:hidden">
         <div className="flex w-full min-h-screen items-center">
           {/* Left side - Image Gallery (65% width) */}
-          <div className="w-[65%] flex items-center justify-center">
+          <div className="w-[65%] self-start flex items-center justify-center">
             <div className="w-full max-w-full px-4">
               <ImageGallery images={product?.images || []} product={product} />
             </div>
           </div>
 
           {/* Right side - Product Info and Actions (35% width) */}
-          <div className="w-[35%] px-4 flex items-center">
+          <div className="w-[35%] mt-4 px-4 flex items-center">
             <div className="flex flex-col gap-y-8 w-full">
               {/* Product Type and Title First */}
               <ProductInfoMobile product={product} />
@@ -131,21 +131,21 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       <div className="hidden xl:block">
         <div className="flex w-full min-h-screen">
           {/* Left column - Product Info (sticky) */}
-          <div className="w-1/4 pl-6">
+          <div className="w-1/5 pl-6">
             <div className="sticky top-0 h-screen flex items-center">
               <ProductInfo product={product} />
             </div>
           </div>
 
           {/* Center column - Image Gallery */}
-          <div className="w-1/2 flex justify-center">
+          <div className="w-3/5 flex justify-center">
             <div className="w-full">
               <ImageGallery images={product?.images || []} product={product} />
             </div>
           </div>
 
           {/* Right column - Product Actions (sticky) */}
-          <div className="w-1/4 pr-6">
+          <div className="w-1/5 pr-6">
             <div className="sticky top-0 h-screen flex items-center">
               <div className="flex flex-col gap-y-8 w-full">
                 <ProductOnboardingCta />
