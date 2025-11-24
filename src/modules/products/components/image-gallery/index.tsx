@@ -115,7 +115,7 @@ const ImageGallery = ({ images, product }: ImageGalleryProps) => {
   }, [images.length])
 
   return (
-    <div className="flex items-start relative">
+    <div className="flex items-start relative px-2">
       {/* Mobile: Horizontal scrolling gallery with indicators - < md (768px) */}
       <div className="md:hidden w-full">
         <div

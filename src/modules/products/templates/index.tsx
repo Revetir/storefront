@@ -41,7 +41,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         </div>
 
         {/* Product Info (Type & Title only) - Below gallery with increased spacing */}
-        <div className="px-4 pt-4 pb-6">
+        <div className="px-4 pt-4 pb-4">
           <ProductInfoMobile product={product} />
         </div>
 
@@ -72,22 +72,22 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
       {/* Tablet Layout - md to xl (768px - 1280px) */}
       <div className="hidden md:block xl:hidden">
-        <div className="flex w-full min-h-screen items-center">
+        <div className="flex w-full min-h-screen">
           {/* Left side - Image Gallery (65% width) */}
-          <div className="w-[65%] self-start flex items-center justify-center">
-            <div className="w-full max-w-full px-4">
+          <div className="w-[65%]">
+            <div className="sticky top-0 h-screen flex items-center justify-center px-4">
               <ImageGallery images={product?.images || []} product={product} />
             </div>
           </div>
 
           {/* Right side - Product Info and Actions (35% width) */}
-          <div className="w-[35%] mt-4 px-4 flex items-center">
+          <div className="w-[35%] mt-4 px-4">
             <div className="flex flex-col gap-y-8 w-full">
               {/* Product Type and Title First */}
               <ProductInfoMobile product={product} />
 
               {/* CTAs Second */}
-              <div className="flex flex-col gap-y-4 mb-5">
+              <div className="flex flex-col gap-y-4">
                 <ProductOnboardingCta />
                 <Suspense
                   fallback={

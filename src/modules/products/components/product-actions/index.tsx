@@ -155,7 +155,7 @@ export default function ProductActions({
 
       {/* Variant selectors */}
       {(product.variants?.length ?? 0) > 1 && (
-        <div className="flex flex-col gap-y-4">
+        <div className="flex flex-col gap-y-4 mb-4">
           {(product.options || []).map((option) => (
             <OptionSelect
               key={option.id}
