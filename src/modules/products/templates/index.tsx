@@ -74,8 +74,12 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       <div className="hidden md:block xl:hidden">
         <div className="flex w-full min-h-screen">
           {/* Left side - Image Gallery (65% width) */}
-          <div className="w-[65%] sticky top-1/2 -translate-y-1/2 self-start h-screen flex items-center px-4">
-            <ImageGallery images={product?.images || []} product={product} />
+          <div className="w-[65%]">
+            <div className="sticky top-0 h-screen flex items-center justify-center px-4">
+              <div className="w-full">
+                <ImageGallery images={product?.images || []} product={product} />
+              </div>
+            </div>
           </div>
 
           {/* Right side - Product Info and Actions (35% width) */}
