@@ -38,7 +38,7 @@ export default function ProductPrice({
     <div className="flex flex-col text-ui-fg-base">
       <span
         className={clx("text-base-semi", {
-          "text-ui-fg-interactive": selectedPrice.price_type === "sale",
+          "font-bold": selectedPrice.price_type === "sale",
         })}
       >
         {!variant && "From "}
@@ -61,7 +61,7 @@ export default function ProductPrice({
               {(selectedPrice as any).original_price}
             </span>
           </p>
-          <span className="text-ui-fg-interactive">
+          <span className="font-bold">
             -{(selectedPrice as any).percentage_diff}%
           </span>
         </>

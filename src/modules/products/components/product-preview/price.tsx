@@ -23,7 +23,7 @@ export default function PreviewPrice({ price }: { price: PreviewPriceData }) {
       )}
       <Text
         className={clx("text-ui-fg-muted", {
-          "text-ui-fg-interactive": price.price_type === "sale",
+          "font-bold text-ui-fg-base": price.price_type === "sale",
         })}
         data-testid="price"
       >
