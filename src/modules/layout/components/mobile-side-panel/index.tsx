@@ -453,9 +453,13 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                                 >
                                   New Arrivals
                                 </LocalizedClientLink>
-                                <div className="block text-sm uppercase text-gray-400 py-2 cursor-not-allowed">
+                                <LocalizedClientLink
+                                  href={`/${genderPath}/trending`}
+                                  className="block text-sm uppercase text-gray-700 hover:text-black py-2"
+                                  onClick={closeAllPanels}
+                                >
                                   Trending
-                                </div>
+                                </LocalizedClientLink>
                               </div>
 
                               {/* Brands Section */}

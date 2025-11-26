@@ -67,6 +67,7 @@ export interface AlgoliaFilterOptions {
   categoryHandle?: string
   brandSlug?: string
   color?: string
+  tagId?: string
   sortBy?: SortOptions
   page?: number
   hitsPerPage?: number
@@ -83,6 +84,7 @@ export async function searchProductsWithAlgolia(
     categoryHandle,
     brandSlug,
     color,
+    tagId,
     sortBy = "created_at",
     page = 1,
     hitsPerPage = 20
@@ -120,6 +122,11 @@ export async function searchProductsWithAlgolia(
     // Color filter
     if (color) {
       filters.push(`primaryColor:"${color}"`)
+    }
+
+    // Tag filter
+    if (tagId) {
+      filters.push(`tags.id:"${tagId}"`)
     }
 
 

@@ -11,7 +11,10 @@
       "Bash(python -m py_compile:*)",
       "Bash(comm:*)",
       "Bash(xargs:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(findstr:*)",
+      "Bash(dir \"C:\\Users\\Michael\\scripts\\autoclaid\" /b)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []
