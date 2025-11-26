@@ -36,8 +36,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const { gender, countryCode } = params
 
   const genderDisplay = gender === "men" ? "Men" : "Women"
-  const title = `Trending Designer Fashion for ${genderDisplay}`
-  const description = `Discover trending ${genderDisplay.toLowerCase()}'s designer fashion at REVETIR. Curated selection of the latest must-have pieces with free shipping and returns.`
+  const title = `Trending ${genderDisplay}`
+  const description = `Defined by what’s now and what’s next, our trending ${genderDisplay.toLowerCase()} curation balances everyday ease with directional style. Statement outerwear, reworked tailoring, and silver jewelry set the tone, while elevated essentials in tees, denim, and glasses ground the look with quiet confidence. Footwear moves between streamlined sneakers, polished loafers, and modern boots, each chosen to anchor both casual and refined outfits. Explore our curated selection of authentic trending fashion, on sale for a limited time only.`
 
   return {
     title,

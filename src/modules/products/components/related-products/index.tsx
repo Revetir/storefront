@@ -1,5 +1,6 @@
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { getBrandsArray } from "@lib/util/brand-utils"
 import { HttpTypes } from "@medusajs/types"
 import Product from "../product-preview"
 
@@ -18,29 +19,51 @@ export default async function RelatedProducts({
     return null
   }
 
-  // edit this function to define your related products logic
-  const queryParams: HttpTypes.StoreProductParams = {}
-  if (region?.id) {
-    queryParams.region_id = region.id
-  }
-  if (product.collection_id) {
-    queryParams.collection_id = [product.collection_id]
-  }
-  if (product.tags) {
-    queryParams.tag_id = product.tags
-      .map((t) => t.id)
-      .filter(Boolean) as string[]
-  }
-  // queryParams.is_giftcard = false
+  // Brand-based related products with category fallback
+  const brands = getBrandsArray((product as any).brands)
 
-  const products = await listProducts({
-    queryParams,
+  // First, try to fetch products from the same brand(s)
+  const brandQueryParams: HttpTypes.StoreProductParams = {}
+  if (region?.id) {
+    brandQueryParams.region_id = region.id
+  }
+  if (brands.length > 0) {
+    brandQueryParams.brand_id = brands.map(b => b.id).filter(Boolean) as string[]
+  }
+
+  let products = await listProducts({
+    queryParams: brandQueryParams,
     countryCode,
   }).then(({ response }) => {
     return response.products.filter(
       (responseProduct) => responseProduct.id !== product.id
     )
   })
+
+  // If not enough brand matches, fall back to category-based products
+  if (products.length < 4 && product.categories && product.categories.length > 0) {
+    const categoryQueryParams: HttpTypes.StoreProductParams = {}
+    if (region?.id) {
+      categoryQueryParams.region_id = region.id
+    }
+    categoryQueryParams.category_id = product.categories
+      .map((c) => c.id)
+      .filter(Boolean) as string[]
+
+    const categoryProducts = await listProducts({
+      queryParams: categoryQueryParams,
+      countryCode,
+    }).then(({ response }) => {
+      return response.products.filter(
+        (responseProduct) =>
+          responseProduct.id !== product.id &&
+          !products.some(p => p.id === responseProduct.id) // Avoid duplicates
+      )
+    })
+
+    // Combine brand matches with category matches to fill the carousel
+    products = [...products, ...categoryProducts]
+  }
 
   if (!products.length) {
     return null
