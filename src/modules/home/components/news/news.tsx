@@ -20,7 +20,7 @@ const NewsSection = () => {
             </div>
             <div className="text-left">
               <h3 className="text-lg font-light uppercase mb-2">NINE FRAMES, a LEMAIRE homage to cinema</h3>
-              <p className="text-sm text-gray-600">October 13, 2025</p>
+              <p className="text-sm text-gray-600">November 26, 2025</p>
             </div>
           </div>
         </Link>
@@ -37,7 +37,7 @@ const NewsSection = () => {
             </div>
             <div className="text-left">
               <h3 className="text-lg font-light uppercase mb-2">Gentle Monster Enchants With Futuristic Tea House</h3>
-              <p className="text-sm text-gray-600">October 12, 2025</p>
+              <p className="text-sm text-gray-600">November 24, 2025</p>
             </div>
           </div>
         </Link>
@@ -54,7 +54,7 @@ const NewsSection = () => {
             </div>
             <div className="text-left">
               <h3 className="text-lg font-light uppercase mb-2">The End Of An Era: Demna at Balenciaga</h3>
-              <p className="text-sm text-gray-600">October 10, 2025</p>
+              <p className="text-sm text-gray-600">November 20, 2025</p>
             </div>
           </div>
         </Link>
