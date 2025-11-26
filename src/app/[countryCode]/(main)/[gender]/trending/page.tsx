@@ -78,9 +78,9 @@ export default async function TrendingPage(props: Props) {
   const currentPage = algoliaResult.page
 
   // Editorial content for trending page
-  const genderDisplay = gender === "men" ? "Men's" : "Women's"
+  const genderDisplay = gender === "men" ? "Menswear" : "Womenswear"
   const editorialTitle = `Trending ${genderDisplay}`
-  const editorialBlurb = "Defined by what’s now and what’s next, our trending ${genderDisplay.toLowerCase()} curation balances everyday ease with directional style. Statement outerwear, reworked tailoring, and silver jewelry set the tone, while elevated essentials in tees, denim, and glasses ground the look with quiet confidence. Footwear moves between streamlined sneakers, polished loafers, and modern boots, each chosen to anchor both casual and refined outfits. Explore our curated selection of authentic trending fashion, on sale for a limited time only."
+  const editorialBlurb = `Defined by what's now and what's next, our trending ${genderDisplay.toLowerCase()} curation balances everyday ease with directional style. Statement outerwear, reworked tailoring, and silver jewelry set the tone, while elevated essentials in tees, denim, and glasses ground the look with quiet confidence. Footwear moves between streamlined sneakers, polished loafers, and modern boots, each chosen to anchor both casual and refined outfits. Explore our curated selection of authentic trending fashion, on sale for a limited time only.`
 
   // Create a mock category object for the template (Trending doesn't have a real category)
   const trendingCategory = {

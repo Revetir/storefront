@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import { notFound, redirect } from "next/navigation"
 import { listProducts } from "@lib/data/products"
 import { getRegion, listRegions } from "@lib/data/regions"
+import { searchProductsWithAlgolia, convertAlgoliaProductsToMedusaFormat } from "@lib/util/algolia-filters"
 import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 import { generateProductJsonLd } from "@lib/util/json-ld"
@@ -252,59 +253,46 @@ export default async function ProductPage(props: Props) {
     redirect(correctUrl)
   }
 
-  // Fetch related products data on the server - brand-based with category fallback
+  // Fetch related products data on the server - brand-based with category fallback using Algolia
   // Get brands from product (handle both single brand object and array)
   const brandData = (pricedProduct as any).brands
   const brands = Array.isArray(brandData) ? brandData : (brandData ? [brandData] : [])
 
-  // First, try to fetch products from the same brand(s)
-  const brandQueryParams: any = {}
-  if (region?.id) {
-    brandQueryParams.region_id = region.id
-  }
-  if (brands.length > 0) {
-    brandQueryParams.brand_id = brands.map((b: any) => b.id).filter(Boolean)
-  }
+  let relatedProducts: any[] = []
 
-  let relatedProducts = await listProducts({
-    queryParams: {
-      ...brandQueryParams,
-      // Include brand to build canonical links in ProductPreview
-      fields: "handle,title,thumbnail,+brands.*",
-    },
-    countryCode: params.countryCode,
-  }).then(({ response }) => {
-    return response.products.filter(
-      (responseProduct) => responseProduct.id !== pricedProduct.id
+  // First, try to fetch products from the same brand(s)
+  if (brands.length > 0) {
+    // For multiple brands (collaborations), fetch from first brand
+    const primaryBrand = brands[0]
+
+    const algoliaResult = await searchProductsWithAlgolia({
+      brandSlug: primaryBrand.slug,
+      hitsPerPage: 12,
+    })
+
+    relatedProducts = convertAlgoliaProductsToMedusaFormat(algoliaResult.hits).filter(
+      (p: any) => p.id !== pricedProduct.id
     )
-  })
+  }
 
   // If not enough brand matches, fall back to category-based products
   if (relatedProducts.length < 4 && pricedProduct.categories && pricedProduct.categories.length > 0) {
-    const categoryQueryParams: any = {}
-    if (region?.id) {
-      categoryQueryParams.region_id = region.id
-    }
-    categoryQueryParams.category_id = pricedProduct.categories
-      .map((c) => c.id)
-      .filter(Boolean)
+    // Get the first category handle
+    const primaryCategory = pricedProduct.categories[0]
 
-    const categoryProducts = await listProducts({
-      queryParams: {
-        ...categoryQueryParams,
-        fields: "handle,title,thumbnail,+brands.*",
-      },
-      countryCode: params.countryCode,
-    }).then(({ response }) => {
-      return response.products.filter(
-        (responseProduct) =>
-          responseProduct.id !== pricedProduct.id &&
-          !relatedProducts.some(p => p.id === responseProduct.id) // Avoid duplicates
+    if (primaryCategory.handle) {
+      const categoryResult = await searchProductsWithAlgolia({
+        categoryHandle: primaryCategory.handle,
+        hitsPerPage: 12,
+      })
+
+      const categoryProducts = convertAlgoliaProductsToMedusaFormat(categoryResult.hits).filter(
+        (p: any) => p.id !== pricedProduct.id && !relatedProducts.some((existing: any) => existing.id === p.id)
       )
-    })
 
-    // Combine brand matches with category matches to fill the carousel
-    relatedProducts = [...relatedProducts, ...categoryProducts]
+      // Combine brand matches with category matches to fill the carousel
+      relatedProducts = [...relatedProducts, ...categoryProducts]
+    }
   }
 
   // Generate JSON-LD structured data for this product
