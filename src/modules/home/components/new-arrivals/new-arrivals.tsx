@@ -393,7 +393,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                         )}
                         <Text
                           className={clx("text-ui-fg-muted", {
-                            "text-ui-fg-interactive": cheapestPrice.price_type === "sale",
+                            "font-bold text-ui-fg-base": cheapestPrice.price_type === "sale",
                           })}
                           data-testid="price"
                         >
@@ -603,7 +603,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                           )}
                           <Text
                             className={clx("text-ui-fg-muted", {
-                              "text-ui-fg-interactive": cheapestPrice.price_type === "sale",
+                              "font-bold text-ui-fg-base": cheapestPrice.price_type === "sale",
                             })}
                             data-testid="price"
                           >
