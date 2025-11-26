@@ -252,23 +252,23 @@ export default async function ProductPage(props: Props) {
     redirect(correctUrl)
   }
 
-  // Fetch related products data on the server
-  const queryParams: any = {}
+  // Fetch related products data on the server - brand-based with category fallback
+  // Get brands from product (handle both single brand object and array)
+  const brandData = (pricedProduct as any).brands
+  const brands = Array.isArray(brandData) ? brandData : (brandData ? [brandData] : [])
+
+  // First, try to fetch products from the same brand(s)
+  const brandQueryParams: any = {}
   if (region?.id) {
-    queryParams.region_id = region.id
+    brandQueryParams.region_id = region.id
   }
-  if (pricedProduct.collection_id) {
-    queryParams.collection_id = [pricedProduct.collection_id]
-  }
-  if (pricedProduct.tags) {
-    queryParams.tag_id = pricedProduct.tags
-      .map((t) => t.id)
-      .filter(Boolean) as string[]
+  if (brands.length > 0) {
+    brandQueryParams.brand_id = brands.map((b: any) => b.id).filter(Boolean)
   }
 
-  const relatedProducts = await listProducts({
+  let relatedProducts = await listProducts({
     queryParams: {
-      ...queryParams,
+      ...brandQueryParams,
       // Include brand to build canonical links in ProductPreview
       fields: "handle,title,thumbnail,+brands.*",
     },
@@ -278,6 +278,34 @@ export default async function ProductPage(props: Props) {
       (responseProduct) => responseProduct.id !== pricedProduct.id
     )
   })
+
+  // If not enough brand matches, fall back to category-based products
+  if (relatedProducts.length < 4 && pricedProduct.categories && pricedProduct.categories.length > 0) {
+    const categoryQueryParams: any = {}
+    if (region?.id) {
+      categoryQueryParams.region_id = region.id
+    }
+    categoryQueryParams.category_id = pricedProduct.categories
+      .map((c) => c.id)
+      .filter(Boolean)
+
+    const categoryProducts = await listProducts({
+      queryParams: {
+        ...categoryQueryParams,
+        fields: "handle,title,thumbnail,+brands.*",
+      },
+      countryCode: params.countryCode,
+    }).then(({ response }) => {
+      return response.products.filter(
+        (responseProduct) =>
+          responseProduct.id !== pricedProduct.id &&
+          !relatedProducts.some(p => p.id === responseProduct.id) // Avoid duplicates
+      )
+    })
+
+    // Combine brand matches with category matches to fill the carousel
+    relatedProducts = [...relatedProducts, ...categoryProducts]
+  }
 
   // Generate JSON-LD structured data for this product
   const jsonLd = generateProductJsonLd({
