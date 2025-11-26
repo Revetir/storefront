@@ -25,6 +25,7 @@ export default async function OrderSamplePage() {
       {
         id: "item_01",
         title: "Premium Cotton T-Shirt",
+        product_title: "Premium Cotton T-Shirt",
         quantity: 2,
         unit_price: 2999,
         subtotal: 5998,
@@ -55,6 +56,7 @@ export default async function OrderSamplePage() {
       {
         id: "item_02",
         title: "Classic Denim Jeans",
+        product_title: "Classic Denim Jeans",
         quantity: 1,
         unit_price: 7999,
         subtotal: 7999,
@@ -85,6 +87,7 @@ export default async function OrderSamplePage() {
       {
         id: "item_03",
         title: "Leather Belt",
+        product_title: "Leather Belt",
         quantity: 1,
         unit_price: 3499,
         subtotal: 3499,
@@ -157,7 +160,7 @@ export default async function OrderSamplePage() {
           {
             id: "pay_01",
             amount: 18496,
-            provider_id: "stripe",
+            provider_id: "pp_stripe_stripe",
             data: {
               card_last4: "4242",
               card_brand: "visa",

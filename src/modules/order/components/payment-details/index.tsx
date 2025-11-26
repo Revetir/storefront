@@ -11,6 +11,9 @@ type PaymentDetailsProps = {
 
 const PaymentDetails = ({ order }: PaymentDetailsProps) => {
   const payment = order.payment_collections?.[0].payments?.[0]
+  const paymentInfo = payment?.provider_id
+    ? paymentInfoMap[payment.provider_id]
+    : null
 
   return (
     <div>
@@ -18,7 +21,7 @@ const PaymentDetails = ({ order }: PaymentDetailsProps) => {
         Payment
       </Heading>
       <div>
-        {payment && (
+        {payment && paymentInfo && (
           <div className="flex items-start gap-x-1 w-full">
             <div className="flex flex-col w-1/3">
               <Text className="txt-medium-plus text-ui-fg-base mb-1">
@@ -28,7 +31,7 @@ const PaymentDetails = ({ order }: PaymentDetailsProps) => {
                 className="txt-medium text-ui-fg-subtle"
                 data-testid="payment-method"
               >
-                {paymentInfoMap[payment.provider_id].title}
+                {paymentInfo.title}
               </Text>
             </div>
             <div className="flex flex-col w-2/3">
@@ -37,7 +40,7 @@ const PaymentDetails = ({ order }: PaymentDetailsProps) => {
               </Text>
               <div className="flex gap-2 txt-medium text-ui-fg-subtle items-center">
                 <Container className="flex items-center h-7 w-fit p-2 bg-ui-button-neutral-hover">
-                  {paymentInfoMap[payment.provider_id].icon}
+                  {paymentInfo.icon}
                 </Container>
                 <Text data-testid="payment-amount">
                   {isStripe(payment.provider_id) && payment.data?.card_last4
