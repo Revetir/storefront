@@ -13,22 +13,29 @@ export default function PreviewPrice({ price }: { price: PreviewPriceData }) {
 
   return (
     <>
-      {price.price_type === "sale" && "original_price" in price && price.original_price && (
+      {price.price_type === "sale" && "original_price" in price && price.original_price ? (
+        <div className="flex items-center gap-1.5">
+          <Text
+            className="font-medium"
+            data-testid="price"
+          >
+            {price.calculated_price?.replace(/\s*USD$/, '')}
+          </Text>
+          <Text
+            className="line-through text-gray-400"
+            data-testid="original-price"
+          >
+            {price.original_price?.replace(/\s*USD$/, '')}
+          </Text>
+        </div>
+      ) : (
         <Text
-          className="line-through text-ui-fg-muted"
-          data-testid="original-price"
+          className="text-ui-fg-muted"
+          data-testid="price"
         >
-          {price.original_price}
+          {price.calculated_price?.replace(/\s*USD$/, '')}
         </Text>
       )}
-      <Text
-        className={clx("text-ui-fg-muted", {
-          "font-bold text-ui-fg-base": price.price_type === "sale",
-        })}
-        data-testid="price"
-      >
-        {price.calculated_price}
-      </Text>
     </>
   )
 }

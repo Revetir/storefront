@@ -36,35 +36,62 @@ export default function ProductPrice({
 
   return (
     <div className="flex flex-col text-ui-fg-base">
-      <span
-        className={clx("text-base-semi", {
-          "font-bold": selectedPrice.price_type === "sale",
-        })}
-      >
-        {!variant && "From "}
+      {selectedPrice.price_type === "sale" && "original_price" in selectedPrice ? (
+        <>
+          {/* Desktop: horizontal layout */}
+          <div className="hidden lg:flex items-center gap-2">
+            <span
+              className="font-medium"
+              data-testid="product-price"
+              data-value={selectedPrice.calculated_price_number}
+            >
+              {!variant && "From "}
+              {selectedPrice.calculated_price?.replace(/\s*USD$/, '')}
+            </span>
+            <span
+              className="line-through text-gray-400"
+              data-testid="original-product-price"
+              data-value={(selectedPrice as any).original_price_number}
+            >
+              {(selectedPrice as any).original_price?.replace(/\s*USD$/, '')}
+            </span>
+            <span className="text-gray-400">
+              {(selectedPrice as any).percentage_diff}% OFF
+            </span>
+          </div>
+
+          {/* Mobile: stacked layout */}
+          <div className="lg:hidden flex flex-col gap-0.5">
+            <span
+              className="font-medium"
+              data-testid="product-price"
+              data-value={selectedPrice.calculated_price_number}
+            >
+              {!variant && "From "}
+              {selectedPrice.calculated_price?.replace(/\s*USD$/, '')}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <span
+                className="line-through text-gray-400"
+                data-testid="original-product-price"
+                data-value={(selectedPrice as any).original_price_number}
+              >
+                {(selectedPrice as any).original_price?.replace(/\s*USD$/, '')}
+              </span>
+              <span className="text-gray-400">
+                {(selectedPrice as any).percentage_diff}% OFF
+              </span>
+            </div>
+          </div>
+        </>
+      ) : (
         <span
           data-testid="product-price"
           data-value={selectedPrice.calculated_price_number}
         >
-          {selectedPrice.calculated_price}
+          {!variant && "From "}
+          {selectedPrice.calculated_price?.replace(/\s*USD$/, '')}
         </span>
-      </span>
-      {selectedPrice.price_type === "sale" && "original_price" in selectedPrice && (
-        <>
-          <p>
-            <span className="text-ui-fg-subtle">Original: </span>
-            <span
-              className="line-through"
-              data-testid="original-product-price"
-              data-value={(selectedPrice as any).original_price_number}
-            >
-              {(selectedPrice as any).original_price}
-            </span>
-          </p>
-          <span className="font-bold">
-            -{(selectedPrice as any).percentage_diff}%
-          </span>
-        </>
       )}
     </div>
   )

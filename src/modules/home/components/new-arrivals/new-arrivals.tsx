@@ -382,24 +382,29 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                   <h3 className="font-medium text-lg mb-1">{product.title}</h3>
                   <div className="text-gray-600">
                     {cheapestPrice ? (
-                      <>
-                        {cheapestPrice.price_type === "sale" && "original_price" in cheapestPrice && cheapestPrice.original_price && (
+                      cheapestPrice.price_type === "sale" && "original_price" in cheapestPrice && cheapestPrice.original_price ? (
+                        <div className="flex items-center gap-1.5">
                           <Text
-                            className="line-through text-ui-fg-muted"
+                            className="font-medium"
+                            data-testid="price"
+                          >
+                            {cheapestPrice.calculated_price?.replace(/\s*USD$/, '')}
+                          </Text>
+                          <Text
+                            className="line-through text-gray-400"
                             data-testid="original-price"
                           >
-                            {cheapestPrice.original_price}
+                            {cheapestPrice.original_price?.replace(/\s*USD$/, '')}
                           </Text>
-                        )}
+                        </div>
+                      ) : (
                         <Text
-                          className={clx("text-ui-fg-muted", {
-                            "font-bold text-ui-fg-base": cheapestPrice.price_type === "sale",
-                          })}
+                          className="text-ui-fg-muted"
                           data-testid="price"
                         >
-                          {cheapestPrice.calculated_price}
+                          {cheapestPrice.calculated_price?.replace(/\s*USD$/, '')}
                         </Text>
-                      </>
+                      )
                     ) : (
                       'Price not available'
                     )}
@@ -592,24 +597,29 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                     <h3 className="font-medium text-lg mb-1">{product.title}</h3>
                     <div className="text-gray-600">
                       {cheapestPrice ? (
-                        <>
-                          {cheapestPrice.price_type === "sale" && "original_price" in cheapestPrice && cheapestPrice.original_price && (
+                        cheapestPrice.price_type === "sale" && "original_price" in cheapestPrice && cheapestPrice.original_price ? (
+                          <div className="flex items-center gap-1.5">
                             <Text
-                              className="line-through text-ui-fg-muted"
+                              className="font-medium"
+                              data-testid="price"
+                            >
+                              {cheapestPrice.calculated_price?.replace(/\s*USD$/, '')}
+                            </Text>
+                            <Text
+                              className="line-through text-gray-400"
                               data-testid="original-price"
                             >
-                              {cheapestPrice.original_price}
+                              {cheapestPrice.original_price?.replace(/\s*USD$/, '')}
                             </Text>
-                          )}
+                          </div>
+                        ) : (
                           <Text
-                            className={clx("text-ui-fg-muted", {
-                              "font-bold text-ui-fg-base": cheapestPrice.price_type === "sale",
-                            })}
+                            className="text-ui-fg-muted"
                             data-testid="price"
                           >
-                            {cheapestPrice.calculated_price}
+                            {cheapestPrice.calculated_price?.replace(/\s*USD$/, '')}
                           </Text>
-                        </>
+                        )
                       ) : (
                         'Price not available'
                       )}
