@@ -151,7 +151,7 @@ export default function ProductActions({
     <div className="flex flex-col gap-y-2" ref={actionsRef}>
       <ProductPrice product={product} variant={selectedVariant} countryCode={countryCode} />
 
-      <p className="text-xs text-gray-500 mb-5">Enjoy complimentary shipping and returns within the United States</p>
+      <p className="text-xs text-gray-600 mb-5">Enjoy complimentary shipping and returns within the United States</p>
 
       {/* Variant selectors */}
       {(product.variants?.length ?? 0) > 1 && (

@@ -14,7 +14,7 @@ export default function ProductPrice({
   countryCode?: string
 }) {
   let selectedPrice
-  
+
   if (isAlgoliaProduct(product)) {
     // For Algolia products, use region-specific pricing
     if (variant) {
@@ -34,6 +34,17 @@ export default function ProductPrice({
     return <div className="block w-32 h-9 bg-gray-100 animate-pulse" />
   }
 
+  // Check if all variants have the same price
+  const allVariantsSamePrice = !variant && product.variants && product.variants.length > 0
+    ? product.variants.every((v: any) => {
+        const price = v.calculated_price?.calculated_amount || v.prices?.[0]?.amount
+        const firstPrice = product.variants![0].calculated_price?.calculated_amount || product.variants![0].prices?.[0]?.amount
+        return price === firstPrice
+      })
+    : false
+
+  const showFrom = !variant && !allVariantsSamePrice
+
   return (
     <div className="flex flex-col text-ui-fg-base">
       {selectedPrice.price_type === "sale" && "original_price" in selectedPrice ? (
@@ -45,17 +56,17 @@ export default function ProductPrice({
               data-testid="product-price"
               data-value={selectedPrice.calculated_price_number}
             >
-              {!variant && "From "}
+              {showFrom && "From "}
               {selectedPrice.calculated_price?.replace(/\s*USD$/, '')}
             </span>
             <span
-              className="line-through text-gray-400"
+              className="line-through text-gray-500"
               data-testid="original-product-price"
               data-value={(selectedPrice as any).original_price_number}
             >
               {(selectedPrice as any).original_price?.replace(/\s*USD$/, '')}
             </span>
-            <span className="text-gray-400">
+            <span className="text-gray-500">
               {(selectedPrice as any).percentage_diff}% OFF
             </span>
           </div>
@@ -67,18 +78,18 @@ export default function ProductPrice({
               data-testid="product-price"
               data-value={selectedPrice.calculated_price_number}
             >
-              {!variant && "From "}
+              {showFrom && "From "}
               {selectedPrice.calculated_price?.replace(/\s*USD$/, '')}
             </span>
             <div className="flex items-center gap-1.5">
               <span
-                className="line-through text-gray-400"
+                className="line-through text-gray-500"
                 data-testid="original-product-price"
                 data-value={(selectedPrice as any).original_price_number}
               >
                 {(selectedPrice as any).original_price?.replace(/\s*USD$/, '')}
               </span>
-              <span className="text-gray-400">
+              <span className="text-gray-500">
                 {(selectedPrice as any).percentage_diff}% OFF
               </span>
             </div>
@@ -89,7 +100,7 @@ export default function ProductPrice({
           data-testid="product-price"
           data-value={selectedPrice.calculated_price_number}
         >
-          {!variant && "From "}
+          {showFrom && "From "}
           {selectedPrice.calculated_price?.replace(/\s*USD$/, '')}
         </span>
       )}

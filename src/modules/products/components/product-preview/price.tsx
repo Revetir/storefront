@@ -22,7 +22,7 @@ export default function PreviewPrice({ price }: { price: PreviewPriceData }) {
             {price.calculated_price?.replace(/\s*USD$/, '')}
           </Text>
           <Text
-            className="line-through text-gray-400"
+            className="line-through text-gray-500"
             data-testid="original-price"
           >
             {price.original_price?.replace(/\s*USD$/, '')}

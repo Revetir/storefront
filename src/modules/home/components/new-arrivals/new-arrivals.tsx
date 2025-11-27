@@ -391,7 +391,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                             {cheapestPrice.calculated_price?.replace(/\s*USD$/, '')}
                           </Text>
                           <Text
-                            className="line-through text-gray-400"
+                            className="line-through text-gray-500"
                             data-testid="original-price"
                           >
                             {cheapestPrice.original_price?.replace(/\s*USD$/, '')}
