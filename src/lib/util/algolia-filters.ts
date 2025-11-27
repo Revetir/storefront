@@ -7,6 +7,7 @@ export interface AlgoliaProduct {
   title: string
   handle: string
   thumbnail?: string
+  status: string // Product status: published, proposed, draft
   brands?: Array<{
     id: string
     name: string
@@ -100,6 +101,9 @@ export async function searchProductsWithAlgolia(
     // Build filters array
     const filters: string[] = []
 
+    // CRITICAL: Only show published products
+    filters.push('status:published')
+
     // Gender filter - convert to the format used in Algolia
     if (gender) {
       const genderValue = gender === "men" ? "menswear" : "womenswear"
@@ -167,6 +171,7 @@ export async function searchProductsWithAlgolia(
           'title',
           'handle',
           'thumbnail',
+          'status',
           'brands',
           'product_sku',
           'gender',
