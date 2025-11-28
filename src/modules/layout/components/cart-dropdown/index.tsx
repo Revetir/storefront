@@ -198,6 +198,7 @@ const CartDropdown = ({
                                     item={item}
                                     style="tight"
                                     currencyCode={cartState.currency_code}
+                                    forceVertical={true}
                                   />
                                 </div>
                               </div>

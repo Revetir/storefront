@@ -1,6 +1,8 @@
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
 import { clx } from "@medusajs/ui"
+import { getVariantPrice, isAlgoliaProduct } from "@lib/util/get-algolia-product-price"
+import { getProductPrice } from "@lib/util/get-product-price"
 
 type LineItemUnitPriceProps = {
   item: HttpTypes.StoreCartLineItem | HttpTypes.StoreOrderLineItem
@@ -14,46 +16,73 @@ const LineItemUnitPrice = ({
   currencyCode,
 }: LineItemUnitPriceProps) => {
   const { subtotal, original_subtotal } = item
-  const hasReducedPrice = subtotal < original_subtotal
+  const hasCartDiscount = subtotal < original_subtotal
 
-  const percentage_diff = Math.round(
-    ((original_subtotal - subtotal) / original_subtotal) * 100
-  )
+  // Check if this item has product-level sale pricing
+  let variantPrice = null
+  if (item.variant) {
+    const product = (item as any).product
+    if (product && isAlgoliaProduct(product)) {
+      variantPrice = getVariantPrice(item.variant as any, currencyCode.toLowerCase())
+    } else if (product) {
+      const priceData = getProductPrice({
+        product: product as any,
+        variantId: item.variant.id,
+      })
+      variantPrice = priceData.variantPrice
+    }
+  }
+
+  const isOnSale = variantPrice?.price_type === "sale" && "original_price" in variantPrice
+  const unitSalePrice = isOnSale ? variantPrice.calculated_price : null
+  const unitOriginalPrice = isOnSale ? (variantPrice as any).original_price : null
 
   return (
     <div className="flex flex-col text-ui-fg-muted justify-center h-full">
-      {hasReducedPrice && (
+      {isOnSale && unitSalePrice && unitOriginalPrice ? (
         <>
-          <p>
-            {style === "default" && (
-              <span className="text-ui-fg-muted">Original: </span>
-            )}
+          {/* Desktop: horizontal layout */}
+          <div className="hidden md:flex items-center gap-1.5">
             <span
-              className="line-through"
+              className="font-medium"
+              data-testid="product-unit-price"
+            >
+              {unitSalePrice?.replace(/\s*USD$/, '')}
+            </span>
+            <span
+              className="line-through text-gray-500"
               data-testid="product-unit-original-price"
             >
-              {convertToLocale({
-                amount: original_subtotal / item.quantity,
-                currency_code: currencyCode,
-              })}
+              {unitOriginalPrice?.replace(/\s*USD$/, '')}
             </span>
-          </p>
-          {style === "default" && (
-            <span className="text-ui-fg-interactive">-{percentage_diff}%</span>
-          )}
+          </div>
+
+          {/* Mobile: vertical layout */}
+          <div className="md:hidden flex flex-col items-start gap-0.5">
+            <span
+              className="font-medium"
+              data-testid="product-unit-price-mobile"
+            >
+              {unitSalePrice?.replace(/\s*USD$/, '')}
+            </span>
+            <span
+              className="line-through text-gray-500"
+              data-testid="product-unit-original-price-mobile"
+            >
+              {unitOriginalPrice?.replace(/\s*USD$/, '')}
+            </span>
+          </div>
         </>
+      ) : (
+        <span
+          data-testid="product-unit-price"
+        >
+          {convertToLocale({
+            amount: subtotal / item.quantity,
+            currency_code: currencyCode,
+          })?.replace(/\s*USD$/, '')}
+        </span>
       )}
-      <span
-        className={clx("text-base-regular", {
-          "text-ui-fg-interactive": hasReducedPrice,
-        })}
-        data-testid="product-unit-price"
-      >
-        {convertToLocale({
-          amount: subtotal / item.quantity,
-          currency_code: currencyCode,
-        })}
-      </span>
     </div>
   )
 }
