@@ -1,4 +1,3 @@
-import { getPercentageDiff } from "@lib/util/get-precentage-diff"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
 import { clx } from "@medusajs/ui"
@@ -10,20 +9,18 @@ type LineItemPriceProps = {
   style?: "default" | "tight"
   currencyCode: string
   forceVertical?: boolean
+  showTotal?: boolean // true = show total price (unit × qty), false = show unit price
 }
 
 const LineItemPrice = ({
   item,
-  style = "default",
   currencyCode,
   forceVertical = false,
+  showTotal = false,
 }: LineItemPriceProps) => {
-  const { subtotal, original_subtotal } = item
-  const originalPrice = original_subtotal ?? 0
-  const currentPrice = subtotal ?? 0
-  const hasCartDiscount = currentPrice < originalPrice && currentPrice > 0
+  const { subtotal, quantity } = item
 
-  // Check if this item has product-level sale pricing
+  // Try to get product-level sale pricing from variant data
   let variantPrice = null
   if (item.variant) {
     const product = (item as any).product
@@ -38,14 +35,34 @@ const LineItemPrice = ({
     }
   }
 
-  const isOnSale = variantPrice?.price_type === "sale" && "original_price" in variantPrice
-  const unitSalePrice = isOnSale ? variantPrice.calculated_price : null
-  const unitOriginalPrice = isOnSale ? (variantPrice as any).original_price : null
+  // Check if this is a product-level sale (NOT cart-level discounts)
+  const isProductOnSale = variantPrice?.price_type === "sale" && "original_price" in variantPrice
+
+  // Determine which prices to display
+  let displayPrice: number
+  let displayOriginalPrice: number | null = null
+
+  if (isProductOnSale && variantPrice) {
+    // Product has a sale price - use pricing from variant
+    const unitSalePrice = parseFloat(variantPrice.calculated_price?.replace(/[^0-9.]/g, '') || '0')
+    const unitOriginalPrice = parseFloat((variantPrice as any).original_price?.replace(/[^0-9.]/g, '') || '0')
+
+    displayPrice = showTotal ? unitSalePrice * quantity : unitSalePrice
+    displayOriginalPrice = showTotal ? unitOriginalPrice * quantity : unitOriginalPrice
+  } else {
+    // No product-level sale - just show current price
+    // Cart-level discounts will be shown in SUMMARY section, not here
+    const currentTotalPrice = subtotal ?? 0
+    displayPrice = showTotal ? currentTotalPrice : currentTotalPrice / quantity
+    displayOriginalPrice = null
+  }
+
+  const hasProductSale = displayOriginalPrice !== null && displayOriginalPrice > displayPrice
 
   return (
     <div className="flex flex-col gap-x-2 text-ui-fg-subtle items-end">
       <div className="text-left">
-        {isOnSale && unitSalePrice && unitOriginalPrice ? (
+        {hasProductSale ? (
           <>
             {/* Desktop/multi-column: horizontal layout, Mobile/cart-dropdown: vertical */}
             <div className={clx("items-center gap-1.5", {
@@ -56,13 +73,19 @@ const LineItemPrice = ({
                 className="font-medium"
                 data-testid="product-price"
               >
-                {unitSalePrice?.replace(/\s*USD$/, '')}
+                {convertToLocale({
+                  amount: displayPrice,
+                  currency_code: currencyCode,
+                })?.replace(/\s*USD$/, '')}
               </span>
               <span
                 className="line-through text-gray-500"
                 data-testid="product-original-price"
               >
-                {unitOriginalPrice?.replace(/\s*USD$/, '')}
+                {convertToLocale({
+                  amount: displayOriginalPrice!,
+                  currency_code: currencyCode,
+                })?.replace(/\s*USD$/, '')}
               </span>
             </div>
 
@@ -73,13 +96,19 @@ const LineItemPrice = ({
                   className="font-medium"
                   data-testid="product-price-mobile"
                 >
-                  {unitSalePrice?.replace(/\s*USD$/, '')}
+                  {convertToLocale({
+                    amount: displayPrice,
+                    currency_code: currencyCode,
+                  })?.replace(/\s*USD$/, '')}
                 </span>
                 <span
                   className="line-through text-gray-500"
                   data-testid="product-original-price-mobile"
                 >
-                  {unitOriginalPrice?.replace(/\s*USD$/, '')}
+                  {convertToLocale({
+                    amount: displayOriginalPrice!,
+                    currency_code: currencyCode,
+                  })?.replace(/\s*USD$/, '')}
                 </span>
               </div>
             )}
@@ -89,7 +118,7 @@ const LineItemPrice = ({
             data-testid="product-price"
           >
             {convertToLocale({
-              amount: currentPrice,
+              amount: displayPrice,
               currency_code: currencyCode,
             })?.replace(/\s*USD$/, '')}
           </span>

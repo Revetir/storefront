@@ -157,11 +157,12 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
       <Table.Cell className="!pr-0">
         <div className="relative h-full flex items-center justify-end">
-          {/* Price - centered vertically */}
+          {/* Total price - centered vertically */}
           <LineItemPrice
             item={item}
             style="tight"
             currencyCode={currencyCode}
+            showTotal={true}
           />
 
           {/* Preview mode: quantity x unit price below */}
