@@ -7,23 +7,29 @@ export const getPricesForVariant = (variant: any) => {
     return null
   }
 
+  const calculatedAmount = variant.calculated_price.calculated_amount
+  const originalAmount = variant.calculated_price.original_amount
+  const isPriceList = variant.calculated_price.is_calculated_price_price_list
+
+  // Determine if this is a sale price:
+  // 1. Must be from a price list
+  // 2. Original amount must exist and be greater than calculated amount
+  const isSale = isPriceList && originalAmount && originalAmount > calculatedAmount
+
   return {
-    calculated_price_number: variant.calculated_price.calculated_amount,
+    calculated_price_number: calculatedAmount,
     calculated_price: convertToLocale({
-      amount: variant.calculated_price.calculated_amount,
+      amount: calculatedAmount,
       currency_code: variant.calculated_price.currency_code,
     }),
-    original_price_number: variant.calculated_price.original_amount,
-    original_price: convertToLocale({
-      amount: variant.calculated_price.original_amount,
+    original_price_number: originalAmount,
+    original_price: originalAmount ? convertToLocale({
+      amount: originalAmount,
       currency_code: variant.calculated_price.currency_code,
-    }),
+    }) : null,
     currency_code: variant.calculated_price.currency_code,
-    price_type: variant.calculated_price.calculated_price?.price_list_type || "default",
-    percentage_diff: getPercentageDiff(
-      variant.calculated_price.original_amount,
-      variant.calculated_price.calculated_amount
-    ),
+    price_type: isSale ? "sale" : "default",
+    percentage_diff: isSale ? getPercentageDiff(originalAmount, calculatedAmount) : 0,
   }
 }
 
