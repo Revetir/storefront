@@ -43,6 +43,14 @@ export function validateCheckout(cart: HttpTypes.StoreCart | null): string[] {
   // Billing address validation
   if (!cart.billing_address) {
     errors.push("billing_address")
+  } else {
+    if (!cart.billing_address.first_name) errors.push("billing_address.first_name")
+    if (!cart.billing_address.last_name) errors.push("billing_address.last_name")
+    if (!cart.billing_address.address_1) errors.push("billing_address.address_1")
+    if (!cart.billing_address.city) errors.push("billing_address.city")
+    if (!cart.billing_address.province) errors.push("billing_address.province")
+    if (!cart.billing_address.postal_code) errors.push("billing_address.postal_code")
+    if (!cart.billing_address.country_code) errors.push("billing_address.country_code")
   }
 
   return errors
