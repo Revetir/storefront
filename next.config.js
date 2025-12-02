@@ -63,6 +63,24 @@ const nextConfig = {
         ],
       },
       {
+        source: '/:countryCode/products/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=1800, stale-while-revalidate=3600',
+          },
+        ],
+      },
+      {
+        source: '/:countryCode/:gender/brands/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=1800, stale-while-revalidate=3600',
+          },
+        ],
+      },
+      {
         source: '/(.*)',
         headers: [
           {
