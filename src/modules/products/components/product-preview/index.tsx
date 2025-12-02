@@ -40,7 +40,15 @@ function ProductPreview({
   // Handle both Algolia and Medusa products
   let cheapestPrice
   if (isAlgoliaProduct(product)) {
-    cheapestPrice = getAlgoliaProductPrice(product, countryCode)
+    const algoliaPrice = getAlgoliaProductPrice(product, countryCode)
+    if (algoliaPrice) {
+      cheapestPrice = {
+        ...algoliaPrice,
+        // PreviewPrice expects original_price to be string, not null
+        original_price: algoliaPrice.original_price ?? algoliaPrice.calculated_price ?? "",
+        price_type: algoliaPrice.price_type || "default"
+      }
+    }
   } else {
     const priceResult = getProductPrice({
       product,
