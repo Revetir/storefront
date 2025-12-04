@@ -37,6 +37,7 @@ export default async function TrackingPage(props: Props) {
 
   // Fetch tracking data from backend API
   const backendUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+  const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
 
   let trackingData
   try {
@@ -46,6 +47,9 @@ export default async function TrackingPage(props: Props) {
         cache: "no-store", // Always fetch fresh tracking data
         headers: {
           "Content-Type": "application/json",
+          ...(publishableKey
+            ? { "x-publishable-api-key": publishableKey }
+            : {}),
         },
       }
     )
