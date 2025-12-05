@@ -117,11 +117,11 @@ const AccountNav = ({
             <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
               <li>
                 <AccountNavLink
-                  href="/account"
+                  href="/account/orders"
                   route={route!}
                   data-testid="overview-link"
                 >
-                  Overview
+                  Orders
                 </AccountNavLink>
               </li>
               <li>
@@ -140,15 +140,6 @@ const AccountNav = ({
                   data-testid="addresses-link"
                 >
                   Addresses
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/orders"
-                  route={route!}
-                  data-testid="orders-link"
-                >
-                  Orders
                 </AccountNavLink>
               </li>
               <li>

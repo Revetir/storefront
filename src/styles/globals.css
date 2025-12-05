@@ -272,6 +272,15 @@ img {
     content: none;
   }
 
+  /* Disable custom markers for specific account components that use list items for layout */
+  [data-testid="order-wrapper"]::marker {
+    content: none;
+  }
+
+  [data-testid="overview-link"] {
+    list-style: none;
+  }
+
   /* Infinite scroll animation */
   @keyframes scroll-left {
     0% {
