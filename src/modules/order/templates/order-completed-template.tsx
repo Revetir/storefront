@@ -7,7 +7,6 @@ import Items from "@modules/order/components/items"
 import OnboardingCta from "@modules/order/components/onboarding-cta"
 import OrderDetails from "@modules/order/components/order-details"
 import MetaPixelPurchase from "@modules/order/components/meta-pixel-purchase"
-import PrintButton from "@modules/order/components/print-button"
 import { HttpTypes } from "@medusajs/types"
 import { getPaymentDisplayFromOrder } from "@lib/util/format-payment-method"
 
@@ -44,9 +43,8 @@ export default async function OrderCompletedTemplate({
             </span>
           </Heading>
 
-          <PrintButton />
           <div className="space-y-6">
-            <OrderDetails order={order} />
+            <OrderDetails order={order} showPrintButton />
 
             {/* Shipping method, payment method, shipping & billing address - mirrored from account order details layout */}
             <div className="flex flex-col gap-y-4 border-b border-gray-200 pb-4">

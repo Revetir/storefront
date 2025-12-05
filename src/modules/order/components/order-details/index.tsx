@@ -1,12 +1,14 @@
 import { HttpTypes } from "@medusajs/types"
 import { Text } from "@medusajs/ui"
+import PrintButton from "@modules/order/components/print-button"
 
 type OrderDetailsProps = {
   order: HttpTypes.StoreOrder
   showStatus?: boolean
+  showPrintButton?: boolean
 }
 
-const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
+const OrderDetails = ({ order, showStatus, showPrintButton }: OrderDetailsProps) => {
   const formatStatus = (str: string) => {
     const formatted = str.split("_").join(" ")
 
@@ -64,17 +66,21 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
       </Text>
       */}
 
-      <div className="mt-4 space-y-1">
-        <Text className="text-xs sm:text-sm text-black">
-          <span className="font-semibold">Order </span>
-          <span data-testid="order-id">{orderId}</span>
-        </Text>
-        <Text
-          className="text-xs sm:text-sm text-black uppercase"
-          data-testid="order-date"
-        >
-          {orderDateLabel} EST
-        </Text>
+      <div className="mt-4 flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <Text className="text-xs sm:text-sm text-black">
+            <span className="font-semibold">Order </span>
+            <span data-testid="order-id">{orderId}</span>
+          </Text>
+          <Text
+            className="text-xs sm:text-sm text-black uppercase"
+            data-testid="order-date"
+          >
+            {orderDateLabel} EST
+          </Text>
+        </div>
+
+        {showPrintButton && <PrintButton />}
       </div>
 
       <div className="flex items-center text-compact-small gap-x-4 mt-4">
