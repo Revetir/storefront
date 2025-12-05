@@ -101,8 +101,8 @@ export default function CustomerCareLayout({
               href={page.href}
               className={`block text-sm transition-colors ${
                 isActive
-                  ? "font-bold underline text-black"
-                  : "text-gray-700 hover:text-black"
+                  ? "font-bold underline text-black hover:underline"
+                  : "text-gray-700 hover:text-black hover:underline"
               }`}
             >
               {page.title}

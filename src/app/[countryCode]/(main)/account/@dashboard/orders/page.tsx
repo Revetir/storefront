@@ -19,6 +19,11 @@ const shouldShowTrackLink = (order: HttpTypes.StoreOrder) => {
   return status === "shipped" || status === "delivered" || status === "fulfilled"
 }
 
+const formatStatusLabel = (status?: string | null) => {
+  if (!status) return ""
+  return status.replace(/_/g, " ").toUpperCase()
+}
+
 export default async function Orders() {
   const orders = await listOrders()
 
@@ -30,18 +35,18 @@ export default async function Orders() {
 
   return (
     <div className="w-full" data-testid="orders-page-wrapper">
-      <div className="mb-6">
-        <h1 className="text-2xl-semi tracking-[0.25em] uppercase">Orders</h1>
+      <div className="mb-3 sm:mb-4">
+        <h1 className="text-xl-semi sm:text-2xl-semi uppercase">Orders</h1>
 
-        <div className="mt-6 border-b border-gray-200">
-          <div className="flex gap-x-8 text-sm">
+        <div className="mt-3 sm:mt-4">
+          <div className="flex gap-x-6 text-xs sm:text-sm overflow-x-auto">
             <button
               type="button"
-              className="pb-3 font-semibold border-b-2 border-black uppercase tracking-[0.15em] text-black"
+              className="pb-3 font-semibold uppercase underline text-black"
             >
               Orders
             </button>
-            <span className="pb-3 text-gray-400 uppercase tracking-[0.15em] cursor-default">
+            <span className="pb-3 text-gray-400 uppercase cursor-default">
               Returns
             </span>
           </div>
@@ -49,32 +54,37 @@ export default async function Orders() {
       </div>
 
       {!hasOrders ? (
-        <div className="w-full flex items-center justify-center py-16 text-base-regular text-gray-500">
+        <div className="w-full flex items-center justify-center py-12 sm:py-16 text-base-regular text-gray-500 text-center px-4">
           No orders yet
         </div>
       ) : (
-        <div className="divide-y divide-gray-200">
+        <div className="mt-3 sm:mt-4 border-t border-gray-200 divide-y divide-gray-200">
           {orders.map((order) => {
             const firstItem = order.items?.[0]
 
             return (
               <div
                 key={order.id}
-                className="flex flex-col md:flex-row md:items-stretch justify-between gap-6 py-8"
+                className="flex flex-col md:flex-row md:items-stretch justify-between gap-4 sm:gap-5 md:gap-6 py-4 sm:py-5 md:py-6"
                 data-testid="order-wrapper"
               >
-                <div className="flex-1 text-sm space-y-1 max-w-xl">
-                  <div className="uppercase text-xs tracking-[0.18em] text-gray-600">
-                    {new Date(order.created_at).toLocaleDateString(undefined, {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                <div className="flex-1 text-sm max-w-xl">
+                  {/* Group 1: Date + fulfillment status */}
+                  <div className="space-y-1">
+                    <div className="uppercase text-xs text-gray-600">
+                      {new Date(order.created_at).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </div>
+                    <div className="uppercase text-xs text-gray-800">
+                      {formatStatusLabel(order.fulfillment_status || order.status || "")}
+                    </div>
                   </div>
-                  <div className="uppercase text-xs tracking-[0.18em] text-gray-800">
-                    {(order.fulfillment_status || order.status || "").toUpperCase()}
-                  </div>
-                  <div className="mt-3 space-y-1">
+
+                  {/* Group 2: Order number + total */}
+                  <div className="mt-3 sm:mt-4 space-y-1">
                     <div className="text-sm">
                       <span className="font-semibold">Order </span>
                       <span>#{order.display_id}</span>
@@ -87,8 +97,9 @@ export default async function Orders() {
                     </div>
                   </div>
 
+                  {/* Group 3: Track Order CTA */}
                   {shouldShowTrackLink(order) && (
-                    <div className="mt-4">
+                    <div className="mt-3 sm:mt-4">
                       {/* TODO: Wire up tracking once dedicated tracking route is finalized */}
                       <button
                         type="button"
@@ -100,7 +111,7 @@ export default async function Orders() {
                   )}
                 </div>
 
-                <div className="flex flex-col items-end gap-4 min-w-[120px]">
+                <div className="flex flex-col items-center gap-4 min-w-[120px]">
                   <LocalizedClientLink
                     href={`/account/orders/details/${order.id}`}
                     className="text-xs underline tracking-[0.15em] uppercase"
@@ -130,9 +141,6 @@ export default async function Orders() {
           })}
         </div>
       )}
-
-      <Divider className="my-16" />
-      <TransferRequestForm />
     </div>
   )
 }
