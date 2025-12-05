@@ -77,9 +77,9 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
     <div className="flex flex-col gap-y-6" data-testid="order-details-container">
       {/* Top: Order meta + print + methods/addresses */}
       <div className="flex flex-col gap-y-4 border-b border-gray-200 pb-4">
-        <div className="flex items-start justify-between items-center gap-4">
+        <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <p className="text-xs tracking-[0.15em] uppercase text-gray-700">ORDER {orderId}</p>
+            <p className="text-xs uppercase text-gray-700">ORDER {orderId}</p>
             <p className="text-xs text-gray-800">{orderDateLabel} EST</p>
           </div>
           <button
@@ -94,7 +94,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
         {/* Mobile: 2x2 grid (Shipping/Payment methods & addresses) */}
         <div className="mt-2 grid grid-cols-2 gap-6 text-xs sm:text-sm md:hidden">
           <div className="space-y-1">
-            <p className="uppercase tracking-[0.15em] text-gray-700">Shipping Method</p>
+            <p className="uppercase text-gray-700">Shipping Method</p>
             {(order as any).shipping_methods?.map((method: any) => (
               <p key={method.id} className="text-gray-900">
                 {method.name}
@@ -103,7 +103,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
           </div>
 
           <div className="space-y-1">
-            <p className="uppercase tracking-[0.15em] text-gray-700">Shipping Address</p>
+            <p className="uppercase text-gray-700">Shipping Address</p>
             {order.shipping_address && (
               <div className="text-gray-900 space-y-0.5">
                 <p>
@@ -121,12 +121,12 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
           </div>
 
           <div className="space-y-1">
-            <p className="uppercase tracking-[0.15em] text-gray-700">Payment Method</p>
+            <p className="uppercase text-gray-700">Payment Method</p>
             <p className="text-gray-900">{paymentDisplay || "Card"}</p>
           </div>
 
           <div className="space-y-1">
-            <p className="uppercase tracking-[0.15em] text-gray-700">Billing Address</p>
+            <p className="uppercase text-gray-700">Billing Address</p>
             {order.billing_address && (
               <div className="text-gray-900 space-y-0.5">
                 <p>
@@ -148,7 +148,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
         <div className="mt-2 hidden md:grid md:grid-cols-3 md:gap-8 text-xs sm:text-sm">
           <div className="space-y-4">
             <div className="space-y-1">
-              <p className="uppercase tracking-[0.15em] text-gray-700">Shipping Method</p>
+              <p className="uppercase text-gray-700">Shipping Method</p>
               {(order as any).shipping_methods?.map((method: any) => (
                 <p key={method.id} className="text-gray-900">
                   {method.name}
@@ -157,13 +157,13 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
             </div>
 
             <div className="space-y-1">
-              <p className="uppercase tracking-[0.15em] text-gray-700">Payment Method</p>
+              <p className="uppercase text-gray-700">Payment Method</p>
               <p className="text-gray-900">{paymentDisplay || "Card"}</p>
             </div>
           </div>
 
           <div className="space-y-1">
-            <p className="uppercase tracking-[0.15em] text-gray-700">Shipping Address</p>
+            <p className="uppercase text-gray-700">Shipping Address</p>
             {order.shipping_address && (
               <div className="text-gray-900 space-y-0.5">
                 <p>
@@ -181,7 +181,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
           </div>
 
           <div className="space-y-1">
-            <p className="uppercase tracking-[0.15em] text-gray-700">Billing Address</p>
+            <p className="uppercase text-gray-700">Billing Address</p>
             {order.billing_address && (
               <div className="text-gray-900 space-y-0.5">
                 <p>
@@ -203,7 +203,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
       {/* Middle: status + track order + items */}
       <div className="flex flex-col gap-y-4 pb-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <p className="text-xs tracking-[0.15em] uppercase text-gray-700">
+          <p className="text-xs uppercase text-gray-700">
             <span className="text-gray-900">{orderStatus}</span>
           </p>
           {shouldShowTrackLink(order) && (

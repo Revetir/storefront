@@ -20,7 +20,7 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
   return (
     <div className="rounded-lg bg-[#f5f5f5] px-4 py-4 sm:px-6 sm:py-5">
       <div className="mb-3">
-        <h2 className="text-xs sm:text-sm tracking-[0.15em] uppercase text-gray-900">
+        <h2 className="text-xs sm:text-sm uppercase text-gray-900">
           ORDER SUMMARY
         </h2>
       </div>
@@ -43,7 +43,7 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
 
       <div className="pt-2 mt-1">
         <div className="flex items-center justify-between text-xs sm:text-sm text-gray-900">
-          <span className="uppercase tracking-[0.15em]">Order Total</span>
+          <span className="uppercase">Order Total</span>
           <span>{getAmount(order.total)}</span>
         </div>
       </div>
