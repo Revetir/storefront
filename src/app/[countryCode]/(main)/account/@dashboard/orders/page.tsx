@@ -65,7 +65,7 @@ export default async function Orders() {
             return (
               <div
                 key={order.id}
-                className="flex flex-row items-center md:items-stretch justify-between gap-4 sm:gap-5 md:gap-6 py-4 sm:py-5 md:py-6"
+                className="flex flex-row items-start md:items-stretch justify-between gap-4 sm:gap-5 md:gap-6 py-4 sm:py-5 md:py-6"
                 data-testid="order-wrapper"
               >
                 <div className="flex-1 text-sm max-w-xl">
