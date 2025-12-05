@@ -1,8 +1,10 @@
+"use client"
+
 import { login } from "@lib/data/customer"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
@@ -10,6 +12,25 @@ type Props = {
 
 const Login = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(login, null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const handleInvalid = (e: React.FormEvent<HTMLInputElement>) => {
+    e.preventDefault()
+    const target = e.target as HTMLInputElement
+
+    if (target.name === "email") {
+      setErrors(prev => ({ ...prev, email: "Please enter your email address" }))
+    } else if (target.name === "password") {
+      setErrors(prev => ({ ...prev, password: "Please enter your password" }))
+    }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name } = e.target
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: "" }))
+    }
+  }
 
   return (
     <div
@@ -30,12 +51,18 @@ const Login = ({ setCurrentView }: Props) => {
               type="email"
               id="email"
               name="email"
-              title="Enter a valid email address."
               autoComplete="email"
               required
               data-testid="email-input"
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              onInvalid={handleInvalid}
+              onChange={handleChange}
+              className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              }`}
             />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+            )}
           </div>
           <div>
             <label
@@ -51,8 +78,15 @@ const Login = ({ setCurrentView }: Props) => {
               autoComplete="current-password"
               required
               data-testid="password-input"
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              onInvalid={handleInvalid}
+              onChange={handleChange}
+              className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              }`}
             />
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            )}
           </div>
         </div>
         <ErrorMessage error={message} data-testid="login-error-message" />

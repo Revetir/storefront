@@ -72,7 +72,7 @@ const AddressSelect = ({
                   className="cursor-default select-none relative pl-6 pr-10 hover:bg-gray-50 py-4"
                   data-testid="shipping-address-option"
                 >
-                  <div className="flex gap-x-4 items-start">
+                  <div className="flex gap-x-4 items-center">
                     <Radio
                       checked={selectedAddress?.id === address.id}
                       data-testid="shipping-address-radio"

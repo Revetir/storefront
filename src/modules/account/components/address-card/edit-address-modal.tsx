@@ -294,7 +294,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
             <button
               type="button"
               onClick={() => setIsDeleteOpen(false)}
-              className="hidden lg:flex absolute right-6 top-6 text-black text-2xl leading-none"
+              className="hidden lg:flex absolute right-0 top-0 text-black text-2xl leading-none"
             >
               ×
             </button>
