@@ -92,6 +92,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
   return (
     <div className="flex flex-col gap-y-6" data-testid="order-details-container">
       {/* Top: Order meta + print + methods/addresses */}
+      {/* Looks like text sizes aren't rendering properly, will have to investigate */}
       <div className="flex flex-col gap-y-4 border-b border-gray-200 pb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
@@ -219,7 +220,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
       {/* Middle: status + track order + items */}
       <div className="flex flex-col gap-y-4 pb-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <p className="text-xs uppercase text-gray-700">
+          <p className="text-md uppercase text-gray-700">
             <span className="text-gray-900">{orderStatus}</span>
           </p>
           {shouldShowTrackLink(order) && (

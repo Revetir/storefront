@@ -23,9 +23,10 @@ type CartTotalsProps = {
     } | null
   }
   isCheckoutPage?: boolean
+  forceFinalLabel?: boolean
 }
 
-const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false }) => {
+const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false, forceFinalLabel = false }) => {
   const [deliveryExpanded, setDeliveryExpanded] = useState(false)
   const [returnsExpanded, setReturnsExpanded] = useState(false)
 
@@ -264,7 +265,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false 
       </div>
       <div className="h-px w-full border-b border-gray-200 my-4" />
       <div className="flex items-center justify-between text-ui-fg-base txt-medium uppercase">
-        <span>{isCheckoutPage && hasAddress ? "Order Total" : "Estimated Order Total"}</span>
+        <span>{forceFinalLabel || (isCheckoutPage && hasAddress) ? "Order Total" : "Estimated Order Total"}</span>
         <span
           className="txt-xlarge-plus"
           data-testid="cart-total"
