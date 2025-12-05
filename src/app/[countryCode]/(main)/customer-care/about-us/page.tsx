@@ -9,7 +9,10 @@ export default function AboutUsPage() {
   return (
     <div className="content-container py-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">About REVETIR</h1>
+        <h1 className="text-3xl mb-8">
+          <span className="font-bold">About</span>{" "}
+          <span className="font-light">REVETIR</span>
+        </h1>
         
         <div className="prose prose-lg max-w-none">
           <p className="text-gray-600 leading-relaxed mb-6">
