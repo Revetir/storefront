@@ -118,55 +118,58 @@ const AccountDetailsForm = ({ customer }: Props) => {
     }
   }
 
-  const disableSave =
-    submitting ||
-    !firstName.trim() ||
-    !lastName.trim() ||
-    !phone.trim() ||
-    !isPasswordSectionValid
+  const disableSave = submitting
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-2xl" data-testid="account-details-form">
       <div className="mb-8">
-        <p className="text-xs uppercase tracking-[0.15em] mb-2">Account Information</p>
+        <p className="text-xs uppercase mb-2">Contact Information</p>
         <div className="space-y-4">
           {/* Name row: First and Last, side-by-side on desktop */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="First name"
-              name="first_name"
-              required
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-            <Input
-              label="Last name"
-              name="last_name"
-              required
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">First name</label>
+              <input
+                type="text"
+                name="first_name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Last name</label>
+              <input
+                type="text"
+                name="last_name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              />
+            </div>
           </div>
 
           {/* Contact row: Email and shorter Phone field */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-            <Input
-              label="Email address"
-              name="email"
-              type="email"
-              required
-              value={customer.email}
-              disabled
-              className="pt-4 pb-1 block w-full h-11 px-4 mt-0 bg-gray-50 border border-gray-300 text-gray-500 appearance-none focus:outline-none focus:ring-0 focus:shadow-none"
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+              <input
+                type="email"
+                name="email"
+                value={customer.email}
+                disabled
+                className="w-full px-3 py-2 border border-gray-300 bg-gray-50 text-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              />
+            </div>
             <div className="w-full md:w-3/5">
-              <Input
-                label="Phone"
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <input
+                type="tel"
                 name="phone"
-                required
                 value={phone}
                 onChange={handlePhoneChange}
                 maxLength={13}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
               />
             </div>
           </div>
@@ -174,7 +177,7 @@ const AccountDetailsForm = ({ customer }: Props) => {
       </div>
 
       <div className="mb-8">
-        <p className="text-xs uppercase tracking-[0.15em] mb-2">Account Password</p>
+        <p className="text-xs uppercase mb-2">Change Password</p>
         <div className="space-y-4">
           <Input
             label="Old password"
@@ -208,7 +211,7 @@ const AccountDetailsForm = ({ customer }: Props) => {
                   style={{ width: `${passwordStrength.level * 100}%` }}
                 />
               </div>
-              <div className="mt-1 text-[10px] tracking-[0.15em] uppercase text-right">
+              <div className="mt-1 text-[10px] uppercase text-right">
                 {passwordStrength.label}
               </div>
             </div>
@@ -231,7 +234,7 @@ const AccountDetailsForm = ({ customer }: Props) => {
         <button
           type="submit"
           disabled={disableSave}
-          className="min-w-[200px] px-10 py-3 text-xs tracking-[0.15em] uppercase bg-black text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="min-w-[200px] px-10 py-3 text-xs tracking-[0.15em] uppercase bg-black text-white"
         >
           {submitting ? "Saving..." : "Save Changes"}
         </button>

@@ -45,7 +45,7 @@ const AccountNav = ({
               </li>
               <li>
                 <AccountNavLink
-                  href="/account/profile"
+                  href="/account/details"
                   route={route!}
                   data-testid="profile-link"
                 >
