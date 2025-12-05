@@ -24,6 +24,7 @@ export interface CheckoutEventData {
   // Flattened item information for analytics tools that surface top-level scalars more easily
   item_titles?: string[]
   item_ids?: string[]
+  items_summary?: string
   shipping_method?: string
   payment_provider?: string
   order_value?: number

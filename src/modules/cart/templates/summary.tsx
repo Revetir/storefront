@@ -25,12 +25,17 @@ const Summary = ({ cart }: SummaryProps) => {
       item_count: cart.items?.length || 0,
       item_titles:
         cart.items
-          ?.map((item) => item.product_title)
+          ?.map((item) => item.product_title || (item as any).title || '')
           .filter((title): title is string => Boolean(title)) || [],
       item_ids:
         cart.items
           ?.map((item) => item.product_id)
           .filter((id): id is string => Boolean(id)) || [],
+      items_summary:
+        cart.items
+          ?.map((item) => item.product_title || (item as any).title || '')
+          .filter((title): title is string => Boolean(title))
+          .join(' | ') || '',
       items: cart.items?.map(item => {
         const product = item.product as any
         return {
