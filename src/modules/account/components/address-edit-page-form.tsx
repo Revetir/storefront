@@ -3,7 +3,6 @@
 import { useState, useEffect, useActionState } from "react"
 import { useRouter } from "next/navigation"
 
-import Input from "@modules/common/components/input"
 import CountrySelect from "@modules/checkout/components/country-select"
 import Checkbox from "@modules/common/components/checkbox"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
@@ -51,59 +50,101 @@ const AddressEditPageForm = ({ address, region }: Props) => {
       <input type="hidden" name="addressId" value={address.id} />
 
       <div className="space-y-4">
+        {/* Name row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="First name"
-            name="first_name"
-            required
-            autoComplete="given-name"
-            defaultValue={address.first_name || undefined}
-            data-testid="first-name-input"
-          />
-          <Input
-            label="Last name"
-            name="last_name"
-            required
-            autoComplete="family-name"
-            defaultValue={address.last_name || undefined}
-            data-testid="last-name-input"
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              First name
+            </label>
+            <input
+              type="text"
+              name="first_name"
+              autoComplete="given-name"
+              required
+              defaultValue={address.first_name || ""}
+              data-testid="first-name-input"
+              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Last name
+            </label>
+            <input
+              type="text"
+              name="last_name"
+              autoComplete="family-name"
+              required
+              defaultValue={address.last_name || ""}
+              data-testid="last-name-input"
+              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        {/* Company */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Company
+          </label>
+          <input
+            type="text"
+            name="company"
+            autoComplete="organization"
+            defaultValue={address.company || ""}
+            data-testid="company-input"
+            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
           />
         </div>
 
-        <Input
-          label="Company"
-          name="company"
-          autoComplete="organization"
-          defaultValue={address.company || undefined}
-          data-testid="company-input"
-        />
+        {/* Address 1 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Street Address
+          </label>
+          <input
+            type="text"
+            name="address_1"
+            autoComplete="address-line1"
+            required
+            defaultValue={address.address_1 || ""}
+            data-testid="address-1-input"
+            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+          />
+        </div>
 
-        <Input
-          label="Street Address"
-          name="address_1"
-          required
-          autoComplete="address-line1"
-          defaultValue={address.address_1 || undefined}
-          data-testid="address-1-input"
-        />
+        {/* Address 2 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Apartment, suite, etc.
+          </label>
+          <input
+            type="text"
+            name="address_2"
+            autoComplete="address-line2"
+            defaultValue={address.address_2 || ""}
+            data-testid="address-2-input"
+            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+          />
+        </div>
 
-        <Input
-          label="Apartment, suite, etc."
-          name="address_2"
-          autoComplete="address-line2"
-          defaultValue={address.address_2 || undefined}
-          data-testid="address-2-input"
-        />
+        {/* City */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            City
+          </label>
+          <input
+            type="text"
+            name="city"
+            autoComplete="locality"
+            required
+            defaultValue={address.city || ""}
+            data-testid="city-input"
+            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+          />
+        </div>
 
-        <Input
-          label="City"
-          name="city"
-          required
-          autoComplete="locality"
-          defaultValue={address.city || undefined}
-          data-testid="city-input"
-        />
-
+        {/* State + Zip */}
         <div className="grid grid-cols-[1fr_144px] gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -127,16 +168,23 @@ const AddressEditPageForm = ({ address, region }: Props) => {
               ))}
             </select>
           </div>
-          <Input
-            label="Zip Code"
-            name="postal_code"
-            required
-            autoComplete="postal-code"
-            defaultValue={address.postal_code || undefined}
-            data-testid="postal-code-input"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Zip Code
+            </label>
+            <input
+              type="text"
+              name="postal_code"
+              autoComplete="postal-code"
+              required
+              defaultValue={address.postal_code || ""}
+              data-testid="postal-code-input"
+              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+            />
+          </div>
         </div>
 
+        {/* Country */}
         <CountrySelect
           name="country_code"
           region={region}
@@ -146,13 +194,20 @@ const AddressEditPageForm = ({ address, region }: Props) => {
           data-testid="country-select"
         />
 
-        <Input
-          label="Phone"
-          name="phone"
-          autoComplete="phone"
-          defaultValue={address.phone || undefined}
-          data-testid="phone-input"
-        />
+        {/* Phone */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Phone
+          </label>
+          <input
+            type="tel"
+            name="phone"
+            autoComplete="tel"
+            defaultValue={address.phone || ""}
+            data-testid="phone-input"
+            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+          />
+        </div>
 
         <div className="mt-4 space-y-2">
           <Checkbox

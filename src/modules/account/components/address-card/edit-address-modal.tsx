@@ -289,7 +289,15 @@ const EditAddress: React.FC<EditAddressProps> = ({
         data-testid="delete-address-modal"
       >
         <Modal.Body>
-          <div className="flex flex-col w-full h-full">
+          <div className="relative flex flex-col w-full h-full">
+            {/* Desktop X close button */}
+            <button
+              type="button"
+              onClick={() => setIsDeleteOpen(false)}
+              className="hidden sm:flex absolute right-5 top-5 text-black"
+            >
+              ×
+            </button>
             <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 text-center gap-4">
               <div className="text-sm leading-relaxed whitespace-pre-line">
                 <div className="font-semibold">

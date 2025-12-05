@@ -6,8 +6,8 @@ import { getRegion } from "@lib/data/regions"
 import AddressEditPageForm from "@modules/account/components/address-edit-page-form"
 
 export const metadata: Metadata = {
-  title: "Edit Address",
-  description: "Edit your saved address.",
+  title: "Addresses",
+  description: "View and edit your addresses.",
 }
 
 export default async function EditAddressPage(props: {
@@ -31,16 +31,7 @@ export default async function EditAddressPage(props: {
 
   return (
     <div className="w-full" data-testid="edit-address-page-wrapper">
-      <div className="mb-3 sm:mb-4">
-        <h1 className="text-xl-semi sm:text-2xl-semi">Edit Address</h1>
-        <p className="mt-3 text-sm text-gray-700 max-w-2xl">
-          Update your saved address details below.
-        </p>
-      </div>
-
-      <div className="mt-6">
-        <AddressEditPageForm address={address} region={region} />
-      </div>
+      <AddressEditPageForm address={address} region={region} />
     </div>
   )
 }

@@ -42,7 +42,9 @@ const Modal = ({
             className={clx(
               search
                 ? "justify-start items-start w-auto"
-                : "flex min-h-full h-full justify-center p-4 text-center items-center",
+                : size === "large"
+                  ? "flex min-h-full h-full justify-center text-center items-center p-0 xsmall:p-0 lg:p-4"
+                  : "flex min-h-full h-full justify-center p-4 text-center items-center",
               "flex"
             )}
             style={search ? { position: "absolute", left: 0, top: 0 } : {}}
