@@ -16,7 +16,17 @@ export const metadata: Metadata = {
 
 const shouldShowTrackLink = (order: HttpTypes.StoreOrder) => {
   const status = (order.fulfillment_status || "").toLowerCase()
-  return status === "shipped" || status === "delivered" || status === "fulfilled"
+  return status === "shipped" || status === "delivered"
+}
+
+const formatOrderDateEST = (dateInput: string | Date) => {
+  const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "America/New_York",
+  })
 }
 
 const formatStatusLabel = (status?: string | null) => {
@@ -72,11 +82,7 @@ export default async function Orders() {
                   {/* Group 1: Date + fulfillment status */}
                   <div className="space-y-1">
                     <div className="uppercase text-xs text-gray-600">
-                      {new Date(order.created_at).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+                      {order.created_at ? formatOrderDateEST(order.created_at) : ""}
                     </div>
                     <div className="uppercase text-xs text-gray-800">
                       {formatStatusLabel(order.fulfillment_status || order.status || "")}
