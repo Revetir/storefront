@@ -40,7 +40,7 @@ const AccountNav = ({
                   route={route!}
                   data-testid="overview-link"
                 >
-                  Orders
+                  Order History
                 </AccountNavLink>
               </li>
               <li>
@@ -49,7 +49,7 @@ const AccountNav = ({
                   route={route!}
                   data-testid="profile-link"
                 >
-                  Profile
+                  Account Details
                 </AccountNavLink>
               </li>
               <li>

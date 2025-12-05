@@ -63,7 +63,7 @@ export default async function Orders() {
   return (
     <div className="w-full" data-testid="orders-page-wrapper">
       <div className="mb-3 sm:mb-4">
-        <h1 className="text-xl-semi sm:text-2xl-semi uppercase">Orders</h1>
+        <h1 className="text-xl-semi sm:text-2xl-semi">Order History</h1>
 
         <div className="mt-3 sm:mt-4">
           <div className="flex gap-x-6 text-xs sm:text-sm overflow-x-auto">
