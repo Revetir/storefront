@@ -252,13 +252,22 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                 >
                   Bag
                 </LocalizedClientLink>
-                <LocalizedClientLink
-                  href="/account"
-                  className="block text-sm uppercase text-gray-700 hover:text-black"
-                  onClick={onClose}
-                >
-                  Account
-                </LocalizedClientLink>
+
+                <div className="flex items-center justify-between">
+                  <LocalizedClientLink
+                    href="/account"
+                    className="text-sm uppercase text-gray-700 hover:text-black"
+                    onClick={onClose}
+                  >
+                    Account
+                  </LocalizedClientLink>
+                  <button
+                    onClick={() => openSubPanel("account")}
+                    className="p-1 hover:bg-gray-100 rounded"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               {/* Customer Care */}
@@ -300,6 +309,7 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                 </button>
                 <h2 className="text-base font-medium uppercase tracking-wide">
                   {activeSubPanel === "customer-care" && "Customer Care"}
+                  {activeSubPanel === "account" && "Account"}
                 </h2>
                 <div className="w-9"></div> {/* Spacer for centering */}
               </div>
@@ -351,6 +361,32 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                       onClick={closeAllPanels}
                     >
                       About Us
+                    </LocalizedClientLink>
+                  </div>
+                )}
+
+                {activeSubPanel === "account" && (
+                  <div className="space-y-3">
+                    <LocalizedClientLink
+                      href="/account/orders"
+                      className="block text-sm uppercase text-gray-700 hover:text-black py-2"
+                      onClick={closeAllPanels}
+                    >
+                      Order History
+                    </LocalizedClientLink>
+                    <LocalizedClientLink
+                      href="/account/details"
+                      className="block text-sm uppercase text-gray-700 hover:text-black py-2"
+                      onClick={closeAllPanels}
+                    >
+                      Account Details
+                    </LocalizedClientLink>
+                    <LocalizedClientLink
+                      href="/account/addresses"
+                      className="block text-sm uppercase text-gray-700 hover:text-black py-2"
+                      onClick={closeAllPanels}
+                    >
+                      Addresses
                     </LocalizedClientLink>
                   </div>
                 )}

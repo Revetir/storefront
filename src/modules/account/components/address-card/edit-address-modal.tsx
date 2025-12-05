@@ -285,7 +285,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
         isOpen={isDeleteOpen}
         close={() => setIsDeleteOpen(false)}
         size="large"
-        panelClassName="lg:max-w-md lg:h-auto lg:max-h-none"
+        panelClassName="lg:!max-w-md lg:!w-auto lg:!h-auto lg:!max-h-none lg:!p-8"
         data-testid="delete-address-modal"
       >
         <Modal.Body>
@@ -294,7 +294,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
             <button
               type="button"
               onClick={() => setIsDeleteOpen(false)}
-              className="hidden sm:flex absolute right-5 top-5 text-black"
+              className="hidden lg:flex absolute right-6 top-6 text-black text-2xl leading-none"
             >
               ×
             </button>
@@ -333,7 +333,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
             <button
               type="button"
               onClick={() => setIsDeleteOpen(false)}
-              className="block w-full border-t border-gray-200 px-6 py-4 text-xs tracking-[0.15em] uppercase bg-white text-black sm:hidden"
+              className="block w-full border-t border-gray-200 px-6 py-4 text-xs tracking-[0.15em] uppercase bg-white text-black lg:hidden"
             >
               Cancel
             </button>
