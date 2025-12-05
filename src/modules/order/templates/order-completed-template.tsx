@@ -7,6 +7,7 @@ import Items from "@modules/order/components/items"
 import OnboardingCta from "@modules/order/components/onboarding-cta"
 import OrderDetails from "@modules/order/components/order-details"
 import MetaPixelPurchase from "@modules/order/components/meta-pixel-purchase"
+import PrintButton from "@modules/order/components/print-button"
 import { HttpTypes } from "@medusajs/types"
 import { getPaymentDisplayFromOrder } from "@lib/util/format-payment-method"
 
@@ -33,7 +34,7 @@ export default async function OrderCompletedTemplate({
         >
           <Heading
             level="h1"
-            className="flex flex-col items-center text-center gap-y-4 text-ui-fg-base mb-6"
+            className="flex flex-col items-center text-center gap-y-4 text-ui-fg-base mb-3"
           >
             <span className="text-4xl sm:text-5xl md:text-6xl leading-none uppercase">
               THANK YOU
@@ -43,15 +44,7 @@ export default async function OrderCompletedTemplate({
             </span>
           </Heading>
 
-          <div className="hidden sm:flex justify-end mb-2">
-            <button
-              type="button"
-              onClick={() => typeof window !== "undefined" && window.print()}
-              className="text-xs underline uppercase text-gray-900"
-            >
-              Print
-            </button>
-          </div>
+          <PrintButton />
           <div className="space-y-6">
             <OrderDetails order={order} />
 
