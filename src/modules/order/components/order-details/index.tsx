@@ -51,6 +51,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
 
   return (
     <div>
+      {/*
       <Text>
         Order confirmation details have been sent to{" "}
         <span
@@ -61,6 +62,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
         </span>
         .
       </Text>
+      */}
 
       <div className="mt-4 space-y-1">
         <Text className="text-xs sm:text-sm text-black">

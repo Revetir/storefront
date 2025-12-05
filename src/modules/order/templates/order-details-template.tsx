@@ -4,6 +4,7 @@ import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Items from "@modules/order/components/items"
 import OrderSummary from "@modules/order/components/order-summary"
+import { getPaymentDisplayFromOrder } from "@lib/util/format-payment-method"
 import React from "react"
 
 type OrderDetailsTemplateProps = {
@@ -44,39 +45,6 @@ const formatOrderDateEST = (dateInput: string | Date | undefined) => {
   })
 }
 
-const getPaymentDisplay = (order: HttpTypes.StoreOrder): string | null => {
-  const payment = (order as any).payment_collections?.[0]?.payments?.[0]
-  const source =
-    payment?.data?.latest_charge_expanded ??
-    payment?.data?.payment_method_expanded ??
-    payment?.data?.payment_intent ??
-    payment?.data
-
-  if (!source) return null
-
-  // Fallbacks for common shapes (card / wallet / PayPal)
-  const pm = source.payment_method ?? source
-
-  if (pm?.object === "payment_method" || pm?.type === "card") {
-    const card = pm.card || pm.payment_method_details?.card
-    if (card) {
-      const brand = card.brand
-        ? card.brand.charAt(0).toUpperCase() + card.brand.slice(1)
-        : "Card"
-      return `${brand} **** ${card.last4}`
-    }
-  }
-
-  if (pm?.payment_method_details?.paypal) {
-    return "PayPal"
-  }
-
-  if (typeof pm === "string") {
-    return "Card payment"
-  }
-
-  return null
-}
 
 const shouldShowTrackLink = (order: HttpTypes.StoreOrder) => {
   const status = (order.fulfillment_status || "").toLowerCase()
@@ -87,7 +55,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
   const orderStatus = formatStatusLabel(order.fulfillment_status, order.status)
   const orderId = order.display_id ?? order.id
   const orderDateLabel = formatOrderDateEST(order.created_at || new Date())
-  const paymentDisplay = getPaymentDisplay(order)
+  const paymentDisplay = getPaymentDisplayFromOrder(order)
 
   return (
     <div className="flex flex-col gap-y-6" data-testid="order-details-container">
@@ -139,7 +107,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
 
           <div className="space-y-1">
             <p className="uppercase text-gray-700">Payment Method</p>
-            <p className="text-gray-900">{paymentDisplay || "Card"}</p>
+            <p className="text-gray-900">{paymentDisplay}</p>
           </div>
 
           <div className="space-y-1">
@@ -175,7 +143,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
 
             <div className="space-y-1">
               <p className="uppercase text-gray-700">Payment Method</p>
-              <p className="text-gray-900">{paymentDisplay || "Card"}</p>
+              <p className="text-gray-900">{paymentDisplay}</p>
             </div>
           </div>
 

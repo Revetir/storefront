@@ -8,6 +8,7 @@ import OnboardingCta from "@modules/order/components/onboarding-cta"
 import OrderDetails from "@modules/order/components/order-details"
 import MetaPixelPurchase from "@modules/order/components/meta-pixel-purchase"
 import { HttpTypes } from "@medusajs/types"
+import { getPaymentDisplayFromOrder } from "@lib/util/format-payment-method"
 
 type OrderCompletedTemplateProps = {
   order: HttpTypes.StoreOrder
@@ -19,6 +20,7 @@ export default async function OrderCompletedTemplate({
   const cookies = await nextCookies()
 
   const isOnboarding = cookies.get("_medusa_onboarding")?.value === "true"
+  const paymentDisplay = getPaymentDisplayFromOrder(order)
 
   return (
     <div className="py-6 min-h-[calc(100vh-64px)]">
@@ -31,15 +33,25 @@ export default async function OrderCompletedTemplate({
         >
           <Heading
             level="h1"
-            className="flex flex-col gap-y-4 text-ui-fg-base mb-6"
+            className="flex flex-col items-center text-center gap-y-4 text-ui-fg-base mb-6"
           >
-            <span className="text-4xl sm:text-5xl md:text-6xl tracking-[0.25em] leading-none uppercase">
+            <span className="text-4xl sm:text-5xl md:text-6xl leading-none uppercase">
               THANK YOU
             </span>
-            <span className="text-xs sm:text-sm tracking-[0.15em] uppercase text-gray-700">
-              Your order has been placed.
+            <span className="text-xs sm:text-sm uppercase text-gray-700">
+              Your order was placed successfully.
             </span>
           </Heading>
+
+          <div className="hidden sm:flex justify-end mb-2">
+            <button
+              type="button"
+              onClick={() => typeof window !== "undefined" && window.print()}
+              className="text-xs underline uppercase text-gray-900"
+            >
+              Print
+            </button>
+          </div>
           <div className="space-y-6">
             <OrderDetails order={order} />
 
@@ -78,8 +90,7 @@ export default async function OrderCompletedTemplate({
 
                 <div className="space-y-1">
                   <p className="uppercase text-gray-700">Payment Method</p>
-                  {/* Keep simple label here; detailed card info is shown in account details */}
-                  <p className="text-gray-900">Card</p>
+                  <p className="text-gray-900">{paymentDisplay}</p>
                 </div>
 
                 <div className="space-y-1">
@@ -117,7 +128,7 @@ export default async function OrderCompletedTemplate({
 
                   <div className="space-y-1">
                     <p className="uppercase text-gray-700">Payment Method</p>
-                    <p className="text-gray-900">Card</p>
+                    <p className="text-gray-900">{paymentDisplay}</p>
                   </div>
                 </div>
 
@@ -164,7 +175,7 @@ export default async function OrderCompletedTemplate({
             </div>
           </div>
 
-          <Heading level="h2" className="flex flex-row text-xl font-medium tracking-[0.15em] uppercase mt-4">
+          <Heading level="h2" className="flex flex-row text-xl font-medium uppercase mt-4">
             Summary
           </Heading>
           <Items order={order} />

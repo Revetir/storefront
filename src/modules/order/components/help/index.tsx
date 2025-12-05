@@ -5,8 +5,7 @@ import React from "react"
 const Help = () => {
   return (
     <div className="mt-6 text-sm sm:text-base">
-      <Heading className="text-base-semi mb-1">Need help?</Heading>
-      <p>
+      <Heading className="text-base-semi">
         Need help?{" "}
         <LocalizedClientLink
           href="/customer-care/contact-us"
@@ -14,7 +13,7 @@ const Help = () => {
         >
           Contact Customer Care
         </LocalizedClientLink>
-      </p>
+      </Heading>
     </div>
   )
 }

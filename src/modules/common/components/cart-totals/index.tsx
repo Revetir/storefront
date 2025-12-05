@@ -178,16 +178,21 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, isCheckoutPage = false,
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-            <span
-              data-testid="cart-shipping"
-              data-value={shipping_subtotal || 0}
-            >
-              {shipping_subtotal === 0 ? (
-                <strong>Free</strong>
-              ) : (
-                convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })
-              )}
-            </span>
+            {(() => {
+              const shippingAmount = shipping_subtotal ?? 0
+              return (
+                <span
+                  data-testid="cart-shipping"
+                  data-value={shippingAmount}
+                >
+                  {shippingAmount === 0 ? (
+                    <strong>Free</strong>
+                  ) : (
+                    convertToLocale({ amount: shippingAmount, currency_code })
+                  )}
+                </span>
+              )
+            })()}
           </div>
           <div
             className={`overflow-hidden transition-all duration-300 ease-in-out ${
