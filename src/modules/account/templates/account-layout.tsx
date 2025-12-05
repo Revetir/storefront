@@ -18,15 +18,15 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
     <div className="py-8 relative" data-testid="account-page">
       {/* Fixed left sidebar on xl, mirroring customer-care layout */}
       {customer && (
-        <div className="hidden xl:block fixed left-8 top-32 w-48">
+        <div className="hidden lg:block fixed left-8 top-32 w-48">
           <AccountNav customer={customer} />
         </div>
       )}
 
-      <div className="xl:mx-96 px-4">
+      <div className="lg:mx-96 px-4">
         {/* Mobile / tablet nav above content */}
         {customer && (
-          <div className="xl:hidden mb-6">
+          <div className="lg:hidden mb-6">
             <AccountNav customer={customer} />
           </div>
         )}

@@ -116,34 +116,34 @@ export default function CustomerCareLayout({
   return (
     <div className="py-8 relative">
       {/* Left Sidebar - Navigation */}
-      <div className="hidden xl:block fixed left-8 top-32 w-48">
+      <div className="hidden lg:block fixed left-8 top-32 w-48">
         {renderNavSection(customerCarePages, "Help")}
         {renderNavSection(shoppingPages, "Shopping")}
         {renderNavSection(revetirPages, "REVETIR")}
       </div>
 
       {/* Right Sidebar - Contact Information */}
-      <div className="hidden xl:block fixed right-8 top-32 w-48">
+      <div className="hidden lg:block fixed right-8 top-32 w-48">
         <h3 className="text-lg font-semibold mb-4">Customer Care</h3>
         <div className="space-y-1 text-sm">
           <div>
             <span className="font-medium">Email:</span> care@revetir.com
           </div>
-            <div>
-              <span className="italic">Monday to Saturday, 9 AM to 11 PM (EST)</span>
-            </div>
-            <div>
+          <div>
+            <span className="italic">Monday to Saturday, 9 AM to 11 PM (EST)</span>
+          </div>
+          <div>
             <span className="font-medium">Live Chat:</span> <em>Coming Soon</em>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="xl:mx-96 px-4">
+      <div className="lg:mx-96 px-4">
         <div className="max-w-3xl mx-auto">
           {children}
         </div>
       </div>
     </div>
   )
-} 
+}
