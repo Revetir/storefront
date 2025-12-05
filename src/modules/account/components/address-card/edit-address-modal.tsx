@@ -5,10 +5,12 @@ import { PencilSquare as Edit, Trash } from "@medusajs/icons"
 import { Button, Heading, Text, clx } from "@medusajs/ui"
 
 import useToggleState from "@lib/hooks/use-toggle-state"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CountrySelect from "@modules/checkout/components/country-select"
 import Input from "@modules/common/components/input"
 import Modal from "@modules/common/components/modal"
 import Checkbox from "@modules/common/components/checkbox"
+import { US_STATES } from "../../../checkout/utils/us-states"
 import Spinner from "@modules/common/icons/spinner"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import { HttpTypes } from "@medusajs/types"
@@ -108,17 +110,16 @@ const EditAddress: React.FC<EditAddressProps> = ({
           )}
         </div>
         <div className="mt-3 flex gap-4 text-xs">
-          <button
-            type="button"
-            className="underline tracking-[0.15em] uppercase text-black"
-            onClick={open}
+          <LocalizedClientLink
+            href={`/account/addresses/${address.id}`}
+            className="text-xs tracking-[0.15em] uppercase text-black hover:underline"
             data-testid="address-edit-button"
           >
             Edit
-          </button>
+          </LocalizedClientLink>
           <button
             type="button"
-            className="underline tracking-[0.15em] uppercase text-black"
+            className="text-xs tracking-[0.15em] uppercase text-black hover:underline"
             onClick={() => setIsDeleteOpen(true)}
             data-testid="address-delete-button"
           >
@@ -175,31 +176,46 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 defaultValue={address.address_2 || undefined}
                 data-testid="address-2-input"
               />
-              <div className="grid grid-cols-[144px_1fr] gap-x-2">
+              <Input
+                label="City"
+                name="city"
+                required
+                autoComplete="locality"
+                defaultValue={address.city || undefined}
+                data-testid="city-input"
+              />
+              <div className="grid grid-cols-[1fr_144px] gap-x-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    State
+                  </label>
+                  <select
+                    name="province"
+                    defaultValue={address.province || ""}
+                    autoComplete="address-level1"
+                    data-testid="state-input"
+                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  >
+                    <option value="">Select a state</option>
+                    {US_STATES.map((state) => (
+                      <option
+                        key={state.code}
+                        value={`us-${state.code.toLowerCase()}`}
+                      >
+                        {state.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <Input
-                  label="Postal code"
+                  label="Zip Code"
                   name="postal_code"
                   required
                   autoComplete="postal-code"
                   defaultValue={address.postal_code || undefined}
                   data-testid="postal-code-input"
                 />
-                <Input
-                  label="City"
-                  name="city"
-                  required
-                  autoComplete="locality"
-                  defaultValue={address.city || undefined}
-                  data-testid="city-input"
-                />
               </div>
-              <Input
-                label="Province / State"
-                name="province"
-                autoComplete="address-level1"
-                defaultValue={address.province || undefined}
-                data-testid="state-input"
-              />
               <CountrySelect
                 name="country_code"
                 region={region}
@@ -269,49 +285,50 @@ const EditAddress: React.FC<EditAddressProps> = ({
         isOpen={isDeleteOpen}
         close={() => setIsDeleteOpen(false)}
         size="large"
+        panelClassName="lg:max-w-md lg:h-auto lg:max-h-none"
         data-testid="delete-address-modal"
       >
-        <Modal.Title>
-          <Heading className="mb-2">Delete address</Heading>
-        </Modal.Title>
         <Modal.Body>
-          <div className="flex flex-col items-center justify-center w-full h-full px-6 py-8 text-center gap-4">
-            <div className="text-sm leading-relaxed whitespace-pre-line">
-              <div className="font-semibold">
-                {address.first_name} {address.last_name}
+          <div className="flex flex-col w-full h-full">
+            <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 text-center gap-4">
+              <div className="text-sm leading-relaxed whitespace-pre-line">
+                <div className="font-semibold">
+                  {address.first_name} {address.last_name}
+                </div>
+                {address.company && <div>{address.company}</div>}
+                <div>{address.address_1}</div>
+                {address.address_2 && <div>{address.address_2}</div>}
+                <div>
+                  {address.city}, {address.province} {address.postal_code}
+                </div>
+                <div>{address.country_code?.toUpperCase()}</div>
+                {address.phone && <div className="mt-1">{address.phone}</div>}
               </div>
-              {address.company && <div>{address.company}</div>}
-              <div>{address.address_1}</div>
-              {address.address_2 && <div>{address.address_2}</div>}
-              <div>
-                {address.city}, {address.province} {address.postal_code}
+
+              <div className="mt-4 space-y-2 max-w-sm w-full">
+                <p className="text-sm">Are you sure you want to delete this address?</p>
+                <p className="text-xs text-gray-600">This action cannot be reverted.</p>
               </div>
-              <div>{address.country_code?.toUpperCase()}</div>
-              {address.phone && <div className="mt-1">{address.phone}</div>}
+
+              <div className="mt-4 w-full max-w-sm">
+                <button
+                  type="button"
+                  onClick={removeAddress}
+                  disabled={removing}
+                  className="w-full px-10 py-3 text-xs tracking-[0.15em] uppercase bg-black text-white"
+                >
+                  {removing ? "Deleting..." : "Delete"}
+                </button>
+              </div>
             </div>
 
-            <div className="mt-4 space-y-2 max-w-sm w-full">
-              <p className="text-sm">Are you sure you want to delete this address?</p>
-              <p className="text-xs text-gray-600">This action cannot be reverted.</p>
-            </div>
-
-            <div className="mt-4 w-full max-w-sm space-y-3">
-              <button
-                type="button"
-                onClick={removeAddress}
-                disabled={removing}
-                className="w-full px-10 py-3 text-xs tracking-[0.15em] uppercase bg-black text-white"
-              >
-                {removing ? "Deleting..." : "Delete"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsDeleteOpen(false)}
-                className="w-full text-xs tracking-[0.15em] uppercase underline text-black"
-              >
-                Cancel
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setIsDeleteOpen(false)}
+              className="block w-full border-t border-gray-200 px-6 py-4 text-xs tracking-[0.15em] uppercase bg-white text-black sm:hidden"
+            >
+              Cancel
+            </button>
           </div>
         </Modal.Body>
       </Modal>
