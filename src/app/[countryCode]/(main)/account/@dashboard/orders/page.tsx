@@ -19,6 +19,22 @@ const shouldShowTrackLink = (order: HttpTypes.StoreOrder) => {
   return status === "shipped" || status === "delivered"
 }
 
+const mapFulfillmentStatus = (fulfillmentStatus?: string | null, orderStatus?: string | null) => {
+  const overall = (orderStatus || "").toLowerCase()
+  if (overall === "canceled") {
+    return "canceled"
+  }
+
+  const normalized = (fulfillmentStatus || "").toLowerCase()
+  if (normalized === "fulfilled" || normalized === "partially_fulfilled") {
+    return "processing"
+  }
+  if (normalized === "not_fulfilled") {
+    return "received"
+  }
+  return fulfillmentStatus || orderStatus || ""
+}
+
 const formatOrderDateEST = (dateInput: string | Date) => {
   const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput
   return date.toLocaleString("en-US", {
@@ -29,9 +45,10 @@ const formatOrderDateEST = (dateInput: string | Date) => {
   })
 }
 
-const formatStatusLabel = (status?: string | null) => {
-  if (!status) return ""
-  return status.replace(/_/g, " ").toUpperCase()
+const formatStatusLabel = (fulfillmentStatus?: string | null, orderStatus?: string | null) => {
+  const mapped = mapFulfillmentStatus(fulfillmentStatus, orderStatus)
+  if (!mapped) return ""
+  return mapped.replace(/_/g, " ").toUpperCase()
 }
 
 export default async function Orders() {
@@ -85,7 +102,7 @@ export default async function Orders() {
                       {order.created_at ? formatOrderDateEST(order.created_at) : ""}
                     </div>
                     <div className="uppercase text-xs text-gray-800">
-                      {formatStatusLabel(order.fulfillment_status || order.status || "")}
+                      {formatStatusLabel(order.fulfillment_status, order.status)}
                     </div>
                   </div>
 

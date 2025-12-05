@@ -10,9 +10,25 @@ type OrderDetailsTemplateProps = {
   order: HttpTypes.StoreOrder
 }
 
-const formatStatusLabel = (status?: string | null) => {
-  if (!status) return ""
-  return status.replace(/_/g, " ").toUpperCase()
+const formatStatusLabel = (fulfillmentStatus?: string | null, orderStatus?: string | null) => {
+  const overall = (orderStatus || "").toLowerCase()
+  if (overall === "canceled") {
+    return "CANCELED"
+  }
+
+  const normalized = (fulfillmentStatus || "").toLowerCase()
+
+  let mapped: string
+  if (normalized === "fulfilled" || normalized === "partially_fulfilled") {
+    mapped = "processing"
+  } else if (normalized === "not_fulfilled") {
+    mapped = "received"
+  } else {
+    mapped = fulfillmentStatus || orderStatus || ""
+  }
+
+  if (!mapped) return ""
+  return mapped.replace(/_/g, " ").toUpperCase()
 }
 
 const formatOrderDateEST = (dateInput: string | Date | undefined) => {
@@ -68,7 +84,7 @@ const shouldShowTrackLink = (order: HttpTypes.StoreOrder) => {
 }
 
 const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) => {
-  const orderStatus = formatStatusLabel(order.fulfillment_status || order.status)
+  const orderStatus = formatStatusLabel(order.fulfillment_status, order.status)
   const orderId = order.display_id ?? order.id
   const orderDateLabel = formatOrderDateEST(order.created_at || new Date())
   const paymentDisplay = getPaymentDisplay(order)
@@ -79,8 +95,8 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
       <div className="flex flex-col gap-y-4 border-b border-gray-200 pb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <p className="text-xs uppercase text-gray-700">ORDER {orderId}</p>
-            <p className="text-xs text-gray-800">{orderDateLabel} EST</p>
+            <p className="text-xs sm:text-md uppercase text-black">ORDER {orderId}</p>
+            <p className="text-xs sm:text-sm text-black">{orderDateLabel} EST</p>
           </div>
           <button
             type="button"
