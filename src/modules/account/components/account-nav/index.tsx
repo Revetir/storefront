@@ -108,7 +108,7 @@ const AccountNav = ({
           </>
         )}
       </div>
-      <div className="hidden lg:block lg:static xl:fixed xl:left-8 xl:top-32 xl:w-48" data-testid="account-nav">
+      <div className="hidden lg:block" data-testid="account-nav">
         <div>
           <div className="mb-3">
             <h3 className="text-medium font-semibold text-gray-800">Account</h3>

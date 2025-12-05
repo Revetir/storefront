@@ -15,19 +15,24 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
   children,
 }) => {
   return (
-    <div className="flex-1 lg:py-12" data-testid="account-page">
-      <div className="content-container max-w-5xl mx-auto bg-white">
-        <div
-          className={`grid grid-cols-1 py-12 ${
-            customer ? "lg:grid-cols-[240px_1fr]" : ""
-          }`}
-        >
-          {customer && (
-            <div>
-              <AccountNav customer={customer} />
-            </div>
-          )}
-          <div className="flex-1">{children}</div>
+    <div className="py-8 relative" data-testid="account-page">
+      {/* Fixed left sidebar on xl, mirroring customer-care layout */}
+      {customer && (
+        <div className="hidden xl:block fixed left-8 top-32 w-48">
+          <AccountNav customer={customer} />
+        </div>
+      )}
+
+      <div className="xl:mx-96 px-4">
+        {/* Mobile / tablet nav above content */}
+        {customer && (
+          <div className="xl:hidden mb-6">
+            <AccountNav customer={customer} />
+          </div>
+        )}
+
+        <div className="max-w-3xl mx-auto">
+          {children}
         </div>
       </div>
     </div>
