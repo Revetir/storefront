@@ -23,6 +23,14 @@ const Summary = ({ cart }: SummaryProps) => {
     trackCheckoutInitiated({
       cart_value: cart.total,
       item_count: cart.items?.length || 0,
+      item_titles:
+        cart.items
+          ?.map((item) => item.product_title)
+          .filter((title): title is string => Boolean(title)) || [],
+      item_ids:
+        cart.items
+          ?.map((item) => item.product_id)
+          .filter((id): id is string => Boolean(id)) || [],
       items: cart.items?.map(item => {
         const product = item.product as any
         return {
