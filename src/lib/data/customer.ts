@@ -244,6 +244,21 @@ export const updateCustomerAddress = async (
     address.phone = phone
   }
 
+  const isDefaultBillingValue = formData.get("is_default_billing_value") as
+    | string
+    | null
+  const isDefaultShippingValue = formData.get("is_default_shipping_value") as
+    | string
+    | null
+
+  if (isDefaultBillingValue != null) {
+    address.is_default_billing = isDefaultBillingValue === "true"
+  }
+
+  if (isDefaultShippingValue != null) {
+    address.is_default_shipping = isDefaultShippingValue === "true"
+  }
+
   const headers = {
     ...(await getAuthHeaders()),
   }

@@ -379,7 +379,7 @@ const ShippingAddress = ({
       {customer && (addressesInRegion?.length || 0) > 0 && (
         <Container className="mb-6 flex flex-col gap-y-4 p-5">
           <p className="text-small-regular">
-            {`Hi ${customer.first_name}, do you want to use one of your saved addresses?`}
+            {`Hi ${customer.first_name}, would you like to use a saved address?`}
           </p>
           <AddressSelect
             addresses={customer.addresses}

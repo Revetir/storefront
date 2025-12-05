@@ -8,6 +8,7 @@ import useToggleState from "@lib/hooks/use-toggle-state"
 import CountrySelect from "@modules/checkout/components/country-select"
 import Input from "@modules/common/components/input"
 import Modal from "@modules/common/components/modal"
+import Checkbox from "@modules/common/components/checkbox"
 import Spinner from "@modules/common/icons/spinner"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import { HttpTypes } from "@medusajs/types"
@@ -30,6 +31,14 @@ const EditAddress: React.FC<EditAddressProps> = ({
   const [removing, setRemoving] = useState(false)
   const [successState, setSuccessState] = useState(false)
   const { state, open, close: closeModal } = useToggleState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+
+  const [isDefaultBilling, setIsDefaultBilling] = useState(
+    !!address.is_default_billing
+  )
+  const [isDefaultShipping, setIsDefaultShipping] = useState(
+    !!address.is_default_shipping
+  )
 
   const [formState, formAction] = useActionState(updateCustomerAddress, {
     success: false,
@@ -59,64 +68,61 @@ const EditAddress: React.FC<EditAddressProps> = ({
     setRemoving(true)
     await deleteCustomerAddress(address.id)
     setRemoving(false)
+    setIsDeleteOpen(false)
   }
 
   return (
     <>
       <div
         className={clx(
-          "border p-5 min-h-[220px] h-full w-full flex flex-col justify-between transition-colors",
+          "flex flex-col items-start text-sm leading-relaxed",
           {
-            "border-gray-900": isActive,
+            "font-semibold": isActive,
           }
         )}
         data-testid="address-container"
       >
-        <div className="flex flex-col">
-          <Heading
-            className="text-left text-base-semi"
-            data-testid="address-name"
-          >
+        <div className="whitespace-pre-line text-center sm:text-left">
+          <div className="font-semibold" data-testid="address-name">
             {address.first_name} {address.last_name}
-          </Heading>
+          </div>
           {address.company && (
-            <Text
-              className="txt-compact-small text-ui-fg-base"
-              data-testid="address-company"
-            >
+            <div className="" data-testid="address-company">
               {address.company}
-            </Text>
+            </div>
           )}
-          <Text className="flex flex-col text-left text-base-regular mt-2">
-            <span data-testid="address-address">
-              {address.address_1}
-              {address.address_2 && <span>, {address.address_2}</span>}
-            </span>
-            <span data-testid="address-postal-city">
-              {address.postal_code}, {address.city}
-            </span>
-            <span data-testid="address-province-country">
-              {address.province && `${address.province}, `}
-              {address.country_code?.toUpperCase()}
-            </span>
-          </Text>
+          <div data-testid="address-address">
+            {address.address_1}
+          </div>
+          {address.address_2 && (
+            <div>{address.address_2}</div>
+          )}
+          <div data-testid="address-postal-city">
+            {address.city}, {address.province} {address.postal_code}
+          </div>
+          <div data-testid="address-province-country">
+            {address.country_code?.toUpperCase()}
+          </div>
+          {address.phone && (
+            <div className="mt-1">{address.phone}</div>
+          )}
         </div>
-        <div className="flex items-center gap-x-4">
+        <div className="mt-3 flex gap-4 text-xs">
           <button
-            className="text-small-regular text-ui-fg-base flex items-center gap-x-2"
+            type="button"
+            className="underline tracking-[0.15em] uppercase text-black"
             onClick={open}
             data-testid="address-edit-button"
           >
-            <Edit />
             Edit
           </button>
           <button
-            className="text-small-regular text-ui-fg-base flex items-center gap-x-2"
-            onClick={removeAddress}
+            type="button"
+            className="underline tracking-[0.15em] uppercase text-black"
+            onClick={() => setIsDeleteOpen(true)}
             data-testid="address-delete-button"
           >
-            {removing ? <Spinner /> : <Trash />}
-            Remove
+            Delete
           </button>
         </div>
       </div>
@@ -209,6 +215,32 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 defaultValue={address.phone || undefined}
                 data-testid="phone-input"
               />
+              <div className="mt-4 space-y-2">
+                <Checkbox
+                  label="Set as default billing address"
+                  name="is_default_billing"
+                  checked={isDefaultBilling}
+                  onChange={() => setIsDefaultBilling((prev) => !prev)}
+                  data-testid="default-billing-checkbox"
+                />
+                <Checkbox
+                  label="Set as default shipping address"
+                  name="is_default_shipping"
+                  checked={isDefaultShipping}
+                  onChange={() => setIsDefaultShipping((prev) => !prev)}
+                  data-testid="default-shipping-checkbox"
+                />
+                <input
+                  type="hidden"
+                  name="is_default_billing_value"
+                  value={isDefaultBilling ? "true" : "false"}
+                />
+                <input
+                  type="hidden"
+                  name="is_default_shipping_value"
+                  value={isDefaultShipping ? "true" : "false"}
+                />
+              </div>
             </div>
             {formState.error && (
               <div className="text-rose-500 text-small-regular py-2">
@@ -231,6 +263,57 @@ const EditAddress: React.FC<EditAddressProps> = ({
             </div>
           </Modal.Footer>
         </form>
+      </Modal>
+
+      <Modal
+        isOpen={isDeleteOpen}
+        close={() => setIsDeleteOpen(false)}
+        size="large"
+        data-testid="delete-address-modal"
+      >
+        <Modal.Title>
+          <Heading className="mb-2">Delete address</Heading>
+        </Modal.Title>
+        <Modal.Body>
+          <div className="flex flex-col items-center justify-center w-full h-full px-6 py-8 text-center gap-4">
+            <div className="text-sm leading-relaxed whitespace-pre-line">
+              <div className="font-semibold">
+                {address.first_name} {address.last_name}
+              </div>
+              {address.company && <div>{address.company}</div>}
+              <div>{address.address_1}</div>
+              {address.address_2 && <div>{address.address_2}</div>}
+              <div>
+                {address.city}, {address.province} {address.postal_code}
+              </div>
+              <div>{address.country_code?.toUpperCase()}</div>
+              {address.phone && <div className="mt-1">{address.phone}</div>}
+            </div>
+
+            <div className="mt-4 space-y-2 max-w-sm w-full">
+              <p className="text-sm">Are you sure you want to delete this address?</p>
+              <p className="text-xs text-gray-600">This action cannot be reverted.</p>
+            </div>
+
+            <div className="mt-4 w-full max-w-sm space-y-3">
+              <button
+                type="button"
+                onClick={removeAddress}
+                disabled={removing}
+                className="w-full px-10 py-3 text-xs tracking-[0.15em] uppercase bg-black text-white"
+              >
+                {removing ? "Deleting..." : "Delete"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsDeleteOpen(false)}
+                className="w-full text-xs tracking-[0.15em] uppercase underline text-black"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </Modal.Body>
       </Modal>
     </>
   )

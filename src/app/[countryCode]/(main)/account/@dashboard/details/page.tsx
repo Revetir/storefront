@@ -24,7 +24,7 @@ export default async function AccountDetailsPage() {
         </p>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-6">
         <AccountDetailsForm customer={customer} />
       </div>
     </div>

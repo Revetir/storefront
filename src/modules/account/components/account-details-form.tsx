@@ -179,28 +179,37 @@ const AccountDetailsForm = ({ customer }: Props) => {
       <div className="mb-8">
         <p className="text-xs uppercase mb-2">Change Password</p>
         <div className="space-y-4">
-          <Input
-            label="Old password"
-            name="old_password"
-            type="password"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-          />
-          <Input
-            label="New password"
-            name="new_password"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-          {showConfirmPassword && (
-            <Input
-              label="Repeat new password"
-              name="confirm_password"
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Old password</label>
+            <input
               type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              name="old_password"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">New password</label>
+            <input
+              type="password"
+              name="new_password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+            />
+          </div>
+          {showConfirmPassword && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Repeat new password</label>
+              <input
+                type="password"
+                name="confirm_password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              />
+            </div>
           )}
 
           {newPassword.length > 0 && (
