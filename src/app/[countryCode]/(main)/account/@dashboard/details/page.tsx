@@ -19,6 +19,9 @@ export default async function AccountDetailsPage() {
     <div className="w-full" data-testid="account-details-page-wrapper">
       <div className="mb-3 sm:mb-4">
         <h1 className="text-xl-semi sm:text-2xl-semi">Account Details</h1>
+        <p className="mt-3 text-sm text-gray-700 max-w-2xl">
+          View and edit your preferences below. We never sell your information and you may request deletion at any time.
+        </p>
       </div>
 
       <div className="mt-4">

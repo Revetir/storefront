@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, FormEvent } from "react"
+import { useState, useMemo, FormEvent, ChangeEvent } from "react"
 import Input from "@modules/common/components/input"
 import { HttpTypes } from "@medusajs/types"
 
@@ -63,6 +63,13 @@ const AccountDetailsForm = ({ customer }: Props) => {
     return true
   }, [oldPassword, newPassword, confirmPassword])
 
+  const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // Allow only digits and limit length similar to checkout validation (8-13 digits)
+    const digitsOnly = e.target.value.replace(/[^0-9]/g, "")
+    const limited = digitsOnly.slice(0, 13)
+    setPhone(limited)
+  }
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -119,40 +126,50 @@ const AccountDetailsForm = ({ customer }: Props) => {
     !isPasswordSectionValid
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto" data-testid="account-details-form">
+    <form onSubmit={handleSubmit} className="w-full max-w-2xl" data-testid="account-details-form">
       <div className="mb-8">
         <p className="text-xs uppercase tracking-[0.15em] mb-2">Account Information</p>
         <div className="space-y-4">
-          <Input
-            label="First name"
-            name="first_name"
-            required
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-          <Input
-            label="Last name"
-            name="last_name"
-            required
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-          <Input
-            label="Phone"
-            name="phone"
-            required
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-          <Input
-            label="Email address"
-            name="email"
-            type="email"
-            required
-            value={customer.email}
-            disabled
-            className="pt-4 pb-1 block w-full h-11 px-4 mt-0 bg-gray-50 border border-gray-300 text-gray-500 appearance-none focus:outline-none focus:ring-0 focus:shadow-none"
-          />
+          {/* Name row: First and Last, side-by-side on desktop */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="First name"
+              name="first_name"
+              required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+            <Input
+              label="Last name"
+              name="last_name"
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </div>
+
+          {/* Contact row: Email and shorter Phone field */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+            <Input
+              label="Email address"
+              name="email"
+              type="email"
+              required
+              value={customer.email}
+              disabled
+              className="pt-4 pb-1 block w-full h-11 px-4 mt-0 bg-gray-50 border border-gray-300 text-gray-500 appearance-none focus:outline-none focus:ring-0 focus:shadow-none"
+            />
+            <div className="w-full md:w-3/5">
+              <Input
+                label="Phone"
+                name="phone"
+                required
+                value={phone}
+                onChange={handlePhoneChange}
+                maxLength={13}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
