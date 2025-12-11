@@ -77,68 +77,46 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
     lastCompletedIndex = 1
   }
 
-  const maxIndex = steps.length - 1
-  const getX = (index: number) => {
-    if (maxIndex === 0) return 0
-    return (index / maxIndex) * 100
-  }
-
-  const startX = getX(0)
-  const activeX2 = getX(lastCompletedIndex)
-
   return (
-    <div className="w-full flex flex-col gap-3">
-      <div className="w-full">
-        <svg
-          viewBox="0 0 100 20"
-          preserveAspectRatio="xMidYMid meet"
-          className="w-full h-10 text-ui-fg-base"
-        >
-          <line
-            x1="0"
-            y1="10"
-            x2="100"
-            y2="10"
-            stroke="#E5E7EB"
-            strokeWidth="0.6"
-            strokeLinecap="round"
-          />
-          <line
-            x1={startX}
-            y1="10"
-            x2={activeX2}
-            y2="10"
-            stroke="currentColor"
-            strokeWidth="0.9"
-            strokeLinecap="round"
-          />
-          {steps.map((step, index) => {
-            const x = getX(index)
-            const isComplete = step.isComplete
-
-            return (
-              <circle
-                key={step.label}
-                cx={x}
-                cy={10}
-                r={1.5}
-                fill={isComplete ? "currentColor" : "#FFFFFF"}
-                stroke={isComplete ? "currentColor" : "#D1D5DB"}
-                strokeWidth={isComplete ? 0.4 : 0.6}
+    <div className="w-full flex flex-col gap-2">
+      {/* Circles and connecting lines */}
+      <div className="relative flex justify-between items-center">
+        {/* Background line spanning full width */}
+        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[1px] bg-gray-200" />
+        {/* Active line */}
+        <div
+          className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-ui-fg-base"
+          style={{
+            width: `${(lastCompletedIndex / (steps.length - 1)) * 100}%`,
+          }}
+        />
+        {/* Circles */}
+        {steps.map((step, index) => {
+          const isComplete = step.isComplete
+          return (
+            <div
+              key={step.label}
+              className="relative z-10 flex-1 flex justify-center"
+            >
+              <div
+                className={`w-3 h-3 rounded-full border-2 ${
+                  isComplete
+                    ? "bg-ui-fg-base border-ui-fg-base"
+                    : "bg-white border-gray-300"
+                }`}
               />
-            )
-          })}
-        </svg>
+            </div>
+          )
+        })}
       </div>
-      <div className="flex justify-between text-[11px] tracking-wide uppercase mt-1">
+      {/* Labels */}
+      <div className="flex justify-between text-[11px] tracking-wide uppercase">
         {steps.map((step) => (
           <div
             key={step.label}
-            className={
-              step.isComplete
-                ? "flex-1 text-ui-fg-base text-center"
-                : "flex-1 text-ui-fg-subtle text-center"
-            }
+            className={`flex-1 text-center ${
+              step.isComplete ? "text-ui-fg-base" : "text-ui-fg-subtle"
+            }`}
           >
             {step.label}
           </div>
@@ -282,8 +260,6 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
           </div>
         </div>
 
-        <Divider />
-
         {/* Order Details – Shipping Method, Shipping Address, Items */}
         <div className="flex flex-col gap-y-4 border-t border-gray-200 pt-4">
           {/* Shipping meta */}
@@ -361,8 +337,6 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
             </div>
           )}
         </div>
-
-        <Divider />
 
         <Help />
       </div>
