@@ -6,6 +6,7 @@ import Items from "@modules/order/components/items"
 import Help from "@modules/order/components/help"
 import TrackingTimeline from "@modules/tracking/components/tracking-timeline"
 import React from "react"
+import Image from "next/image"
 
 type TrackingData = {
   order: {
@@ -28,6 +29,7 @@ type TrackingData = {
       name: string
     }>
     items?: any[]
+    fulfillments?: any[]
   }
   tracking_number: string
   carrier: string
@@ -147,6 +149,8 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
 }
 
 const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
+  const [carrierName, setCarrierName] = React.useState<string | null>(null)
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString("en-US", {
@@ -193,6 +197,116 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
     return { dateLabel, timeLabel }
   }
 
+  React.useEffect(() => {
+    let cancelled = false
+
+    const loadCarrierName = async () => {
+      try {
+        const response = await fetch(
+          "https://res.17track.net/asset/carrier/info/apicarrier.all.json"
+        )
+        if (!response.ok) {
+          return
+        }
+
+        const carriers: Array<{ key: number; _name: string }> = await response.json()
+        const mapped = carriers.find((c) => String(c.key) === String(data.carrier))
+        if (!cancelled && mapped?._name) {
+          setCarrierName(mapped._name)
+        }
+      } catch {
+        // ignore mapping failures and fall back to raw carrier code
+      }
+    }
+
+    loadCarrierName()
+
+    return () => {
+      cancelled = true
+    }
+  }, [data.carrier])
+
+  const displayCarrier = carrierName || data.carrier
+
+  // Derive items that belong to the fulfillment(s) associated with this tracking number.
+  const deriveShipmentItems = () => {
+    const order = data.order as any
+    const orderItems: any[] = Array.isArray(order.items) ? order.items : []
+    const fulfillments: any[] = Array.isArray(order.fulfillments)
+      ? order.fulfillments
+      : []
+
+    if (!fulfillments.length || !orderItems.length) {
+      return orderItems
+    }
+
+    // Find fulfillments whose tracking numbers or tracking links match this tracking number.
+    const matchingFulfillments = fulfillments.filter((f) => {
+      const directNumbers: string[] = Array.isArray(f.tracking_numbers)
+        ? f.tracking_numbers
+        : []
+
+      const linkNumbers: string[] = Array.isArray(f.tracking_links)
+        ? f.tracking_links
+            .map((l: any) => l?.tracking_number)
+            .filter((n: any) => typeof n === "string")
+        : []
+
+      const allNumbers = [...directNumbers, ...linkNumbers].filter(Boolean)
+      return allNumbers.some(
+        (n) => String(n).trim() === String(data.tracking_number).trim()
+      )
+    })
+
+    if (!matchingFulfillments.length) {
+      return orderItems
+    }
+
+    const orderItemsById = new Map<string, any>()
+    orderItems.forEach((item: any) => {
+      if (item?.id) {
+        orderItemsById.set(item.id, item)
+      }
+    })
+
+    const shipmentItems: any[] = []
+
+    matchingFulfillments.forEach((f) => {
+      const fulfillmentItems: any[] = Array.isArray(f.items) ? f.items : []
+      fulfillmentItems.forEach((fi) => {
+        const lineItemId = fi?.line_item_id
+        if (!lineItemId) return
+
+        const lineItem = orderItemsById.get(lineItemId)
+        if (lineItem && !shipmentItems.includes(lineItem)) {
+          shipmentItems.push(lineItem)
+        }
+      })
+    })
+
+    return shipmentItems.length ? shipmentItems : orderItems
+  }
+
+  const shipmentItems = React.useMemo(deriveShipmentItems, [data])
+
+  const shipmentThumbnails = React.useMemo(() => {
+    const maxThumbs = 2
+    const items = Array.isArray(shipmentItems) ? shipmentItems : []
+    const visible = items.slice(0, maxThumbs)
+    const remainingCount = items.length > maxThumbs ? items.length - maxThumbs : 0
+
+    return {
+      visible,
+      remainingCount,
+    }
+  }, [shipmentItems])
+
+  const getItemThumbnailUrl = (item: any): string | null => {
+    const variantThumb = item?.variant?.thumbnail
+    const productThumb = item?.variant?.product?.thumbnail || item?.product?.thumbnail
+    return variantThumb || productThumb || null
+  }
+
   return (
     <div className="flex flex-col justify-center gap-y-4 max-w-4xl mx-auto py-8">
       <div className="w-full">
@@ -210,32 +324,37 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
           </Heading>
 
           <div className="flex flex-col divide-y divide-gray-100">
-            {data.events.map((event, index) => {
-              const { dateLabel, timeLabel } = formatEventDateTime(event.timestamp)
+            {data.events
+              .filter((event) => {
+                const status = (event.status || "").toLowerCase()
+                return !status.includes("registered")
+              })
+              .map((event, index) => {
+                const { dateLabel, timeLabel } = formatEventDateTime(event.timestamp)
 
-              return (
-                <div
-                  key={`${event.timestamp}-${index}`}
-                  className="py-4 flex flex-row gap-6 text-sm md:text-base"
-                >
-                  <div className="w-40 shrink-0 text-xs md:text-sm text-ui-fg-subtle">
-                    <div className="whitespace-nowrap">{dateLabel}</div>
-                    <div className="whitespace-nowrap">{timeLabel}</div>
-                  </div>
-
-                  <div className="flex-1 text-sm md:text-base leading-relaxed">
-                    <div className="text-md font-medium text-ui-fg-base">
-                      {event.description || getStatusDisplay(event.status)}
+                return (
+                  <div
+                    key={`${event.timestamp}-${index}`}
+                    className="py-4 flex flex-row gap-6 text-sm md:text-base"
+                  >
+                    <div className="w-40 shrink-0 text-xs md:text-sm text-ui-fg-subtle">
+                      <div className="whitespace-nowrap">{dateLabel}</div>
+                      <div className="whitespace-nowrap">{timeLabel}</div>
                     </div>
-                    {event.location && (
-                      <div className="mt-1 text-ui-fg-subtle text-sm md:text-base uppercase tracking-wide">
-                        {event.location}
+
+                    <div className="flex-1 text-sm md:text-base leading-relaxed">
+                      <div className="text-md font-medium text-ui-fg-base">
+                        {event.description || getStatusDisplay(event.status)}
                       </div>
-                    )}
+                      {event.location && (
+                        <div className="mt-1 text-ui-fg-subtle text-sm md:text-base uppercase tracking-wide">
+                          {event.location}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
           </div>
         </div>
 
@@ -252,10 +371,13 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
 
           <div className="text-sm md:text-base leading-relaxed space-y-1">
             <Text className="text-md">
-              Tracking Number: <span className="font-mono">{data.tracking_number}</span>
+              Carrier: <span className="uppercase">{displayCarrier}</span>
             </Text>
             <Text className="text-md">
-              Carrier: <span className="uppercase">{data.carrier}</span>
+              Service: <span className="uppercase">Standard International</span>
+            </Text>
+            <Text className="text-md">
+              Tracking Number: <span className="font-mono">{data.tracking_number}</span>
             </Text>
             {typeof data.weight_lb === "number" || typeof data.weight_kg === "number" ? (
               <Text className="text-md">
@@ -285,7 +407,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
           {/* Shipping meta */}
           <div className="mt-2 grid grid-cols-2 gap-6 text-xs sm:text-sm md:hidden">
             <div className="space-y-1">
-              <p className="uppercase text-gray-700">Shipping Method</p>
+              <p className="text-md uppercase text-gray-700">Shipping Method</p>
               {data.order.shipping_methods?.map((method) => (
                 <p key={method.id} className="text-gray-900">
                   {method.name}
@@ -294,7 +416,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
             </div>
 
             <div className="space-y-1">
-              <p className="uppercase text-gray-700">Shipping Address</p>
+              <p className="text-md uppercase text-gray-700">Shipping Address</p>
               {data.order.shipping_address && (
                 <div className="text-gray-900 space-y-0.5">
                   <p>
@@ -313,13 +435,42 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                 </div>
               )}
             </div>
+
+            {/* On small screens, show shipment thumbnails below as a full-width row */}
+            {shipmentThumbnails.visible.length > 0 && (
+              <div className="col-span-2 space-y-1">
+                <p className="text-md uppercase text-gray-700">In This Shipment</p>
+                <div className="flex flex-row items-center gap-2">
+                  {shipmentThumbnails.visible.map((item, idx) => {
+                    const thumb = getItemThumbnailUrl(item)
+                    if (!thumb) return null
+                    return (
+                      <div key={idx} className="w-12 h-16 relative overflow-hidden">
+                        <Image
+                          src={thumb}
+                          alt={item?.title || "Shipment item"}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
+                      </div>
+                    )
+                  })}
+                  {shipmentThumbnails.remainingCount > 0 && (
+                    <div className="text-xs sm:text-sm text-gray-700">
+                      +{shipmentThumbnails.remainingCount}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Desktop: 2-column layout (shipping method + address) */}
+          {/* Desktop: 3-column layout (shipping method + address + shipment items) */}
           <div className="mt-2 hidden md:grid md:grid-cols-3 md:gap-8 text-xs sm:text-sm">
             <div className="space-y-4">
               <div className="space-y-1">
-                <p className="uppercase text-gray-700">Shipping Method</p>
+                <p className="text-md uppercase text-gray-700">Shipping Method</p>
                 {data.order.shipping_methods?.map((method) => (
                   <p key={method.id} className="text-gray-900">
                     {method.name}
@@ -328,8 +479,8 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
               </div>
             </div>
 
-            <div className="space-y-1 col-span-2">
-              <p className="uppercase text-gray-700">Shipping Address</p>
+            <div className="space-y-1">
+              <p className="text-md uppercase text-gray-700">Shipping Address</p>
               {data.order.shipping_address && (
                 <div className="text-gray-900 space-y-0.5">
                   <p>
@@ -348,14 +499,35 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                 </div>
               )}
             </div>
-          </div>
 
-          {/* Items – use existing Items component styling */}
-          {data.order.items && data.order.items.length > 0 && (
-            <div className="pt-4 border-t border-gray-200">
-              <Items order={data.order as any} />
-            </div>
-          )}
+            {shipmentThumbnails.visible.length > 0 && (
+              <div className="space-y-1">
+                <p className="text-md uppercase text-gray-700">In This Shipment</p>
+                <div className="flex flex-row items-center gap-2">
+                  {shipmentThumbnails.visible.map((item, idx) => {
+                    const thumb = getItemThumbnailUrl(item)
+                    if (!thumb) return null
+                    return (
+                      <div key={idx} className="w-12 h-16 relative overflow-hidden">
+                        <Image
+                          src={thumb}
+                          alt={item?.title || "Shipment item"}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
+                      </div>
+                    )
+                  })}
+                  {shipmentThumbnails.remainingCount > 0 && (
+                    <div className="text-xs sm:text-sm text-gray-700">
+                      +{shipmentThumbnails.remainingCount}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <Help />
