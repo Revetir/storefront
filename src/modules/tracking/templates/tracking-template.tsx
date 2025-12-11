@@ -5,6 +5,7 @@ import Divider from "@modules/common/components/divider"
 import Items from "@modules/order/components/items"
 import Help from "@modules/order/components/help"
 import TrackingTimeline from "@modules/tracking/components/tracking-timeline"
+import { formatUSState } from "@lib/util/format-us-state"
 import React from "react"
 import Image from "next/image"
 
@@ -418,7 +419,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                     <p>{data.order.shipping_address.address_2}</p>
                   )}
                   <p>
-                    {data.order.shipping_address.city}, {data.order.shipping_address.province} {" "}
+                    {data.order.shipping_address.city}, {formatUSState(data.order.shipping_address.province)} {" "}
                     {data.order.shipping_address.postal_code}
                   </p>
                   <p>{data.order.shipping_address.country_code?.toUpperCase()}</p>
@@ -493,7 +494,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                     <p>{data.order.shipping_address.address_2}</p>
                   )}
                   <p>
-                    {data.order.shipping_address.city}, {data.order.shipping_address.province} {" "}
+                    {data.order.shipping_address.city}, {formatUSState(data.order.shipping_address.province)} {" "}
                     {data.order.shipping_address.postal_code}
                   </p>
                   <p>{data.order.shipping_address.country_code?.toUpperCase()}</p>
