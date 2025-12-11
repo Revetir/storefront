@@ -37,6 +37,97 @@ type TrackingTemplateProps = {
   data: TrackingData
 }
 
+const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatus }) => {
+  const normalizedStatus = currentStatus.toLowerCase()
+
+  const isDelivered = normalizedStatus.includes("delivered")
+  const isOutForDelivery =
+    normalizedStatus.includes("outfordelivery") ||
+    normalizedStatus.includes("out_for_delivery")
+
+  const steps = [
+    { label: "Order Placed", isComplete: true },
+    { label: "Shipped", isComplete: true },
+    { label: "Out For Delivery", isComplete: isDelivered || isOutForDelivery },
+    { label: "Delivered", isComplete: isDelivered },
+  ]
+
+  let lastCompletedIndex = 1
+  steps.forEach((step, index) => {
+    if (step.isComplete) {
+      lastCompletedIndex = index
+    }
+  })
+
+  if (lastCompletedIndex < 1) {
+    lastCompletedIndex = 1
+  }
+
+  const maxIndex = steps.length - 1
+  const progress = (lastCompletedIndex / maxIndex) * 100
+
+  return (
+    <div className="w-full flex flex-col gap-3">
+      <div className="w-full">
+        <svg
+          viewBox="0 0 100 16"
+          preserveAspectRatio="none"
+          className="w-full h-8 text-ui-fg-base"
+        >
+          <line
+            x1="0"
+            y1="4"
+            x2="100"
+            y2="4"
+            stroke="#E5E7EB"
+            strokeWidth="0.6"
+            strokeLinecap="round"
+          />
+          <line
+            x1="0"
+            y1="4"
+            x2={progress.toString()}
+            y2="4"
+            stroke="currentColor"
+            strokeWidth="0.9"
+            strokeLinecap="round"
+          />
+          {steps.map((step, index) => {
+            const x = (index / maxIndex) * 100
+            const isComplete = step.isComplete
+
+            return (
+              <circle
+                key={step.label}
+                cx={x}
+                cy={4}
+                r={2.1}
+                fill={isComplete ? "currentColor" : "#FFFFFF"}
+                stroke={isComplete ? "currentColor" : "#D1D5DB"}
+                strokeWidth={isComplete ? 0.4 : 0.6}
+              />
+            )
+          })}
+        </svg>
+      </div>
+      <div className="flex justify-between text-[11px] tracking-wide uppercase">
+        {steps.map((step) => (
+          <div
+            key={step.label}
+            className={
+              step.isComplete
+                ? "text-ui-fg-base text-center"
+                : "text-ui-fg-subtle text-center"
+            }
+          >
+            {step.label}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -69,6 +160,10 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
 
   return (
     <div className="flex flex-col justify-center gap-y-4 max-w-4xl mx-auto py-8">
+      <div className="w-full">
+        <OrderStatusTimeline currentStatus={data.current_status} />
+      </div>
+
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl-semi">Track Your Order</h1>
         <Text className="text-ui-fg-subtle">

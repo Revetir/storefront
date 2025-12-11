@@ -57,3 +57,4 @@ dump.rdb
 /playwright/.auth
 nul
 .claude/settings.local.json
+17track_docs.txt

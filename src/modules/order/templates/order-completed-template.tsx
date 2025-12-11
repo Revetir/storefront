@@ -39,7 +39,7 @@ export default async function OrderCompletedTemplate({
               THANK YOU
             </span>
             <span className="text-xs sm:text-sm uppercase text-gray-700">
-              Your order was placed successfully.
+              Your order was placed successfully
             </span>
           </Heading>
 
