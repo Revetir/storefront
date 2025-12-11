@@ -31,6 +31,13 @@ type TrackingData = {
     description: string
     location?: string
   }>
+  weight_kg?: number
+  weight_lb?: number
+  dimensions_cm?: {
+    length: number
+    width: number
+    height: number
+  }
 }
 
 type TrackingTemplateProps = {
@@ -64,7 +71,16 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
   }
 
   const maxIndex = steps.length - 1
-  const progress = (lastCompletedIndex / maxIndex) * 100
+  const stepCount = steps.length
+
+  const getX = (index: number) => {
+    return ((index * 2 + 1) / (stepCount * 2)) * 100
+  }
+
+  const startX = getX(0)
+  const endX = getX(maxIndex)
+  const progressRatio = lastCompletedIndex / maxIndex
+  const activeX2 = startX + (endX - startX) * progressRatio
 
   return (
     <div className="w-full flex flex-col gap-3">
@@ -84,16 +100,16 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
             strokeLinecap="round"
           />
           <line
-            x1="0"
+            x1={startX}
             y1="10"
-            x2={progress}
+            x2={activeX2}
             y2="10"
             stroke="currentColor"
             strokeWidth="0.9"
             strokeLinecap="round"
           />
           {steps.map((step, index) => {
-            const x = (index / maxIndex) * 100
+            const x = getX(index)
             const isComplete = step.isComplete
 
             return (
@@ -158,6 +174,23 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
     return status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, " ")
   }
 
+  const formatEventDateTime = (timestamp: string) => {
+    const date = new Date(timestamp)
+
+    const dateLabel = date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
+
+    const timeLabel = date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    })
+
+    return { dateLabel, timeLabel }
+  }
+
   return (
     <div className="flex flex-col justify-center gap-y-4 max-w-4xl mx-auto py-8">
       <div className="w-full">
@@ -220,6 +253,86 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
         </div>
 
         <Divider />
+
+        {/* Travel History */}
+        <div>
+          <Heading
+            level="h2"
+            className="text-xl font-semibold tracking-[0.18em] mb-4 uppercase"
+          >
+            Travel History
+          </Heading>
+
+          <div className="flex flex-col divide-y divide-gray-100">
+            {data.events.map((event, index) => {
+              const { dateLabel, timeLabel } = formatEventDateTime(event.timestamp)
+
+              return (
+                <div
+                  key={`${event.timestamp}-${index}`}
+                  className="py-4 flex flex-row gap-6 text-sm md:text-base"
+                >
+                  <div className="w-40 shrink-0 text-xs md:text-sm text-ui-fg-subtle">
+                    <div className="whitespace-nowrap">{dateLabel}</div>
+                    <div className="whitespace-nowrap">{timeLabel}</div>
+                  </div>
+
+                  <div className="flex-1 text-sm md:text-base leading-relaxed">
+                    <div className="text-md font-medium text-ui-fg-base">
+                      {event.description || getStatusDisplay(event.status)}
+                    </div>
+                    {event.location && (
+                      <div className="mt-1 text-ui-fg-subtle text-sm md:text-base uppercase tracking-wide">
+                        {event.location}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        <Divider />
+
+        {/* Package Details */}
+        <div>
+          <Heading
+            level="h2"
+            className="text-xl font-semibold tracking-[0.18em] mb-4 uppercase"
+          >
+            Package Details
+          </Heading>
+
+          <div className="text-sm md:text-base leading-relaxed space-y-1">
+            <Text className="text-md">
+              Tracking Number: <span className="font-mono">{data.tracking_number}</span>
+            </Text>
+            <Text className="text-md">
+              Carrier: <span className="uppercase">{data.carrier}</span>
+            </Text>
+            {typeof data.weight_lb === "number" || typeof data.weight_kg === "number" ? (
+              <Text className="text-md">
+                Weight:{" "}
+                {typeof data.weight_lb === "number" && (
+                  <span>
+                    {data.weight_lb.toFixed(1)} lbs
+                    {typeof data.weight_kg === "number" && " / "}
+                  </span>
+                )}
+                {typeof data.weight_kg === "number" && (
+                  <span>{data.weight_kg.toFixed(2)} kgs</span>
+                )}
+              </Text>
+            ) : null}
+            {data.dimensions_cm && (
+              <Text className="text-md">
+                Dimensions: {data.dimensions_cm.length} x {data.dimensions_cm.width} x{" "}
+                {data.dimensions_cm.height} cm
+              </Text>
+            )}
+          </div>
+        </div>
 
         {/* Shipping Address */}
         <div>
