@@ -14,6 +14,27 @@ export const metadata: Metadata = {
   description: "Overview of your previous orders.",
 }
 
+const getPrimaryTrackingNumber = (order: HttpTypes.StoreOrder): string | null => {
+  const fulfillments = (order as any).fulfillments as any[] | undefined
+  if (!Array.isArray(fulfillments) || !fulfillments.length) {
+    return null
+  }
+
+  // TODO: Support selecting among multiple fulfillments/shipments in the UI
+  for (const fulfillment of fulfillments) {
+    const trackingNumbers: string[] = Array.isArray(fulfillment.tracking_numbers)
+      ? fulfillment.tracking_numbers
+      : []
+
+    const first = trackingNumbers.find((n) => Boolean(String(n).trim()))
+    if (first) {
+      return String(first).trim()
+    }
+  }
+
+  return null
+}
+
 const shouldShowTrackLink = (order: HttpTypes.StoreOrder) => {
   const status = (order.fulfillment_status || "").toLowerCase()
   return status === "shipped" || status === "delivered"
@@ -88,6 +109,7 @@ export default async function Orders() {
         <div className="mt-3 sm:mt-4 border-t border-gray-200 divide-y divide-gray-200">
           {orders.map((order) => {
             const firstItem = order.items?.[0]
+            const trackingNumber = getPrimaryTrackingNumber(order as HttpTypes.StoreOrder)
 
             return (
               <div
@@ -121,15 +143,17 @@ export default async function Orders() {
                   </div>
 
                   {/* Group 3: Track Order CTA */}
-                  {shouldShowTrackLink(order) && (
+                  {shouldShowTrackLink(order as HttpTypes.StoreOrder) && trackingNumber && (
                     <div className="mt-3 sm:mt-4">
                       {/* TODO: Wire up tracking once dedicated tracking route is finalized */}
-                      <button
-                        type="button"
+                      <LocalizedClientLink
+                        href={`/account/orders/details/${order.id}/track?tracking_number=${encodeURIComponent(
+                          trackingNumber
+                        )}`}
                         className="text-xs underline tracking-[0.15em] uppercase text-black"
                       >
                         Track Order
-                      </button>
+                      </LocalizedClientLink>
                     </div>
                   )}
                 </div>

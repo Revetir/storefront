@@ -11,6 +11,27 @@ type OrderDetailsTemplateProps = {
   order: HttpTypes.StoreOrder
 }
 
+const getPrimaryTrackingNumber = (order: HttpTypes.StoreOrder): string | null => {
+  const fulfillments = (order as any).fulfillments as any[] | undefined
+  if (!Array.isArray(fulfillments) || !fulfillments.length) {
+    return null
+  }
+
+  // TODO: Support selecting among multiple fulfillments/shipments in the UI
+  for (const fulfillment of fulfillments) {
+    const trackingNumbers: string[] = Array.isArray(fulfillment.tracking_numbers)
+      ? fulfillment.tracking_numbers
+      : []
+
+    const first = trackingNumbers.find((n) => Boolean(String(n).trim()))
+    if (first) {
+      return String(first).trim()
+    }
+  }
+
+  return null
+}
+
 const formatStatusLabel = (fulfillmentStatus?: string | null, orderStatus?: string | null) => {
   const overall = (orderStatus || "").toLowerCase()
   if (overall === "canceled") {
@@ -56,6 +77,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
   const orderId = order.display_id ?? order.id
   const orderDateLabel = formatOrderDateEST(order.created_at || new Date())
   const paymentDisplay = getPaymentDisplayFromOrder(order)
+  const trackingNumber = getPrimaryTrackingNumber(order)
 
   return (
     <div className="flex flex-col gap-y-6" data-testid="order-details-container">
@@ -191,9 +213,11 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
           <p className="text-md uppercase text-gray-700">
             <span className="text-gray-900">{orderStatus}</span>
           </p>
-          {shouldShowTrackLink(order) && (
+          {shouldShowTrackLink(order) && trackingNumber && (
             <LocalizedClientLink
-              href="#"
+              href={`/account/orders/details/${order.id}/track?tracking_number=${encodeURIComponent(
+                trackingNumber
+              )}`}
               className="inline-flex items-center justify-center px-6 py-2 border border-gray-900 text-gray-900 text-xs sm:text-sm tracking-[0.15em] uppercase hover:bg-gray-900 hover:text-white transition-colors"
             >
               Track Order
