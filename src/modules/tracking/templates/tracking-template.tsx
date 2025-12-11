@@ -2,6 +2,8 @@
 
 import { Heading, Text } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
+import Items from "@modules/order/components/items"
+import Help from "@modules/order/components/help"
 import TrackingTimeline from "@modules/tracking/components/tracking-timeline"
 import React from "react"
 
@@ -20,6 +22,11 @@ type TrackingData = {
       postal_code?: string
       country_code?: string
     }
+    shipping_methods?: Array<{
+      id: string
+      name: string
+    }>
+    items?: any[]
   }
   tracking_number: string
   carrier: string
@@ -71,16 +78,13 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
   }
 
   const maxIndex = steps.length - 1
-  const stepCount = steps.length
-
   const getX = (index: number) => {
-    return ((index * 2 + 1) / (stepCount * 2)) * 100
+    if (maxIndex === 0) return 0
+    return (index / maxIndex) * 100
   }
 
   const startX = getX(0)
-  const endX = getX(maxIndex)
-  const progressRatio = lastCompletedIndex / maxIndex
-  const activeX2 = startX + (endX - startX) * progressRatio
+  const activeX2 = getX(lastCompletedIndex)
 
   return (
     <div className="w-full flex flex-col gap-3">
@@ -197,68 +201,12 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
         <OrderStatusTimeline currentStatus={data.current_status} />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl-semi">Track Your Order</h1>
-        <Text className="text-ui-fg-subtle">
-          Order #{data.order.display_id} placed on {formatDate(data.order.created_at)}
-        </Text>
-      </div>
-
       <div className="flex flex-col gap-6 bg-white p-6 rounded-lg">
-        {/* Tracking Number Section */}
-        <div>
-          <Heading level="h2" className="text-3xl-regular mb-4">
-            Tracking Information
-          </Heading>
-          <div className="flex flex-col gap-2">
-            <div className="flex justify-between items-center">
-              <Text className="txt-medium-plus text-ui-fg-base">
-                Tracking Number
-              </Text>
-              <Text className="txt-medium font-mono">{data.tracking_number}</Text>
-            </div>
-            <div className="flex justify-between items-center">
-              <Text className="txt-medium-plus text-ui-fg-base">Carrier</Text>
-              <Text className="txt-medium">{data.carrier}</Text>
-            </div>
-            <div className="flex justify-between items-center">
-              <Text className="txt-medium-plus text-ui-fg-base">Status</Text>
-              <Text
-                className={`txt-medium font-semibold ${getStatusColor(data.current_status)}`}
-              >
-                {getStatusDisplay(data.current_status)}
-              </Text>
-            </div>
-            {data.estimated_delivery && (
-              <div className="flex justify-between items-center">
-                <Text className="txt-medium-plus text-ui-fg-base">
-                  Estimated Delivery
-                </Text>
-                <Text className="txt-medium">
-                  {formatDate(data.estimated_delivery)}
-                </Text>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <Divider />
-
-        {/* Tracking Timeline */}
-        <div>
-          <Heading level="h2" className="text-3xl-regular mb-4">
-            Tracking History
-          </Heading>
-          <TrackingTimeline events={data.events} />
-        </div>
-
-        <Divider />
-
         {/* Travel History */}
         <div>
           <Heading
             level="h2"
-            className="text-xl font-semibold tracking-[0.18em] mb-4 uppercase"
+            className="text-md uppercase text-gray-800 mb-4"
           >
             Travel History
           </Heading>
@@ -299,7 +247,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
         <div>
           <Heading
             level="h2"
-            className="text-xl font-semibold tracking-[0.18em] mb-4 uppercase"
+            className="text-md uppercase text-gray-700 mb-4"
           >
             Package Details
           </Heading>
@@ -334,60 +282,89 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
           </div>
         </div>
 
-        {/* Shipping Address */}
-        <div>
-          <Heading level="h2" className="text-3xl-regular mb-4">
-            Shipping Address
-          </Heading>
-          <div className="flex flex-col gap-1">
-            <Text className="txt-medium text-ui-fg-base">
-              {data.order.shipping_address?.first_name}{" "}
-              {data.order.shipping_address?.last_name}
-            </Text>
-            <Text className="txt-medium text-ui-fg-subtle">
-              {data.order.shipping_address?.address_1}
-            </Text>
-            {data.order.shipping_address?.address_2 && (
-              <Text className="txt-medium text-ui-fg-subtle">
-                {data.order.shipping_address.address_2}
-              </Text>
-            )}
-            <Text className="txt-medium text-ui-fg-subtle">
-              {data.order.shipping_address?.city},{" "}
-              {data.order.shipping_address?.province}{" "}
-              {data.order.shipping_address?.postal_code}
-            </Text>
-            <Text className="txt-medium text-ui-fg-subtle">
-              {data.order.shipping_address?.country_code?.toUpperCase()}
-            </Text>
+        <Divider />
+
+        {/* Order Details – Shipping Method, Shipping Address, Items */}
+        <div className="flex flex-col gap-y-4 border-t border-gray-200 pt-4">
+          {/* Shipping meta */}
+          <div className="mt-2 grid grid-cols-2 gap-6 text-xs sm:text-sm md:hidden">
+            <div className="space-y-1">
+              <p className="uppercase text-gray-700">Shipping Method</p>
+              {data.order.shipping_methods?.map((method) => (
+                <p key={method.id} className="text-gray-900">
+                  {method.name}
+                </p>
+              ))}
+            </div>
+
+            <div className="space-y-1">
+              <p className="uppercase text-gray-700">Shipping Address</p>
+              {data.order.shipping_address && (
+                <div className="text-gray-900 space-y-0.5">
+                  <p>
+                    {data.order.shipping_address.first_name} {" "}
+                    {data.order.shipping_address.last_name}
+                  </p>
+                  <p>{data.order.shipping_address.address_1}</p>
+                  {data.order.shipping_address.address_2 && (
+                    <p>{data.order.shipping_address.address_2}</p>
+                  )}
+                  <p>
+                    {data.order.shipping_address.city}, {data.order.shipping_address.province} {" "}
+                    {data.order.shipping_address.postal_code}
+                  </p>
+                  <p>{data.order.shipping_address.country_code?.toUpperCase()}</p>
+                </div>
+              )}
+            </div>
           </div>
+
+          {/* Desktop: 2-column layout (shipping method + address) */}
+          <div className="mt-2 hidden md:grid md:grid-cols-3 md:gap-8 text-xs sm:text-sm">
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <p className="uppercase text-gray-700">Shipping Method</p>
+                {data.order.shipping_methods?.map((method) => (
+                  <p key={method.id} className="text-gray-900">
+                    {method.name}
+                  </p>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-1 col-span-2">
+              <p className="uppercase text-gray-700">Shipping Address</p>
+              {data.order.shipping_address && (
+                <div className="text-gray-900 space-y-0.5">
+                  <p>
+                    {data.order.shipping_address.first_name} {" "}
+                    {data.order.shipping_address.last_name}
+                  </p>
+                  <p>{data.order.shipping_address.address_1}</p>
+                  {data.order.shipping_address.address_2 && (
+                    <p>{data.order.shipping_address.address_2}</p>
+                  )}
+                  <p>
+                    {data.order.shipping_address.city}, {data.order.shipping_address.province} {" "}
+                    {data.order.shipping_address.postal_code}
+                  </p>
+                  <p>{data.order.shipping_address.country_code?.toUpperCase()}</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Items – use existing Items component styling */}
+          {data.order.items && data.order.items.length > 0 && (
+            <div className="pt-4 border-t border-gray-200">
+              <Items order={data.order as any} />
+            </div>
+          )}
         </div>
 
         <Divider />
 
-        {/* Help Section */}
-        <div className="bg-gray-50 p-4 rounded">
-          <Text className="txt-medium-plus text-ui-fg-base mb-2">
-            Need Help?
-          </Text>
-          <Text className="txt-small text-ui-fg-subtle">
-            If you have any questions about your shipment, please{" "}
-            <a
-              href="/us/customer-care/contact-us"
-              className="text-blue-600 hover:underline"
-            >
-              contact our Customer Care team
-            </a>{" "}
-            or email us at{" "}
-            <a
-              href="mailto:care@revetir.com"
-              className="text-blue-600 hover:underline"
-            >
-              care@revetir.com
-            </a>
-            .
-          </Text>
-        </div>
+        <Help />
       </div>
     </div>
   )
