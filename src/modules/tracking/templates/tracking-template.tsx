@@ -371,13 +371,13 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
 
           <div className="text-sm md:text-base leading-relaxed space-y-1">
             <Text className="text-md">
-              Carrier: <span className="uppercase">{displayCarrier}</span>
+              Carrier: <span>{displayCarrier}</span>
             </Text>
             <Text className="text-md">
-              Service: <span className="uppercase">Standard International</span>
+              Service: <span>Standard International</span>
             </Text>
             <Text className="text-md">
-              Tracking Number: <span className="font-mono">{data.tracking_number}</span>
+              Tracking Number: <span>{data.tracking_number}</span>
             </Text>
             {typeof data.weight_lb === "number" || typeof data.weight_kg === "number" ? (
               <Text className="text-md">
@@ -445,14 +445,19 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                     const thumb = getItemThumbnailUrl(item)
                     if (!thumb) return null
                     return (
-                      <div key={idx} className="w-12 h-16 relative overflow-hidden">
-                        <Image
-                          src={thumb}
-                          alt={item?.title || "Shipment item"}
-                          fill
-                          sizes="48px"
-                          className="object-cover"
-                        />
+                      <div
+                        key={idx}
+                        className="w-16 aspect-square rounded-[14px] overflow-hidden bg-white border border-gray-200 flex items-center justify-center p-2"
+                      >
+                        <div className="relative w-full h-full">
+                          <Image
+                            src={thumb}
+                            alt={item?.title || "Shipment item"}
+                            fill
+                            sizes="64px"
+                            className="object-contain"
+                          />
+                        </div>
                       </div>
                     )
                   })}
@@ -508,14 +513,19 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                     const thumb = getItemThumbnailUrl(item)
                     if (!thumb) return null
                     return (
-                      <div key={idx} className="w-12 h-16 relative overflow-hidden">
-                        <Image
-                          src={thumb}
-                          alt={item?.title || "Shipment item"}
-                          fill
-                          sizes="48px"
-                          className="object-cover"
-                        />
+                      <div
+                        key={idx}
+                        className="w-16 aspect-square rounded-[14px] overflow-hidden bg-white border border-gray-200 flex items-center justify-center p-2"
+                      >
+                        <div className="relative w-full h-full">
+                          <Image
+                            src={thumb}
+                            alt={item?.title || "Shipment item"}
+                            fill
+                            sizes="64px"
+                            className="object-contain"
+                          />
+                        </div>
                       </div>
                     )
                   })}
