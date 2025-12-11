@@ -310,7 +310,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
       </div>
 
       <div className="flex flex-col gap-6 bg-white p-6 rounded-lg">
-        {/* Travel History */}
+        {/* Travel History TODO: collapsible events*/}
         <div>
           <Heading
             level="h2"
@@ -404,7 +404,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
           <div className="mt-2 grid grid-cols-2 gap-6 text-xs sm:text-sm md:hidden">
             {/* Left column: Shipping Address */}
             <div className="space-y-1">
-              <Heading level="h2" className="text-md uppercase text-gray-700">
+              <Heading level="h2" className="text-md uppercase text-gray-800 mb-4">
                 Shipping Address
               </Heading>
               {data.order.shipping_address && (
@@ -429,7 +429,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
             {/* Right column: In This Shipment thumbnails */}
             {shipmentThumbnails.mobile.visible.length > 0 && (
               <div className="space-y-1 flex flex-col">
-                <Heading level="h2" className="text-md uppercase text-gray-700">
+                <Heading level="h2" className="text-md uppercase text-gray-800 mb-4">
                   In This Shipment
                 </Heading>
                 <div className="flex flex-row items-center gap-2">
@@ -467,7 +467,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
           <div className="mt-2 hidden md:grid md:grid-cols-3 md:gap-8 text-xs sm:text-sm">
             <div className="space-y-4">
               <div className="space-y-1">
-                <Heading level="h3" className="text-md uppercase text-gray-700">
+                <Heading level="h2" className="text-md uppercase text-gray-800 mb-4">
                   Shipping Method
                 </Heading>
                 {data.order.shipping_methods?.map((method) => (
@@ -479,7 +479,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
             </div>
 
             <div className="space-y-1">
-              <Heading level="h3" className="text-md uppercase text-gray-700">
+              <Heading level="h2" className="text-md uppercase text-gray-800 mb-4">
                 Shipping Address
               </Heading>
               {data.order.shipping_address && (
@@ -503,7 +503,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
 
             {shipmentThumbnails.desktop.visible.length > 0 && (
               <div className="space-y-1">
-                <Heading level="h3" className="text-md uppercase text-gray-700">
+                <Heading level="h2" className="text-md uppercase text-gray-800 mb-4">
                   In This Shipment
                 </Heading>
                 <div className="flex flex-row items-center gap-2">
