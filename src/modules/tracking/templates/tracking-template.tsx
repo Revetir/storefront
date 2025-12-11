@@ -343,11 +343,11 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                     </div>
 
                     <div className="flex-1 text-sm md:text-base leading-relaxed">
-                      <div className="text-md font-medium text-ui-fg-base">
+                      <div className="text-md text-ui-fg-base">
                         {event.description || getStatusDisplay(event.status)}
                       </div>
                       {event.location && (
-                        <div className="mt-1 text-ui-fg-subtle text-sm md:text-base uppercase tracking-wide">
+                        <div className="mt-1 text-ui-fg-subtle text-sm md:text-base">
                           {event.location}
                         </div>
                       )}
