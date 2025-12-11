@@ -240,20 +240,13 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
       return orderItems
     }
 
-    // Find fulfillments whose tracking numbers or tracking links match this tracking number.
+    // Find fulfillments whose tracking numbers match this tracking number.
     const matchingFulfillments = fulfillments.filter((f) => {
-      const directNumbers: string[] = Array.isArray(f.tracking_numbers)
+      const trackingNumbers: string[] = Array.isArray(f.tracking_numbers)
         ? f.tracking_numbers
         : []
 
-      const linkNumbers: string[] = Array.isArray(f.tracking_links)
-        ? f.tracking_links
-            .map((l: any) => l?.tracking_number)
-            .filter((n: any) => typeof n === "string")
-        : []
-
-      const allNumbers = [...directNumbers, ...linkNumbers].filter(Boolean)
-      return allNumbers.some(
+      return trackingNumbers.some(
         (n) => String(n).trim() === String(data.tracking_number).trim()
       )
     })
