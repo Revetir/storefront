@@ -370,7 +370,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
               Carrier: <span>{displayCarrier}</span>
             </Text>
             <Text className="text-md">
-              Service: <span>Standard International</span>
+              Service: <span>International Air</span>
             </Text>
             <Text className="text-md">
               Tracking Number: <span>{data.tracking_number}</span>
