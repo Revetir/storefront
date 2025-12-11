@@ -46,7 +46,7 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
     normalizedStatus.includes("out_for_delivery")
 
   const steps = [
-    { label: "Order Placed", isComplete: true },
+    { label: "Processing", isComplete: true },
     { label: "Shipped", isComplete: true },
     { label: "Out For Delivery", isComplete: isDelivered || isOutForDelivery },
     { label: "Delivered", isComplete: isDelivered },
@@ -70,24 +70,24 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
     <div className="w-full flex flex-col gap-3">
       <div className="w-full">
         <svg
-          viewBox="0 0 100 16"
-          preserveAspectRatio="none"
-          className="w-full h-8 text-ui-fg-base"
+          viewBox="0 0 100 20"
+          preserveAspectRatio="xMidYMid meet"
+          className="w-full h-10 text-ui-fg-base"
         >
           <line
             x1="0"
-            y1="4"
+            y1="10"
             x2="100"
-            y2="4"
+            y2="10"
             stroke="#E5E7EB"
             strokeWidth="0.6"
             strokeLinecap="round"
           />
           <line
             x1="0"
-            y1="4"
-            x2={progress.toString()}
-            y2="4"
+            y1="10"
+            x2={progress}
+            y2="10"
             stroke="currentColor"
             strokeWidth="0.9"
             strokeLinecap="round"
@@ -100,8 +100,8 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
               <circle
                 key={step.label}
                 cx={x}
-                cy={4}
-                r={2.1}
+                cy={10}
+                r={1.5}
                 fill={isComplete ? "currentColor" : "#FFFFFF"}
                 stroke={isComplete ? "currentColor" : "#D1D5DB"}
                 strokeWidth={isComplete ? 0.4 : 0.6}
@@ -110,14 +110,14 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
           })}
         </svg>
       </div>
-      <div className="flex justify-between text-[11px] tracking-wide uppercase">
+      <div className="flex justify-between text-[11px] tracking-wide uppercase mt-1">
         {steps.map((step) => (
           <div
             key={step.label}
             className={
               step.isComplete
-                ? "text-ui-fg-base text-center"
-                : "text-ui-fg-subtle text-center"
+                ? "flex-1 text-ui-fg-base text-center"
+                : "flex-1 text-ui-fg-subtle text-center"
             }
           >
             {step.label}
