@@ -398,23 +398,13 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
           </div>
         </div>
 
-        {/* Order Details – Shipping Method, Shipping Address, Items */}
+        {/* Order Details – Shipping Address & Items */}
         <div className="flex flex-col gap-y-4 border-t border-gray-200 pt-4">
-          {/* Shipping meta */}
+          {/* Mobile: 2-column layout with Shipping Address (left) and In This Shipment (right) */}
           <div className="mt-2 grid grid-cols-2 gap-6 text-xs sm:text-sm md:hidden">
+            {/* Left column: Shipping Address */}
             <div className="space-y-1">
-              <Heading level="h3" className="text-md uppercase text-gray-700">
-                Shipping Method
-              </Heading>
-              {data.order.shipping_methods?.map((method) => (
-                <p key={method.id} className="text-gray-900">
-                  {method.name}
-                </p>
-              ))}
-            </div>
-
-            <div className="space-y-1">
-              <Heading level="h3" className="text-md uppercase text-gray-700">
+              <Heading level="h2" className="text-md uppercase text-gray-700">
                 Shipping Address
               </Heading>
               {data.order.shipping_address && (
@@ -436,10 +426,10 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
               )}
             </div>
 
-            {/* On small screens, show shipment thumbnails below as a full-width row */}
+            {/* Right column: In This Shipment thumbnails */}
             {shipmentThumbnails.mobile.visible.length > 0 && (
-              <div className="col-span-2 space-y-1">
-                <Heading level="h3" className="text-md uppercase text-gray-700">
+              <div className="space-y-1 flex flex-col">
+                <Heading level="h2" className="text-md uppercase text-gray-700">
                   In This Shipment
                 </Heading>
                 <div className="flex flex-row items-center gap-2">
