@@ -283,14 +283,17 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
   const shipmentItems = React.useMemo(deriveShipmentItems, [data])
 
   const shipmentThumbnails = React.useMemo(() => {
-    const maxThumbs = 2
     const items = Array.isArray(shipmentItems) ? shipmentItems : []
-    const visible = items.slice(0, maxThumbs)
-    const remainingCount = items.length > maxThumbs ? items.length - maxThumbs : 0
-
     return {
-      visible,
-      remainingCount,
+      items,
+      mobile: {
+        visible: items.slice(0, 2),
+        remainingCount: items.length > 2 ? items.length - 2 : 0,
+      },
+      desktop: {
+        visible: items.slice(0, 3),
+        remainingCount: items.length > 3 ? items.length - 3 : 0,
+      },
     }
   }, [shipmentItems])
 
@@ -328,19 +331,19 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                 return (
                   <div
                     key={`${event.timestamp}-${index}`}
-                    className="py-4 flex flex-row gap-6 text-sm md:text-base"
+                    className="py-4 flex flex-row gap-6 text-xs md:text-sm"
                   >
                     <div className="w-40 shrink-0 text-xs md:text-sm text-ui-fg-subtle">
                       <div className="whitespace-nowrap">{dateLabel}</div>
                       <div className="whitespace-nowrap">{timeLabel}</div>
                     </div>
 
-                    <div className="flex-1 text-sm md:text-base leading-relaxed">
-                      <div className="text-md text-ui-fg-base">
+                    <div className="flex-1 text-xs md:text-sm leading-relaxed">
+                      <div className="text-xs md:text-sm text-ui-fg-base">
                         {event.description || getStatusDisplay(event.status)}
                       </div>
                       {event.location && (
-                        <div className="mt-1 text-ui-fg-subtle text-sm md:text-base">
+                        <div className="mt-1 text-ui-fg-subtle text-xs md:text-sm">
                           {event.location}
                         </div>
                       )}
@@ -400,7 +403,9 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
           {/* Shipping meta */}
           <div className="mt-2 grid grid-cols-2 gap-6 text-xs sm:text-sm md:hidden">
             <div className="space-y-1">
-              <p className="text-md uppercase text-gray-700">Shipping Method</p>
+              <Heading level="h3" className="text-md uppercase text-gray-700">
+                Shipping Method
+              </Heading>
               {data.order.shipping_methods?.map((method) => (
                 <p key={method.id} className="text-gray-900">
                   {method.name}
@@ -409,7 +414,9 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
             </div>
 
             <div className="space-y-1">
-              <p className="text-md uppercase text-gray-700">Shipping Address</p>
+              <Heading level="h3" className="text-md uppercase text-gray-700">
+                Shipping Address
+              </Heading>
               {data.order.shipping_address && (
                 <div className="text-gray-900 space-y-0.5">
                   <p>
@@ -430,17 +437,19 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
             </div>
 
             {/* On small screens, show shipment thumbnails below as a full-width row */}
-            {shipmentThumbnails.visible.length > 0 && (
+            {shipmentThumbnails.mobile.visible.length > 0 && (
               <div className="col-span-2 space-y-1">
-                <p className="text-md uppercase text-gray-700">In This Shipment</p>
+                <Heading level="h3" className="text-md uppercase text-gray-700">
+                  In This Shipment
+                </Heading>
                 <div className="flex flex-row items-center gap-2">
-                  {shipmentThumbnails.visible.map((item, idx) => {
+                  {shipmentThumbnails.mobile.visible.map((item, idx) => {
                     const thumb = getItemThumbnailUrl(item)
                     if (!thumb) return null
                     return (
                       <div
                         key={idx}
-                        className="w-16 aspect-square rounded-[14px] overflow-hidden bg-white border border-gray-200 flex items-center justify-center p-2"
+                        className="w-16 aspect-square overflow-hidden bg-white border border-gray-200 flex items-center justify-center p-2"
                       >
                         <div className="relative w-full h-full">
                           <Image
@@ -454,9 +463,9 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                       </div>
                     )
                   })}
-                  {shipmentThumbnails.remainingCount > 0 && (
+                  {shipmentThumbnails.mobile.remainingCount > 0 && (
                     <div className="text-xs sm:text-sm text-gray-700">
-                      +{shipmentThumbnails.remainingCount}
+                      +{shipmentThumbnails.mobile.remainingCount}
                     </div>
                   )}
                 </div>
@@ -468,7 +477,9 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
           <div className="mt-2 hidden md:grid md:grid-cols-3 md:gap-8 text-xs sm:text-sm">
             <div className="space-y-4">
               <div className="space-y-1">
-                <p className="text-md uppercase text-gray-700">Shipping Method</p>
+                <Heading level="h3" className="text-md uppercase text-gray-700">
+                  Shipping Method
+                </Heading>
                 {data.order.shipping_methods?.map((method) => (
                   <p key={method.id} className="text-gray-900">
                     {method.name}
@@ -478,7 +489,9 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
             </div>
 
             <div className="space-y-1">
-              <p className="text-md uppercase text-gray-700">Shipping Address</p>
+              <Heading level="h3" className="text-md uppercase text-gray-700">
+                Shipping Address
+              </Heading>
               {data.order.shipping_address && (
                 <div className="text-gray-900 space-y-0.5">
                   <p>
@@ -498,17 +511,19 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
               )}
             </div>
 
-            {shipmentThumbnails.visible.length > 0 && (
+            {shipmentThumbnails.desktop.visible.length > 0 && (
               <div className="space-y-1">
-                <p className="text-md uppercase text-gray-700">In This Shipment</p>
+                <Heading level="h3" className="text-md uppercase text-gray-700">
+                  In This Shipment
+                </Heading>
                 <div className="flex flex-row items-center gap-2">
-                  {shipmentThumbnails.visible.map((item, idx) => {
+                  {shipmentThumbnails.desktop.visible.map((item, idx) => {
                     const thumb = getItemThumbnailUrl(item)
                     if (!thumb) return null
                     return (
                       <div
                         key={idx}
-                        className="w-16 aspect-square rounded-[14px] overflow-hidden bg-white border border-gray-200 flex items-center justify-center p-2"
+                        className="w-16 aspect-square overflow-hidden bg-white border border-gray-200 flex items-center justify-center p-2"
                       >
                         <div className="relative w-full h-full">
                           <Image
@@ -522,9 +537,9 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                       </div>
                     )
                   })}
-                  {shipmentThumbnails.remainingCount > 0 && (
+                  {shipmentThumbnails.desktop.remainingCount > 0 && (
                     <div className="text-xs sm:text-sm text-gray-700">
-                      +{shipmentThumbnails.remainingCount}
+                      +{shipmentThumbnails.desktop.remainingCount}
                     </div>
                   )}
                 </div>
