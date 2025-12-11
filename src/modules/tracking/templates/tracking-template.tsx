@@ -12,6 +12,7 @@ type TrackingData = {
     id: string
     display_id: number
     created_at: string
+    currency_code?: string
     shipping_address: {
       first_name?: string
       last_name?: string
@@ -77,17 +78,36 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
     lastCompletedIndex = 1
   }
 
+  // Calculate line positions based on circle centers
+  // Each circle is in a flex-1 container, so centers are at 12.5%, 37.5%, 62.5%, 87.5%
+  const stepCount = steps.length
+  const firstCenter = 100 / (stepCount * 2) // 12.5% for 4 steps
+  const lastCenter = 100 - firstCenter // 87.5% for 4 steps
+  const totalLineWidth = lastCenter - firstCenter // 75% for 4 steps
+  
+  // Active line width: from first center to last completed center
+  const activeLineWidth = lastCompletedIndex === 0 
+    ? 0 
+    : (lastCompletedIndex / (stepCount - 1)) * totalLineWidth
+
   return (
     <div className="w-full flex flex-col gap-2">
       {/* Circles and connecting lines */}
       <div className="relative flex justify-between items-center">
-        {/* Background line spanning full width */}
-        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[1px] bg-gray-200" />
-        {/* Active line */}
-        <div
-          className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-ui-fg-base"
+        {/* Background line between first and last circle centers */}
+        <div 
+          className="absolute top-1/2 -translate-y-1/2 h-[1px] bg-gray-200"
           style={{
-            width: `${(lastCompletedIndex / (steps.length - 1)) * 100}%`,
+            left: `${firstCenter}%`,
+            right: `${firstCenter}%`,
+          }}
+        />
+        {/* Active line from first center through last completed circle center */}
+        <div
+          className="absolute top-1/2 -translate-y-1/2 h-[2px] bg-ui-fg-base"
+          style={{
+            left: `${firstCenter}%`,
+            width: `${activeLineWidth}%`,
           }}
         />
         {/* Circles */}
