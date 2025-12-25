@@ -44,6 +44,17 @@ export const ShortsDiagram: React.FC<{ className?: string }> = ({ className = ""
   </div>
 )
 
+// Jackets sizing diagram
+export const JacketsDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
+  <div className={`w-full h-auto ${className}`} style={{ aspectRatio: '600/800' }}>
+    <img
+      src="/images/jackets_sizing_diagram.svg"
+      alt="Jackets measurements diagram"
+      className="w-full h-full object-contain"
+    />
+  </div>
+)
+
 export const SizingMissingDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
   <svg
     viewBox="0 0 300 150"

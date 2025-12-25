@@ -3,6 +3,7 @@ export type TemplateCategory =
   | "T-Shirts"
   | "Sweaters"
   | "Shorts"
+  | "Jackets"
   | "Shoes Unisex"
   | "Shoes Men"
   | "Shoes Women"
@@ -150,6 +151,18 @@ function applyTemplateAssignments(): void {
   // SHORTS
   CategoryMaster.setTemplate({ handle: "mens-shorts" }, "Shorts")
   CategoryMaster.setTemplate({ handle: "womens-shorts" }, "Shorts")
+
+  // JACKETS
+  CategoryMaster.setTemplate({ handle: "mens-bombers" }, "Jackets")
+  CategoryMaster.setTemplate({ handle: "mens-denim-jackets" }, "Jackets")
+  CategoryMaster.setTemplate({ handle: "mens-down" }, "Jackets")
+  CategoryMaster.setTemplate({ handle: "mens-jackets" }, "Jackets")
+  CategoryMaster.setTemplate({ handle: "mens-leather-jackets" }, "Jackets")
+  CategoryMaster.setTemplate({ handle: "womens-bombers" }, "Jackets")
+  CategoryMaster.setTemplate({ handle: "womens-denim-jackets" }, "Jackets")
+  CategoryMaster.setTemplate({ handle: "womens-down" }, "Jackets")
+  CategoryMaster.setTemplate({ handle: "womens-jackets" }, "Jackets")
+  CategoryMaster.setTemplate({ handle: "womens-leather-jackets" }, "Jackets")
 }
 
 export const CategoryMaster = {

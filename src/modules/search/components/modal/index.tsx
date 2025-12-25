@@ -141,7 +141,7 @@ export default function SearchModal({ isOpen: externalIsOpen, setIsOpen: externa
                 WOMENSWEAR
               </button>
             </div>
-            <Configure facetFilters={[`gender:${gender}`]} hitsPerPage={8} />
+            <Configure facetFilters={[`gender:${gender}`]} filters="status:published" hitsPerPage={8} />
             {/* Move the search bar lower by increasing the space above it by 50% (relative to previous) */}
             <div className="flex-1 flex flex-col" style={{ justifyContent: "flex-start" }}>
               {/* Add extra margin above the search bar (was ~auto, now 48px) */}

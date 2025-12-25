@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 import Modal from "@modules/common/components/modal"
 import { getSizingTemplate, SizingTemplate } from "@lib/data/sizing-templates"
-import { SizingMissingDiagram, PantsDiagram, TShirtsDiagram, SweatersDiagram, ShortsDiagram } from "@modules/common/icons/sizing-diagrams"
+import { SizingMissingDiagram, PantsDiagram, TShirtsDiagram, SweatersDiagram, ShortsDiagram, JacketsDiagram } from "@modules/common/icons/sizing-diagrams"
 import X from "@modules/common/icons/x"
 
 interface SizingModalProps {
@@ -247,6 +247,9 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
       case "ShortsDiagram":
         return <ShortsDiagram className="w-full h-auto max-w-md" />
+
+      case "JacketsDiagram":
+        return <JacketsDiagram className="w-full h-auto max-w-md" />
 
       // TODO: Add more diagram rendering cases here when templates are implemented
       // Example:
