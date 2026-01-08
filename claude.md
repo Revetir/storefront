@@ -1,2 +1,1 @@
-Always use complete absolute Windows paths
-with drive letters and backslashes for ALL file operations
+Use relative paths on edit retry if previous edit failed due to a modified file.
