@@ -19,6 +19,8 @@
     "@medusajs/js-sdk": "latest",
     "@medusajs/medusa-js": "^6.1.10",
     "@medusajs/ui": "latest",
+    "@react-three/drei": "latest",
+    "@react-three/fiber": "latest",
     "@radix-ui/react-accordion": "^1.2.1",
     "@stripe/react-stripe-js": "^5.3.0",
     "@stripe/stripe-js": "^8.2.0",
@@ -39,6 +41,7 @@
     "resend": "^4.7.0",
     "server-only": "^0.0.1",
     "tailwindcss-radix": "^2.8.0",
+    "three": "latest",
     "webpack": "^5"
   },
   "devDependencies": {

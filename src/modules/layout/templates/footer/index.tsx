@@ -81,7 +81,7 @@ export default function Footer() {
 
         {/* Bottom footer text and copyright on same line with normal case */}
         <div className="flex flex-wrap justify-center items-center text-gray-400 text-xs no-border py-2 mt-0 gap-x-6 gap-y-2">
-          <span className="whitespace-nowrap">© 2025 REVETIR</span>
+          <span className="whitespace-nowrap">© 2026 REVETIR</span>
           <LocalizedClientLink href="/terms-conditions" className="hover:text-ui-fg-base hover:underline">
             Terms & Conditions
           </LocalizedClientLink>

@@ -1,8 +1,10 @@
 "use client"
 
 import { ExpressCheckoutElement, useStripe, useElements } from "@stripe/react-stripe-js"
-import { placeOrder } from "@lib/data/cart"
+import { placeOrder, updateCart } from "@lib/data/cart"
 import { useState, useContext } from "react"
+import { validateCheckout, triggerFieldErrors, scrollToTop } from "../../utils/validate-checkout"
+import { US_STATES } from "../../utils/us-states"
 
 import PaymentButton from "../payment-button"
 import { usePaymentContext } from "../payment/payment-context"
@@ -30,9 +32,118 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
     // For wallets (Apple Pay/Google Pay): Shows branded button, collects payment, completes transaction
     // For Klarna: Shows "Continue with Klarna" button, handles redirect, returns user after completion
     console.log('Express Checkout payment initiated:', event)
+    console.log('Express Checkout billingDetails:', event.billingDetails)
+    console.log('Express Checkout shippingAddress:', event.shippingAddress)
 
     if (!stripe || !elements) {
       setErrorMessage('Stripe is not initialized')
+      return
+    }
+
+    // CRITICAL: Sync billing/shipping details from Express Checkout to Medusa cart
+    // The wallet (Google Pay, Apple Pay) collects its own address data which must be
+    // synced to the cart BEFORE placing the order, otherwise the order will be missing
+    // the customer's name and shipping address.
+    try {
+      const billingDetails = event.billingDetails
+      const shippingAddress = event.shippingAddress
+
+      // Parse the name into first_name and last_name
+      const parseName = (name: string | undefined) => {
+        if (!name) return { first_name: '', last_name: '' }
+        const parts = name.trim().split(/\s+/)
+        if (parts.length === 1) {
+          return { first_name: parts[0], last_name: '' }
+        }
+        return {
+          first_name: parts[0],
+          last_name: parts.slice(1).join(' ')
+        }
+      }
+
+      const normalizeUSStateCode = (state: string | undefined) => {
+        if (!state) return ""
+        const trimmed = state.trim()
+        if (!trimmed) return ""
+
+        const lower = trimmed.toLowerCase()
+        if (lower.startsWith("us-") && lower.length >= 5) {
+          const code = lower.slice(3, 5)
+          if (/^[a-z]{2}$/.test(code)) return code.toUpperCase()
+        }
+
+        if (/^[a-z]{2}$/i.test(trimmed)) return trimmed.toUpperCase()
+
+        const normalizedName = lower.replace(/[^a-z]/g, "")
+        const match = US_STATES.find(
+          (s) => s.name.toLowerCase().replace(/[^a-z]/g, "") === normalizedName
+        )
+        return match?.code || ""
+      }
+
+      // Map Stripe address format to Medusa format
+      const mapStripeAddress = (address: any, name?: string) => {
+        if (!address) return null
+        const { first_name, last_name } = parseName(name)
+
+        const countryCode = ((address.country || "US") as string).toLowerCase().trim()
+        const stateRaw = (address.state as string | undefined) ?? ""
+        const stateCode = countryCode === "us"
+          ? normalizeUSStateCode(stateRaw).toLowerCase()
+          : stateRaw.trim().toLowerCase()
+
+        const province = stateCode ? `${countryCode}-${stateCode}` : ""
+
+        return {
+          first_name,
+          last_name,
+          address_1: address.line1 || '',
+          address_2: address.line2 || '',
+          city: address.city || '',
+          province,
+          postal_code: address.postal_code || '',
+          country_code: countryCode,
+          phone: billingDetails?.phone || '',
+        }
+      }
+
+      const cartUpdateData: any = {}
+
+      // Sync shipping address from Express Checkout
+      if (shippingAddress) {
+        cartUpdateData.shipping_address = mapStripeAddress(
+          shippingAddress.address,
+          shippingAddress.name
+        )
+      }
+
+      // Sync billing address from Express Checkout
+      if (billingDetails?.address) {
+        cartUpdateData.billing_address = mapStripeAddress(
+          billingDetails.address,
+          billingDetails.name
+        )
+      } else if (shippingAddress) {
+        // Fallback: use shipping address as billing if no billing provided
+        cartUpdateData.billing_address = mapStripeAddress(
+          shippingAddress.address,
+          shippingAddress.name
+        )
+      }
+
+      // Sync email if provided
+      if (billingDetails?.email) {
+        cartUpdateData.email = billingDetails.email
+      }
+
+      // Update the cart with the Express Checkout data
+      if (Object.keys(cartUpdateData).length > 0) {
+        console.log('Syncing Express Checkout data to cart:', cartUpdateData)
+        await updateCart(cartUpdateData)
+      }
+    } catch (syncError: any) {
+      console.error('Failed to sync Express Checkout data to cart:', syncError)
+      setErrorMessage('Failed to save shipping information. Please try again.')
       return
     }
 

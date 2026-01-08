@@ -58,3 +58,4 @@ dump.rdb
 nul
 .claude/settings.local.json
 17track_docs.txt
+claude.md

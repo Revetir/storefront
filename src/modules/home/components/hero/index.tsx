@@ -6,6 +6,8 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 
 const Hero = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [hoveredSection, setHoveredSection] = useState<"men" | "women" | null>(null);
+  const [hoveredButton, setHoveredButton] = useState<"men" | "women" | null>(null);
 
   useEffect(() => {
     if (!isExpanded) return;
@@ -44,14 +46,33 @@ const Hero = () => {
         {/* Sale Image with Split Clickable Areas - Desktop (768px+) */}
         <div className="hidden md:block" style={{ width: "100%", position: "relative", maxWidth: "1240px", margin: "0 auto" }}>
           <div style={{ position: "relative", width: "100%", aspectRatio: "1240/620" }}>
+            {/* Left Half - Men's */}
             <Image
-              src="/images/sale_banner.svg"
+              src="/images/sale_banner_hover_compatible.svg"
               alt="Designer Fashion Sale - Up To 80% Off Men and Women's Styles"
               fill
               sizes="(max-width: 1280px) 100vw, 1240px"
               style={{
                 objectFit: "contain",
                 borderRadius: 8,
+                clipPath: "inset(0 50% 0 0)",
+                filter: hoveredSection === "men" ? "invert(1)" : "none",
+                transition: "filter 200ms ease",
+              }}
+              priority
+            />
+            {/* Right Half - Women's */}
+            <Image
+              src="/images/sale_banner_hover_compatible.svg"
+              alt="Designer Fashion Sale - Up To 80% Off Men and Women's Styles"
+              fill
+              sizes="(max-width: 1280px) 100vw, 1240px"
+              style={{
+                objectFit: "contain",
+                borderRadius: 8,
+                clipPath: "inset(0 0 0 50%)",
+                filter: hoveredSection === "women" ? "invert(1)" : "none",
+                transition: "filter 200ms ease",
               }}
               priority
             />
@@ -60,13 +81,15 @@ const Hero = () => {
           {/* Left Clickable Area - Men's */}
           <LocalizedClientLink href="/men">
             <div
+              onMouseEnter={() => setHoveredSection("men")}
+              onMouseLeave={() => setHoveredSection(null)}
               style={{
                 position: "absolute",
                 top: 0,
                 left: 0,
                 width: "50%",
                 height: "100%",
-                cursor: "pointer",
+                cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><text x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="24" fill="white" font-family="Arial">♂</text></svg>') 16 16, pointer`,
               }}
               aria-label="Shop Menswear"
             />
@@ -75,13 +98,15 @@ const Hero = () => {
           {/* Right Clickable Area - Women's */}
           <LocalizedClientLink href="/women">
             <div
+              onMouseEnter={() => setHoveredSection("women")}
+              onMouseLeave={() => setHoveredSection(null)}
               style={{
                 position: "absolute",
                 top: 0,
                 right: 0,
                 width: "50%",
                 height: "100%",
-                cursor: "pointer",
+                cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><text x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="24" fill="white" font-family="Arial">♀</text></svg>') 16 16, pointer`,
               }}
               aria-label="Shop Womenswear"
             />
@@ -251,20 +276,18 @@ const Hero = () => {
               textTransform: "uppercase",
               fontWeight: "300",
               fontSize: "clamp(1.5rem, 2.5vw, 2.5rem)",
-              color: "#000",
+              color: hoveredButton === "men" ? "#fff" : "#000",
               textDecoration: "none",
               cursor: "pointer",
               border: "1px solid #000",
               transition: "background-color 200ms ease, color 200ms ease",
-              backgroundColor: "transparent",
+              backgroundColor: hoveredButton === "men" ? "#000" : "transparent",
             }}
-            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
-              e.currentTarget.style.backgroundColor = "#000";
-              e.currentTarget.style.color = "#fff";
+            onMouseEnter={() => {
+              setHoveredButton("men");
             }}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.color = "#000";
+            onMouseLeave={() => {
+              setHoveredButton(null);
             }}
             aria-label="Shop menswear"
           >
@@ -279,20 +302,18 @@ const Hero = () => {
               textTransform: "uppercase",
               fontWeight: "300",
               fontSize: "clamp(1.5rem, 2.5vw, 2.5rem)",
-              color: "#000",
+              color: hoveredButton === "women" ? "#fff" : "#000",
               textDecoration: "none",
               cursor: "pointer",
               border: "1px solid #000",
               transition: "background-color 200ms ease, color 200ms ease",
-              backgroundColor: "transparent",
+              backgroundColor: hoveredButton === "women" ? "#000" : "transparent",
             }}
-            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
-              e.currentTarget.style.backgroundColor = "#000";
-              e.currentTarget.style.color = "#fff";
+            onMouseEnter={() => {
+              setHoveredButton("women");
             }}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.color = "#000";
+            onMouseLeave={() => {
+              setHoveredButton(null);
             }}
             aria-label="Shop womenswear"
           >

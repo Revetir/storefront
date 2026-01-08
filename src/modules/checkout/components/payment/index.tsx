@@ -84,6 +84,8 @@ const StripePaymentContent = ({ cart, activeSession }: { cart: any, activeSessio
                   },
                 },
                 hidePostalCode: false,
+                // Link is enabled - it autofills saved card data into CardElement
+                // If Link fails, check console/backend logs for specific error
               }}
               onChange={handleCardChange}
             />

@@ -4,22 +4,22 @@ import Hero from "@modules/home/components/hero"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import EditorialGrid from "@modules/home/components/editorial/editorial-grid"
-import { getNewestProducts } from "@lib/data/products"
 import BottomCTA from "@modules/home/components/bottom-cta"
+import EditorialSpotlight from "@modules/home/components/editorial/editorial-spotlight"
+import { mockRegion, mockCollections, mockProducts } from "@lib/data/mock-data"
+import ExpoGrid from "@modules/home/components/editorial/expo-grid"
 
 // Dynamic imports for below-the-fold components
-const NewsSection = dynamic(() => import("@modules/home/components/news/news"), {
+const FeaturedGrid = dynamic(() => import("@modules/home/components/featured-brands/featured-grid"), {
   loading: () => <div className="h-96" />,
 })
-const FeaturedBrands = dynamic(() => import("@modules/home/components/featured-brands/featured-brands"), {
-  loading: () => <div className="h-96" />,
+const RunwayBelt3D = dynamic(() => import("@modules/home/components/runway-belt-3d/RunwayBelt3DClient"), {
+  loading: () => <div className="h-[180px] sm:h-[220px] md:h-[280px] lg:h-[320px]" />,
 })
 const CuratedProducts = dynamic(() => import("@modules/home/components/curated/curated-products"), {
   loading: () => <div className="h-96" />,
 })
-const NewArrivals = dynamic(() => import("@modules/home/components/new-arrivals/new-arrivals"), {
-  loading: () => <div className="h-96" />,
-})
+
 
 export const metadata: Metadata = {
   title: "REVETIR: Luxury Fashion & Independent Designers",
@@ -57,14 +57,27 @@ export default async function Home(props: {
 
   const { countryCode } = params
 
-  const region = await getRegion(countryCode)
+  // Check if we're in design mode (local development without backend)
+  const isDesignMode = process.env.NEXT_PUBLIC_DESIGN_MODE === "true"
 
-  const { collections } = await listCollections({
-    fields: "id, handle, title",
-  })
+  let region
+  let collections
+  let initialProducts
 
-  // Fetch initial products for NewArrivals
-  const initialProducts = await getNewestProducts({ countryCode, limit: 15 })
+  if (isDesignMode) {
+    // Use mock data when backend is not available
+    region = mockRegion
+    collections = mockCollections
+    initialProducts = mockProducts.slice(0, 15)
+  } else {
+    // Fetch real data from backend
+    region = await getRegion(countryCode)
+
+    const collectionsResponse = await listCollections({
+      fields: "id, handle, title",
+    })
+    collections = collectionsResponse.collections
+  }
 
   if (!collections || !region) {
     return null
@@ -77,20 +90,52 @@ export default async function Home(props: {
         <EditorialGrid />
       </div>
 
-      <div className="">
-        <NewsSection />
+      <EditorialSpotlight />
+
+      <ExpoGrid />
+
+      <FeaturedGrid />
+
+      <div className="mt-14 md:mt-16">
+        <RunwayBelt3D
+          items={[
+            {
+              id: "dept_galerie_jacket_3d",
+              modelSrc: "/images/dept_galerie_jacket_3d.glb",
+              alt: "Dept Galerie jacket 3D",
+              rotationSpeed: 0.35,
+              scale: 1.45,
+              href: "/men/jackets"
+            },
+            {
+              id: "balenciaga_snow_boots_3d",
+              modelSrc: "/images/balenciaga_snow_boots_3d.glb",
+              alt: "Balenciaga snow boots 3D",
+              rotationSpeed: 0.35,
+              href: "/men/shoes"
+            },
+            {
+              id: "hat_3d",
+              modelSrc: "/images/hat_3d.glb",
+              alt: "Hat 3D",
+              rotationSpeed: 0.35,
+              scale: 0.6,
+              href: "/women/hats"
+            },
+            {
+              id: "boots",
+              modelSrc: "/images/boots_3d.glb",
+              alt: "3D rotating boots",
+              rotationSpeed: 0.35,
+              href: "/women/boots"
+            },
+          ]}
+        />
       </div>
 
-      <div className="mt-20">
-        <FeaturedBrands />
-      </div>
-
-      <div className="mt-20">
+      {/* <div className="mt-20">
         <CuratedProducts />
-      </div>
-      <div className="mt-10">
-        <NewArrivals countryCode={countryCode} initialProducts={initialProducts} />
-      </div>
+      </div> */}
 
       <BottomCTA />
     </>

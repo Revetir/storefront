@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 const BACKEND_URL = process.env.MEDUSA_BACKEND_URL
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
 const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "us"
+const DESIGN_MODE = process.env.NEXT_PUBLIC_DESIGN_MODE === "true"
 
 const regionMapCache = {
   regionMap: new Map<string, HttpTypes.StoreRegion>(),
@@ -12,6 +13,14 @@ const regionMapCache = {
 
 async function getRegionMap(cacheId: string) {
   const { regionMap, regionMapUpdated } = regionMapCache
+
+  // In design mode, return a mock region map
+  if (DESIGN_MODE) {
+    if (!regionMap.has("us")) {
+      regionMap.set("us", { id: "mock-region", name: "United States" } as any)
+    }
+    return regionMap
+  }
 
   if (!BACKEND_URL) {
     throw new Error(

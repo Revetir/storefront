@@ -26,7 +26,10 @@ export const sdk = new Medusa({
   publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
 })
 
+// In design mode, use dummy Algolia credentials to avoid errors
+const DESIGN_MODE = process.env.NEXT_PUBLIC_DESIGN_MODE === "true"
+
 export const searchClient: SearchClient = algoliasearch(
-  process.env.NEXT_PUBLIC_ALGOLIA_APP_ID || "", 
-  process.env.NEXT_PUBLIC_ALGOLIA_API_KEY || ""
+  DESIGN_MODE ? "dummy-app-id" : (process.env.NEXT_PUBLIC_ALGOLIA_APP_ID || "dummy-app-id"),
+  DESIGN_MODE ? "dummy-api-key" : (process.env.NEXT_PUBLIC_ALGOLIA_API_KEY || "dummy-api-key")
 )
