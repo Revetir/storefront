@@ -1,13 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    appDir: true,
     optimizePackageImports: ['@medusajs/ui'],
   },
   reactStrictMode: true,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -47,6 +43,10 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "media.revetir.com",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.sanity.io",
       },
     ],
   },
@@ -101,7 +101,7 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.gstatic.com https://r.stripe.com https://js.radar.com https://www.googletagmanager.com https://connect.facebook.net https://cdn.jsdelivr.net https://*.facebook.com https://*.facebook.net https://static.cloudflareinsights.com",
               "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.google.com https://pay.google.com https://www.facebook.com https://*.facebook.com",
-              "connect-src 'self' blob: https://application-production-0ced.up.railway.app https://google.com/pay https://api.stripe.com https://r.stripe.com https://pay.google.com https://*.stripe.com https://api.radar.io https://*.radar.io https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.facebook.com https://*.facebook.com https://*.facebook.net https://*.algolia.net https://*.algolianet.com https://*.algolia.io https://static.cloudflareinsights.com https://*.cloudflare.com https://res.17track.net",
+              "connect-src 'self' blob: https://application-production-0ced.up.railway.app https://google.com/pay https://api.stripe.com https://r.stripe.com https://pay.google.com https://*.stripe.com https://api.radar.io https://*.radar.io https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.facebook.com https://*.facebook.com https://*.facebook.net https://*.algolia.net https://*.algolianet.com https://*.algolia.io https://static.cloudflareinsights.com https://*.cloudflare.com https://res.17track.net https://*.sanity.io https://*.api.sanity.io",
               "style-src 'self' 'unsafe-inline' https://js.radar.com",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data: https://static.radar.com",

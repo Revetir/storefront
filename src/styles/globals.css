@@ -267,6 +267,18 @@ img {
     content: "· ";
   }
 
+  /* Dropcap styling for editorial content */
+  .dropcap::first-letter {
+    font-size: 6rem;
+    font-weight: 200;
+    font-style: italic;
+    float: left;
+    margin-right: 0.75rem;
+    margin-top: -0.1rem;
+    line-height: 0.8;
+    color: #1f2937;
+  }
+
   /* Disable custom list markers in category sidebar */
   nav ul li::marker {
     content: none;

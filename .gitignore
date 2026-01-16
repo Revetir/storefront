@@ -59,3 +59,6 @@ nul
 .claude/settings.local.json
 17track_docs.txt
 claude.md
+/design_examples
+/editorial/demo
+/editorial_guides

@@ -370,7 +370,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                     fill
                     className="object-contain"
                     loading="lazy"
-                    quality={80}
+                    quality={90}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     draggable={false}
                   />
@@ -585,7 +585,7 @@ const NewArrivals = ({ countryCode, initialProducts }: NewArrivalsProps) => {
                       fill
                       className="object-contain"
                       loading="lazy"
-                      quality={80}
+                      quality={90}
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       draggable={false}
                     />

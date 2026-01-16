@@ -28,7 +28,7 @@ const CuratedProducts = () => {
                   fill
                   className="object-cover"
                   priority={true}
-                  quality={80}
+                  quality={90}
                   sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
               </div>
@@ -44,7 +44,7 @@ const CuratedProducts = () => {
                 fill
                 className="object-cover"
                 priority={true}
-                quality={80}
+                quality={90}
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />
             </div>
@@ -59,7 +59,7 @@ const CuratedProducts = () => {
                 alt="Model wearing Retro Americana outfit"
                 fill
                 className="object-cover"
-                quality={80}
+                quality={90}
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />
             </div>
@@ -74,7 +74,7 @@ const CuratedProducts = () => {
                 alt="Model wearing Minimalist outfit"
                 fill
                 className="object-cover"
-                quality={80}
+                quality={90}
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />
             </div>

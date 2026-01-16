@@ -151,7 +151,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
           </div>
         </div>
 
-        {/* Desktop: SSENSE-style 3-column layout */}
+        {/* Desktop: Editorial-style 3-column layout */}
         <div className="mt-2 hidden md:grid md:grid-cols-3 md:gap-8 text-xs sm:text-sm">
           <div className="space-y-4">
             <div className="space-y-1">

@@ -8,6 +8,25 @@ import { Canvas, useFrame, useThree, type RootState } from "@react-three/fiber"
 import { useGLTF } from "@react-three/drei"
 import * as THREE from "three"
 
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    
+    const media = window.matchMedia(query)
+    if (media.matches !== matches) {
+      setMatches(media.matches)
+    }
+    
+    const listener = () => setMatches(media.matches)
+    media.addEventListener("change", listener)
+    return () => media.removeEventListener("change", listener)
+  }, [matches, query])
+
+  return matches
+}
+
 export type RunwayBelt3DItem = {
   id: string
   modelSrc: string
@@ -86,10 +105,12 @@ function BeltFallback({ items }: { items: RunwayBelt3DItem[] }) {
   )
 }
 
-function CenteredRotatingModel({ item, isHovered, onHover }: { 
+function CenteredRotatingModel({ item, isHovered, onHover, shouldRotate, onClick }: { 
   item: RunwayBelt3DItem;
   isHovered: boolean;
   onHover: (hovered: boolean) => void;
+  shouldRotate: boolean;
+  onClick: () => void;
 }) {
   const router = useRouter()
   const groupRef = useRef<THREE.Group>(null)
@@ -127,7 +148,7 @@ function CenteredRotatingModel({ item, isHovered, onHover }: {
   }, [gltf.scene])
 
   useFrame((_state: RootState, delta: number) => {
-    if (!groupRef.current) return
+    if (!groupRef.current || !shouldRotate) return
     const speed = item.rotationSpeed ?? 0.4
     groupRef.current.rotation.y += speed * delta
   })
@@ -151,6 +172,7 @@ function CenteredRotatingModel({ item, isHovered, onHover }: {
       ref={groupRef}
       onClick={(e) => {
         e.stopPropagation()
+        onClick()
         if (item.href) router.push(item.href)
       }}
       onPointerOver={(e) => {
@@ -170,24 +192,52 @@ function CenteredRotatingModel({ item, isHovered, onHover }: {
 
 function RunwayBeltItems({ items }: { items: RunwayBelt3DItem[] }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [clickedId, setClickedId] = useState<string | null>(null);
+  const [mobileClickEffectId, setMobileClickEffectId] = useState<string | null>(null);
+  const isMobile = useMediaQuery("(max-width: 640px)");
   
   const handleItemHover = (id: string, isHovered: boolean) => {
     setHoveredId(isHovered ? id : null);
   };
 
+  const handleItemClick = (id: string, hasLink: boolean) => {
+    setClickedId(id);
+    
+    // On mobile, show hover effect briefly before navigation
+    if (isMobile) {
+      setMobileClickEffectId(id);
+      // Only clear the effect if there's no link (no navigation will occur)
+      // If there's a link, let the navigation handle cleanup to avoid flash
+      if (!hasLink) {
+        setTimeout(() => {
+          setMobileClickEffectId(null);
+        }, 1500);
+      }
+    }
+  };
+
+  // Stop rotation if any item is hovered (desktop) or clicked (desktop + mobile)
+  const shouldRotate = hoveredId === null && clickedId === null;
+
   return (
     <group>
       {items.map((item, idx) => {
-        const spacing = 1.8;
+        const spacing = isMobile ? 1.2 : 1.8;
         const offset = (idx - (items.length - 1) / 2) * spacing;
+        
+        // Determine if this item should appear highlighted
         const isHovered = hoveredId === item.id || hoveredId === null;
+        const isMobileClickEffect = mobileClickEffectId === item.id || mobileClickEffectId === null;
+        const shouldHighlight = isHovered && isMobileClickEffect;
         
         return (
           <group key={item.id} position={[offset, 0, 0]}>
             <CenteredRotatingModel 
               item={item} 
-              isHovered={isHovered}
+              isHovered={shouldHighlight}
               onHover={(hovered) => handleItemHover(item.id, hovered)}
+              shouldRotate={shouldRotate}
+              onClick={() => handleItemClick(item.id, !!item.href)}
             />
           </group>
         );
@@ -251,6 +301,8 @@ const RunwayBelt3D = ({ items, className }: Props) => {
                     item={items[0]} 
                     isHovered={true}
                     onHover={() => {}}
+                    shouldRotate={true}
+                    onClick={() => {}}
                   />
                 ) : (
                   <RunwayBeltItems items={items} />
