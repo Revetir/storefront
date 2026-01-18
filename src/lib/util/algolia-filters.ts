@@ -74,12 +74,21 @@ export interface AlgoliaFilterOptions {
   hitsPerPage?: number
 }
 
+async function disableNextCache() {
+  if (!process.env.NEXT_RUNTIME) {
+    return
+  }
+  const { unstable_noStore } = await import("next/cache")
+  unstable_noStore()
+}
+
 /**
  * Search products using Algolia with filters for category and brand
  */
 export async function searchProductsWithAlgolia(
   options: AlgoliaFilterOptions = {}
 ): Promise<AlgoliaSearchResult> {
+  await disableNextCache()
   const {
     gender,
     categoryHandle,

@@ -15,6 +15,14 @@ export interface AlgoliaFacetOptions {
   color?: string
 }
 
+async function disableNextCache() {
+  if (!process.env.NEXT_RUNTIME) {
+    return
+  }
+  const { unstable_noStore } = await import("next/cache")
+  unstable_noStore()
+}
+
 /**
  * Get available categories from Algolia facets (contextual based on current filters)
  * Returns only categories that have products matching the current filter context
@@ -43,6 +51,7 @@ export interface AlgoliaFacetOptions {
 export async function getAvailableCategories(
   options: AlgoliaFacetOptions = {}
 ): Promise<CategoryFacet[]> {
+  await disableNextCache()
   const { gender, brandSlug, color } = options
 
   try {
@@ -120,6 +129,7 @@ export async function getAvailableCategories(
 export async function getAvailableBrands(
   options: AlgoliaFacetOptions = {}
 ): Promise<BrandFacet[]> {
+  await disableNextCache()
   const { gender, categoryHandle, color } = options
 
   try {
