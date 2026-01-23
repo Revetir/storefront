@@ -4,7 +4,7 @@ import React from "react"
 export const PantsDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
   <div className={`w-full h-auto ${className}`} style={{ aspectRatio: '600/800' }}>
     <img
-      src="/images/pants_sizing_diagram.svg"
+      src="/images/pants_sizing_diagram_v2.svg"
       alt="Pants measurements diagram"
       className="w-full h-full object-contain"
     />
@@ -15,7 +15,7 @@ export const PantsDiagram: React.FC<{ className?: string }> = ({ className = "" 
 export const TShirtsDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
   <div className={`w-full h-auto ${className}`} style={{ aspectRatio: '600/800' }}>
     <img
-      src="/images/t_shirts_sizing_diagram_vertical.svg"
+      src="/images/t-shirts_sizing_diagram.svg"
       alt="T-Shirts measurements diagram"
       className="w-full h-full object-contain"
     />
@@ -26,7 +26,7 @@ export const TShirtsDiagram: React.FC<{ className?: string }> = ({ className = "
 export const SweatersDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
   <div className={`w-full h-auto ${className}`} style={{ aspectRatio: '600/800' }}>
     <img
-      src="/images/sweaters_sizing_diagram_wide.svg"
+      src="/images/sweaters_sizing_diagram.svg"
       alt="Sweaters measurements diagram"
       className="w-full h-full object-contain"
     />
