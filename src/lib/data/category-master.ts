@@ -9,6 +9,7 @@ export type TemplateCategory =
   | "Shoes Unisex"
   | "Shoes Men"
   | "Shoes Women"
+  | "Rings"
 
 export interface CategoryRecord {
   id: string
@@ -128,6 +129,10 @@ function applyTemplateAssignments(): void {
   // SHOES - Fully implemented (uses size conversion tables, not diagrams)
   CategoryMaster.setTemplate({ handle: "mens-shoes" }, "Shoes Men")
   CategoryMaster.setTemplate({ handle: "womens-shoes" }, "Shoes Women")
+
+  // RINGS - Fully implemented (uses size conversion tables, not diagrams)
+  CategoryMaster.setTemplate({ handle: "mens-rings" }, "Rings")
+  CategoryMaster.setTemplate({ handle: "womens-rings" }, "Rings")
 
   // PANTS & JEANS
   CategoryMaster.setTemplate({ handle: "mens-pants" }, "Pants")

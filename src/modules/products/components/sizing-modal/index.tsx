@@ -114,6 +114,9 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
                   sizingTemplate?.diagram_component === "ShoesWomen" ||
                   sizingTemplate?.diagram_component === "ShoesUnisex"
 
+  // Check if rings category
+  const isRings = sizingTemplate?.diagram_component === "Rings"
+
   // Create variant mapping (variant title -> variant id)
   const variantMap = useMemo(() => {
     const map = new Map<string, string>()
@@ -140,14 +143,14 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
 
   // Page visibility logic
   const showPMPage = useMemo(() => {
-    // PM page requires measurements data, template, and not shoes
-    return !!(productMeasurements?.measurements_by_variant && Object.keys(productMeasurements.measurements_by_variant).length > 0 && sizingTemplate && !isShoes)
-  }, [productMeasurements, sizingTemplate, isShoes])
+    // PM page requires measurements data, template, and not shoes/rings
+    return !!(productMeasurements?.measurements_by_variant && Object.keys(productMeasurements.measurements_by_variant).length > 0 && sizingTemplate && !isShoes && !isRings)
+  }, [productMeasurements, sizingTemplate, isShoes, isRings])
 
   const showSCCPage = useMemo(() => {
-    // SCC only for shoes
-    return isShoes
-  }, [isShoes])
+    // SCC for shoes and rings
+    return isShoes || isRings
+  }, [isShoes, isRings])
 
   // Determine which pages are available
   const hasMultiplePages = showPMPage && showSCCPage
@@ -283,6 +286,31 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   const SHOES_MEN = SHOES_DATA.filter(row => row.usMen !== null && row.eu >= 39 && row.eu <= 46.5)
   const SHOES_WOMEN = SHOES_DATA.filter(row => row.usWomen !== null && row.eu >= 35 && row.eu <= 42)
   const SHOES_UNISEX = SHOES_DATA.filter(row => row.eu >= 35 && row.eu <= 46.5)
+
+  // --- Rings conversion data (half sizes only) ---
+  type RingRow = { us: number, innerCircMm: number, uk: string, jp: number }
+
+  const RINGS_DATA: RingRow[] = [
+    { us: 4, innerCircMm: 46.8, uk: "H", jp: 7 },
+    { us: 4.5, innerCircMm: 48.0, uk: "I", jp: 8 },
+    { us: 5, innerCircMm: 49.3, uk: "J½", jp: 9 },
+    { us: 5.5, innerCircMm: 50.6, uk: "K½", jp: 10 },
+    { us: 6, innerCircMm: 51.9, uk: "L½", jp: 11 },
+    { us: 6.5, innerCircMm: 53.1, uk: "M½", jp: 13 },
+    { us: 7, innerCircMm: 54.4, uk: "N½", jp: 14 },
+    { us: 7.5, innerCircMm: 55.7, uk: "O½", jp: 15 },
+    { us: 8, innerCircMm: 57.0, uk: "P½", jp: 16 },
+    { us: 8.5, innerCircMm: 58.3, uk: "Q¼", jp: 17 },
+    { us: 9, innerCircMm: 59.5, uk: "R½", jp: 18 },
+    { us: 9.5, innerCircMm: 60.8, uk: "S½", jp: 19 },
+    { us: 10, innerCircMm: 62.1, uk: "T½", jp: 20 },
+    { us: 10.5, innerCircMm: 63.4, uk: "U½", jp: 22 },
+    { us: 11, innerCircMm: 64.6, uk: "V½", jp: 23 },
+    { us: 11.5, innerCircMm: 65.9, uk: "W½", jp: 24 },
+    { us: 12, innerCircMm: 67.2, uk: "X½", jp: 25 },
+    { us: 12.5, innerCircMm: 68.5, uk: "Y½", jp: 26 },
+    { us: 13, innerCircMm: 69.7, uk: "Z½", jp: 27 },
+  ]
 
   // Render measurement overlays
   const renderMeasurementOverlays = () => {
@@ -454,11 +482,128 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     )
   }
 
+  // Render Rings Conversion Chart
+  const renderRingsChart = () => {
+    const rows = RINGS_DATA
+
+    // Calculate responsive padding
+    const numSizes = rows.length
+    let cellPaddingX = 'px-6'
+    let cellPaddingY = 'py-3'
+
+    if (numSizes > 10) {
+      cellPaddingX = 'px-2'
+      cellPaddingY = 'py-2'
+    } else if (numSizes > 8) {
+      cellPaddingX = 'px-3'
+      cellPaddingY = 'py-2'
+    } else if (numSizes > 6) {
+      cellPaddingX = 'px-4'
+      cellPaddingY = 'py-3'
+    }
+
+    const cellPadding = `${cellPaddingX} ${cellPaddingY}`
+
+    return (
+      <div className="flex flex-col gap-6 w-full h-full">
+        {/* Desktop/Laptop: VERTICAL table - US/Inner Circ/UK/JP as ROW headers, sizes as COLUMNS */}
+        <div className="hidden lg:flex lg:flex-col w-full h-full pt-4">
+          <table className="w-full table-fixed">
+            <tbody>
+              <tr>
+                <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>US</th>
+                {rows.map((r, idx) => (
+                  <td key={`us-${r.us}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>{r.us}</td>
+                ))}
+              </tr>
+              <tr>
+                <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>Inner Circ (mm)</th>
+                {rows.map((r, idx) => (
+                  <td key={`circ-${r.us}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>{r.innerCircMm}</td>
+                ))}
+              </tr>
+              <tr>
+                <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>UK</th>
+                {rows.map((r, idx) => (
+                  <td key={`uk-${r.us}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>{r.uk}</td>
+                ))}
+              </tr>
+              <tr>
+                <th className={`${cellPadding} text-center font-medium border-r border-gray-200 w-24`}>Japan</th>
+                {rows.map((r, idx) => (
+                  <td key={`jp-${r.us}`} className={`${cellPadding} text-center ${idx !== rows.length - 1 ? 'border-r border-gray-200' : ''}`}>{r.jp}</td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+
+          {/* Note about US sizing */}
+          <p className="text-xs text-gray-600 mt-4 text-left">
+            <strong>Note:</strong> Sizes are in US unless otherwise indicated.
+          </p>
+
+          {/* Disclaimer */}
+          <p className="text-xs text-gray-600 mt-2 text-left">
+            Size conversions vary per brand and may deviate from the conversions shown above. For dedicated assistance with sizing, please contact us{' '}
+            <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
+              here
+            </a>
+            .
+          </p>
+        </div>
+
+        {/* Tablet/Phone: HORIZONTAL table - US/Inner Circ/UK/JP as COLUMN headers, sizes as ROWS */}
+        <div className="block lg:hidden w-full overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className={`${cellPadding} text-center font-medium`}>US</th>
+                <th className={`${cellPadding} text-center font-medium`}>Inner Circ (mm)</th>
+                <th className={`${cellPadding} text-center font-medium`}>UK</th>
+                <th className={`${cellPadding} text-center font-medium`}>Japan</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, idx) => (
+                <tr key={`ring-${r.us}`} className={idx !== rows.length - 1 ? 'border-b border-gray-200' : ''}>
+                  <td className={`${cellPadding} text-center`}>{r.us}</td>
+                  <td className={`${cellPadding} text-center`}>{r.innerCircMm}</td>
+                  <td className={`${cellPadding} text-center`}>{r.uk}</td>
+                  <td className={`${cellPadding} text-center`}>{r.jp}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* Note about US sizing */}
+          <p className="text-xs text-gray-600 mt-4 text-left">
+            <strong>Note:</strong> Sizes are in US unless otherwise indicated.
+          </p>
+
+          {/* Disclaimer */}
+          <p className="text-xs text-gray-600 mt-2 text-left">
+            Size conversions vary per brand and may deviate from the conversions shown above. For dedicated assistance with sizing, please contact us{' '}
+            <a href="https://revetir.com/us/customer-care/contact-us" className="underline hover:text-gray-800">
+              here
+            </a>
+            .
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   // Render Size Conversion Chart page
   const renderSCCPage = () => {
     if (!showSCCPage) return null
 
     const heading = sizingTemplate?.category || ""
+
+    // Handle rings separately
+    if (heading === "Rings") {
+      return renderRingsChart()
+    }
+
     const rows = heading === "Shoes Men" ? SHOES_MEN : heading === "Shoes Women" ? SHOES_WOMEN : SHOES_UNISEX
     const isUnisex = heading === "Shoes Unisex"
 

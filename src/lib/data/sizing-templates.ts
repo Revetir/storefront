@@ -292,6 +292,16 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
     units: "cm",
     measurement_points: {},
     size_chart: {}
+  },
+
+  // Rings category renders a conversion chart (US/Inner Circ/UK/JP) in the modal
+  // The modal provides a custom renderer; size_chart remains empty
+  {
+    category: "Rings",
+    diagram_component: "Rings",
+    units: "cm",
+    measurement_points: {},
+    size_chart: {}
   }
 ]
 
