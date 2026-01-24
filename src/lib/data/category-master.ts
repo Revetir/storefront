@@ -4,6 +4,8 @@ export type TemplateCategory =
   | "Sweaters"
   | "Shorts"
   | "Jackets"
+  | "Long Sleeve Shirts"
+  | "Short Sleeve Shirts"
   | "Shoes Unisex"
   | "Shoes Men"
   | "Shoes Women"
@@ -147,6 +149,14 @@ function applyTemplateAssignments(): void {
   // SWEATERS
   CategoryMaster.setTemplate({ handle: "mens-sweaters" }, "Sweaters")
   CategoryMaster.setTemplate({ handle: "womens-sweaters" }, "Sweaters")
+
+  // LONG SLEEVE SHIRTS
+  CategoryMaster.setTemplate({ handle: "mens-long-sleeve-shirts" }, "Long Sleeve Shirts")
+  CategoryMaster.setTemplate({ handle: "womens-long-sleeve-shirts" }, "Long Sleeve Shirts")
+
+  // SHORT SLEEVE SHIRTS
+  CategoryMaster.setTemplate({ handle: "mens-short-sleeve-shirts" }, "Short Sleeve Shirts")
+  CategoryMaster.setTemplate({ handle: "womens-short-sleeve-shirts" }, "Short Sleeve Shirts")
 
   // SHORTS
   CategoryMaster.setTemplate({ handle: "mens-shorts" }, "Shorts")

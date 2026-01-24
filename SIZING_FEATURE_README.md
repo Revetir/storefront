@@ -40,7 +40,6 @@ Currently supports these product categories:
 - **Shirts**: T-shirt style diagram with chest, waist, length, shoulder measurements
 - **Sweatshirts**: Same as shirts but with different default measurements
 - **Pants**: Trousers diagram with waist, hip, length, inseam measurements
-- **Merch**: Generic diagram for accessories and other items
 
 ### 3. Adding Sizing to Products
 

@@ -71,6 +71,11 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
         y_percent: 52,
         label: "Inseam"
       },
+      outseam: {
+        x_percent: 8,
+        y_percent: 48,
+        label: "Outseam"
+      },
       leg_opening: {
         x_percent: 32.5,
         y_percent: 89,
@@ -161,6 +166,11 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
         y_percent: 59,
         label: "Inseam"
       },
+      outseam: {
+        x_percent: 8,
+        y_percent: 48,
+        label: "Outseam"
+      },
       leg_opening: {
         x_percent: 26,
         y_percent: 78,
@@ -194,6 +204,66 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
       length: {
         x_percent: 100,
         y_percent: 49,
+        label: "Length"
+      }
+    },
+    size_chart: {}
+  },
+
+  // Long Sleeve Shirts template with SVG diagram
+  {
+    category: "Long Sleeve Shirts",
+    diagram_component: "LongSleeveShirtsDiagram",
+    units: "cm",
+    measurement_points: {
+      sleeve: {
+        x_percent: 0,
+        y_percent: 49,
+        label: "Sleeve"
+      },
+      shoulder: {
+        x_percent: 49,
+        y_percent: 14,
+        label: "Shoulder"
+      },
+      chest: {
+        x_percent: 49,
+        y_percent: 40,
+        label: "Chest"
+      },
+      length: {
+        x_percent: 91,
+        y_percent: 48,
+        label: "Length"
+      }
+    },
+    size_chart: {}
+  },
+
+  // Short Sleeve Shirts template with SVG diagram
+  {
+    category: "Short Sleeve Shirts",
+    diagram_component: "ShortSleeveShirtsDiagram",
+    units: "cm",
+    measurement_points: {
+      sleeve: {
+        x_percent: 4,
+        y_percent: 35,
+        label: "Sleeve"
+      },
+      shoulder: {
+        x_percent: 49,
+        y_percent: 14,
+        label: "Shoulder"
+      },
+      chest: {
+        x_percent: 49,
+        y_percent: 40,
+        label: "Chest"
+      },
+      length: {
+        x_percent: 91,
+        y_percent: 48,
         label: "Length"
       }
     },

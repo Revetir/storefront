@@ -4,7 +4,7 @@ import React from "react"
 export const PantsDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
   <div className={`w-full h-auto ${className}`} style={{ aspectRatio: '600/800' }}>
     <img
-      src="/images/pants_sizing_diagram_v2.svg"
+      src="/images/pants_sizing_diagram_outseam_support.svg"
       alt="Pants measurements diagram"
       className="w-full h-full object-contain"
     />
@@ -37,7 +37,7 @@ export const SweatersDiagram: React.FC<{ className?: string }> = ({ className = 
 export const ShortsDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
   <div className={`w-full h-auto ${className}`} style={{ aspectRatio: '600/800' }}>
     <img
-      src="/images/shorts_sizing_diagram.svg"
+      src="/images/shorts_sizing_diagram_outseam_support.svg"
       alt="Shorts measurements diagram"
       className="w-full h-full object-contain"
     />
@@ -50,6 +50,28 @@ export const JacketsDiagram: React.FC<{ className?: string }> = ({ className = "
     <img
       src="/images/jackets_sizing_diagram.svg"
       alt="Jackets measurements diagram"
+      className="w-full h-full object-contain"
+    />
+  </div>
+)
+
+// Long Sleeve Shirts sizing diagram
+export const LongSleeveShirtsDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
+  <div className={`w-full h-auto ${className}`} style={{ aspectRatio: '600/800' }}>
+    <img
+      src="/images/long_sleeve_shirts_sizing_diagram.svg"
+      alt="Long Sleeve Shirts measurements diagram"
+      className="w-full h-full object-contain"
+    />
+  </div>
+)
+
+// Short Sleeve Shirts sizing diagram
+export const ShortSleeveShirtsDiagram: React.FC<{ className?: string }> = ({ className = "" }) => (
+  <div className={`w-full h-auto ${className}`} style={{ aspectRatio: '600/800' }}>
+    <img
+      src="/images/short_sleeve_shirts_sizing_diagram.svg"
+      alt="Short Sleeve Shirts measurements diagram"
       className="w-full h-full object-contain"
     />
   </div>
