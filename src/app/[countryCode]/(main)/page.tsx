@@ -7,9 +7,12 @@ import EditorialGrid from "@modules/home/components/editorial/editorial-grid"
 import BottomCTA from "@modules/home/components/bottom-cta"
 import EditorialSpotlight from "@modules/home/components/editorial/editorial-spotlight"
 import { mockRegion, mockCollections, mockProducts } from "@lib/data/mock-data"
-import ExpoGrid from "@modules/home/components/editorial/expo-grid"
 
-// Dynamic imports for below-the-fold components
+// Dynamic imports for heavier/below-the-fold components
+const ExpoGrid = dynamic(() => import("@modules/home/components/editorial/expo-grid"), {
+  loading: () => <div className="h-[520px] md:h-[640px]" />,
+})
+
 const FeaturedGrid = dynamic(() => import("@modules/home/components/featured-brands/featured-grid"), {
   loading: () => <div className="h-96" />,
 })

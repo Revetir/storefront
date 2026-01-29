@@ -27,6 +27,43 @@ function useMediaQuery(query: string) {
   return matches
 }
 
+function usePageVisibility() {
+  const [isVisible, setIsVisible] = useState(true)
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      setIsVisible(document.visibilityState === "visible")
+    }
+
+    handleVisibility()
+    document.addEventListener("visibilitychange", handleVisibility)
+    return () => document.removeEventListener("visibilitychange", handleVisibility)
+  }, [])
+
+  return isVisible
+}
+
+function useSaveDataPreference() {
+  const [saveData, setSaveData] = useState(false)
+
+  useEffect(() => {
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean; addEventListener?: (type: string, listener: () => void) => void; removeEventListener?: (type: string, listener: () => void) => void } }).connection
+    if (!connection || typeof connection.saveData === "undefined") {
+      return
+    }
+
+    const handleChange = () => {
+      setSaveData(Boolean(connection.saveData))
+    }
+
+    handleChange()
+    connection.addEventListener?.("change", handleChange)
+    return () => connection.removeEventListener?.("change", handleChange)
+  }, [])
+
+  return saveData
+}
+
 export type RunwayBelt3DItem = {
   id: string
   modelSrc: string
@@ -40,6 +77,7 @@ export type RunwayBelt3DItem = {
 type Props = {
   items: RunwayBelt3DItem[]
   className?: string
+  isVisible?: boolean
 }
 
 function isWebGLAvailable() {
@@ -190,7 +228,7 @@ function CenteredRotatingModel({ item, isHovered, onHover, shouldRotate, onClick
   )
 }
 
-function RunwayBeltItems({ items }: { items: RunwayBelt3DItem[] }) {
+function RunwayBeltItems({ items, isActive }: { items: RunwayBelt3DItem[]; isActive: boolean }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [clickedId, setClickedId] = useState<string | null>(null);
   const [mobileClickEffectId, setMobileClickEffectId] = useState<string | null>(null);
@@ -217,7 +255,7 @@ function RunwayBeltItems({ items }: { items: RunwayBelt3DItem[] }) {
   };
 
   // Stop rotation if any item is hovered (desktop) or clicked (desktop + mobile)
-  const shouldRotate = hoveredId === null && clickedId === null;
+  const shouldRotate = isActive && hoveredId === null && clickedId === null;
 
   return (
     <group>
@@ -257,12 +295,23 @@ function BeltCameraAim() {
   return null
 }
 
-const RunwayBelt3D = ({ items, className }: Props) => {
+const RunwayBelt3D = ({ items, className, isVisible = true }: Props) => {
   const [webglOk, setWebglOk] = useState<boolean>(false)
+  const isMobile = useMediaQuery("(max-width: 640px)")
+  const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)")
+  const saveData = useSaveDataPreference()
+  const pageVisible = usePageVisibility()
+  const hasThumbnails = items.some((item) => item.thumbnailSrc)
+  const motionAllowed = !prefersReducedMotion && !saveData
+  const isActive = isVisible && pageVisible && motionAllowed
 
   useEffect(() => {
     setWebglOk(isWebGLAvailable())
   }, [])
+
+  const canRenderWebGL = webglOk && !(saveData && hasThumbnails)
+  const dpr = saveData ? [1, 1.05] : isMobile ? [1, 1.1] : [1, 1.25]
+  const powerPreference = saveData || isMobile ? "low-power" : "high-performance"
 
   return (
     <section
@@ -274,15 +323,16 @@ const RunwayBelt3D = ({ items, className }: Props) => {
       aria-label="3D runway belt"
     >
       <div className="w-full h-full">
-        {!webglOk ? (
+        {!canRenderWebGL ? (
           <BeltFallback items={items} />
         ) : (
           <RenderErrorBoundary fallback={<BeltFallback items={items} />}>
             <Suspense fallback={<BeltFallback items={items} />}>
               <Canvas
                 className="w-full h-full"
-                dpr={[1, 1.5]}
-                gl={{ antialias: true, powerPreference: "high-performance", alpha: true }}
+                dpr={dpr}
+                gl={{ antialias: true, powerPreference, alpha: true }}
+                frameloop={isActive ? "always" : "demand"}
                 camera={{ position: [0, 1.4, 5], fov: 28, near: 0.1, far: 100 }}
                 style={{ position: 'relative', zIndex: 0 }}
               >
@@ -301,11 +351,11 @@ const RunwayBelt3D = ({ items, className }: Props) => {
                     item={items[0]} 
                     isHovered={true}
                     onHover={() => {}}
-                    shouldRotate={true}
+                    shouldRotate={isActive}
                     onClick={() => {}}
                   />
                 ) : (
-                  <RunwayBeltItems items={items} />
+                  <RunwayBeltItems items={items} isActive={isActive} />
                 )}
               </Canvas>
             </Suspense>

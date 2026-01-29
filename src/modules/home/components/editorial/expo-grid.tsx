@@ -6,10 +6,13 @@ import Image from "next/image"
 const ExpoGrid = () => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(true)
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const hasAutoPlayedRef = useRef(false)
+  const autoPlayRequestedRef = useRef(false)
+  const userInteractedRef = useRef(false)
 
-  // Lazy load video - start playing when it enters viewport (only once)
+  // Lazy load video and auto-play when it enters the viewport
   useEffect(() => {
     const videoElement = videoRef.current
     if (!videoElement) return
@@ -17,15 +20,22 @@ const ExpoGrid = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasAutoPlayedRef.current) {
-            videoElement.play()
-            setIsPlaying(true)
-            hasAutoPlayedRef.current = true
-            observer.disconnect() // Stop observing after first autoplay
+          if (entry.isIntersecting) {
+            setShouldLoadVideo(true)
+
+            if (!hasAutoPlayedRef.current && !userInteractedRef.current) {
+              autoPlayRequestedRef.current = true
+            }
+          } else if (!userInteractedRef.current && !videoElement.paused) {
+            videoElement.pause()
+            setIsPlaying(false)
           }
         })
       },
-      { threshold: 0.5 } // Start playing when 50% of video is visible
+      {
+        rootMargin: "200px",
+        threshold: 0.35,
+      }
     )
 
     observer.observe(videoElement)
@@ -55,18 +65,80 @@ const ExpoGrid = () => {
     }
   }, [])
 
+  useEffect(() => {
+    const videoElement = videoRef.current
+    if (!videoElement || !shouldLoadVideo) return
+
+    videoElement.load()
+
+    if (!autoPlayRequestedRef.current || hasAutoPlayedRef.current || userInteractedRef.current) {
+      return
+    }
+
+    const attemptPlay = () => {
+      const playPromise = videoElement.play()
+      if (playPromise && typeof playPromise.then === "function") {
+        playPromise
+          .then(() => {
+            hasAutoPlayedRef.current = true
+          })
+          .catch(() => {
+            // Autoplay can fail silently on some devices/browsers.
+          })
+      } else {
+        hasAutoPlayedRef.current = true
+      }
+    }
+
+    if (videoElement.readyState >= 2) {
+      attemptPlay()
+      return
+    }
+
+    const handleCanPlay = () => {
+      attemptPlay()
+      videoElement.removeEventListener("canplay", handleCanPlay)
+    }
+
+    videoElement.addEventListener("canplay", handleCanPlay)
+    return () => videoElement.removeEventListener("canplay", handleCanPlay)
+  }, [shouldLoadVideo])
+
   const handlePlayPause = () => {
+    userInteractedRef.current = true
     if (videoRef.current) {
+      if (!shouldLoadVideo) {
+        setShouldLoadVideo(true)
+      }
       if (isPlaying) {
         videoRef.current.pause()
-      } else {
-        videoRef.current.play()
+        setIsPlaying(false)
+        return
       }
-      setIsPlaying(!isPlaying)
+
+      const attemptPlay = () => {
+        const playPromise = videoRef.current?.play()
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {
+            // Ignore play errors (e.g. user gesture requirements).
+          })
+        }
+      }
+
+      if (videoRef.current.readyState >= 2) {
+        attemptPlay()
+      } else {
+        const handleCanPlay = () => {
+          attemptPlay()
+          videoRef.current?.removeEventListener("canplay", handleCanPlay)
+        }
+        videoRef.current.addEventListener("canplay", handleCanPlay)
+      }
     }
   }
 
   const handleMuteToggle = () => {
+    userInteractedRef.current = true
     if (videoRef.current) {
       videoRef.current.muted = !isMuted
       setIsMuted(!isMuted)
@@ -74,6 +146,7 @@ const ExpoGrid = () => {
   }
 
   const handleFullscreen = () => {
+    userInteractedRef.current = true
     if (videoRef.current) {
       if (document.fullscreenElement) {
         document.exitFullscreen()
@@ -104,10 +177,13 @@ const ExpoGrid = () => {
               className="w-full h-full object-contain"
               onClick={handlePlayPause}
               loop
-              muted
+              muted={isMuted}
               playsInline
+              preload="none"
             >
-              <source src="/images/beyond_space_revetir.mp4" type="video/mp4" />
+              {shouldLoadVideo ? (
+                <source src="/images/beyond_space_revetir.mp4" type="video/mp4" />
+              ) : null}
             </video>
 
             {/* Video Controls - positioned inside on mobile, outside on desktop */}
