@@ -17,6 +17,8 @@ const StripePaymentContent = ({ cart, activeSession }: { cart: any, activeSessio
   const { setSelectedPaymentMethod } = usePaymentContext()
   const [error, setError] = useState<string | null>(null)
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethodType | null>(null)
+  const isInstagramBrowser =
+    typeof navigator !== "undefined" && /Instagram/i.test(navigator.userAgent)
 
   // Safe to call hooks here - we're inside Elements context
   const stripe = useStripe()
@@ -84,8 +86,9 @@ const StripePaymentContent = ({ cart, activeSession }: { cart: any, activeSessio
                   },
                 },
                 hidePostalCode: false,
-                // Link is enabled - it autofills saved card data into CardElement
-                // If Link fails, check console/backend logs for specific error
+                ...(isInstagramBrowser ? { disableLink: true } : {}),
+                // Link is enabled by default to autofill saved card data into CardElement
+                // Disabled for Instagram's in-app browser to avoid Link-specific issues
               }}
               onChange={handleCardChange}
             />
