@@ -30,7 +30,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       const genderDisplay = gender === "men" ? "Men" : "Women"
       return {
         title: `${brandSlug} for ${genderDisplay}`,
-        description: `Shop ${brandSlug} ${genderDisplay.toLowerCase()} clothing at REVETIR.`,
+        description: `Shop ${brandSlug} for ${genderDisplay} at REVETIR.`,
         alternates: {
           canonical: `/${params.countryCode}/${gender}/brands/${brandSlug}`,
         },
@@ -39,7 +39,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
     const genderDisplay = gender === "men" ? "Men" : "Women"
     const title = `${brand.name} for ${genderDisplay}`
-    const description = brand.blurb || `Shop ${brand.name} ${genderDisplay.toLowerCase()} clothing at REVETIR. Premium fashion with free shipping and returns.`
+    const description = brand.blurb || `Shop ${brand.name} for ${genderDisplay} at REVETIR. Premium fashion with free shipping and returns.`
 
     return {
       title,
@@ -53,7 +53,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     const genderDisplay = gender === "men" ? "Men" : "Women"
     return {
       title: `${brandSlug} for ${genderDisplay}`,
-      description: `Shop ${brandSlug} ${genderDisplay.toLowerCase()} clothing at REVETIR.`,
+      description: `Shop ${brandSlug} for ${genderDisplay} at REVETIR.`,
       alternates: {
         canonical: `/${params.countryCode}/${gender}/brands/${brandSlug}`,
       },

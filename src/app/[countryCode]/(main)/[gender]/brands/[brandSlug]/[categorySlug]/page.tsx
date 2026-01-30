@@ -28,7 +28,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     if (!brand) {
       return {
         title: `${brandSlug} ${categoryDisplay} for ${genderDisplay}`,
-        description: `Shop ${brandSlug} ${genderDisplay.toLowerCase()} ${categorySlug} at REVETIR.`,
+        description: `Shop ${brandSlug} ${categorySlug} for ${genderDisplay} at REVETIR.`,
         alternates: {
           canonical: `/${params.countryCode}/${gender}/brands/${brandSlug}/${categorySlug}`,
         },
@@ -36,7 +36,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     }
 
     const title = `${brand.name} ${categoryDisplay} for ${genderDisplay}`
-    const description = `Shop ${brand.name} ${genderDisplay.toLowerCase()} ${categorySlug} at REVETIR. Premium fashion with free shipping and returns.`
+    const description = `Shop ${brand.name} ${categorySlug} for ${genderDisplay} at REVETIR. Premium fashion with free shipping and returns.`
 
     return {
       title,
@@ -50,7 +50,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     const categoryDisplay = categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1)
     return {
       title: `${brandSlug} ${categoryDisplay} for ${genderDisplay}`,
-      description: `Shop ${brandSlug} ${genderDisplay.toLowerCase()} ${categorySlug} at REVETIR.`,
+      description: `Shop ${brandSlug} ${categorySlug} for ${genderDisplay} at REVETIR.`,
       alternates: {
         canonical: `/${params.countryCode}/${gender}/brands/${brandSlug}/${categorySlug}`,
       },
