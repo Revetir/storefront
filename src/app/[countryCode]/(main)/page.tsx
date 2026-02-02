@@ -88,7 +88,7 @@ export default async function Home(props: {
 
   return (
     <>
-      <Hero />
+      {/* <Hero /> */}
       <div className="">
         <EditorialGrid />
       </div>
