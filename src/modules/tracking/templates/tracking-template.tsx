@@ -151,6 +151,7 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
 
 const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
   const [carrierName, setCarrierName] = React.useState<string | null>(null)
+  const [showAllEvents, setShowAllEvents] = React.useState(false)
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -213,7 +214,9 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
         const carriers: Array<{ key: number; _name: string }> = await response.json()
         const mapped = carriers.find((c) => String(c.key) === String(data.carrier))
         if (!cancelled && mapped?._name) {
-          setCarrierName(mapped._name)
+          // Map China Post to EMS for display
+          const displayName = mapped._name === "China Post" ? "EMS" : mapped._name
+          setCarrierName(displayName)
         }
       } catch {
         // ignore mapping failures and fall back to raw carrier code
@@ -311,7 +314,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
       </div>
 
       <div className="flex flex-col gap-6 bg-white p-6 rounded-lg">
-        {/* Travel History TODO: collapsible events*/}
+        {/* Travel History with collapsible events */}
         <div>
           <Heading
             level="h2"
@@ -320,39 +323,60 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
             Travel History
           </Heading>
 
-          <div className="flex flex-col divide-y divide-gray-100">
-            {data.events
-              .filter((event) => {
-                const status = (event.status || "").toLowerCase()
-                return !status.includes("registered")
-              })
-              .map((event, index) => {
-                const { dateLabel, timeLabel } = formatEventDateTime(event.timestamp)
+          {(() => {
+            const VISIBLE_EVENT_COUNT = 4
+            const filteredEvents = data.events.filter((event) => {
+              const status = (event.status || "").toLowerCase()
+              return !status.includes("registered")
+            })
+            const visibleEvents = showAllEvents
+              ? filteredEvents
+              : filteredEvents.slice(0, VISIBLE_EVENT_COUNT)
+            const hasMoreEvents = filteredEvents.length > VISIBLE_EVENT_COUNT
 
-                return (
-                  <div
-                    key={`${event.timestamp}-${index}`}
-                    className="py-4 flex flex-row gap-6 text-xs md:text-sm"
-                  >
-                    <div className="w-40 shrink-0 text-xs md:text-sm text-ui-fg-subtle">
-                      <div className="whitespace-nowrap">{dateLabel}</div>
-                      <div className="whitespace-nowrap">{timeLabel}</div>
-                    </div>
+            return (
+              <>
+                <div className="flex flex-col divide-y divide-gray-100">
+                  {visibleEvents.map((event, index) => {
+                    const { dateLabel, timeLabel } = formatEventDateTime(event.timestamp)
 
-                    <div className="flex-1 text-xs md:text-sm">
-                      <div className="text-xs md:text-sm text-ui-fg-base">
-                        {event.description || getStatusDisplay(event.status)}
-                      </div>
-                      {event.location && (
-                        <div className="mt-1 text-ui-fg-subtle text-xs md:text-sm">
-                          {event.location}
+                    return (
+                      <div
+                        key={`${event.timestamp}-${index}`}
+                        className="py-4 flex flex-row gap-6 text-xs md:text-sm"
+                      >
+                        <div className="w-40 shrink-0 text-xs md:text-sm text-ui-fg-subtle">
+                          <div className="whitespace-nowrap">{dateLabel}</div>
+                          <div className="whitespace-nowrap">{timeLabel}</div>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-          </div>
+
+                        <div className="flex-1 text-xs md:text-sm">
+                          <div className="text-xs md:text-sm text-ui-fg-base">
+                            {event.description || getStatusDisplay(event.status)}
+                          </div>
+                          {event.location && (
+                            <div className="mt-1 text-ui-fg-subtle text-xs md:text-sm">
+                              {event.location}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+                {hasMoreEvents && (
+                  <button
+                    onClick={() => setShowAllEvents(!showAllEvents)}
+                    className="mt-4 text-sm text-ui-fg-subtle hover:text-ui-fg-base underline"
+                  >
+                    {showAllEvents
+                      ? "Show fewer events"
+                      : `Show ${filteredEvents.length - VISIBLE_EVENT_COUNT} earlier events`}
+                  </button>
+                )}
+              </>
+            )
+          })()}
         </div>
 
         <Divider />
