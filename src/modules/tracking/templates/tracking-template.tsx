@@ -369,9 +369,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                     onClick={() => setShowAllEvents(!showAllEvents)}
                     className="mt-4 text-sm text-ui-fg-subtle hover:text-ui-fg-base underline"
                   >
-                    {showAllEvents
-                      ? "Show fewer events"
-                      : `Show ${filteredEvents.length - VISIBLE_EVENT_COUNT} earlier events`}
+                    {showAllEvents ? "Show less" : "Show all"}
                   </button>
                 )}
               </>
