@@ -74,7 +74,8 @@ const shouldShowTrackLink = (order: HttpTypes.StoreOrder) => {
 
 const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) => {
   const orderStatus = formatStatusLabel(order.fulfillment_status, order.status)
-  const orderId = order.display_id ?? order.id
+  const orderId =
+    (order as any).custom_display_id ?? order.display_id ?? order.id
   const orderDateLabel = formatOrderDateEST(order.created_at || new Date())
   const paymentDisplay = getPaymentDisplayFromOrder(order)
   const trackingNumber = getPrimaryTrackingNumber(order)

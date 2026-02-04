@@ -48,7 +48,8 @@ const OrderDetails = ({ order, showStatus, showPrintButton }: OrderDetailsProps)
     })
   }
 
-  const orderId = order.display_id ?? order.id
+  const orderId =
+    (order as any).custom_display_id ?? order.display_id ?? order.id
   const orderDateLabel = formatOrderDateEST(order.created_at || new Date())
 
   return (

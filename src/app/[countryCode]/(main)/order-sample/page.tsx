@@ -11,6 +11,7 @@ export default async function OrderSamplePage() {
   // Mock order data for visual testing
   const mockOrder: HttpTypes.StoreOrder = {
     id: "order_01234567890abcdef",
+    custom_display_id: "001701234567892",
     display_id: 1234,
     email: "customer@example.com",
     created_at: new Date().toISOString(),

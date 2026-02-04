@@ -44,6 +44,7 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
     // The wallet (Google Pay, Apple Pay) collects its own address data which must be
     // synced to the cart BEFORE placing the order, otherwise the order will be missing
     // the customer's name and shipping address.
+    let updatedCart = cart
     try {
       const billingDetails = event.billingDetails
       const shippingAddress = event.shippingAddress
@@ -103,7 +104,7 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
           province,
           postal_code: address.postal_code || '',
           country_code: countryCode,
-          phone: billingDetails?.phone || '',
+          phone: billingDetails.phone,
         }
       }
 
@@ -139,7 +140,16 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
       // Update the cart with the Express Checkout data
       if (Object.keys(cartUpdateData).length > 0) {
         console.log('Syncing Express Checkout data to cart:', cartUpdateData)
-        await updateCart(cartUpdateData)
+        updatedCart = await updateCart(cartUpdateData)
+      }
+
+      // Validate checkout fields before proceeding to payment
+      const validationErrors = validateCheckout(updatedCart)
+      if (validationErrors.length > 0) {
+        setErrorMessage('Please complete all required fields before placing your order.')
+        scrollToTop()
+        triggerFieldErrors(validationErrors)
+        return
       }
     } catch (syncError: any) {
       console.error('Failed to sync Express Checkout data to cart:', syncError)
@@ -157,7 +167,7 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
     }
 
     // Get the client secret from the cart's payment session
-    const paymentSession = cart.payment_collection?.payment_sessions?.find(
+    const paymentSession = updatedCart.payment_collection?.payment_sessions?.find(
       (session: any) => session.provider_id === "pp_stripe_stripe"
     )
     const clientSecret = paymentSession?.data?.client_secret as string
@@ -206,7 +216,7 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
     // This configures what data the Express Checkout element will collect
     const options = {
       emailRequired: true, // Collect email (cart already has it, but wallets need confirmation)
-      phoneNumberRequired: false, // Optional - set to true if you want to collect phone
+      phoneNumberRequired: true, // Required to guarantee a phone number on orders
       shippingAddressRequired: true, // Required since we have physical products
       allowedShippingCountries: ['US'], // Limit to US for now
       shippingRates: cart.shipping_methods?.map((method: any) => ({

@@ -15,8 +15,11 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
+  const orderNumber =
+    (order as any).custom_display_id ?? order.display_id ?? order.id
+
   return {
-    title: `Order #${order.display_id}`,
+    title: `Order #${orderNumber}`,
     description: `View your order`,
   }
 }

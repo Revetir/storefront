@@ -110,6 +110,8 @@ export default async function Orders() {
           {orders.map((order) => {
             const firstItem = order.items?.[0]
             const trackingNumber = getPrimaryTrackingNumber(order as HttpTypes.StoreOrder)
+            const orderNumber =
+              (order as any).custom_display_id ?? order.display_id ?? order.id
 
             return (
               <div
@@ -132,7 +134,7 @@ export default async function Orders() {
                   <div className="mt-3 sm:mt-4 space-y-1">
                     <div className="text-sm">
                       <span className="font-semibold">Order </span>
-                      <span>#{order.display_id}</span>
+                      <span>#{orderNumber}</span>
                     </div>
                     <div className="text-sm" data-testid="order-amount">
                       {convertToLocale({

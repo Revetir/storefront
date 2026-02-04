@@ -12,7 +12,8 @@ import Image from "next/image"
 type TrackingData = {
   order: {
     id: string
-    display_id: number
+    display_id?: number | string | null
+    custom_display_id?: string | null
     created_at: string
     currency_code?: string
     shipping_address: {
