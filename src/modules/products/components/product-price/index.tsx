@@ -36,10 +36,10 @@ export default function ProductPrice({
 
   // Check if all variants have the same price
   const allVariantsSamePrice = !variant && product.variants && product.variants.length > 0
-    ? product.variants.every((v: any) => {
-        const price = v.calculated_price?.calculated_amount || v.prices?.[0]?.amount
-        const firstPrice = product.variants![0].calculated_price?.calculated_amount || product.variants![0].prices?.[0]?.amount
-        return price === firstPrice
+    ? product.variants.every((v) => {
+        const price = v.calculated_price?.calculated_amount
+        const firstPrice = product.variants![0].calculated_price?.calculated_amount
+        return price != null && firstPrice != null && price === firstPrice
       })
     : false
 

@@ -10,11 +10,11 @@ export type FeaturedProduct = {
 export type VariantPrice = {
   calculated_price_number: number
   calculated_price: string
-  original_price_number: number
-  original_price: string
+  original_price_number?: number | null
+  original_price?: string | null
   currency_code: string
-  price_type: string
-  percentage_diff: string
+  price_type: "default" | "sale" | string
+  percentage_diff?: string | number
 }
 
 export type StoreFreeShippingPrice = StorePrice & {

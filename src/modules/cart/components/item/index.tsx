@@ -63,6 +63,17 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   const brands = getBrandsArray((item.product as any)?.brands)
   const productUrl = getProductUrl((item.product as any)?.brands, item.product_handle || "")
   const primaryBrand = getPrimaryBrand((item.product as any)?.brands)
+  const productId = item.product_id ?? item.product?.id
+  const trackingData = productId
+    ? {
+        product_id: productId,
+        product_name: item.product_title ?? undefined,
+        brand: primaryBrand?.name,
+        variant_id: item.variant_id ?? undefined,
+        variant_name: item.variant?.title ?? undefined,
+        quantity: item.quantity,
+      }
+    : undefined
 
   return (
     <Table.Row className="w-full [&:hover]:bg-transparent" data-testid="product-row">
@@ -112,14 +123,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             <DeleteButton
               id={item.id}
               data-testid="product-delete-button"
-              trackingData={{
-                product_id: item.product_id,
-                product_name: item.product_title,
-                brand: primaryBrand?.name,
-                variant_id: item.variant_id,
-                variant_name: item.variant?.title || undefined,
-                quantity: item.quantity,
-              }}
+              trackingData={trackingData}
             />
             <CartItemSelect
               value={item.quantity}
@@ -200,14 +204,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
               <DeleteButton
                 id={item.id}
                 data-testid="product-delete-button-mobile"
-                trackingData={{
-                  product_id: item.product_id,
-                  product_name: item.product_title,
-                  brand: primaryBrand?.name,
-                  variant_id: item.variant_id,
-                  variant_name: item.variant?.title || undefined,
-                  quantity: item.quantity,
-                }}
+                trackingData={trackingData}
               />
             </div>
           )}

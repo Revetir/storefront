@@ -15,8 +15,8 @@ const LineItemUnitPrice = ({
   style = "default",
   currencyCode,
 }: LineItemUnitPriceProps) => {
-  const { subtotal, original_subtotal } = item
-  const hasCartDiscount = subtotal < original_subtotal
+  const subtotal =
+    item.subtotal ?? item.total ?? item.unit_price * item.quantity
 
   // Check if this item has product-level sale pricing
   let variantPrice = null
@@ -33,9 +33,15 @@ const LineItemUnitPrice = ({
     }
   }
 
-  const isOnSale = variantPrice?.price_type === "sale" && "original_price" in variantPrice
-  const unitSalePrice = isOnSale ? variantPrice.calculated_price : null
-  const unitOriginalPrice = isOnSale ? (variantPrice as any).original_price : null
+  const salePrice =
+    variantPrice &&
+    variantPrice.price_type === "sale" &&
+    "original_price" in variantPrice
+      ? variantPrice
+      : null
+  const unitSalePrice = salePrice?.calculated_price ?? null
+  const unitOriginalPrice = salePrice ? (salePrice as any).original_price : null
+  const isOnSale = salePrice != null
 
   return (
     <div className="flex flex-col text-ui-fg-muted justify-center h-full">

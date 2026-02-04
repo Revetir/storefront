@@ -10,7 +10,7 @@ import Search from "@modules/common/icons/search"
 import { getProductUrl } from "@lib/util/brand-utils"
 
 // Helper for click outside
-function useOnClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void) {
+function useOnClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
   useEffect(() => {
     function listener(event: MouseEvent) {
       if (!ref.current || ref.current.contains(event.target as Node)) {
@@ -160,7 +160,7 @@ export default function SearchModal({ isOpen: externalIsOpen, setIsOpen: externa
 }
 
 // Custom SearchBox with ref, sharp, rectangular outline, and Close button
-function CustomSearchBox({ inputRef, onClose, gender }: { inputRef: React.RefObject<HTMLInputElement>, onClose: () => void, gender: "menswear" | "womenswear" }) {
+function CustomSearchBox({ inputRef, onClose, gender }: { inputRef: React.RefObject<HTMLInputElement | null>, onClose: () => void, gender: "menswear" | "womenswear" }) {
   const { query, refine } = useSearchBox();
   // Placeholder text based on gender
   const placeholder = gender === "menswear" ? "SEARCH MENSWEAR" : "SEARCH WOMENSWEAR";

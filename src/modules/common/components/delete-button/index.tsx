@@ -2,20 +2,13 @@ import { deleteLineItem } from "@lib/data/cart"
 import { Spinner, Trash } from "@medusajs/icons"
 import { clx } from "@medusajs/ui"
 import { useState } from "react"
-import { trackRemoveFromBag } from "@lib/util/analytics"
+import { trackRemoveFromBag, type CartEventData } from "@lib/util/analytics"
 
 type DeleteButtonProps = {
   id: string
   children?: React.ReactNode
   className?: string
-  trackingData?: {
-    product_id?: string
-    product_name?: string
-    brand?: string
-    variant_id?: string
-    variant_name?: string
-    quantity?: number
-  }
+  trackingData?: CartEventData
 }
 
 const DeleteButton = ({

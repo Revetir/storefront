@@ -310,7 +310,7 @@ const RunwayBelt3D = ({ items, className, isVisible = true }: Props) => {
   }, [])
 
   const canRenderWebGL = webglOk && !(saveData && hasThumbnails)
-  const dpr = saveData ? [1, 1.05] : isMobile ? [1, 1.1] : [1, 1.25]
+  const dpr: [number, number] = saveData ? [1, 1.05] : isMobile ? [1, 1.1] : [1, 1.25]
   const powerPreference = saveData || isMobile ? "low-power" : "high-performance"
 
   return (

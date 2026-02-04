@@ -82,7 +82,7 @@ export async function getAvailableCategories(
         query: '', // Empty query to get all products
         filters: filters.length > 0 ? filters.join(" AND ") : undefined,
         facets: ['allCategoryHandles'],
-        maxFacetHits: 1000,
+        maxValuesPerFacet: 1000,
         hitsPerPage: 0 // Only want facet data, not products
       }
     }])
@@ -162,7 +162,7 @@ export async function getAvailableBrands(
         query: '',
         filters: filters.length > 0 ? filters.join(" AND ") : undefined,
         facets: ['brands.slug'],
-        maxFacetHits: 1000,
+        maxValuesPerFacet: 1000,
         hitsPerPage: 0
       }
     }])
