@@ -4,7 +4,6 @@ import { Heading, Text } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
 import Items from "@modules/order/components/items"
 import Help from "@modules/order/components/help"
-import TrackingTimeline from "@modules/tracking/components/tracking-timeline"
 import { formatUSState } from "@lib/util/format-us-state"
 import React from "react"
 import Image from "next/image"
@@ -42,6 +41,8 @@ type TrackingData = {
     status: string
     description: string
     location?: string
+    journey_zone?: string | null
+    journey_event?: string | null
   }>
   weight_kg?: number
   weight_lb?: number
@@ -151,27 +152,7 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
 }
 
 const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
-  const [carrierName, setCarrierName] = React.useState<string | null>(null)
   const [showAllEvents, setShowAllEvents] = React.useState(false)
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
-
-  const getStatusColor = (status: string) => {
-    const normalizedStatus = status.toLowerCase()
-    if (normalizedStatus.includes("delivered")) return "text-green-600"
-    if (normalizedStatus.includes("transit") || normalizedStatus.includes("picked"))
-      return "text-blue-600"
-    if (normalizedStatus.includes("exception") || normalizedStatus.includes("failed"))
-      return "text-red-600"
-    return "text-gray-600"
-  }
 
   const getStatusDisplay = (status: string) => {
     // Convert status codes to human-readable format
@@ -200,38 +181,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
     return { dateLabel, timeLabel }
   }
 
-  React.useEffect(() => {
-    let cancelled = false
-
-    const loadCarrierName = async () => {
-      try {
-        const response = await fetch(
-          "https://res.17track.net/asset/carrier/info/apicarrier.all.json"
-        )
-        if (!response.ok) {
-          return
-        }
-
-        const carriers: Array<{ key: number; _name: string }> = await response.json()
-        const mapped = carriers.find((c) => String(c.key) === String(data.carrier))
-        if (!cancelled && mapped?._name) {
-          // Map China Post to EMS for display
-          const displayName = mapped._name === "China Post" ? "EMS" : mapped._name
-          setCarrierName(displayName)
-        }
-      } catch {
-        // ignore mapping failures and fall back to raw carrier code
-      }
-    }
-
-    loadCarrierName()
-
-    return () => {
-      cancelled = true
-    }
-  }, [data.carrier])
-
-  const displayCarrier = carrierName || data.carrier
+  const displayCarrier = data.carrier
 
   // Derive items that belong to the fulfillment(s) associated with this tracking number.
   const deriveShipmentItems = () => {
@@ -340,6 +290,8 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                 <div className="flex flex-col divide-y divide-gray-100">
                   {visibleEvents.map((event, index) => {
                     const { dateLabel, timeLabel } = formatEventDateTime(event.timestamp)
+                    const journeyZone = event.journey_zone || event.description
+                    const journeyEvent = event.journey_event || event.location
 
                     return (
                       <div
@@ -353,11 +305,11 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
 
                         <div className="flex-1 text-xs md:text-sm">
                           <div className="text-xs md:text-sm text-ui-fg-base">
-                            {event.description || getStatusDisplay(event.status)}
+                            {journeyZone || getStatusDisplay(event.status)}
                           </div>
-                          {event.location && (
+                          {journeyEvent && (
                             <div className="mt-1 text-ui-fg-subtle text-xs md:text-sm">
-                              {event.location}
+                              {journeyEvent}
                             </div>
                           )}
                         </div>
