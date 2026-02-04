@@ -280,6 +280,13 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
               const status = (event.status || "").toLowerCase()
               return !status.includes("registered")
             })
+            if (filteredEvents.length === 0) {
+              return (
+                <div className="py-4 text-xs md:text-sm text-ui-fg-subtle">
+                  Tracking will appear once shipment information is processed by the carrier.
+                </div>
+              )
+            }
             const visibleEvents = showAllEvents
               ? filteredEvents
               : filteredEvents.slice(0, VISIBLE_EVENT_COUNT)
@@ -344,9 +351,6 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
           <div className="text-sm md:text-base leading-relaxed space-y-1">
             <Text className="text-md">
               Carrier: <span>{displayCarrier}</span>
-            </Text>
-            <Text className="text-md">
-              Service: <span>International Air</span>
             </Text>
             <Text className="text-md">
               Tracking Number: <span>{data.tracking_number}</span>
