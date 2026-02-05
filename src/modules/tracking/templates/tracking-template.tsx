@@ -350,10 +350,10 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
 
           <div className="text-sm md:text-base leading-relaxed space-y-1">
             <Text className="text-md">
-              Carrier: <span>{displayCarrier}</span>
+              Delivery Provider: <span>{displayCarrier}</span>
             </Text>
             <Text className="text-md">
-              Tracking Number: <span>{data.tracking_number}</span>
+              Shipment ID: <span>{data.tracking_number}</span>
             </Text>
             {typeof data.weight_lb === "number" || typeof data.weight_kg === "number" ? (
               <Text className="text-md">
