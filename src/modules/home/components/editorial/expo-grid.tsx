@@ -180,9 +180,10 @@ const ExpoGrid = () => {
               muted={isMuted}
               playsInline
               preload="none"
+              poster="/images/beyond_space_poster.jpg"
             >
               {shouldLoadVideo ? (
-                <source src="/images/beyond_space_revetir.mp4" type="video/mp4" />
+                <source src="/images/beyond_space_revetir_compressed.mp4" type="video/mp4" />
               ) : null}
             </video>
 

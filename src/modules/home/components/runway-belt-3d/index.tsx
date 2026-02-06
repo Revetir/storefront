@@ -68,6 +68,10 @@ export type RunwayBelt3DItem = {
   id: string
   modelSrc: string
   thumbnailSrc?: string
+  previewSrc?: string
+  previewScale?: number
+  previewAspect?: number
+  previewDepth?: number
   alt?: string
   rotationSpeed?: number
   scale?: number
@@ -78,6 +82,7 @@ type Props = {
   items: RunwayBelt3DItem[]
   className?: string
   isVisible?: boolean
+  onReady?: () => void
 }
 
 function isWebGLAvailable() {
@@ -295,7 +300,20 @@ function BeltCameraAim() {
   return null
 }
 
-const RunwayBelt3D = ({ items, className, isVisible = true }: Props) => {
+function ReadySignal({ onReady }: { onReady?: () => void }) {
+  const firedRef = useRef(false)
+
+  useFrame(() => {
+    if (!firedRef.current && onReady) {
+      firedRef.current = true
+      onReady()
+    }
+  })
+
+  return null
+}
+
+const RunwayBelt3D = ({ items, className, isVisible = true, onReady }: Props) => {
   const [webglOk, setWebglOk] = useState<boolean>(false)
   const isMobile = useMediaQuery("(max-width: 640px)")
   const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)")
@@ -337,6 +355,7 @@ const RunwayBelt3D = ({ items, className, isVisible = true }: Props) => {
                 style={{ position: 'relative', zIndex: 0 }}
               >
                 <BeltCameraAim />
+                <ReadySignal onReady={onReady} />
                 <color attach="background" args={["#ffffff"]} />
                 <ambientLight intensity={0.7} />
                 <directionalLight position={[0, 0, 4]} intensity={0.65} />

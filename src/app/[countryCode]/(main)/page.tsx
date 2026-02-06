@@ -105,31 +105,43 @@ export default async function Home(props: {
             {
               id: "dept_galerie_jacket_3d",
               modelSrc: "/images/dept_galerie_jacket_3d.glb",
+              previewSrc: "/images/dept_galerie_jacket_preview.png",
               alt: "Dept Galerie jacket 3D",
               rotationSpeed: 0.35,
               scale: 1.45,
+              previewAspect: 0.357,
+              previewDepth: 0.751,
               href: "/men/jackets"
             },
             {
               id: "balenciaga_snow_boots_3d",
               modelSrc: "/images/balenciaga_snow_boots_3d.glb",
+              previewSrc: "/images/balenciaga_snow_boots_preview.png",
               alt: "Balenciaga snow boots 3D",
               rotationSpeed: 0.35,
+              previewAspect: 1.206,
+              previewDepth: 1.148,
               href: "/men/shoes"
             },
             {
               id: "hat_3d",
               modelSrc: "/images/hat_3d.glb",
+              previewSrc: "/images/hat_preview.png",
               alt: "Hat 3D",
               rotationSpeed: 0.35,
               scale: 0.6,
+              previewAspect: 2.05,
+              previewDepth: 2.038,
               href: "/women/hats"
             },
             {
               id: "boots",
               modelSrc: "/images/boots_3d.glb",
+              previewSrc: "/images/boots_preview.png",
               alt: "3D rotating boots",
               rotationSpeed: 0.35,
+              previewAspect: 0.816,
+              previewDepth: 0.998,
               href: "/women/boots"
             },
           ]}
