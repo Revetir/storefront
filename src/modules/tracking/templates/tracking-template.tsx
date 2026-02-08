@@ -297,8 +297,14 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                 <div className="flex flex-col divide-y divide-gray-100">
                   {visibleEvents.map((event, index) => {
                     const { dateLabel, timeLabel } = formatEventDateTime(event.timestamp)
-                    const journeyZone = event.journey_zone || event.description
-                    const journeyEvent = event.journey_event || event.location
+                    const isDomestic = event.journey_zone === "Domestic Transit"
+                    const primaryText =
+                      event.journey_event ||
+                      event.description ||
+                      getStatusDisplay(event.status)
+                    const secondaryText = isDomestic
+                      ? event.location || event.journey_zone
+                      : event.journey_zone || event.location
 
                     return (
                       <div
@@ -312,11 +318,11 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
 
                         <div className="flex-1 text-xs md:text-sm">
                           <div className="text-xs md:text-sm text-ui-fg-base">
-                            {journeyZone || getStatusDisplay(event.status)}
+                            {primaryText}
                           </div>
-                          {journeyEvent && (
+                          {secondaryText && (
                             <div className="mt-1 text-ui-fg-subtle text-xs md:text-sm">
-                              {journeyEvent}
+                              {secondaryText}
                             </div>
                           )}
                         </div>
