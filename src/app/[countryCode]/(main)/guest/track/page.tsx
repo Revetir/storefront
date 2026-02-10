@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import TrackingTemplate from "@modules/tracking/templates/tracking-template"
 
 type Props = {
-  searchParams: Promise<{ token?: string }>
+  searchParams: Promise<{ t?: string; token?: string }>
 }
 
 export const metadata: Metadata = {
@@ -15,11 +15,12 @@ export const metadata: Metadata = {
  * Customer tracking page
  * Token-based authentication via URL query parameter
  *
- * URL: /us/track?token={jwt}
+ * URL: /us/track?t={opaque_token} (or legacy /us/track?token={jwt})
  */
 export default async function TrackingPage(props: Props) {
   const searchParams = await props.searchParams
-  const token = searchParams.token
+  const token = searchParams.t || searchParams.token
+  const tokenParamName = searchParams.t ? "t" : "token"
 
   if (!token) {
     return (
@@ -42,7 +43,7 @@ export default async function TrackingPage(props: Props) {
   let trackingData
   try {
     const response = await fetch(
-      `${backendUrl}/store/track?token=${token}`,
+      `${backendUrl}/store/track?${tokenParamName}=${encodeURIComponent(token)}`,
       {
         cache: "no-store", // Always fetch fresh tracking data
         headers: {
