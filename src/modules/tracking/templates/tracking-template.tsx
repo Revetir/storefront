@@ -30,7 +30,6 @@ type TrackingData = {
       name: string
     }>
     items?: any[]
-    fulfillments?: any[]
   }
   tracking_number: string
   carrier: string
@@ -51,6 +50,7 @@ type TrackingData = {
     width: number
     height: number
   }
+  fulfillment_items: Array<{ line_item_id: string | null; quantity: number }>
 }
 
 type TrackingTemplateProps = {
@@ -183,56 +183,21 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
 
   const displayCarrier = data.carrier
 
-  // Derive items that belong to the fulfillment(s) associated with this tracking number.
+  // Filter order items to only those in this fulfillment
   const deriveShipmentItems = () => {
-    const order = data.order as any
-    const orderItems: any[] = Array.isArray(order.items) ? order.items : []
-    const fulfillments: any[] = Array.isArray(order.fulfillments)
-      ? order.fulfillments
-      : []
+    const orderItems: any[] = Array.isArray(data.order.items) ? data.order.items : []
 
-    if (!fulfillments.length || !orderItems.length) {
-      return orderItems
-    }
+    // Get set of line_item_ids from the fulfillment
+    const fulfillmentLineItemIds = new Set(
+      data.fulfillment_items
+        .map(fi => fi.line_item_id)
+        .filter((id): id is string => id != null)
+    )
 
-    // Find fulfillments whose tracking numbers match this tracking number.
-    const matchingFulfillments = fulfillments.filter((f) => {
-      const trackingNumbers: string[] = Array.isArray(f.tracking_numbers)
-        ? f.tracking_numbers
-        : []
-
-      return trackingNumbers.some(
-        (n) => String(n).trim() === String(data.tracking_number).trim()
-      )
-    })
-
-    if (!matchingFulfillments.length) {
-      return orderItems
-    }
-
-    const orderItemsById = new Map<string, any>()
-    orderItems.forEach((item: any) => {
-      if (item?.id) {
-        orderItemsById.set(item.id, item)
-      }
-    })
-
-    const shipmentItems: any[] = []
-
-    matchingFulfillments.forEach((f) => {
-      const fulfillmentItems: any[] = Array.isArray(f.items) ? f.items : []
-      fulfillmentItems.forEach((fi) => {
-        const lineItemId = fi?.line_item_id
-        if (!lineItemId) return
-
-        const lineItem = orderItemsById.get(lineItemId)
-        if (lineItem && !shipmentItems.includes(lineItem)) {
-          shipmentItems.push(lineItem)
-        }
-      })
-    })
-
-    return shipmentItems.length ? shipmentItems : orderItems
+    // Filter order items to only those in this fulfillment
+    return orderItems.filter(item =>
+      item?.id && fulfillmentLineItemIds.has(item.id)
+    )
   }
 
   const shipmentItems = React.useMemo(deriveShipmentItems, [data])
