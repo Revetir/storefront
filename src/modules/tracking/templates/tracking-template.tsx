@@ -63,7 +63,8 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
   const isDelivered = normalizedStatus.includes("delivered")
   const isOutForDelivery =
     normalizedStatus.includes("outfordelivery") ||
-    normalizedStatus.includes("out_for_delivery")
+    normalizedStatus.includes("out_for_delivery") ||
+    normalizedStatus.includes("out for delivery")
 
   const steps = [
     { label: "Processing", isComplete: true },
