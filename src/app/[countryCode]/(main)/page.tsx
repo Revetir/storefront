@@ -1,6 +1,6 @@
 import { Metadata } from "next"
 import dynamic from "next/dynamic"
-import Hero from "@modules/home/components/hero"
+import CheckerboardHero from "@modules/home/components/checkerboard-hero"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import EditorialGrid from "@modules/home/components/editorial/editorial-grid"
@@ -88,7 +88,7 @@ export default async function Home(props: {
 
   return (
     <>
-      {/* <Hero /> */}
+      <CheckerboardHero />
       <div className="">
         <EditorialGrid />
       </div>

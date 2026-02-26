@@ -220,14 +220,16 @@ const ProductHit = ({ hit }: { hit: any }) => {
 
   return (
     <div className="flex flex-row gap-x-2 mt-4 relative">
-      <img
-        src={hit.thumbnail}
-        alt={`${hit.type || 'Product'} ${hit.title}`}
-        width={60}
-        height={60}
-        style={{ objectFit: 'contain', objectPosition: 'center', borderRadius: 4 }}
-        loading="lazy"
-      />
+      <div className="w-[60px] h-[60px] shrink-0 flex items-center justify-center overflow-hidden">
+        <img
+          src={hit.thumbnail}
+          alt={`${hit.type || 'Product'} ${hit.title}`}
+          width={60}
+          height={60}
+          className="w-full h-full object-contain object-center rounded"
+          loading="lazy"
+        />
+      </div>
       <div className="flex flex-col gap-y-1">
         {hit.brands?.[0]?.name && (
           <span className="text-xs text-gray-500 uppercase tracking-wide">{hit.brands[0].name}</span>
