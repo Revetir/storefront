@@ -11,12 +11,25 @@ import { usePaymentContext } from "../payment/payment-context"
 import ErrorMessage from "../error-message"
 import { StripeContext } from "../payment-wrapper/stripe-wrapper"
 
+const isNextRedirectError = (error: unknown): boolean => {
+  if (!error || typeof error !== "object") {
+    return false
+  }
+
+  const redirectError = error as { message?: string; digest?: string }
+  return (
+    redirectError.message === "NEXT_REDIRECT" ||
+    redirectError.digest?.includes("NEXT_REDIRECT") === true
+  )
+}
+
 // Inner component that safely uses Stripe hooks - only rendered when inside Elements context
 const StripeReviewContent = ({ cart }: { cart: any }) => {
   const { selectedPaymentMethod } = usePaymentContext()
   const stripe = useStripe()
   const elements = useElements()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
   // Express Checkout methods handle payment with their own buttons
   // No need to show the traditional "Place Order" button for these
@@ -28,6 +41,13 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
 
   // Express Checkout Element handlers
   const handleExpressCheckoutConfirm = async (event: any) => {
+    if (submitting) {
+      return
+    }
+
+    setSubmitting(true)
+    setErrorMessage(null)
+
     // Express Checkout Element manages the entire payment flow internally
     // For wallets (Apple Pay/Google Pay): Shows branded button, collects payment, completes transaction
     // For Klarna: Shows "Continue with Klarna" button, handles redirect, returns user after completion
@@ -37,6 +57,7 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
 
     if (!stripe || !elements) {
       setErrorMessage('Stripe is not initialized')
+      setSubmitting(false)
       return
     }
 
@@ -149,11 +170,13 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
         setErrorMessage('Please complete all required fields before placing your order.')
         scrollToTop()
         triggerFieldErrors(validationErrors)
+        setSubmitting(false)
         return
       }
     } catch (syncError: any) {
       console.error('Failed to sync Express Checkout data to cart:', syncError)
       setErrorMessage('Failed to save shipping information. Please try again.')
+      setSubmitting(false)
       return
     }
 
@@ -163,6 +186,7 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
     if (submitResult?.error) {
       setErrorMessage(submitResult.error.message || 'Failed to submit payment')
       console.error('Elements submit error:', submitResult.error)
+      setSubmitting(false)
       return
     }
 
@@ -174,6 +198,7 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
 
     if (!clientSecret) {
       setErrorMessage('Payment session not found')
+      setSubmitting(false)
       return
     }
 
@@ -192,15 +217,24 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
     if (error) {
       setErrorMessage(error.message || 'Payment failed')
       console.error('Express Checkout payment error:', error)
+      setSubmitting(false)
       return
     }
 
     // If payment succeeded without redirect, place the order
     try {
       await placeOrder()
-    } catch (err: any) {
-      setErrorMessage(err.message)
+      setSubmitting(false)
+    } catch (err) {
+      if (isNextRedirectError(err)) {
+        throw err
+      }
+
+      const errorText =
+        err instanceof Error ? err.message : "Failed to place order"
+      setErrorMessage(errorText)
       console.error('Failed to place order:', err)
+      setSubmitting(false)
     }
   }
 

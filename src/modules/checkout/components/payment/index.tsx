@@ -11,6 +11,7 @@ import CustomPaymentSelector from "./custom-payment-selector"
 import { useAvailablePaymentMethods } from "./use-available-payment-methods"
 import { PaymentMethodType } from "./payment-methods-config"
 import { usePaymentContext } from "./payment-context"
+import { isStripe } from "@lib/constants"
 
 // Inner component that safely uses Stripe hooks - only rendered when inside Elements context
 const StripePaymentContent = ({ cart, activeSession }: { cart: any, activeSession: any }) => {
@@ -185,16 +186,31 @@ const Payment = ({
   cart: any
   availablePaymentMethods: any[]
 }) => {
-  const activeSession = cart.payment_collection?.payment_sessions?.find(
-    (paymentSession: any) => paymentSession.status === "pending"
+  const stripeSession = cart.payment_collection?.payment_sessions?.find(
+    (paymentSession: any) =>
+      isStripe(paymentSession.provider_id) && paymentSession.status === "pending"
   )
+  const hasStripeSession = cart.payment_collection?.payment_sessions?.some(
+    (paymentSession: any) =>
+      isStripe(paymentSession.provider_id) &&
+      (paymentSession.status === "pending" || paymentSession.status === "authorized")
+  )
+  const paymentCollectionStatus = cart.payment_collection?.status
   const stripeReady = useContext(StripeContext)
   const [error, setError] = useState<string | null>(null)
 
   // Initialize payment session if it doesn't exist (runs outside Elements context)
   useEffect(() => {
     const initStripe = async () => {
-      if (!activeSession && availablePaymentMethods?.length > 0) {
+      if (paymentCollectionStatus === "authorized" || paymentCollectionStatus === "captured") {
+        return
+      }
+
+      const hasStripeProvider = availablePaymentMethods?.some(
+        (provider: any) => provider.id === "pp_stripe_stripe"
+      )
+
+      if (!hasStripeSession && hasStripeProvider) {
         try {
           await initiatePaymentSession(cart, {
             provider_id: "pp_stripe_stripe",
@@ -207,11 +223,11 @@ const Payment = ({
     }
 
     initStripe()
-  }, [cart.id, activeSession, availablePaymentMethods])
+  }, [cart.id, hasStripeSession, availablePaymentMethods, paymentCollectionStatus])
 
   // Only render Stripe-specific content if we're inside Stripe Elements context
   if (stripeReady && availablePaymentMethods?.length) {
-    return <StripePaymentContent cart={cart} activeSession={activeSession} />
+    return <StripePaymentContent cart={cart} activeSession={stripeSession} />
   }
 
   // Fallback for non-Stripe payments or when Stripe isn't ready

@@ -20,9 +20,20 @@ if (stripeKey && !stripePromise) {
 }
 
 const PaymentWrapper: React.FC<PaymentWrapperProps> = ({ cart, children }) => {
-  const paymentSession = cart.payment_collection?.payment_sessions?.find(
-    (s) => s.status === "pending"
-  )
+  const paymentSessions = cart.payment_collection?.payment_sessions || []
+  const paymentSession =
+    paymentSessions.find(
+      (s) =>
+        isStripe(s.provider_id) &&
+        s.status === "pending" &&
+        !!s.data?.client_secret
+    ) ||
+    paymentSessions.find(
+      (s) =>
+        isStripe(s.provider_id) &&
+        s.status !== "canceled" &&
+        !!s.data?.client_secret
+    )
 
   if (
     isStripe(paymentSession?.provider_id) &&

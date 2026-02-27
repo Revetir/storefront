@@ -20,6 +20,18 @@ type PaymentButtonProps = {
   "data-testid": string
 }
 
+const isNextRedirectError = (error: unknown): boolean => {
+  if (!error || typeof error !== "object") {
+    return false
+  }
+
+  const redirectError = error as { message?: string; digest?: string }
+  return (
+    redirectError.message === "NEXT_REDIRECT" ||
+    redirectError.digest?.includes("NEXT_REDIRECT") === true
+  )
+}
+
 /**
  * Get the button text based on the selected payment method
  *
@@ -41,7 +53,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     !cart.email ||
     (cart.shipping_methods?.length ?? 0) < 1
 
-  const paymentSession = cart.payment_collection?.payment_sessions?.[0]
+  const paymentSessions = cart.payment_collection?.payment_sessions || []
+  const paymentSession =
+    paymentSessions.find((session) => session.status === "pending") ||
+    paymentSessions.find((session) => session.status !== "canceled") ||
+    paymentSessions[0]
   const stripeReady = useContext(StripeContext)
 
   // Avoid rendering any fallback button while the payment session is still loading.
@@ -92,19 +108,28 @@ const StripePaymentButton = ({
 
   const { countryCode } = useParams()
   const paymentSession = cart.payment_collection?.payment_sessions?.find(
-    (session) => session.provider_id === "pp_stripe_stripe"
+    (session) => session.provider_id === "pp_stripe_stripe" && session.status === "pending"
+  ) || cart.payment_collection?.payment_sessions?.find(
+    (session) =>
+      session.provider_id === "pp_stripe_stripe" && session.status !== "canceled"
   )
 
   const buttonText = getButtonText(selectedPaymentMethod)
 
   const onPaymentCompleted = async () => {
-    await placeOrder()
-      .catch((err) => {
-        setErrorMessage(err.message)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
+    try {
+      await placeOrder()
+      setSubmitting(false)
+    } catch (err) {
+      if (isNextRedirectError(err)) {
+        throw err
+      }
+
+      const errorText =
+        err instanceof Error ? err.message : "Failed to place order"
+      setErrorMessage(errorText)
+      setSubmitting(false)
+    }
   }
 
   const stripe = useStripe()
@@ -113,6 +138,10 @@ const StripePaymentButton = ({
   const disabled = !stripe || !elements ? true : false
 
   const handlePayment = async () => {
+    if (submitting) {
+      return
+    }
+
     // Validate all required checkout fields first
     const validationErrors = validateCheckout(cart)
 
@@ -133,6 +162,11 @@ const StripePaymentButton = ({
     setSubmitting(true)
 
     const clientSecret = paymentSession?.data?.client_secret as string
+    if (!clientSecret) {
+      setErrorMessage("Payment session not ready. Please refresh and try again.")
+      setSubmitting(false)
+      return
+    }
 
     /**
      * Payment Method Handling Strategy (Card and Afterpay only):
@@ -179,21 +213,19 @@ const StripePaymentButton = ({
         },
       }
 
-      await stripe
-        .confirmAfterpayClearpayPayment(clientSecret, {
-          payment_method: {
-            billing_details: billingDetails,
-          },
-          shipping: shippingDetails,
-          return_url: `${window.location.origin}/${countryCode}/checkout`,
-        })
-        .then(({ error }) => {
-          if (error) {
-            setErrorMessage(error.message || null)
-            setSubmitting(false)
-          }
-          // If successful, Stripe will redirect to return_url
-        })
+      const { error } = await stripe.confirmAfterpayClearpayPayment(clientSecret, {
+        payment_method: {
+          billing_details: billingDetails,
+        },
+        shipping: shippingDetails,
+        return_url: `${window.location.origin}/${countryCode}/checkout`,
+      })
+
+      if (error) {
+        setErrorMessage(error.message || null)
+        setSubmitting(false)
+      }
+      // If successful, Stripe will redirect to return_url
 
       return
     }
@@ -208,8 +240,7 @@ const StripePaymentButton = ({
     }
 
     // Use confirmCardPayment for CardElement
-    await stripe
-    .confirmCardPayment(clientSecret, {
+    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
         card: cardElement,
         billing_details: {
@@ -230,35 +261,36 @@ const StripePaymentButton = ({
         },
       },
     })
-    .then(({ error, paymentIntent }) => {
-      if (error) {
-        const pi = error.payment_intent
 
-        if (
-          (pi && pi.status === "requires_capture") ||
-          (pi && pi.status === "succeeded")
-        ) {
-          onPaymentCompleted()
-          return
-        }
+    if (error) {
+      const pi = error.payment_intent
 
-        setErrorMessage(error.message || null)
-        setSubmitting(false)
+      if (
+        (pi && pi.status === "requires_capture") ||
+        (pi && pi.status === "succeeded")
+      ) {
+        await onPaymentCompleted()
         return
       }
 
-      if (
-        paymentIntent.status === "requires_capture" ||
-        paymentIntent.status === "succeeded"
-      ) {
-        onPaymentCompleted()
-      }
-    })
+      setErrorMessage(error.message || null)
+      setSubmitting(false)
+      return
+    }
+
+    if (
+      paymentIntent?.status === "requires_capture" ||
+      paymentIntent?.status === "succeeded"
+    ) {
+      await onPaymentCompleted()
+    } else {
+      setSubmitting(false)
+    }
   }
 
   useEffect(() => {
     if (cart.payment_collection?.status === "authorized") {
-      onPaymentCompleted()
+      void onPaymentCompleted()
     }
   }, [cart.payment_collection?.status])
 
@@ -267,12 +299,12 @@ const StripePaymentButton = ({
       {selectedPaymentMethod === 'afterpay_clearpay' ? (
         <AfterpayButton
           onClick={handlePayment}
-          disabled={disabled || notReady}
+          disabled={disabled || notReady || submitting}
           isLoading={submitting}
         />
       ) : (
         <Button
-          disabled={disabled || notReady}
+          disabled={disabled || notReady || submitting}
           onClick={handlePayment}
           isLoading={submitting}
           data-testid={dataTestId}
@@ -294,16 +326,26 @@ const ManualTestPaymentButton = ({ notReady, cart }: { notReady: boolean, cart: 
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const onPaymentCompleted = async () => {
-    await placeOrder()
-      .catch((err) => {
-        setErrorMessage(err.message)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
+    try {
+      await placeOrder()
+      setSubmitting(false)
+    } catch (err) {
+      if (isNextRedirectError(err)) {
+        throw err
+      }
+
+      const errorText =
+        err instanceof Error ? err.message : "Failed to place order"
+      setErrorMessage(errorText)
+      setSubmitting(false)
+    }
   }
 
   const handlePayment = () => {
+    if (submitting) {
+      return
+    }
+
     // Validate all required checkout fields first
     const validationErrors = validateCheckout(cart)
 

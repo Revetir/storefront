@@ -1,4 +1,6 @@
-import { placeOrder, retrieveCart } from "@lib/data/cart"
+import { retrieveCart } from "@lib/data/cart"
+import { sdk } from "@lib/config"
+import { getAuthHeaders } from "@lib/data/cookies"
 import { NextRequest, NextResponse } from "next/server"
 
 type Params = Promise<{ cartId: string }>
@@ -35,9 +37,19 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
     )
   }
 
-  const order = await placeOrder(cartId)
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  const cartRes = await sdk.store.cart.complete(cartId, {}, headers)
+
+  if (cartRes.type !== "order") {
+    return NextResponse.redirect(
+      `${origin}/${countryCode}/cart?step=review&error=payment_failed`
+    )
+  }
 
   return NextResponse.redirect(
-    `${origin}/${countryCode}/order/${order.id}/confirmed`
+    `${origin}/${countryCode}/order/${cartRes.order.id}/confirmed`
   )
 }
