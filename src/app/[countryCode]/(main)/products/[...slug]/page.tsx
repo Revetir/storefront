@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation"
 import { listProducts } from "@lib/data/products"
 import { getRegion, listRegions } from "@lib/data/regions"
 import { searchProductsWithAlgolia, convertAlgoliaProductsToMedusaFormat } from "@lib/util/algolia-filters"
+import { sanitizeProductOptions } from "@lib/util/sanitize-product-options"
 import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 import { generateProductJsonLd } from "@lib/util/json-ld"
@@ -227,7 +228,8 @@ export default async function ProductPage(props: Props) {
     notFound()
   }
 
-  const { product: resolvedProduct, brandSlug } = resolved
+  const { product: rawResolvedProduct, brandSlug } = resolved
+  const resolvedProduct = sanitizeProductOptions(rawResolvedProduct)
 
   // Normalize brands data for resolved product
   const resolvedBrandData = (resolvedProduct as any).brands

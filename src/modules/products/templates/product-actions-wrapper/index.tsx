@@ -1,4 +1,5 @@
 import { listProducts } from "@lib/data/products"
+import { sanitizeProductOptions } from "@lib/util/sanitize-product-options"
 import { HttpTypes } from "@medusajs/types"
 import ProductActions from "@modules/products/components/product-actions"
 
@@ -25,5 +26,5 @@ export default async function ProductActionsWrapper({
     return null
   }
 
-  return <ProductActions product={product} region={region} />
+  return <ProductActions product={sanitizeProductOptions(product)} region={region} />
 }
