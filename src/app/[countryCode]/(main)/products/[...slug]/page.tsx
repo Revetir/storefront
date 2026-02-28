@@ -13,19 +13,39 @@ type Props = {
   params: Promise<{ countryCode: string; slug: string[] }>
 }
 
+const PRODUCT_PAGE_FIELDS =
+  "id,handle,title,description,thumbnail,*images,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.title,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,+metadata,+tags,+categories.*,+product_sku.*,+brands.*,*options.*,*options.values.*"
+
+async function fetchProductByHandle(
+  countryCode: string,
+  handle: string
+): Promise<HttpTypes.StoreProduct | null> {
+  try {
+    const result = await listProducts({
+      countryCode,
+      queryParams: {
+        handle,
+        fields: PRODUCT_PAGE_FIELDS,
+        limit: 1,
+      },
+    })
+
+    return result.response.products[0] ?? null
+  } catch (error) {
+    console.error(
+      `[products] Failed to fetch product handle "${handle}" for country "${countryCode}".`,
+      error
+    )
+    return null
+  }
+}
+
 async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCode: string): Promise<{ product: HttpTypes.StoreProduct; brandSlug: string } | null> {
   const parts = brandAndHandle.split("-")
 
   if (parts.length < 2) {
     // No dash: treat entire string as handle, resolve and redirect later
-    const product = await listProducts({
-      countryCode,
-      queryParams: {
-        handle: brandAndHandle,
-        fields: "handle,title,description,thumbnail,*images,+categories.*,+product_sku.*,+brands.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,*options.*,*options.values.*",
-        limit: 1,
-      },
-    }).then(({ response }) => response.products[0])
+    const product = await fetchProductByHandle(countryCode, brandAndHandle)
 
     if (!product) {
       return null
@@ -45,15 +65,7 @@ async function resolveProductByBrandAndHandle(brandAndHandle: string, countryCod
     const brandCandidate = parts.slice(0, i).join("-")
     const handleCandidate = parts.slice(i).join("-")
 
-    const candidate = await listProducts({
-      countryCode,
-      queryParams: {
-        handle: handleCandidate,
-        // ensure brand/brands are included to validate
-        fields: "handle,title,description,thumbnail,*images,+categories.*,+product_sku.*,+brands.*,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,*options.*,*options.values.*",
-        limit: 1,
-      },
-    }).then(({ response }) => response.products[0])
+    const candidate = await fetchProductByHandle(countryCode, handleCandidate)
 
     if (candidate) {
       // Get brand(s) - the 'brands' field returns an array when isList: true
@@ -228,34 +240,20 @@ export default async function ProductPage(props: Props) {
     redirect(correctUrl)
   }
 
-  const pricedProduct = await listProducts({
-    countryCode: params.countryCode,
-    queryParams: {
-      handle: resolvedProduct.handle,
-      // Ensure all relations needed by the template are present
-      fields:
-        "*images,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.title,*variants.options.value,*variants.options.option_id,*variants.metadata,+variants.ean,+variants.upc,+variants.barcode,+metadata,+tags,+categories.*,+product_sku.*,+brands.*,*options.*,*options.values.*",
-    },
-  }).then(({ response }) => response.products[0])
-
-  if (!pricedProduct) {
-    notFound()
-  }
-
   // Normalize brands data for priced product
-  const pricedBrandData = (pricedProduct as any).brands
+  const pricedBrandData = (resolvedProduct as any).brands
   const pricedBrands = Array.isArray(pricedBrandData) ? pricedBrandData : (pricedBrandData ? [pricedBrandData] : [])
   const pricedAllBrandSlugs = pricedBrands.length > 0 ? pricedBrands.map((b: any) => b.slug).join("-") : ""
 
   // If brand slug in URL doesn't match all product brands, redirect to correct URL
   if (pricedAllBrandSlugs && pricedAllBrandSlugs !== brandSlug) {
-    const correctUrl = `/${params.countryCode}/products/${pricedAllBrandSlugs}-${pricedProduct.handle}`
+    const correctUrl = `/${params.countryCode}/products/${pricedAllBrandSlugs}-${resolvedProduct.handle}`
     redirect(correctUrl)
   }
 
   // Fetch related products data on the server - brand-based with category fallback using Algolia
   // Get brands from product (handle both single brand object and array)
-  const brandData = (pricedProduct as any).brands
+  const brandData = (resolvedProduct as any).brands
   const brands = Array.isArray(brandData) ? brandData : (brandData ? [brandData] : [])
 
   let relatedProducts: any[] = []
@@ -271,14 +269,14 @@ export default async function ProductPage(props: Props) {
     })
 
     relatedProducts = convertAlgoliaProductsToMedusaFormat(algoliaResult.hits).filter(
-      (p: any) => p.id !== pricedProduct.id
+      (p: any) => p.id !== resolvedProduct.id
     )
   }
 
   // If not enough brand matches, fall back to category-based products
-  if (relatedProducts.length < 4 && pricedProduct.categories && pricedProduct.categories.length > 0) {
+  if (relatedProducts.length < 4 && resolvedProduct.categories && resolvedProduct.categories.length > 0) {
     // Get the first category handle
-    const primaryCategory = pricedProduct.categories[0]
+    const primaryCategory = resolvedProduct.categories[0]
 
     if (primaryCategory.handle) {
       const categoryResult = await searchProductsWithAlgolia({
@@ -287,7 +285,7 @@ export default async function ProductPage(props: Props) {
       })
 
       const categoryProducts = convertAlgoliaProductsToMedusaFormat(categoryResult.hits).filter(
-        (p: any) => p.id !== pricedProduct.id && !relatedProducts.some((existing: any) => existing.id === p.id)
+        (p: any) => p.id !== resolvedProduct.id && !relatedProducts.some((existing: any) => existing.id === p.id)
       )
 
       // Combine brand matches with category matches to fill the carousel
@@ -297,7 +295,7 @@ export default async function ProductPage(props: Props) {
 
   // Generate JSON-LD structured data for this product
   const jsonLd = generateProductJsonLd({
-    product: pricedProduct,
+    product: resolvedProduct,
     region,
     countryCode: params.countryCode
   })
@@ -312,7 +310,7 @@ export default async function ProductPage(props: Props) {
         }}
       />
       <ProductTemplate
-        product={pricedProduct}
+        product={resolvedProduct}
         region={region}
         countryCode={params.countryCode}
         relatedProducts={relatedProducts}

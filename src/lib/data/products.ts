@@ -68,28 +68,41 @@ export const listProducts = async ({
     tags: [`products-${region.id}`], // Simplified cache tags
   }
   
-  return sdk.client
-    .fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(
-      "/store/products",
-      {
-        method: "GET",
-        query: finalQuery,
-        headers,
-        next,
-      }
-    )
-    .then(({ products, count }) => {
-      const nextPage = count > offset + limit ? pageParam + 1 : null
-
-      return {
-        response: {
-          products,
-          count,
-        },
-        nextPage,
-        queryParams,
-      }
+  try {
+    const { products, count } = await sdk.client.fetch<{
+      products: HttpTypes.StoreProduct[]
+      count: number
+    }>("/store/products", {
+      method: "GET",
+      query: finalQuery,
+      headers,
+      next,
     })
+
+    const nextPage = count > offset + limit ? pageParam + 1 : null
+
+    return {
+      response: {
+        products,
+        count,
+      },
+      nextPage,
+      queryParams,
+    }
+  } catch (error) {
+    console.error("[products] Failed to fetch /store/products", {
+      countryCode,
+      regionId: region.id,
+      query: finalQuery,
+      error,
+    })
+
+    return {
+      response: { products: [], count: 0 },
+      nextPage: null,
+      queryParams,
+    }
+  }
 }
 
 
