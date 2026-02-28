@@ -13,6 +13,7 @@ import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
 import SizeGuideLink from "@modules/products/components/size-guide-link"
 import { trackAddToBag, trackVariantSelected } from "@lib/util/analytics"
+import { trackAddToCart } from "@lib/util/meta-pixel"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -138,6 +139,26 @@ export default function ProductActions({
         price: selectedVariant.calculated_price?.calculated_amount ?? undefined,
         currency: selectedVariant.calculated_price?.currency_code ?? undefined,
         quantity: 1,
+      })
+
+      const variantPrice = selectedVariant.calculated_price?.calculated_amount
+      const variantCurrency = selectedVariant.calculated_price?.currency_code
+      const normalizedValue =
+        typeof variantPrice === "number" ? variantPrice / 100 : 0
+
+      trackAddToCart({
+        value: normalizedValue,
+        currency: variantCurrency?.toUpperCase() || "USD",
+        contentIds: [selectedVariant.id],
+        contentName: product.title,
+        contentType: "product",
+        contents: [
+          {
+            id: selectedVariant.id,
+            quantity: 1,
+            item_price: normalizedValue,
+          },
+        ],
       })
     } catch (error) {
       console.error('Error adding to cart:', error)

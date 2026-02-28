@@ -14,18 +14,31 @@ type MetaPixelPurchaseProps = {
  */
 export default function MetaPixelPurchase({ order }: MetaPixelPurchaseProps) {
   useEffect(() => {
+    const storageKey = `meta_pixel_purchase_${order.id}`
+
+    try {
+      if (sessionStorage.getItem(storageKey) === "1") {
+        return
+      }
+    } catch {
+      // Ignore storage access issues and continue with tracking.
+    }
+
     // Only track once when component mounts
     const totalValue = order.total / 100 // Convert from cents to dollars
     const currency = order.currency_code.toUpperCase()
 
     // Get product IDs from line items
-    const contentIds = order.items?.map((item) => item.variant?.sku || item.id) || []
+    const contentIds =
+      order.items?.map((item) => item.variant?.id || item.variant?.sku || item.id) || []
 
     // Get detailed contents with quantities
-    const contents = order.items?.map((item) => ({
-      id: item.variant?.sku || item.id,
-      quantity: item.quantity,
-    })) || []
+    const contents =
+      order.items?.map((item) => ({
+        id: item.variant?.id || item.variant?.sku || item.id,
+        quantity: item.quantity,
+        item_price: typeof item.unit_price === "number" ? item.unit_price / 100 : undefined,
+      })) || []
 
     // Total number of items
     const numItems = order.items?.reduce((sum, item) => sum + item.quantity, 0) || 0
@@ -39,6 +52,12 @@ export default function MetaPixelPurchase({ order }: MetaPixelPurchaseProps) {
       numItems,
     })
 
+    try {
+      sessionStorage.setItem(storageKey, "1")
+    } catch {
+      // Ignore storage access issues after tracking.
+    }
+
     // Optional: Log for debugging (remove in production)
     if (process.env.NODE_ENV === "development") {
       console.log("Meta Pixel Purchase Event Tracked:", {
@@ -50,7 +69,7 @@ export default function MetaPixelPurchase({ order }: MetaPixelPurchaseProps) {
         orderId: order.id,
       })
     }
-  }, [order.id]) // Only re-run if order ID changes
+  }, [order]) // Re-run when order payload changes
 
   return null // This component doesn't render anything
 }

@@ -8,6 +8,7 @@ import RelatedProductsClient from "@modules/products/components/related-products
 import ProductInfo from "@modules/products/templates/product-info"
 import ProductInfoMobile from "@modules/products/templates/product-info/product-info-mobile"
 import ProductDescriptionMobile from "@modules/products/templates/product-info/product-description-mobile"
+import MetaPixelViewContent from "@modules/products/components/meta-pixel-view-content"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import { notFound } from "next/navigation"
 import ProductActionsWrapper from "./product-actions-wrapper"
@@ -31,8 +32,24 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
     return notFound()
   }
 
+  const firstPricedVariant = product.variants?.find(
+    (variant) => typeof variant?.calculated_price?.calculated_amount === "number"
+  )
+  const viewContentValue =
+    typeof firstPricedVariant?.calculated_price?.calculated_amount === "number"
+      ? firstPricedVariant.calculated_price.calculated_amount / 100
+      : undefined
+  const viewContentCurrency =
+    firstPricedVariant?.calculated_price?.currency_code?.toUpperCase()
+
   return (
     <>
+      <MetaPixelViewContent
+        productId={product.id}
+        contentName={product.title}
+        value={viewContentValue}
+        currency={viewContentCurrency}
+      />
       {/* Mobile Layout - < md (768px) */}
       <div className="md:hidden">
         {/* Image Gallery - Full width at top */}

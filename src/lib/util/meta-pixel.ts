@@ -9,6 +9,14 @@ declare global {
   }
 }
 
+type ContentType = "product" | "product_group"
+
+type PixelContent = {
+  id: string
+  quantity?: number
+  item_price?: number
+}
+
 /**
  * Track a Meta Pixel Purchase event
  * @param value - Total purchase value in the currency
@@ -29,8 +37,8 @@ export const trackPurchase = ({
   value: number
   currency: string
   contentIds?: string[]
-  contentType?: "product" | "product_group"
-  contents?: Array<{ id: string; quantity: number }>
+  contentType?: ContentType
+  contents?: PixelContent[]
   numItems?: number
 }) => {
   if (typeof window !== "undefined" && window.fbq) {
@@ -51,17 +59,23 @@ export const trackPurchase = ({
  * @param currency - Currency code
  * @param contentName - Name of the content
  * @param contentIds - Array of content IDs
+ * @param contentType - Type of content ('product' or 'product_group')
+ * @param contents - Array of items with id and quantity
  */
 export const trackViewContent = ({
   value,
   currency,
   contentName,
   contentIds,
+  contentType = "product",
+  contents,
 }: {
   value?: number
   currency?: string
   contentName?: string
   contentIds?: string[]
+  contentType?: ContentType
+  contents?: PixelContent[]
 }) => {
   if (typeof window !== "undefined" && window.fbq) {
     window.fbq("track", "ViewContent", {
@@ -69,6 +83,8 @@ export const trackViewContent = ({
       currency,
       content_name: contentName,
       content_ids: contentIds,
+      content_type: contentType,
+      contents,
     })
   }
 }
@@ -79,17 +95,23 @@ export const trackViewContent = ({
  * @param currency - Currency code
  * @param contentIds - Array of content IDs
  * @param contentName - Name of the content
+ * @param contentType - Type of content ('product' or 'product_group')
+ * @param contents - Array of items with id and quantity
  */
 export const trackAddToCart = ({
   value,
   currency,
   contentIds,
   contentName,
+  contentType = "product",
+  contents,
 }: {
   value: number
   currency: string
   contentIds?: string[]
   contentName?: string
+  contentType?: ContentType
+  contents?: PixelContent[]
 }) => {
   if (typeof window !== "undefined" && window.fbq) {
     window.fbq("track", "AddToCart", {
@@ -97,6 +119,8 @@ export const trackAddToCart = ({
       currency,
       content_ids: contentIds,
       content_name: contentName,
+      content_type: contentType,
+      contents,
     })
   }
 }
@@ -107,17 +131,23 @@ export const trackAddToCart = ({
  * @param currency - Currency code
  * @param numItems - Number of items
  * @param contentIds - Array of content IDs
+ * @param contentType - Type of content ('product' or 'product_group')
+ * @param contents - Array of items with id and quantity
  */
 export const trackInitiateCheckout = ({
   value,
   currency,
   numItems,
   contentIds,
+  contentType = "product",
+  contents,
 }: {
   value: number
   currency: string
   numItems?: number
   contentIds?: string[]
+  contentType?: ContentType
+  contents?: PixelContent[]
 }) => {
   if (typeof window !== "undefined" && window.fbq) {
     window.fbq("track", "InitiateCheckout", {
@@ -125,6 +155,8 @@ export const trackInitiateCheckout = ({
       currency,
       num_items: numItems,
       content_ids: contentIds,
+      content_type: contentType,
+      contents,
     })
   }
 }
