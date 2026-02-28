@@ -286,7 +286,13 @@ export function generateProductJsonLd({ product, region, countryCode }: ProductJ
       // Check if variant has options and extract the option values
       if (variant.options && variant.options.length > 0) {
         // Join all option values to create the variant name
-        return variant.options.map(option => option.value).join(' / ')
+        const optionValues = variant.options
+          .map((option) => option?.value)
+          .filter((value): value is string => typeof value === "string" && value.length > 0)
+
+        if (optionValues.length > 0) {
+          return optionValues.join(" / ")
+        }
       }
       
       // Fallback to variant.title if available
