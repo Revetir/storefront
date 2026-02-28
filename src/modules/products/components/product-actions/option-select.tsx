@@ -52,7 +52,8 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
   }
 
   const sortedOptions = (option.values ?? [])
-    .map((v) => v.value)
+    .map((v) => v?.value)
+    .filter((value): value is string => typeof value === "string" && value.length > 0)
     .sort(universalSort)
 
   return (

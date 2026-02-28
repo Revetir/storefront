@@ -25,6 +25,10 @@ const optionsAsKeymap = (
   variantOptions: HttpTypes.StoreProductVariant["options"]
 ) => {
   return variantOptions?.reduce((acc: Record<string, string>, varopt: any) => {
+    if (!varopt?.option_id || typeof varopt?.value !== "string") {
+      return acc
+    }
+
     acc[varopt.option_id] = varopt.value
     return acc
   }, {} as Record<string, string>)
@@ -177,7 +181,7 @@ export default function ProductActions({
       {/* Variant selectors */}
       {(product.variants?.length ?? 0) > 1 && (
         <div className="flex flex-col gap-y-4 mb-4">
-          {(product.options || []).map((option) => (
+          {(product.options || []).filter(Boolean).map((option) => (
             <OptionSelect
               key={option.id}
               option={option}
