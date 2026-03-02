@@ -15,6 +15,40 @@ interface SizingModalProps {
 
 type PageType = "PM" | "SCC"
 
+const getImmediateSizingTemplate = (product: HttpTypes.StoreProduct): SizingTemplate | null => {
+  if (!product.categories || product.categories.length === 0) {
+    return null
+  }
+
+  let hasMensShoes = false
+  let hasWomensShoes = false
+  let hasRings = false
+
+  for (const category of product.categories) {
+    const handle = (category.handle || "").toLowerCase()
+    const name = (category.name || "").toLowerCase()
+
+    if (handle === "mens-shoes" || (/\bshoe(s)?\b/.test(name) && /\bmen(s)?\b/.test(name))) {
+      hasMensShoes = true
+    }
+
+    if (handle === "womens-shoes" || (/\bshoe(s)?\b/.test(name) && /\bwomen(s)?\b/.test(name))) {
+      hasWomensShoes = true
+    }
+
+    if (handle === "mens-rings" || handle === "womens-rings" || /\brings?\b/.test(name)) {
+      hasRings = true
+    }
+  }
+
+  if (hasMensShoes && hasWomensShoes) return getSizingTemplate("Shoes Unisex")
+  if (hasMensShoes) return getSizingTemplate("Shoes Men")
+  if (hasWomensShoes) return getSizingTemplate("Shoes Women")
+  if (hasRings) return getSizingTemplate("Rings")
+
+  return null
+}
+
 const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => {
   // State for size and unit toggles
   const [selectedSize, setSelectedSize] = useState<string>("S")
@@ -25,14 +59,27 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
   const [productMeasurements, setProductMeasurements] = useState<any>(null)
   const [isLoadingMeasurements, setIsLoadingMeasurements] = useState(false)
 
+  const immediateTemplate = useMemo(() => getImmediateSizingTemplate(product), [product.categories])
+
   // State for sizing template (fetched asynchronously)
-  const [sizingTemplate, setSizingTemplate] = useState<SizingTemplate | null>(null)
+  const [sizingTemplate, setSizingTemplate] = useState<SizingTemplate | null>(immediateTemplate)
+
+  React.useEffect(() => {
+    if (!isOpen) return
+    setSizingTemplate(immediateTemplate)
+  }, [isOpen, immediateTemplate, product.id])
 
   // Fetch sizing template asynchronously when modal opens or productMeasurements change
   React.useEffect(() => {
     if (!isOpen) return
 
     const fetchSizingTemplate = async () => {
+      // Fast path for categories with conversion charts (shoes/rings)
+      if (immediateTemplate) {
+        setSizingTemplate(immediateTemplate)
+        return
+      }
+
       // First try backend template (for products with measurements)
       if (productMeasurements?.template) {
         const template = getSizingTemplate(productMeasurements.template)
@@ -56,7 +103,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
     }
 
     fetchSizingTemplate()
-  }, [isOpen, productMeasurements?.template, product.categories])
+  }, [isOpen, productMeasurements?.template, product.categories, product, immediateTemplate])
 
   React.useEffect(() => {
     if (!isOpen) return
