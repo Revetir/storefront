@@ -78,7 +78,7 @@ async function getRegionMap(cacheId: string) {
  */
 async function getCountryCode(
   request: NextRequest,
-  regionMap: Map<string, HttpTypes.StoreRegion | number>
+  regionMap: Map<string, HttpTypes.StoreRegion>
 ) {
   try {
     let countryCode
@@ -113,31 +113,15 @@ async function getCountryCode(
  * Middleware to handle region selection and onboarding status.
  */
 export async function middleware(request: NextRequest) {
-  let redirectUrl = request.nextUrl.href
-
-  let response = NextResponse.redirect(redirectUrl, 307)
-
   let cacheIdCookie = request.cookies.get("_medusa_cache_id")
-
   let cacheId = cacheIdCookie?.value || crypto.randomUUID()
 
-  const regionMap = await getRegionMap(cacheId)
-
-  const countryCode = regionMap && (await getCountryCode(request, regionMap))
-
-  const urlHasCountryCode =
-    countryCode && request.nextUrl.pathname.split("/")[1].includes(countryCode)
-
-  // if one of the country codes is in the url and the cache id is set, return next
-  if (urlHasCountryCode && cacheIdCookie) {
-    return NextResponse.next()
-  }
-
-  // if one of the country codes is in the url and the cache id is not set, set the cache id and redirect
-  if (urlHasCountryCode && !cacheIdCookie) {
-    response.cookies.set("_medusa_cache_id", cacheId, {
-      maxAge: 60 * 60 * 24,
-    })
+  const attachCacheIdCookie = (response: NextResponse) => {
+    if (!cacheIdCookie) {
+      response.cookies.set("_medusa_cache_id", cacheId, {
+        maxAge: 60 * 60 * 24,
+      })
+    }
 
     return response
   }
@@ -147,6 +131,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  const regionMap = await getRegionMap(cacheId)
+
+  const countryCode = regionMap && (await getCountryCode(request, regionMap))
+
+  const urlCountryCode = request.nextUrl.pathname.split("/")[1]?.toLowerCase()
+  const urlHasCountryCode = Boolean(
+    countryCode && urlCountryCode && urlCountryCode === countryCode
+  )
+
+  // If the URL already has a valid country code, continue without redirecting.
+  if (urlHasCountryCode) {
+    return attachCacheIdCookie(NextResponse.next())
+  }
+
   const redirectPath =
     request.nextUrl.pathname === "/" ? "" : request.nextUrl.pathname
 
@@ -154,11 +152,12 @@ export async function middleware(request: NextRequest) {
 
   // If no country code is set, we redirect to the relevant region.
   if (!urlHasCountryCode && countryCode) {
-    redirectUrl = `${request.nextUrl.origin}/${countryCode}${redirectPath}${queryString}`
-    response = NextResponse.redirect(`${redirectUrl}`, 307)
+    const redirectUrl = `${request.nextUrl.origin}/${countryCode}${redirectPath}${queryString}`
+    return attachCacheIdCookie(NextResponse.redirect(`${redirectUrl}`, 307))
   }
 
-  return response
+  // Safety fallback: never self-redirect when country resolution fails.
+  return attachCacheIdCookie(NextResponse.next())
 }
 
 export const config = {
