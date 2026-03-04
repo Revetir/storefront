@@ -57,8 +57,8 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
     units: "cm",
     measurement_points: {
       waist: {
-        x_percent: 49.5,
-        y_percent: 2,
+        x_percent: 50,
+        y_percent: 0,
         label: "Waist"
       },
       rise: {
@@ -77,8 +77,8 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
         label: "Outseam"
       },
       leg_opening: {
-        x_percent: 31,
-        y_percent: 96,
+        x_percent: 30,
+        y_percent: 100,
         label: "Leg Opening"
       }
     },
