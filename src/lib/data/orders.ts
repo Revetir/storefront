@@ -6,16 +6,18 @@ import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { HttpTypes } from "@medusajs/types"
 
 const ORDER_FIELDS =
-  "*,*items,*items.variant,*items.product,*shipping_methods,*shipping_address,*billing_address,*fulfillments,*payment_collections,*payment_collections.payments,custom_display_id"
+  "*items,*items.variant,*items.product,*shipping_methods,*shipping_address,*billing_address,*fulfillments,*payment_collections,*payment_collections.payments,custom_display_id"
 
 const isOrderFieldsParseError = (error: any) => {
-  const message = (
-    error?.response?.data?.message ||
-    error?.message ||
-    ""
-  ).toLowerCase()
+  const rawMessage = error?.response?.data?.message || error?.message || ""
+  const message = String(rawMessage).toLowerCase()
 
-  return message.includes("does not have property ''")
+  return (
+    message.includes("entity 'order' does not have property") ||
+    message.includes('entity "order" does not have property') ||
+    message.includes("does not have property ''") ||
+    message.includes('does not have property ""')
+  )
 }
 
 export const retrieveOrder = async (id: string) => {
