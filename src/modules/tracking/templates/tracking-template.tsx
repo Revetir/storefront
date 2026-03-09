@@ -55,14 +55,24 @@ type TrackingTemplateProps = {
   data: TrackingData
 }
 
-const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatus }) => {
-  const normalizedStatus = currentStatus.toLowerCase()
+const normalizeTrackingStatus = (status: string): string =>
+  status.toLowerCase().replace(/[^a-z0-9]/g, "")
 
-  const isDelivered = normalizedStatus.includes("delivered")
-  const isOutForDelivery =
-    normalizedStatus.includes("outfordelivery") ||
-    normalizedStatus.includes("out_for_delivery") ||
-    normalizedStatus.includes("out for delivery")
+const resolveTimelineState = (status: string): "delivered" | "out_for_delivery" | "shipped" => {
+  const normalizedStatus = normalizeTrackingStatus(status)
+  if (normalizedStatus === "delivered") {
+    return "delivered"
+  }
+  if (normalizedStatus === "outfordelivery") {
+    return "out_for_delivery"
+  }
+  return "shipped"
+}
+
+const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatus }) => {
+  const timelineState = resolveTimelineState(currentStatus)
+  const isDelivered = timelineState === "delivered"
+  const isOutForDelivery = timelineState === "out_for_delivery"
 
   const steps = [
     { label: "Processing", isComplete: true },
@@ -153,15 +163,17 @@ const OrderStatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatu
 const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
   const [showAllEvents, setShowAllEvents] = React.useState(false)
 
-  const getStatusDisplay = (status: string) => {
-    // Convert status codes to human-readable format
-    const normalizedStatus = status.toLowerCase()
-    if (normalizedStatus.includes("delivered")) return "Delivered"
-    if (normalizedStatus.includes("transit")) return "In Transit"
-    if (normalizedStatus.includes("picked")) return "Picked Up"
-    if (normalizedStatus.includes("registered")) return "Registered"
-    return status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, " ")
-  }
+  const infoReceivedMessage =
+    "Your shipment is currently in international transit. Tracking updates will appear once the package reaches the destination country and is scanned by the local carrier."
+  const notFoundMessage =
+    "Tracking will appear once shipment information is processed by the carrier."
+  const noEventsMessage =
+    normalizeTrackingStatus(data.current_status) === "notfound"
+      ? notFoundMessage
+      : infoReceivedMessage
+
+  const isHiddenStatus = (status: string): boolean =>
+    ["registered", "inforeceived", "notfound"].includes(normalizeTrackingStatus(status))
 
   const formatEventDateTime = (timestamp: string) => {
     const date = new Date(timestamp)
@@ -179,14 +191,6 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
 
     return { dateLabel, timeLabel }
   }
-
-  const toTitleCase = (value: string): string =>
-    value
-      .toLowerCase()
-      .split(/\s+/g)
-      .filter(Boolean)
-      .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-      .join(" ")
 
   const displayCarrier = data.carrier
 
@@ -248,14 +252,13 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
 
           {(() => {
             const VISIBLE_EVENT_COUNT = 4
-            const filteredEvents = data.events.filter((event) => {
-              const status = (event.status || "").toLowerCase()
-              return !status.includes("registered")
-            })
+            const filteredEvents = data.events.filter(
+              (event) => !isHiddenStatus(event.status || "")
+            )
             if (filteredEvents.length === 0) {
                 return (
                 <div className="py-4 text-xs md:text-sm text-ui-fg-subtle">
-                  Your shipment is currently in international transit. Tracking updates will appear once the package reaches the destination country and is scanned by the local carrier.
+                  {noEventsMessage}
                 </div>
               )
             }
@@ -269,7 +272,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                 <div className="flex flex-col divide-y divide-gray-100">
                   {visibleEvents.map((event, index) => {
                     const { dateLabel, timeLabel } = formatEventDateTime(event.timestamp)
-                    const primaryText = event.description || getStatusDisplay(event.status)
+                    const primaryText = event.description || event.status
                     const secondaryText = event.location
 
                     return (
@@ -284,7 +287,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
 
                         <div className="flex-1 text-xs md:text-sm">
                           <div className="text-xs md:text-sm text-ui-fg-base">
-                            {toTitleCase(primaryText)}
+                            {primaryText}
                           </div>
                           {secondaryText && (
                             <div className="mt-1 text-ui-fg-subtle text-xs md:text-sm">
