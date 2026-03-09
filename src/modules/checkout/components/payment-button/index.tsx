@@ -1,7 +1,7 @@
 "use client"
 
 import { isManual, isStripe } from "@lib/constants"
-import { placeOrder } from "@lib/data/cart"
+import { placeOrder, updateCart } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
@@ -32,6 +32,119 @@ const isNextRedirectError = (error: unknown): boolean => {
   )
 }
 
+const ADDRESS_FIELDS = [
+  "first_name",
+  "last_name",
+  "address_1",
+  "address_2",
+  "company",
+  "postal_code",
+  "city",
+  "country_code",
+  "province",
+  "phone",
+] as const
+
+const readAutocompleteFieldValue = (testId: string): string | undefined => {
+  if (typeof window === "undefined") return undefined
+
+  const container = document.querySelector(
+    `[data-testid="${testId}"]`
+  ) as HTMLElement | null
+  const input = container?.querySelector(
+    ".radar-autocomplete-input"
+  ) as HTMLInputElement | null
+
+  const value = input?.value?.trim()
+  return value ? value : undefined
+}
+
+const readFieldValue = (name: string): string | undefined => {
+  if (typeof window === "undefined") return undefined
+
+  const field = document.querySelector(
+    `[name="${name}"]`
+  ) as HTMLInputElement | HTMLSelectElement | null
+
+  if (field) {
+    const value = field.value?.trim()
+    return value ? value : undefined
+  }
+
+  if (name === "shipping_address.address_1") {
+    return readAutocompleteFieldValue("shipping-address-input")
+  }
+
+  if (name === "billing_address.address_1") {
+    return readAutocompleteFieldValue("billing-address-input")
+  }
+
+  return undefined
+}
+
+const readAddressFromForm = (
+  prefix: "shipping_address" | "billing_address"
+): Partial<HttpTypes.StoreCartAddress> | null => {
+  const address: Partial<HttpTypes.StoreCartAddress> = {}
+  let hasAnyValue = false
+
+  ADDRESS_FIELDS.forEach((field) => {
+    const value = readFieldValue(`${prefix}.${field}`)
+    if (value !== undefined) {
+      hasAnyValue = true
+      address[field] = value
+    }
+  })
+
+  return hasAnyValue ? address : null
+}
+
+const isSameAsBillingChecked = (): boolean => {
+  if (typeof window === "undefined") return true
+
+  const checkbox = document.querySelector(
+    '[data-testid="billing-address-checkbox"]'
+  ) as HTMLElement | null
+
+  return checkbox?.getAttribute("aria-checked") !== "false"
+}
+
+const syncCartFromCheckoutForm = async (
+  cart: HttpTypes.StoreCart
+): Promise<HttpTypes.StoreCart> => {
+  if (typeof window === "undefined") return cart
+
+  const shippingAddress = readAddressFromForm("shipping_address")
+  const billingAddress = readAddressFromForm("billing_address")
+  const email = readFieldValue("email")
+  const sameAsBilling = isSameAsBillingChecked()
+
+  const updateData: HttpTypes.StoreUpdateCart = {}
+
+  if (shippingAddress) {
+    updateData.shipping_address = shippingAddress
+  }
+
+  if (email !== undefined) {
+    updateData.email = email
+  }
+
+  if (sameAsBilling) {
+    if (shippingAddress || cart.shipping_address) {
+      updateData.billing_address = shippingAddress || cart.shipping_address || undefined
+    }
+  } else if (billingAddress) {
+    updateData.billing_address = billingAddress
+  }
+
+  if (Object.keys(updateData).length === 0) {
+    return cart
+  }
+
+  const updatedCart = await updateCart(updateData)
+  return updatedCart || cart
+}
+
 /**
  * Get the button text based on the selected payment method
  *
@@ -48,9 +161,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 }) => {
   const notReady =
     !cart ||
-    !cart.shipping_address ||
-    !cart.billing_address ||
-    !cart.email ||
     (cart.shipping_methods?.length ?? 0) < 1
 
   const paymentSessions = cart.payment_collection?.payment_sessions || []
@@ -107,12 +217,6 @@ const StripePaymentButton = ({
   const { selectedPaymentMethod } = usePaymentContext()
 
   const { countryCode } = useParams()
-  const paymentSession = cart.payment_collection?.payment_sessions?.find(
-    (session) => session.provider_id === "pp_stripe_stripe" && session.status === "pending"
-  ) || cart.payment_collection?.payment_sessions?.find(
-    (session) =>
-      session.provider_id === "pp_stripe_stripe" && session.status !== "canceled"
-  )
 
   const buttonText = getButtonText(selectedPaymentMethod)
 
@@ -142,8 +246,17 @@ const StripePaymentButton = ({
       return
     }
 
+    let checkoutCart = cart
+
+    try {
+      checkoutCart = await syncCartFromCheckoutForm(cart)
+    } catch (syncError) {
+      setErrorMessage("Unable to save your checkout details. Please try again.")
+      return
+    }
+
     // Validate all required checkout fields first
-    const validationErrors = validateCheckout(cart)
+    const validationErrors = validateCheckout(checkoutCart)
 
     if (validationErrors.length > 0) {
       // Scroll to top to show errors
@@ -155,11 +268,18 @@ const StripePaymentButton = ({
       return
     }
 
-    if (!stripe || !elements || !cart) {
+    if (!stripe || !elements || !checkoutCart) {
       return
     }
 
     setSubmitting(true)
+
+    const paymentSession = checkoutCart.payment_collection?.payment_sessions?.find(
+      (session) => session.provider_id === "pp_stripe_stripe" && session.status === "pending"
+    ) || checkoutCart.payment_collection?.payment_sessions?.find(
+      (session) =>
+        session.provider_id === "pp_stripe_stripe" && session.status !== "canceled"
+    )
 
     const clientSecret = paymentSession?.data?.client_secret as string
     if (!clientSecret) {
@@ -187,29 +307,29 @@ const StripePaymentButton = ({
     // Handle Afterpay payment flow
     if (selectedPaymentMethod === 'afterpay_clearpay') {
       const billingDetails = {
-        name: `${cart.billing_address?.first_name} ${cart.billing_address?.last_name}`,
-        email: cart.email,
-        phone: cart.billing_address?.phone ?? undefined,
+        name: `${checkoutCart.billing_address?.first_name} ${checkoutCart.billing_address?.last_name}`,
+        email: checkoutCart.email,
+        phone: checkoutCart.billing_address?.phone ?? undefined,
         address: {
-          line1: cart.billing_address?.address_1 ?? undefined,
-          line2: cart.billing_address?.address_2 ?? undefined,
-          city: cart.billing_address?.city ?? undefined,
-          state: cart.billing_address?.province ?? undefined,
-          postal_code: cart.billing_address?.postal_code ?? undefined,
-          country: cart.billing_address?.country_code ?? undefined,
+          line1: checkoutCart.billing_address?.address_1 ?? undefined,
+          line2: checkoutCart.billing_address?.address_2 ?? undefined,
+          city: checkoutCart.billing_address?.city ?? undefined,
+          state: checkoutCart.billing_address?.province ?? undefined,
+          postal_code: checkoutCart.billing_address?.postal_code ?? undefined,
+          country: checkoutCart.billing_address?.country_code ?? undefined,
         },
       }
 
       const shippingDetails = {
-        name: `${cart.shipping_address?.first_name} ${cart.shipping_address?.last_name}`,
-        phone: cart.shipping_address?.phone ?? '',
+        name: `${checkoutCart.shipping_address?.first_name} ${checkoutCart.shipping_address?.last_name}`,
+        phone: checkoutCart.shipping_address?.phone ?? '',
         address: {
-          line1: cart.shipping_address?.address_1 ?? '',
-          line2: cart.shipping_address?.address_2 ?? '',
-          city: cart.shipping_address?.city ?? '',
-          state: cart.shipping_address?.province ?? '',
-          postal_code: cart.shipping_address?.postal_code ?? '',
-          country: cart.shipping_address?.country_code ?? '',
+          line1: checkoutCart.shipping_address?.address_1 ?? '',
+          line2: checkoutCart.shipping_address?.address_2 ?? '',
+          city: checkoutCart.shipping_address?.city ?? '',
+          state: checkoutCart.shipping_address?.province ?? '',
+          postal_code: checkoutCart.shipping_address?.postal_code ?? '',
+          country: checkoutCart.shipping_address?.country_code ?? '',
         },
       }
 
@@ -245,19 +365,19 @@ const StripePaymentButton = ({
         card: cardElement,
         billing_details: {
           name:
-            cart.billing_address?.first_name +
+            checkoutCart.billing_address?.first_name +
             " " +
-            cart.billing_address?.last_name,
+            checkoutCart.billing_address?.last_name,
           address: {
-            city: cart.billing_address?.city ?? undefined,
-            country: cart.billing_address?.country_code ?? undefined,
-            line1: cart.billing_address?.address_1 ?? undefined,
-            line2: cart.billing_address?.address_2 ?? undefined,
-            postal_code: cart.billing_address?.postal_code ?? undefined,
-            state: cart.billing_address?.province ?? undefined,
+            city: checkoutCart.billing_address?.city ?? undefined,
+            country: checkoutCart.billing_address?.country_code ?? undefined,
+            line1: checkoutCart.billing_address?.address_1 ?? undefined,
+            line2: checkoutCart.billing_address?.address_2 ?? undefined,
+            postal_code: checkoutCart.billing_address?.postal_code ?? undefined,
+            state: checkoutCart.billing_address?.province ?? undefined,
           },
-          email: cart.email,
-          phone: cart.billing_address?.phone ?? undefined,
+          email: checkoutCart.email,
+          phone: checkoutCart.billing_address?.phone ?? undefined,
         },
       },
     })
@@ -342,26 +462,37 @@ const ManualTestPaymentButton = ({ notReady, cart }: { notReady: boolean, cart: 
   }
 
   const handlePayment = () => {
-    if (submitting) {
-      return
-    }
+    void (async () => {
+      if (submitting) {
+        return
+      }
 
-    // Validate all required checkout fields first
-    const validationErrors = validateCheckout(cart)
+      let checkoutCart = cart
 
-    if (validationErrors.length > 0) {
-      // Scroll to top to show errors
-      scrollToTop()
+      try {
+        checkoutCart = await syncCartFromCheckoutForm(cart)
+      } catch (syncError) {
+        setErrorMessage("Unable to save your checkout details. Please try again.")
+        return
+      }
 
-      // Trigger field errors
-      triggerFieldErrors(validationErrors)
+      // Validate all required checkout fields first
+      const validationErrors = validateCheckout(checkoutCart)
 
-      return
-    }
+      if (validationErrors.length > 0) {
+        // Scroll to top to show errors
+        scrollToTop()
 
-    setSubmitting(true)
+        // Trigger field errors
+        triggerFieldErrors(validationErrors)
 
-    onPaymentCompleted()
+        return
+      }
+
+      setSubmitting(true)
+
+      onPaymentCompleted()
+    })()
   }
 
   return (
