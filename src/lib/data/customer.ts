@@ -33,7 +33,7 @@ export const retrieveCustomer =
       .fetch<{ customer: HttpTypes.StoreCustomer }>(`/store/customers/me`, {
         method: "GET",
         query: {
-          fields: "*orders",
+          fields: "id,email,first_name,last_name,phone,*addresses",
         },
         headers,
         next,
@@ -67,6 +67,7 @@ export async function signup(_currentState: unknown, formData: FormData) {
     last_name: formData.get("last_name") as string,
     phone: formData.get("phone") as string,
   }
+  const countryCode = formData.get("country_code") as string
 
   try {
     const token = await sdk.auth.register("customer", "emailpass", {
@@ -76,14 +77,14 @@ export async function signup(_currentState: unknown, formData: FormData) {
 
     await setAuthToken(token as string)
 
-    const headers = {
+    const authHeaders = {
       ...(await getAuthHeaders()),
     }
 
-    const { customer: createdCustomer } = await sdk.store.customer.create(
+    await sdk.store.customer.create(
       customerForm,
       {},
-      headers
+      authHeaders
     )
 
     const loginToken = await sdk.auth.login("customer", "emailpass", {
@@ -98,7 +99,7 @@ export async function signup(_currentState: unknown, formData: FormData) {
 
     await transferCart()
 
-    return createdCustomer
+    redirect(`/${countryCode || "us"}/account`)
   } catch (error: any) {
     return error.toString()
   }
@@ -107,6 +108,7 @@ export async function signup(_currentState: unknown, formData: FormData) {
 export async function login(_currentState: unknown, formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
+  const countryCode = (formData.get("country_code") as string) || "us"
 
   try {
     await sdk.auth
@@ -125,6 +127,8 @@ export async function login(_currentState: unknown, formData: FormData) {
   } catch (error: any) {
     return error.toString()
   }
+
+  redirect(`/${countryCode}/account`)
 }
 
 export async function signout(countryCode: string) {

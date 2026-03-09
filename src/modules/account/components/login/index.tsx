@@ -4,6 +4,7 @@ import { login } from "@lib/data/customer"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
+import { useParams } from "next/navigation"
 import { useActionState, useState } from "react"
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
 const Login = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(login, null)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const { countryCode } = useParams()
 
   const handleInvalid = (e: React.FormEvent<HTMLInputElement>) => {
     e.preventDefault()
@@ -39,6 +41,11 @@ const Login = ({ setCurrentView }: Props) => {
     >
       <h1 className="text-large-semi uppercase mb-7">Welcome back</h1>
       <form className="w-full" action={formAction}>
+        <input
+          type="hidden"
+          name="country_code"
+          value={(countryCode as string) || "us"}
+        />
         <div className="flex flex-col w-full gap-y-4">
           <div>
             <label

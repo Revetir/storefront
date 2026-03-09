@@ -5,6 +5,19 @@ import medusaError from "@lib/util/medusa-error"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { HttpTypes } from "@medusajs/types"
 
+const ORDER_FIELDS =
+  "*,*items,*items.variant,*items.product,*shipping_methods,*shipping_address,*billing_address,*fulfillments,*payment_collections,*payment_collections.payments,custom_display_id"
+
+const isOrderFieldsParseError = (error: any) => {
+  const message = (
+    error?.response?.data?.message ||
+    error?.message ||
+    ""
+  ).toLowerCase()
+
+  return message.includes("does not have property ''")
+}
+
 export const retrieveOrder = async (id: string) => {
   const headers = {
     ...(await getAuthHeaders()),
@@ -14,19 +27,31 @@ export const retrieveOrder = async (id: string) => {
     ...(await getCacheOptions("orders")),
   }
 
-  return sdk.client
-    .fetch<HttpTypes.StoreOrderResponse>(`/store/orders/${id}`, {
+  try {
+    return await sdk.client.fetch<HttpTypes.StoreOrderResponse>(`/store/orders/${id}`, {
       method: "GET",
       query: {
-        fields:
-          "*,*payment_collections.payments,*items,+items.metadata,*items.variant,*items.product,*fulfillments,+fulfillments.tracking_numbers,custom_display_id",
+        fields: ORDER_FIELDS,
       },
       headers,
       next,
       cache: "force-cache",
     })
     .then(({ order }) => order)
-    .catch((err) => medusaError(err))
+  } catch (error) {
+    if (isOrderFieldsParseError(error)) {
+      return await sdk.client
+        .fetch<HttpTypes.StoreOrderResponse>(`/store/orders/${id}`, {
+          method: "GET",
+          headers,
+          next,
+          cache: "force-cache",
+        })
+        .then(({ order }) => order)
+    }
+
+    return medusaError(error)
+  }
 }
 
 export const listOrders = async (
@@ -42,23 +67,42 @@ export const listOrders = async (
     ...(await getCacheOptions("orders")),
   }
 
-  return sdk.client
-    .fetch<HttpTypes.StoreOrderListResponse>(`/store/orders`, {
-      method: "GET",
-      query: {
-        limit,
-        offset,
-        order: "-created_at",
-        fields:
-          "*,*items,+items.metadata,*items.variant,*items.product,*fulfillments,+fulfillments.tracking_numbers,custom_display_id",
-        ...filters,
-      },
-      headers,
-      next,
-      cache: "force-cache",
-    })
-    .then(({ orders }) => orders)
-    .catch((err) => medusaError(err))
+  try {
+    return await sdk.client
+      .fetch<HttpTypes.StoreOrderListResponse>(`/store/orders`, {
+        method: "GET",
+        query: {
+          limit,
+          offset,
+          order: "-created_at",
+          fields: ORDER_FIELDS,
+          ...filters,
+        },
+        headers,
+        next,
+        cache: "force-cache",
+      })
+      .then(({ orders }) => orders)
+  } catch (error) {
+    if (isOrderFieldsParseError(error)) {
+      return await sdk.client
+        .fetch<HttpTypes.StoreOrderListResponse>(`/store/orders`, {
+          method: "GET",
+          query: {
+            limit,
+            offset,
+            order: "-created_at",
+            ...filters,
+          },
+          headers,
+          next,
+          cache: "force-cache",
+        })
+        .then(({ orders }) => orders)
+    }
+
+    return medusaError(error)
+  }
 }
 
 export const createTransferRequest = async (

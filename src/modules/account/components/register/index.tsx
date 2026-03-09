@@ -1,6 +1,7 @@
 "use client"
 
 import { useActionState, useState } from "react"
+import { useParams } from "next/navigation"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
@@ -12,6 +13,7 @@ type Props = {
 }
 
 const Register = ({ setCurrentView }: Props) => {
+  const { countryCode } = useParams()
   const [message, formAction] = useActionState(signup, null)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -51,6 +53,11 @@ const Register = ({ setCurrentView }: Props) => {
         Members enjoy exclusive discounts and personalized service
       </p>
       <form className="w-full flex flex-col" action={formAction}>
+        <input
+          type="hidden"
+          name="country_code"
+          value={(countryCode as string) || "us"}
+        />
         <div className="flex flex-col w-full gap-y-4">
           <div>
             <label
