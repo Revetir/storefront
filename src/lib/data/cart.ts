@@ -342,77 +342,138 @@ export async function submitPromotionForm(
 
 // TODO: Pass a POJO instead of a form entity here
 export async function setAddresses(currentState: unknown, formData: FormData) {
+  let redirectCountryCode = "us"
+
   try {
     if (!formData) {
       throw new Error("No form data found when setting addresses")
     }
-    const cartId = getCartId()
+
+    const cartId = await getCartId()
     if (!cartId) {
       throw new Error("No existing cart found when setting addresses")
     }
 
-    const shippingAddress = {
-        first_name: formData.get("shipping_address.first_name"),
-        last_name: formData.get("shipping_address.last_name"),
-        address_1: formData.get("shipping_address.address_1"),
-        address_2: "",
-        company: formData.get("shipping_address.company"),
-        postal_code: formData.get("shipping_address.postal_code"),
-        city: formData.get("shipping_address.city"),
-        country_code: formData.get("shipping_address.country_code"),
-        province: formData.get("shipping_address.province"),
-        phone: formData.get("shipping_address.phone"),
+    const cart = await retrieveCart(cartId)
+    if (!cart) {
+      throw new Error("No existing cart found when setting addresses")
     }
 
-    const billingAddress = {
-      first_name: formData.get("billing_address.first_name"),
-      last_name: formData.get("billing_address.last_name"),
-      address_1: formData.get("billing_address.address_1"),
-      address_2: "",
-      company: formData.get("billing_address.company"),
-      postal_code: formData.get("billing_address.postal_code"),
-      city: formData.get("billing_address.city"),
-      country_code: formData.get("billing_address.country_code"),
-      province: formData.get("billing_address.province"),
-      phone: formData.get("billing_address.phone"),
+    const addressFields = [
+      "first_name",
+      "last_name",
+      "address_1",
+      "address_2",
+      "company",
+      "postal_code",
+      "city",
+      "country_code",
+      "province",
+      "phone",
+    ] as const
+
+    const getFormValue = (key: string) => {
+      if (!formData.has(key)) {
+        return undefined
+      }
+
+      const value = formData.get(key)
+      if (value === null) {
+        return undefined
+      }
+
+      if (typeof value === "string") {
+        return value.trim()
+      }
+
+      return String(value)
     }
+
+    const buildAddressUpdate = (
+      prefix: "shipping_address" | "billing_address",
+      existingAddress: HttpTypes.StoreCartAddress | null | undefined
+    ) => {
+      const hasAnyField = addressFields.some((field) =>
+        formData.has(`${prefix}.${field}`)
+      )
+
+      if (!hasAnyField) {
+        return { hasAnyField: false, address: existingAddress || null }
+      }
+
+      const nextAddress = {
+        first_name: existingAddress?.first_name ?? "",
+        last_name: existingAddress?.last_name ?? "",
+        address_1: existingAddress?.address_1 ?? "",
+        address_2: existingAddress?.address_2 ?? "",
+        company: existingAddress?.company ?? "",
+        postal_code: existingAddress?.postal_code ?? "",
+        city: existingAddress?.city ?? "",
+        country_code: existingAddress?.country_code ?? "",
+        province: existingAddress?.province ?? "",
+        phone: existingAddress?.phone ?? "",
+      } as Record<(typeof addressFields)[number], string>
+
+      addressFields.forEach((field) => {
+        const value = getFormValue(`${prefix}.${field}`)
+        if (value !== undefined) {
+          nextAddress[field] = value
+        }
+      })
+
+      return { hasAnyField: true, address: nextAddress }
+    }
+
+    const shippingUpdate = buildAddressUpdate(
+      "shipping_address",
+      cart.shipping_address
+    )
+    const billingUpdate = buildAddressUpdate(
+      "billing_address",
+      cart.billing_address
+    )
+
+    const shippingCountryFromForm = getFormValue("shipping_address.country_code")
+    redirectCountryCode =
+      shippingCountryFromForm?.toLowerCase() ||
+      shippingUpdate.address?.country_code?.toLowerCase() ||
+      cart.shipping_address?.country_code?.toLowerCase() ||
+      cart.region?.countries?.[0]?.iso_2?.toLowerCase() ||
+      "us"
 
     const sameAsBilling = formData.get("same_as_billing")
-    const hasBillingValues = [
-      "billing_address.first_name",
-      "billing_address.last_name",
-      "billing_address.address_1",
-      "billing_address.city",
-      "billing_address.postal_code",
-      "billing_address.country_code",
-      "billing_address.province",
-      "billing_address.phone",
-    ].some((field) => {
-      const value = formData.get(field)
-      return value !== null && String(value).trim().length > 0
-    })
-
     const shouldReuseShippingForBilling =
-      sameAsBilling === "on" || (sameAsBilling !== "off" && !hasBillingValues)
+      sameAsBilling === "on" ||
+      (sameAsBilling !== "off" && !billingUpdate.hasAnyField)
 
-    const data = {
-      shipping_address: shippingAddress,
-      email: formData.get("email"),
-    } as any
+    const data: HttpTypes.StoreUpdateCart = {}
+
+    if (shippingUpdate.hasAnyField && shippingUpdate.address) {
+      data.shipping_address = shippingUpdate.address
+    }
+
+    const email = getFormValue("email")
+    if (email !== undefined) {
+      data.email = email
+    }
 
     if (shouldReuseShippingForBilling) {
-      data.billing_address = data.shipping_address
-    } else {
-      data.billing_address = billingAddress
+      const shippingForBilling = shippingUpdate.address || cart.shipping_address
+      if (shippingForBilling) {
+        data.billing_address = shippingForBilling
+      }
+    } else if (billingUpdate.hasAnyField && billingUpdate.address) {
+      data.billing_address = billingUpdate.address
     }
-    await updateCart(data)
+
+    if (Object.keys(data).length > 0) {
+      await updateCart(data)
+    }
   } catch (e: any) {
     return e.message
   }
 
-  redirect(
-    `/${formData.get("shipping_address.country_code")}/checkout`
-  )
+  redirect(`/${redirectCountryCode}/checkout`)
 }
 
 /**
