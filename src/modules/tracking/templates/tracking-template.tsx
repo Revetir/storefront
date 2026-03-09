@@ -40,8 +40,6 @@ type TrackingData = {
     status: string
     description: string
     location?: string
-    journey_zone?: string | null
-    journey_event?: string | null
   }>
   weight_kg?: number
   weight_lb?: number
@@ -182,6 +180,14 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
     return { dateLabel, timeLabel }
   }
 
+  const toTitleCase = (value: string): string =>
+    value
+      .toLowerCase()
+      .split(/\s+/g)
+      .filter(Boolean)
+      .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+      .join(" ")
+
   const displayCarrier = data.carrier
 
   // Filter order items to only those in this fulfillment
@@ -247,9 +253,9 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
               return !status.includes("registered")
             })
             if (filteredEvents.length === 0) {
-              return (
+                return (
                 <div className="py-4 text-xs md:text-sm text-ui-fg-subtle">
-                  Tracking will appear once shipment information is processed by the carrier.
+                  Your shipment is currently in international transit. Tracking updates will appear once the package reaches the destination country and is scanned by the local carrier.
                 </div>
               )
             }
@@ -263,14 +269,8 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
                 <div className="flex flex-col divide-y divide-gray-100">
                   {visibleEvents.map((event, index) => {
                     const { dateLabel, timeLabel } = formatEventDateTime(event.timestamp)
-                    const isDomestic = event.journey_zone === "Domestic Transit"
-                    const primaryText =
-                      event.journey_event ||
-                      event.description ||
-                      getStatusDisplay(event.status)
-                    const secondaryText = isDomestic
-                      ? event.location || event.journey_zone
-                      : event.journey_zone || event.location
+                    const primaryText = event.description || getStatusDisplay(event.status)
+                    const secondaryText = event.location
 
                     return (
                       <div
@@ -284,11 +284,11 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
 
                         <div className="flex-1 text-xs md:text-sm">
                           <div className="text-xs md:text-sm text-ui-fg-base">
-                            {primaryText}
+                            {toTitleCase(primaryText)}
                           </div>
                           {secondaryText && (
                             <div className="mt-1 text-ui-fg-subtle text-xs md:text-sm">
-                              {secondaryText}
+                              {secondaryText.toUpperCase()}
                             </div>
                           )}
                         </div>
@@ -325,7 +325,7 @@ const TrackingTemplate: React.FC<TrackingTemplateProps> = ({ data }) => {
               Delivery Provider: <span>{displayCarrier}</span>
             </Text>
             <Text className="text-md">
-              Shipment ID: <span>{data.tracking_number}</span>
+              Tracking Number: <span>{data.tracking_number}</span>
             </Text>
             {typeof data.weight_lb === "number" || typeof data.weight_kg === "number" ? (
               <Text className="text-md">
