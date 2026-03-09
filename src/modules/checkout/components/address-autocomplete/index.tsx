@@ -30,6 +30,7 @@ interface AddressAutocompleteProps {
   name: string
   value: string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void
   onAddressSelect: (address: RadarAddress) => void
   label: string
   required?: boolean
@@ -47,6 +48,7 @@ const AddressAutocomplete = React.forwardRef<
       name,
       value,
       onChange,
+      onBlur,
       onAddressSelect,
       label,
       required = false,
@@ -65,6 +67,7 @@ const AddressAutocomplete = React.forwardRef<
     const isSelectingRef = useRef(false)
     const onAddressSelectRef = useRef(onAddressSelect)
     const onChangeRef = useRef(onChange)
+    const onBlurRef = useRef(onBlur)
 
     // Keep the ref updated without causing effect re-runs
     useEffect(() => {
@@ -74,6 +77,10 @@ const AddressAutocomplete = React.forwardRef<
     useEffect(() => {
       onChangeRef.current = onChange
     }, [onChange])
+
+    useEffect(() => {
+      onBlurRef.current = onBlur
+    }, [onBlur])
 
     // Memoize the selection handler with stable identity
     // Don't include onAddressSelect in deps to prevent autocomplete recreation
@@ -165,9 +172,25 @@ const AddressAutocomplete = React.forwardRef<
           }
 
           const handleFocus = () => setIsFocused(true)
-          const handleBlur = () => {
+          const handleBlur = (e: FocusEvent) => {
             setIsFocused(false)
             setHasValue(!!input.value)
+
+            const blurHandler = onBlurRef.current
+            if (blurHandler) {
+              const syntheticEvent = {
+                target: {
+                  name: name,
+                  value: (e.target as HTMLInputElement).value,
+                },
+                currentTarget: {
+                  name: name,
+                  value: (e.target as HTMLInputElement).value,
+                },
+              } as React.FocusEvent<HTMLInputElement>
+
+              blurHandler(syntheticEvent)
+            }
           }
           const handleInput = (e: Event) => {
             setHasValue(!!input.value)

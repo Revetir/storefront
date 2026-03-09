@@ -256,16 +256,15 @@ const ShippingAddress = ({
       }
     }
 
-    // Only trigger auto-save if all 4 required address fields are complete
-    // This ensures cart updates (and price changes) only happen when we can actually show the tax
-    const isAddressComplete = !!(
+    // Track tax calculation only when address details needed for tax are complete.
+    const isAddressCompleteForTax = !!(
       formData["shipping_address.address_1"] &&
       formData["shipping_address.city"] &&
       formData["shipping_address.province"] &&
       formData["shipping_address.postal_code"]
     )
 
-    if (isAddressComplete) {
+    if (isAddressCompleteForTax) {
       // Set calculating state BEFORE triggering debounced save to prevent $0.00 flash
       // This ensures "Calculating..." shows immediately when address becomes complete
       if (typeof window !== "undefined") {
@@ -286,9 +285,10 @@ const ShippingAddress = ({
         console.log(`ShippingAddress - Starting tax calculation ${calculationId}, oldTax: ${cart?.tax_total}`)
       }
       setIsCalculatingTax(true)
-
-      debouncedSaveAddress(createAddressFormPayload(formData, checked))
     }
+
+    // Always persist latest form state on blur so required fields can't be left unsaved.
+    debouncedSaveAddress(createAddressFormPayload(formData, checked))
   }
 
   const handleInvalid = (e: React.FormEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -411,6 +411,7 @@ const ShippingAddress = ({
             autoComplete="given-name"
             value={formData["shipping_address.first_name"]}
             onChange={handleChange}
+            onBlur={handleBlur}
             onInvalid={handleInvalid}
             required
             data-testid="shipping-first-name-input"
@@ -433,6 +434,7 @@ const ShippingAddress = ({
             autoComplete="family-name"
             value={formData["shipping_address.last_name"]}
             onChange={handleChange}
+            onBlur={handleBlur}
             onInvalid={handleInvalid}
             required
             data-testid="shipping-last-name-input"
@@ -455,6 +457,7 @@ const ShippingAddress = ({
               autoComplete="address-line1"
               value={formData["shipping_address.address_1"]}
               onChange={handleChange}
+              onBlur={handleBlur}
               onAddressSelect={handleAddressSelect}
               countryCodes={countriesInRegion}
               required
@@ -508,6 +511,7 @@ const ShippingAddress = ({
             autoComplete="address-level2"
             value={formData["shipping_address.city"]}
             onChange={handleChange}
+            onBlur={handleBlur}
             onInvalid={handleInvalid}
             required
             data-testid="shipping-city-input"
@@ -560,6 +564,7 @@ const ShippingAddress = ({
               autoComplete="postal-code"
               value={formData["shipping_address.postal_code"]}
               onChange={handleChange}
+              onBlur={handleBlur}
               onInvalid={handleInvalid}
               required
               data-testid="shipping-postal-code-input"

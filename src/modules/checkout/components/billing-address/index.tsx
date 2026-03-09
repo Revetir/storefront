@@ -190,6 +190,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
               autoComplete="address-line1"
               value={formData["billing_address.address_1"]}
               onChange={handleChange}
+              onBlur={handleBlur}
               onAddressSelect={handleAddressSelect}
               countryCodes={countriesInRegion}
               required
