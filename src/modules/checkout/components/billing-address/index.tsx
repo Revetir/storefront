@@ -29,6 +29,19 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
     return emailRegex.test(email)
   }
 
+  const createAddressFormPayload = (values: Record<string, any>) => {
+    const formDataObj = new FormData()
+
+    Object.keys(values).forEach((key) => {
+      if (values[key]) {
+        formDataObj.append(key, values[key])
+      }
+    })
+
+    formDataObj.append("same_as_billing", "off")
+    return formDataObj
+  }
+
   const countriesInRegion = useMemo(
     () => cart?.region?.countries?.map((c) => c.iso_2).filter((code): code is string => !!code),
     [cart?.region]
@@ -66,17 +79,8 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
 
   // Auto-save address data on blur with debounce
   const debouncedSaveAddress = useCallback(
-    debounce(async (data: Record<string, any>) => {
+    debounce(async (formDataObj: FormData) => {
       try {
-        // Create FormData to match the setAddresses server action signature
-        const formDataObj = new FormData()
-
-        Object.keys(data).forEach(key => {
-          if (data[key]) {
-            formDataObj.append(key, data[key])
-          }
-        })
-
         // Auto-save to cart (silently, don't block user)
         await setAddresses(null, formDataObj)
       } catch (error) {
@@ -89,7 +93,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
     // Trigger auto-save on blur
-    debouncedSaveAddress(formData)
+    debouncedSaveAddress(createAddressFormPayload(formData))
   }
 
   const handleAddressSelect = (address: RadarAddress) => {

@@ -117,6 +117,22 @@ const ShippingAddress = ({
     return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''))
   }
 
+  const createAddressFormPayload = (
+    values: Record<string, any>,
+    sameAsBilling: boolean
+  ) => {
+    const formDataObj = new FormData()
+
+    Object.keys(values).forEach((key) => {
+      if (values[key]) {
+        formDataObj.append(key, values[key])
+      }
+    })
+
+    formDataObj.append("same_as_billing", sameAsBilling ? "on" : "off")
+    return formDataObj
+  }
+
   const countriesInRegion = useMemo(
     () => cart?.region?.countries?.map((c) => c.iso_2).filter((code): code is string => !!code),
     [cart?.region]
@@ -201,20 +217,11 @@ const ShippingAddress = ({
 
   // Auto-save address data on blur with debounce
   const debouncedSaveAddress = useCallback(
-    debounce(async (data: Record<string, any>) => {
+    debounce(async (formDataObj: FormData) => {
       // Note: setIsCalculatingTax(true) and snapshot are now set BEFORE calling this function
       // to prevent $0.00 flash. This function just performs the actual save.
 
       try {
-        // Create FormData to match the setAddresses server action signature
-        const formDataObj = new FormData()
-
-        Object.keys(data).forEach(key => {
-          if (data[key]) {
-            formDataObj.append(key, data[key])
-          }
-        })
-
         // Auto-save to cart (silently, don't block user)
         await setAddresses(null, formDataObj)
       } catch (error: any) {
@@ -280,7 +287,7 @@ const ShippingAddress = ({
       }
       setIsCalculatingTax(true)
 
-      debouncedSaveAddress(formData)
+      debouncedSaveAddress(createAddressFormPayload(formData, checked))
     }
   }
 
@@ -371,7 +378,7 @@ const ShippingAddress = ({
       ...formData,
       ...updatedFields,
     }
-    debouncedSaveAddress(mergedData)
+    debouncedSaveAddress(createAddressFormPayload(mergedData, checked))
   }
 
   return (
