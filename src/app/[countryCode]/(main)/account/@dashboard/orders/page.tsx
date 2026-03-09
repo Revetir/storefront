@@ -2,11 +2,10 @@ import { Metadata } from "next"
 
 import { notFound } from "next/navigation"
 import { listOrders } from "@lib/data/orders"
-import Divider from "@modules/common/components/divider"
-import TransferRequestForm from "@modules/account/components/transfer-request-form"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { convertToLocale } from "@lib/util/money"
+import { getOrderDisplayId } from "@lib/util/get-order-display-id"
 import { HttpTypes } from "@medusajs/types"
 
 export const metadata: Metadata = {
@@ -110,16 +109,15 @@ export default async function Orders() {
           {orders.map((order) => {
             const firstItem = order.items?.[0]
             const trackingNumber = getPrimaryTrackingNumber(order as HttpTypes.StoreOrder)
-            const orderNumber =
-              (order as any).custom_display_id ?? order.display_id ?? order.id
+            const orderNumber = getOrderDisplayId(order)
 
             return (
               <div
                 key={order.id}
-                className="flex flex-row items-start md:items-stretch justify-between gap-4 sm:gap-5 md:gap-6 py-4 sm:py-5 md:py-6"
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-start md:items-stretch gap-4 sm:gap-5 md:gap-6 py-4 sm:py-5 md:py-6 overflow-hidden"
                 data-testid="order-wrapper"
               >
-                <div className="flex-1 text-sm max-w-xl">
+                <div className="min-w-0 text-sm md:max-w-xl">
                   {/* Group 1: Date + fulfillment status */}
                   <div className="space-y-1">
                     <div className="uppercase text-xs text-gray-600">
@@ -131,10 +129,15 @@ export default async function Orders() {
                   </div>
 
                   {/* Group 2: Order number + total */}
-                  <div className="mt-3 sm:mt-4 space-y-1">
-                    <div className="text-sm">
+                  <div className="mt-3 sm:mt-4 space-y-1 min-w-0">
+                    <div className="text-sm min-w-0">
                       <span className="font-semibold">Order </span>
-                      <span>#{orderNumber}</span>
+                      <span
+                        className="inline-block max-w-full align-bottom truncate"
+                        title={`#${orderNumber}`}
+                      >
+                        #{orderNumber}
+                      </span>
                     </div>
                     <div className="text-sm" data-testid="order-amount">
                       {convertToLocale({
@@ -160,10 +163,10 @@ export default async function Orders() {
                   )}
                 </div>
 
-                <div className="flex flex-col items-center md:items-end gap-3 sm:gap-4 min-w-[110px] sm:min-w-[120px]">
+                <div className="flex flex-col items-end gap-3 sm:gap-4 w-24 sm:w-28 md:w-32 shrink-0">
                   <LocalizedClientLink
                     href={`/account/orders/details/${order.id}`}
-                    className="text-xs underline tracking-[0.15em] uppercase"
+                    className="text-[11px] sm:text-xs underline tracking-[0.15em] uppercase whitespace-nowrap self-end"
                   >
                     View Details
                   </LocalizedClientLink>
@@ -171,7 +174,7 @@ export default async function Orders() {
                   {firstItem && (
                     <LocalizedClientLink
                       href={`/account/orders/details/${order.id}`}
-                      className="block w-24 md:w-28 lg:w-32"
+                      className="block w-full max-w-full self-end"
                     >
                       <Thumbnail
                         thumbnail={firstItem.thumbnail}

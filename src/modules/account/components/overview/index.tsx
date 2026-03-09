@@ -3,6 +3,7 @@ import { Container } from "@medusajs/ui"
 import ChevronDown from "@modules/common/icons/chevron-down"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { convertToLocale } from "@lib/util/money"
+import { getOrderDisplayId } from "@lib/util/get-order-display-id"
 import { HttpTypes } from "@medusajs/types"
 
 type OverviewProps = {
@@ -75,10 +76,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
               >
                 {orders && orders.length > 0 ? (
                   orders.slice(0, 5).map((order) => {
-                    const orderNumber =
-                      (order as any).custom_display_id ??
-                      order.display_id ??
-                      order.id
+                    const orderNumber = getOrderDisplayId(order)
                     return (
                       <li
                         key={order.id}

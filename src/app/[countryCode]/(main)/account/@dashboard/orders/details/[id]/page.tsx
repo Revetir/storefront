@@ -1,4 +1,5 @@
 import { retrieveOrder } from "@lib/data/orders"
+import { getOrderDisplayId } from "@lib/util/get-order-display-id"
 import OrderDetailsTemplate from "@modules/order/templates/order-details-template"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
@@ -15,8 +16,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
-  const orderNumber =
-    (order as any).custom_display_id ?? order.display_id ?? order.id
+  const orderNumber = getOrderDisplayId(order)
 
   return {
     title: `Order #${orderNumber}`,

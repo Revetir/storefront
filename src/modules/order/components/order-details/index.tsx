@@ -1,5 +1,6 @@
 import { HttpTypes } from "@medusajs/types"
 import { Text } from "@medusajs/ui"
+import { getOrderDisplayId } from "@lib/util/get-order-display-id"
 import PrintButton from "@modules/order/components/print-button"
 
 type OrderDetailsProps = {
@@ -48,8 +49,7 @@ const OrderDetails = ({ order, showStatus, showPrintButton }: OrderDetailsProps)
     })
   }
 
-  const orderId =
-    (order as any).custom_display_id ?? order.display_id ?? order.id
+  const orderId = getOrderDisplayId(order)
   const orderDateLabel = formatOrderDateEST(order.created_at || new Date())
 
   return (
@@ -97,7 +97,7 @@ const OrderDetails = ({ order, showStatus, showPrintButton }: OrderDetailsProps)
               Payment status:{" "}
               <span
                 className="text-ui-fg-subtle "
-                sata-testid="order-payment-status"
+                data-testid="order-payment-status"
               >
                 {formatStatus(order.payment_status)}
               </span>

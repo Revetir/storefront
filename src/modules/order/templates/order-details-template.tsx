@@ -5,6 +5,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Items from "@modules/order/components/items"
 import OrderSummary from "@modules/order/components/order-summary"
 import { getPaymentDisplayFromOrder } from "@lib/util/format-payment-method"
+import { getOrderDisplayId } from "@lib/util/get-order-display-id"
 import React from "react"
 
 type OrderDetailsTemplateProps = {
@@ -72,10 +73,9 @@ const shouldShowTrackLink = (order: HttpTypes.StoreOrder) => {
   return status === "shipped" || status === "delivered"
 }
 
-const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) => {
+  const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) => {
   const orderStatus = formatStatusLabel(order.fulfillment_status, order.status)
-  const orderId =
-    (order as any).custom_display_id ?? order.display_id ?? order.id
+  const orderId = getOrderDisplayId(order)
   const orderDateLabel = formatOrderDateEST(order.created_at || new Date())
   const paymentDisplay = getPaymentDisplayFromOrder(order)
   const trackingNumber = getPrimaryTrackingNumber(order)

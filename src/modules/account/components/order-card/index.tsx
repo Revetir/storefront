@@ -4,6 +4,7 @@ import { useMemo } from "react"
 import Thumbnail from "@modules/products/components/thumbnail"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { convertToLocale } from "@lib/util/money"
+import { getOrderDisplayId } from "@lib/util/get-order-display-id"
 import { HttpTypes } from "@medusajs/types"
 
 type OrderCardProps = {
@@ -23,8 +24,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
     return order.items?.length ?? 0
   }, [order])
 
-  const orderNumber =
-    (order as any).custom_display_id ?? order.display_id ?? order.id
+  const orderNumber = getOrderDisplayId(order)
 
   return (
     <div className="bg-white flex flex-col" data-testid="order-card">
