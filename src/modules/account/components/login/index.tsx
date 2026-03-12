@@ -52,7 +52,7 @@ const Login = ({ setCurrentView }: Props) => {
               htmlFor="email"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Email<span className="text-red-500">*</span>
+              Email<span>*</span>
             </label>
             <input
               type="email"
@@ -76,7 +76,7 @@ const Login = ({ setCurrentView }: Props) => {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Password<span className="text-red-500">*</span>
+              Password<span>*</span>
             </label>
             <input
               type="password"
