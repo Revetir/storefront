@@ -12,18 +12,6 @@ import ErrorMessage from "../error-message"
 import { StripeContext } from "../payment-wrapper/stripe-wrapper"
 import { useParams } from "next/navigation"
 
-const isNextRedirectError = (error: unknown): boolean => {
-  if (!error || typeof error !== "object") {
-    return false
-  }
-
-  const redirectError = error as { message?: string; digest?: string }
-  return (
-    redirectError.message === "NEXT_REDIRECT" ||
-    redirectError.digest?.includes("NEXT_REDIRECT") === true
-  )
-}
-
 const resolveCountryCode = (
   routeCountryCode: string | string[] | undefined,
   fallbackCountryCode?: string | null
@@ -255,13 +243,12 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
 
     // If payment succeeded without redirect, place the order
     try {
-      await placeOrder()
+      const order = await placeOrder()
+      window.location.assign(
+        `/${order.countryCode}/order/${order.orderId}/confirmed`
+      )
       setSubmitting(false)
     } catch (err) {
-      if (isNextRedirectError(err)) {
-        throw err
-      }
-
       const errorText =
         err instanceof Error ? err.message : "Failed to place order"
       setErrorMessage(errorText)

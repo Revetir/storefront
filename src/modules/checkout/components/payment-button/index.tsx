@@ -20,18 +20,6 @@ type PaymentButtonProps = {
   "data-testid": string
 }
 
-const isNextRedirectError = (error: unknown): boolean => {
-  if (!error || typeof error !== "object") {
-    return false
-  }
-
-  const redirectError = error as { message?: string; digest?: string }
-  return (
-    redirectError.message === "NEXT_REDIRECT" ||
-    redirectError.digest?.includes("NEXT_REDIRECT") === true
-  )
-}
-
 const resolveCountryCode = (
   routeCountryCode: string | string[] | undefined,
   fallbackCountryCode?: string | null
@@ -74,6 +62,20 @@ const toStripeState = (
   }
 
   return trimmed
+}
+
+const redirectToOrderConfirmation = ({
+  countryCode,
+  orderId,
+}: {
+  countryCode: string
+  orderId: string
+}) => {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  window.location.assign(`/${countryCode}/order/${orderId}/confirmed`)
 }
 
 const ADDRESS_FIELDS = [
@@ -266,13 +268,10 @@ const StripePaymentButton = ({
 
   const onPaymentCompleted = async () => {
     try {
-      await placeOrder()
+      const order = await placeOrder()
+      redirectToOrderConfirmation(order)
       setSubmitting(false)
     } catch (err) {
-      if (isNextRedirectError(err)) {
-        throw err
-      }
-
       const errorText =
         err instanceof Error ? err.message : "Failed to place order"
       setErrorMessage(errorText)
@@ -516,13 +515,10 @@ const ManualTestPaymentButton = ({ notReady, cart }: { notReady: boolean, cart: 
 
   const onPaymentCompleted = async () => {
     try {
-      await placeOrder()
+      const order = await placeOrder()
+      redirectToOrderConfirmation(order)
       setSubmitting(false)
     } catch (err) {
-      if (isNextRedirectError(err)) {
-        throw err
-      }
-
       const errorText =
         err instanceof Error ? err.message : "Failed to place order"
       setErrorMessage(errorText)
@@ -564,7 +560,7 @@ const ManualTestPaymentButton = ({ notReady, cart }: { notReady: boolean, cart: 
 
       setSubmitting(true)
 
-      onPaymentCompleted()
+      await onPaymentCompleted()
     })()
   }
 

@@ -511,14 +511,20 @@ export async function placeOrder(cartId?: string) {
       .catch(medusaError)
 
     if (cartRes?.type === "order") {
-      const countryCode =
-        cartRes.order.shipping_address?.country_code?.toLowerCase()
+      const countryCode = (
+        cartRes.order.shipping_address?.country_code ||
+        cartRes.order.billing_address?.country_code ||
+        "us"
+      ).toLowerCase()
 
       const orderCacheTag = await getCacheTag("orders")
       revalidateTag(orderCacheTag, "max")
 
       await removeCartId()
-      redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
+      return {
+        orderId: cartRes.order.id,
+        countryCode,
+      }
     }
 
     const shouldRetry =
@@ -538,6 +544,8 @@ export async function placeOrder(cartId?: string) {
         "Failed to complete checkout. Please contact support with your cart ID."
     )
   }
+
+  throw new Error("Failed to complete checkout. Please contact support.")
 }
 
 /**
