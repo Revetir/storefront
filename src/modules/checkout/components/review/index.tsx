@@ -10,6 +10,7 @@ import PaymentButton from "../payment-button"
 import { usePaymentContext } from "../payment/payment-context"
 import ErrorMessage from "../error-message"
 import { StripeContext } from "../payment-wrapper/stripe-wrapper"
+import { useParams } from "next/navigation"
 
 const isNextRedirectError = (error: unknown): boolean => {
   if (!error || typeof error !== "object") {
@@ -23,11 +24,27 @@ const isNextRedirectError = (error: unknown): boolean => {
   )
 }
 
+const resolveCountryCode = (
+  routeCountryCode: string | string[] | undefined,
+  fallbackCountryCode?: string | null
+): string => {
+  const fromRoute = Array.isArray(routeCountryCode)
+    ? routeCountryCode[0]
+    : routeCountryCode
+
+  return (
+    fromRoute?.toLowerCase() ||
+    fallbackCountryCode?.toLowerCase() ||
+    "us"
+  )
+}
+
 // Inner component that safely uses Stripe hooks - only rendered when inside Elements context
 const StripeReviewContent = ({ cart }: { cart: any }) => {
   const { selectedPaymentMethod } = usePaymentContext()
   const stripe = useStripe()
   const elements = useElements()
+  const { countryCode } = useParams()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -43,6 +60,10 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
   const handleExpressCheckoutConfirm = async (event: any) => {
     if (submitting) {
       return
+    }
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("checkout:submit-intent"))
     }
 
     setSubmitting(true)
@@ -209,7 +230,18 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
       elements: elements,
       clientSecret: clientSecret,
       confirmParams: {
-        return_url: `${window.location.origin}${window.location.pathname}`,
+        return_url: (() => {
+          const resolvedCountryCode = resolveCountryCode(
+            countryCode as string | string[] | undefined,
+            updatedCart.shipping_address?.country_code
+          )
+          const captureUrl = new URL(
+            `/api/capture-payments/${updatedCart.id}`,
+            window.location.origin
+          )
+          captureUrl.searchParams.set("country_code", resolvedCountryCode)
+          return captureUrl.toString()
+        })(),
       },
       redirect: 'if_required', // Only redirect if 3DS or similar authentication is needed
     })

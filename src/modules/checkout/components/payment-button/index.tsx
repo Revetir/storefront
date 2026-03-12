@@ -32,6 +32,50 @@ const isNextRedirectError = (error: unknown): boolean => {
   )
 }
 
+const resolveCountryCode = (
+  routeCountryCode: string | string[] | undefined,
+  fallbackCountryCode?: string | null
+): string => {
+  const fromRoute = Array.isArray(routeCountryCode)
+    ? routeCountryCode[0]
+    : routeCountryCode
+
+  return (
+    fromRoute?.toLowerCase() ||
+    fallbackCountryCode?.toLowerCase() ||
+    "us"
+  )
+}
+
+const toStripeState = (
+  province: string | undefined | null,
+  countryCode: string | undefined | null
+): string | undefined => {
+  if (!province) {
+    return undefined
+  }
+
+  const trimmed = province.trim()
+  if (!trimmed) {
+    return undefined
+  }
+
+  if ((countryCode || "").toLowerCase() !== "us") {
+    return trimmed
+  }
+
+  const usPrefixed = /^us-([a-z]{2})$/i.exec(trimmed)
+  if (usPrefixed?.[1]) {
+    return usPrefixed[1].toUpperCase()
+  }
+
+  if (/^[a-z]{2}$/i.test(trimmed)) {
+    return trimmed.toUpperCase()
+  }
+
+  return trimmed
+}
+
 const ADDRESS_FIELDS = [
   "first_name",
   "last_name",
@@ -246,6 +290,10 @@ const StripePaymentButton = ({
       return
     }
 
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("checkout:submit-intent"))
+    }
+
     let checkoutCart = cart
 
     try {
@@ -314,7 +362,10 @@ const StripePaymentButton = ({
           line1: checkoutCart.billing_address?.address_1 ?? undefined,
           line2: checkoutCart.billing_address?.address_2 ?? undefined,
           city: checkoutCart.billing_address?.city ?? undefined,
-          state: checkoutCart.billing_address?.province ?? undefined,
+          state: toStripeState(
+            checkoutCart.billing_address?.province,
+            checkoutCart.billing_address?.country_code
+          ),
           postal_code: checkoutCart.billing_address?.postal_code ?? undefined,
           country: checkoutCart.billing_address?.country_code ?? undefined,
         },
@@ -327,7 +378,11 @@ const StripePaymentButton = ({
           line1: checkoutCart.shipping_address?.address_1 ?? '',
           line2: checkoutCart.shipping_address?.address_2 ?? '',
           city: checkoutCart.shipping_address?.city ?? '',
-          state: checkoutCart.shipping_address?.province ?? '',
+          state:
+            toStripeState(
+              checkoutCart.shipping_address?.province,
+              checkoutCart.shipping_address?.country_code
+            ) ?? "",
           postal_code: checkoutCart.shipping_address?.postal_code ?? '',
           country: checkoutCart.shipping_address?.country_code ?? '',
         },
@@ -338,7 +393,18 @@ const StripePaymentButton = ({
           billing_details: billingDetails,
         },
         shipping: shippingDetails,
-        return_url: `${window.location.origin}/${countryCode}/checkout`,
+        return_url: (() => {
+          const resolvedCountryCode = resolveCountryCode(
+            countryCode as string | string[] | undefined,
+            checkoutCart.shipping_address?.country_code
+          )
+          const captureUrl = new URL(
+            `/api/capture-payments/${checkoutCart.id}`,
+            window.location.origin
+          )
+          captureUrl.searchParams.set("country_code", resolvedCountryCode)
+          return captureUrl.toString()
+        })(),
       })
 
       if (error) {
@@ -374,7 +440,10 @@ const StripePaymentButton = ({
             line1: checkoutCart.billing_address?.address_1 ?? undefined,
             line2: checkoutCart.billing_address?.address_2 ?? undefined,
             postal_code: checkoutCart.billing_address?.postal_code ?? undefined,
-            state: checkoutCart.billing_address?.province ?? undefined,
+            state: toStripeState(
+              checkoutCart.billing_address?.province,
+              checkoutCart.billing_address?.country_code
+            ),
           },
           email: checkoutCart.email,
           phone: checkoutCart.billing_address?.phone ?? undefined,
@@ -465,6 +534,10 @@ const ManualTestPaymentButton = ({ notReady, cart }: { notReady: boolean, cart: 
     void (async () => {
       if (submitting) {
         return
+      }
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("checkout:submit-intent"))
       }
 
       let checkoutCart = cart

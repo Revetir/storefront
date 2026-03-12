@@ -218,26 +218,32 @@ const ShippingAddress = ({
   // Auto-save address data on blur with debounce
   const debouncedSaveAddress = useCallback(
     debounce(async (formDataObj: FormData) => {
-      // Note: setIsCalculatingTax(true) and snapshot are now set BEFORE calling this function
-      // to prevent $0.00 flash. This function just performs the actual save.
-
       try {
-        // Auto-save to cart (silently, don't block user)
+        // Auto-save to cart silently as the user fills checkout.
         await setAddresses(null, formDataObj)
+        setIsCalculatingTax(false)
       } catch (error: any) {
-        // NEXT_REDIRECT is expected - it means the save was successful and triggered a revalidation
-        if (error?.message === 'NEXT_REDIRECT' || error?.digest?.includes('NEXT_REDIRECT')) {
-          console.log("Auto-save successful (triggered revalidation)")
-          // Don't clear isCalculatingTax here - let the redirect happen with state persisted
-          return
-        }
-        // Only log actual errors
         console.error("Auto-save failed:", error)
         setIsCalculatingTax(false)
       }
     }, 500),
     [setIsCalculatingTax]
   )
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+
+    const cancelPendingAutoSave = () => {
+      debouncedSaveAddress.cancel()
+    }
+
+    window.addEventListener("checkout:submit-intent", cancelPendingAutoSave)
+    return () => {
+      window.removeEventListener("checkout:submit-intent", cancelPendingAutoSave)
+    }
+  }, [debouncedSaveAddress])
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target

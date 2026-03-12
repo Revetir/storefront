@@ -91,6 +91,21 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
     []
   )
 
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+
+    const cancelPendingAutoSave = () => {
+      debouncedSaveAddress.cancel()
+    }
+
+    window.addEventListener("checkout:submit-intent", cancelPendingAutoSave)
+    return () => {
+      window.removeEventListener("checkout:submit-intent", cancelPendingAutoSave)
+    }
+  }, [debouncedSaveAddress])
+
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
     // Trigger auto-save on blur
     debouncedSaveAddress(createAddressFormPayload(formData))

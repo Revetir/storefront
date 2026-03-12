@@ -4,6 +4,7 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import dynamic from "next/dynamic"
 import { PaymentProvider } from "@modules/checkout/components/payment/payment-context"
+import PaymentReturnHandler from "@modules/checkout/components/payment-return-handler"
 
 // Dynamic imports for heavy checkout components
 const PaymentWrapper = dynamic(() => import("@modules/checkout/components/payment-wrapper"))
@@ -28,6 +29,7 @@ export default async function Checkout() {
     <CheckoutWrapper>
       <PaymentProvider>
         <PaymentWrapper cart={cart}>
+          <PaymentReturnHandler cartId={cart.id} />
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_416px] content-container gap-x-40 py-6">
             <CheckoutForm cart={cart} customer={customer} />
             <div className="lg:sticky lg:top-20 lg:self-start">

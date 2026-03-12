@@ -15,6 +15,21 @@ import {
 } from "./cookies"
 import { getRegion } from "./regions"
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const isRetryableCartCompletionError = (
+  message: string | undefined,
+  type: string | undefined
+): boolean => {
+  const combined = `${type ?? ""} ${message ?? ""}`.toLowerCase()
+
+  return (
+    combined.includes("pending") ||
+    combined.includes("authorize") ||
+    combined.includes("in progress")
+  )
+}
+
 /**
  * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookies.
  * @param cartId - optional - The ID of the cart to retrieve.
@@ -342,8 +357,6 @@ export async function submitPromotionForm(
 
 // TODO: Pass a POJO instead of a form entity here
 export async function setAddresses(currentState: unknown, formData: FormData) {
-  let redirectCountryCode = "us"
-
   try {
     if (!formData) {
       throw new Error("No form data found when setting addresses")
@@ -433,14 +446,6 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
       cart.billing_address
     )
 
-    const shippingCountryFromForm = getFormValue("shipping_address.country_code")
-    redirectCountryCode =
-      shippingCountryFromForm?.toLowerCase() ||
-      shippingUpdate.address?.country_code?.toLowerCase() ||
-      cart.shipping_address?.country_code?.toLowerCase() ||
-      cart.region?.countries?.[0]?.iso_2?.toLowerCase() ||
-      "us"
-
     const sameAsBilling = formData.get("same_as_billing")
     const shouldReuseShippingForBilling =
       sameAsBilling === "on" ||
@@ -472,8 +477,6 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
   } catch (e: any) {
     return e.message
   }
-
-  redirect(`/${redirectCountryCode}/checkout`)
 }
 
 /**
@@ -492,27 +495,49 @@ export async function placeOrder(cartId?: string) {
     ...(await getAuthHeaders()),
   }
 
-  const cartRes = await sdk.store.cart
-    .complete(id, {}, headers)
-    .then(async (cartRes) => {
-      const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag, "max")
-      return cartRes
-    })
-    .catch(medusaError)
+  let attempts = 0
+  const maxAttempts = 4
 
-  if (cartRes?.type === "order") {
-    const countryCode =
-      cartRes.order.shipping_address?.country_code?.toLowerCase()
+  while (attempts < maxAttempts) {
+    attempts += 1
 
-    const orderCacheTag = await getCacheTag("orders")
-    revalidateTag(orderCacheTag, "max")
+    const cartRes = await sdk.store.cart
+      .complete(id, {}, headers)
+      .then(async (cartRes) => {
+        const cartCacheTag = await getCacheTag("carts")
+        revalidateTag(cartCacheTag, "max")
+        return cartRes
+      })
+      .catch(medusaError)
 
-    removeCartId()
-    redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
+    if (cartRes?.type === "order") {
+      const countryCode =
+        cartRes.order.shipping_address?.country_code?.toLowerCase()
+
+      const orderCacheTag = await getCacheTag("orders")
+      revalidateTag(orderCacheTag, "max")
+
+      await removeCartId()
+      redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
+    }
+
+    const shouldRetry =
+      attempts < maxAttempts &&
+      isRetryableCartCompletionError(
+        cartRes?.error?.message,
+        cartRes?.error?.type
+      )
+
+    if (shouldRetry) {
+      await wait(250 * attempts)
+      continue
+    }
+
+    throw new Error(
+      cartRes?.error?.message ||
+        "Failed to complete checkout. Please contact support with your cart ID."
+    )
   }
-
-  return cartRes.cart
 }
 
 /**
