@@ -5,8 +5,35 @@ import medusaError from "@lib/util/medusa-error"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { HttpTypes } from "@medusajs/types"
 
-const ORDER_FIELDS =
-  "*items,*items.variant,*items.product,*shipping_methods,*shipping_address,*billing_address,*fulfillments,*payment_collections,*payment_collections.payments,custom_display_id"
+const ORDER_FIELDS = [
+  "id",
+  "display_id",
+  "custom_display_id",
+  "metadata",
+  "email",
+  "status",
+  "fulfillment_status",
+  "payment_status",
+  "currency_code",
+  "created_at",
+  "total",
+  "subtotal",
+  "item_total",
+  "shipping_total",
+  "shipping_subtotal",
+  "tax_total",
+  "discount_total",
+  "gift_card_total",
+  "*items",
+  "*items.variant",
+  "*items.product",
+  "*shipping_methods",
+  "*shipping_address",
+  "*billing_address",
+  "*fulfillments",
+  "*payment_collections",
+  "*payment_collections.payments",
+].join(",")
 
 const isOrderFieldsParseError = (error: any) => {
   const rawMessage = error?.response?.data?.message || error?.message || ""
