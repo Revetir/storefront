@@ -160,7 +160,12 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       )}
 
       <Table.Cell className="!pr-0">
-        <div className="relative h-full flex items-center justify-end">
+        <div
+          className={clx("h-full flex justify-end", {
+            "relative items-center": type === "full",
+            "items-end flex-col gap-1": type === "preview",
+          })}
+        >
           {/* Total price - centered vertically */}
           <LineItemPrice
             item={item}
@@ -172,7 +177,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
           {/* Preview mode: show quantity below unit price */}
           {type === "preview" && item.quantity >= 2 && (
-            <Text className="text-xs absolute bottom-1 right-0 whitespace-nowrap text-ui-fg-muted leading-none">
+            <Text className="text-xs whitespace-nowrap text-ui-fg-muted leading-none">
               Quantity: {item.quantity}
             </Text>
           )}
