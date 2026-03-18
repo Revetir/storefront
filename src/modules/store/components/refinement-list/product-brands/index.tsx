@@ -96,7 +96,7 @@ export default function BrandRefinementList({ selectedBrand: propSelectedBrand }
   if (loading) return null
 
   return (
-    <div className="flex flex-col gap-2 my-4">
+    <div className="flex flex-col gap-2 my-2">
       <span className="text-xs uppercase text-gray-500 mb-1">Brands</span>
       {brands.map((brand) => (
         <button

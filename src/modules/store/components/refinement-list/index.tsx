@@ -29,9 +29,9 @@ const RefinementList = ({ sortBy: _sortBy, 'data-testid': _dataTestId, selectedB
   }
 
   return (
-    <div className="flex lg:flex-col gap-6 py-4 mb-8 lg:px-0 lg:min-w-[250px]">
+    <div className="flex lg:flex-col gap-4 py-4 mb-8 lg:px-0 lg:min-w-[250px]">
       <div className="w-full">
-        <SaleToggle checked={saleOnly} onToggle={handleToggleSale} className="mb-8 px-2" />
+        <SaleToggle checked={saleOnly} onToggle={handleToggleSale} className="mb-9 px-2" />
         <CategorySidebar className="border-r-0 p-0 w-full" />
       </div>
       <BrandRefinementList selectedBrand={selectedBrand} />

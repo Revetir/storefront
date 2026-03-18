@@ -327,7 +327,7 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
 
   if (loading) {
     return (
-      <div className={`w-full mb-6 ${className}`}>
+      <div className={`w-full mb-4 ${className}`}>
         <h2 className="text-xs uppercase text-gray-500 mb-3">Categories</h2>
         <div className="space-y-2">
           {[...Array(5)].map((_, i) => (
@@ -340,7 +340,7 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
 
   if (error) {
     return (
-      <div className={`w-full mb-6 ${className}`}>
+      <div className={`w-full mb-4 ${className}`}>
         <h2 className="text-xs uppercase text-gray-500 mb-3">Categories</h2>
         <p className="text-red-500 text-sm">Error loading categories: {error}</p>
       </div>
@@ -348,7 +348,7 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
   }
 
   return (
-    <div className={`w-full mb-6 ${className}`}>
+    <div className={`w-full mb-4 ${className}`}>
       <h2 className="text-xs uppercase text-gray-500 mb-3">Categories</h2>
       {categories.length > 0 ? (
         <nav>

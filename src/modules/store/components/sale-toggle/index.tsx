@@ -16,16 +16,16 @@ const SaleToggle: React.FC<SaleToggleProps> = ({ checked, onToggle, className = 
         role="checkbox"
         aria-checked={checked}
         onClick={onToggle}
-        className="relative flex h-4 w-4 items-center justify-center outline-none"
+        className="relative flex h-3.5 w-3.5 items-center justify-center outline-none"
       >
-        <div className="h-4 w-4 border border-black bg-white rounded-sm flex items-center justify-center">
-          {checked && <div className="h-2 w-2 bg-black rounded-sm" />}
+        <div className="h-3.5 w-3.5 border border-black bg-white flex items-center justify-center">
+          {checked && <div className="h-[7px] w-[7px] bg-black" />}
         </div>
       </button>
       <button
         type="button"
         onClick={onToggle}
-        className="h-4 flex items-center text-left text-xs uppercase font-sans leading-none text-black"
+        className="h-3.5 flex items-center text-left text-xs uppercase font-sans leading-none text-black"
       >
         SALE ONLY
       </button>
