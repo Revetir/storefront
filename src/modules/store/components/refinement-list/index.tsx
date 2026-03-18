@@ -1,11 +1,12 @@
 "use client"
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useTransition } from "react"
 
-import SortProducts, { SortOptions } from "./sort-products"
+import { SortOptions } from "./sort-products"
 import CategorySidebar from "@modules/layout/components/category-sidebar"
 import BrandRefinementList from "./product-brands"
+import SaleToggle from "@modules/store/components/sale-toggle"
+import { buildPathWithQueryFlags, isSaleQueryEnabled, setSaleQuery } from "@lib/util/sale-query"
 
 type RefinementListProps = {
   sortBy: SortOptions
@@ -14,34 +15,25 @@ type RefinementListProps = {
   selectedBrand?: string
 }
 
-const RefinementList = ({ sortBy, 'data-testid': dataTestId, selectedBrand }: RefinementListProps) => {
+const RefinementList = ({ sortBy: _sortBy, 'data-testid': _dataTestId, selectedBrand }: RefinementListProps) => {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const [isPending, startTransition] = useTransition()
+  const saleOnly = isSaleQueryEnabled(searchParams)
 
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams)
-      params.set(name, value)
-
-      return params.toString()
-    },
-    [searchParams]
-  )
-
-  const setQueryParams = (name: string, value: string) => {
-    const query = createQueryString(name, value)
-    
-    // Use startTransition for better UX during navigation
-    startTransition(() => {
-      router.push(`${pathname}?${query}`)
-    })
+  const handleToggleSale = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    setSaleQuery(params, !saleOnly)
+    params.delete("page")
+    router.push(buildPathWithQueryFlags(pathname, params))
   }
 
   return (
     <div className="flex lg:flex-col gap-6 py-4 mb-8 lg:px-0 lg:min-w-[250px]">
-      <CategorySidebar className="border-r-0 p-0 w-full" />
+      <div className="w-full">
+        <SaleToggle checked={saleOnly} onToggle={handleToggleSale} className="mb-4 px-2" />
+        <CategorySidebar className="border-r-0 p-0 w-full" />
+      </div>
       <BrandRefinementList selectedBrand={selectedBrand} />
     </div>
   )

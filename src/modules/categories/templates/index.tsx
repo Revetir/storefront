@@ -8,6 +8,12 @@ import RefinementList from "@modules/store/components/refinement-list"
 import MobileRefinementPanel from "@modules/store/components/mobile-refinement-panel"
 import ColorRefinementList from "@modules/store/components/refinement-list/product-colors"
 import SortProducts, { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import SaleToggle from "@modules/store/components/sale-toggle"
+import {
+  buildPathWithQueryFlags,
+  isSaleQueryEnabled,
+  setSaleQuery,
+} from "@lib/util/sale-query"
 
 import PaginatedProductsClient from "@modules/store/templates/paginated-products-client"
 import EditorialIntro from "@modules/store/components/editorial-intro"
@@ -52,6 +58,7 @@ const CategoryTemplate = ({
 
   // Extract color from query params
   const selectedColor = searchParams.get('color') || undefined
+  const saleOnly = isSaleQueryEnabled(searchParams)
 
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
@@ -72,8 +79,16 @@ const CategoryTemplate = ({
   const setQueryParams = (name: string, value: string) => {
     const query = createQueryString(name, value)
     startTransition(() => {
-      router.push(`${pathname}?${query}`)
+      const params = new URLSearchParams(query)
+      router.push(buildPathWithQueryFlags(pathname, params))
     })
+  }
+
+  const handleToggleSale = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    setSaleQuery(params, !saleOnly)
+    params.delete("page")
+    router.push(buildPathWithQueryFlags(pathname, params))
   }
 
   return (
@@ -112,6 +127,10 @@ const CategoryTemplate = ({
                   Sort
                 </button>
               </div>
+            </div>
+
+            <div className="mb-6 border border-gray-300 border-t-0 px-4 py-3">
+              <SaleToggle checked={saleOnly} onToggle={handleToggleSale} />
             </div>
 
             {/* Product Grid */}

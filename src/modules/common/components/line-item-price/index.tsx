@@ -1,8 +1,7 @@
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
 import { clx } from "@medusajs/ui"
-import { getVariantPrice, isAlgoliaProduct } from "@lib/util/get-algolia-product-price"
-import { getProductPrice } from "@lib/util/get-product-price"
+import { resolveLineItemPricing } from "@lib/util/resolve-line-item-pricing"
 
 type LineItemPriceProps = {
   item: HttpTypes.StoreCartLineItem | HttpTypes.StoreOrderLineItem
@@ -18,45 +17,13 @@ const LineItemPrice = ({
   forceVertical = false,
   showTotal = false,
 }: LineItemPriceProps) => {
-  const { subtotal, quantity } = item
-
-  // Try to get product-level sale pricing from variant data
-  let variantPrice = null
-  if (item.variant) {
-    const product = (item as any).product
-    if (product && isAlgoliaProduct(product)) {
-      variantPrice = getVariantPrice(item.variant as any, currencyCode.toLowerCase())
-    } else if (product) {
-      const priceData = getProductPrice({
-        product: product as any,
-        variantId: item.variant.id,
-      })
-      variantPrice = priceData.variantPrice
-    }
-  }
-
-  // Check if this is a product-level sale (NOT cart-level discounts)
-  const isProductOnSale = variantPrice?.price_type === "sale" && "original_price" in variantPrice
-
-  // Determine which prices to display
-  let displayPrice: number
-  let displayOriginalPrice: number | null = null
-
-  if (isProductOnSale && variantPrice) {
-    // Product has a sale price - use pricing from variant
-    const unitSalePrice = parseFloat(variantPrice.calculated_price?.replace(/[^0-9.]/g, '') || '0')
-    const unitOriginalPrice = parseFloat((variantPrice as any).original_price?.replace(/[^0-9.]/g, '') || '0')
-
-    displayPrice = showTotal ? unitSalePrice * quantity : unitSalePrice
-    displayOriginalPrice = showTotal ? unitOriginalPrice * quantity : unitOriginalPrice
-  } else {
-    // No product-level sale - just show current price
-    // Cart-level discounts will be shown in SUMMARY section, not here
-    const currentTotalPrice = subtotal ?? 0
-    displayPrice = showTotal ? currentTotalPrice : currentTotalPrice / quantity
-    displayOriginalPrice = null
-  }
-
+  const pricing = resolveLineItemPricing(item)
+  const displayPrice = showTotal ? pricing.calculatedTotal : pricing.calculatedUnit
+  const displayOriginalPrice = pricing.hasDiscount
+    ? showTotal
+      ? pricing.originalTotal
+      : pricing.originalUnit
+    : null
   const hasProductSale = displayOriginalPrice !== null && displayOriginalPrice > displayPrice
 
   return (

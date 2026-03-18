@@ -79,7 +79,7 @@ const Hero = () => {
           </div>
 
           {/* Left Clickable Area - Men's */}
-          <LocalizedClientLink href="/men">
+          <LocalizedClientLink href="/men?sale">
             <div
               onMouseEnter={() => setHoveredSection("men")}
               onMouseLeave={() => setHoveredSection(null)}
@@ -96,7 +96,7 @@ const Hero = () => {
           </LocalizedClientLink>
 
           {/* Right Clickable Area - Women's */}
-          <LocalizedClientLink href="/women">
+          <LocalizedClientLink href="/women?sale">
             <div
               onMouseEnter={() => setHoveredSection("women")}
               onMouseLeave={() => setHoveredSection(null)}
@@ -131,7 +131,7 @@ const Hero = () => {
           </div>
 
           {/* Left Clickable Area - Men's */}
-          <LocalizedClientLink href="/men">
+          <LocalizedClientLink href="/men?sale">
             <div
               style={{
                 position: "absolute",
@@ -146,7 +146,7 @@ const Hero = () => {
           </LocalizedClientLink>
 
           {/* Right Clickable Area - Women's */}
-          <LocalizedClientLink href="/women">
+          <LocalizedClientLink href="/women?sale">
             <div
               style={{
                 position: "absolute",
@@ -210,7 +210,7 @@ const Hero = () => {
               aria-label="Shop by category"
             >
               <LocalizedClientLink
-                href="/men"
+                href="/men?sale"
                 style={{
                   flex: "1 1 50%",
                   width: "50%",
@@ -233,7 +233,7 @@ const Hero = () => {
                 MENSWEAR
               </LocalizedClientLink>
               <LocalizedClientLink
-                href="/women"
+                href="/women?sale"
                 style={{
                   flex: "1 1 50%",
                   width: "50%",
@@ -268,7 +268,7 @@ const Hero = () => {
           aria-label="Shop menswear or womenswear"
         >
           <LocalizedClientLink
-            href="/men"
+            href="/men?sale"
             style={{
               flex: 1,
               padding: "2rem 1.5rem",
@@ -294,7 +294,7 @@ const Hero = () => {
             SHOP MENSWEAR
           </LocalizedClientLink>
           <LocalizedClientLink
-            href="/women"
+            href="/women?sale"
             style={{
               flex: 1,
               padding: "2rem 1.5rem",

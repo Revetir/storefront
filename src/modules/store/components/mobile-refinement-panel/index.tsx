@@ -7,6 +7,7 @@ import { usePathname, useRouter, useSearchParams, useParams } from "next/navigat
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { listBrands, Brand } from "@lib/data/brands"
 import { Category } from "@lib/data/categories"
+import { buildPathWithQueryFlags, isSaleQueryEnabled } from "@lib/util/sale-query"
 
 interface MobileRefinementPanelProps {
   isOpen: boolean
@@ -65,6 +66,7 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const params = useParams()
+  const saleOnly = isSaleQueryEnabled(searchParams)
 
   // Sync activeTab with initialTab when panel opens
   useEffect(() => {
@@ -123,7 +125,9 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
             getAvailableBrands({
               gender: gender as "men" | "women",
               categoryHandle: selectedFilters.category, // Filter by selected category if any
-              color: selectedFilters.color // Filter by selected color if any
+              color: selectedFilters.color, // Filter by selected color if any
+              saleOnly,
+              countryCode: (params?.countryCode as string) || "us"
             }),
             listBrands()
           ])
@@ -144,7 +148,7 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
 
       fetchBrands()
     }
-  }, [activeTab, activeSection, selectedFilters.category, selectedFilters.color, params])
+  }, [activeTab, activeSection, selectedFilters.category, selectedFilters.color, params, saleOnly, params?.countryCode])
 
   // Fetch categories with contextual filtering based on selected brand
   useEffect(() => {
@@ -160,7 +164,9 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
             getAvailableCategories({
               gender: genderParam as "men" | "women",
               brandSlug: selectedFilters.brand, // Filter by selected brand if any
-              color: selectedFilters.color // Filter by selected color if any
+              color: selectedFilters.color, // Filter by selected color if any
+              saleOnly,
+              countryCode: (params?.countryCode as string) || "us"
             }),
             fetch('/api/categories')
           ])
@@ -192,7 +198,7 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
 
       fetchCategories()
     }
-  }, [activeTab, activeSection, selectedFilters.brand, selectedFilters.color, params])
+  }, [activeTab, activeSection, selectedFilters.brand, selectedFilters.color, params, saleOnly, params?.countryCode])
 
   const handleToggleCategory = (categoryId: string) => {
     setExpandedCategories(prev => {
@@ -317,11 +323,14 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
       path = `/${countryCode}/${gender}/${category}`
     }
 
+    const queryParams = new URLSearchParams(searchParams.toString())
+    queryParams.delete("page")
+    queryParams.delete("color")
     if (color) {
-      path += `?color=${color}`
+      queryParams.set("color", color)
     }
 
-    router.push(path)
+    router.push(buildPathWithQueryFlags(path, queryParams))
     onClose()
   }
 
@@ -336,8 +345,7 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
   const handleSortSelect = (sortValue: string) => {
     const params = new URLSearchParams(searchParams)
     params.set('sortBy', sortValue)
-    const queryString = params.toString()
-    router.push(`${pathname}?${queryString}`)
+    router.push(buildPathWithQueryFlags(pathname, params))
     onClose()
   }
 

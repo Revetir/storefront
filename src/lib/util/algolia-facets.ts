@@ -1,4 +1,5 @@
 import { searchClient } from "@lib/config"
+import { getSaleFacetForCountryCode } from "./sale-region"
 
 export interface CategoryFacet {
   handle: string
@@ -13,6 +14,8 @@ export interface AlgoliaFacetOptions {
   categoryHandle?: string
   brandSlug?: string
   color?: string
+  saleOnly?: boolean
+  countryCode?: string
 }
 
 async function disableNextCache() {
@@ -52,7 +55,7 @@ export async function getAvailableCategories(
   options: AlgoliaFacetOptions = {}
 ): Promise<CategoryFacet[]> {
   await disableNextCache()
-  const { gender, brandSlug, color } = options
+  const { gender, brandSlug, color, saleOnly, countryCode } = options
 
   try {
     const indexName = process.env.NEXT_PUBLIC_ALGOLIA_PRODUCT_INDEX_NAME
@@ -72,6 +75,10 @@ export async function getAvailableCategories(
     }
     if (color) {
       filters.push(`primaryColor:"${color}"`)
+    }
+    if (saleOnly) {
+      const saleFacet = getSaleFacetForCountryCode(countryCode)
+      filters.push(`${saleFacet}:true`)
     }
 
     console.log("[Algolia Facets] Fetching categories with filters:", filters.join(" AND ") || "none")
@@ -130,7 +137,7 @@ export async function getAvailableBrands(
   options: AlgoliaFacetOptions = {}
 ): Promise<BrandFacet[]> {
   await disableNextCache()
-  const { gender, categoryHandle, color } = options
+  const { gender, categoryHandle, color, saleOnly, countryCode } = options
 
   try {
     const indexName = process.env.NEXT_PUBLIC_ALGOLIA_PRODUCT_INDEX_NAME
@@ -152,6 +159,10 @@ export async function getAvailableBrands(
     }
     if (color) {
       filters.push(`primaryColor:"${color}"`)
+    }
+    if (saleOnly) {
+      const saleFacet = getSaleFacetForCountryCode(countryCode)
+      filters.push(`${saleFacet}:true`)
     }
 
     console.log("[Algolia Facets] Fetching brands with filters:", filters.join(" AND ") || "none")

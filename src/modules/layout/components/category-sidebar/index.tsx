@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useParams, usePathname, useSearchParams } from "next/navigation"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Category } from "@lib/data/categories"
+import { buildPathWithQueryFlags, isSaleQueryEnabled } from "@lib/util/sale-query"
 
 interface CategorySidebarProps {
   className?: string
@@ -19,6 +20,7 @@ interface CategoryNodeProps {
   level?: number
   parentPath?: string
   activeCategoryPath: string[]
+  queryParams: URLSearchParams
 }
 
 const CategoryNode = ({
@@ -31,6 +33,7 @@ const CategoryNode = ({
   level = 0,
   parentPath = "",
   activeCategoryPath,
+  queryParams,
 }: CategoryNodeProps) => {
   const hasChildren = category.children && category.children.length > 0
   const isExpanded = expandedCategories.has(category.id)
@@ -88,6 +91,12 @@ const CategoryNode = ({
     }
   }
 
+  const getLinkWithQuery = (basePath: string) => {
+    const params = new URLSearchParams(queryParams.toString())
+    params.delete("page")
+    return buildPathWithQueryFlags(basePath, params)
+  }
+
   return (
     <li className="w-full">
       <div className="flex items-center w-full" style={{ marginLeft: `${level * 6 + 8}px` }}>
@@ -120,7 +129,7 @@ const CategoryNode = ({
         
         {/* Category Link */}
         <LocalizedClientLink
-          href={isCurrentCategory ? getToggleOffPath() : categoryPath}
+          href={getLinkWithQuery(isCurrentCategory ? getToggleOffPath() : categoryPath)}
           className={`flex-1 text-xs uppercase py-1 px-2 font-sans transition-colors ${
             isCurrentCategory
               ? "font-bold underline text-black"
@@ -145,12 +154,13 @@ const CategoryNode = ({
               onToggleExpanded={onToggleExpanded}
               gender={gender}
               brandSlug={brandSlug}
-              level={level + 1}
-              parentPath="" // Not needed for flat URLs
-              activeCategoryPath={activeCategoryPath}
-            />
-          ))}
-        </ul>
+                level={level + 1}
+                parentPath="" // Not needed for flat URLs
+                activeCategoryPath={activeCategoryPath}
+                queryParams={queryParams}
+              />
+            ))}
+          </ul>
       )}
     </li>
   )
@@ -170,6 +180,8 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
   const genderParam = (params?.gender as string) || ""
   const brandSlugParam = params?.brandSlug as string | undefined
   const colorParam = searchParams.get('color') || undefined
+  const saleOnly = isSaleQueryEnabled(searchParams)
+  const queryParams = new URLSearchParams(searchParams.toString())
 
   // Determine the current category handle from pretty URL routes
   // Supported: /{countryCode}/{gender}/{categorySlug} and /{countryCode}/{gender}/brands/{brandSlug}/{categorySlug}
@@ -237,7 +249,9 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
           getAvailableCategories({
             gender: genderParam as "men" | "women" | undefined,
             brandSlug: brandSlugParam,
-            color: colorParam
+            color: colorParam,
+            saleOnly,
+            countryCode
           }),
           fetch("/api/categories")
         ])
@@ -297,7 +311,7 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
     }
 
     fetchCategories()
-  }, [currentCategoryHandle, genderParam, brandSlugParam, colorParam])
+  }, [currentCategoryHandle, genderParam, brandSlugParam, colorParam, saleOnly, countryCode])
 
   const handleToggleExpanded = (categoryId: string) => {
     setExpandedCategories(prev => {
@@ -349,6 +363,7 @@ export default function CategorySidebar({ className = "" }: CategorySidebarProps
                 gender={genderParam}
                 brandSlug={brandSlugParam}
                 activeCategoryPath={activeCategoryPath}
+                queryParams={queryParams}
               />
             ))}
           </ul>

@@ -117,7 +117,7 @@ const CheckerboardHero = () => {
           </div>
 
           <LocalizedClientLink
-            href="/men"
+            href="/men?sale"
             aria-label="Shop menswear"
             className="absolute bottom-0 left-0 z-20 block h-1/2 w-1/2"
             onMouseEnter={() => setHoveredSide("men")}
@@ -130,7 +130,7 @@ const CheckerboardHero = () => {
           </LocalizedClientLink>
 
           <LocalizedClientLink
-            href="/women"
+            href="/women?sale"
             aria-label="Shop womenswear"
             className="absolute right-0 top-0 z-20 block h-1/2 w-1/2"
             onMouseEnter={() => setHoveredSide("women")}
@@ -143,7 +143,7 @@ const CheckerboardHero = () => {
           </LocalizedClientLink>
 
           <LocalizedClientLink
-            href="/men"
+            href="/men?sale"
             aria-label="Shop menswear from sale text"
             className="absolute left-0 top-0 z-10 block h-1/2 w-1/2"
             style={{ cursor: "pointer" }}
@@ -152,7 +152,7 @@ const CheckerboardHero = () => {
           </LocalizedClientLink>
 
           <LocalizedClientLink
-            href="/women"
+            href="/women?sale"
             aria-label="Shop womenswear from sale text"
             className="absolute bottom-0 right-0 z-10 block h-1/2 w-1/2"
             style={{ cursor: "pointer" }}
@@ -161,7 +161,7 @@ const CheckerboardHero = () => {
           </LocalizedClientLink>
 
           <LocalizedClientLink
-            href="/men"
+            href="/men?sale"
             aria-label="Shop menswear from SALE text"
             className="absolute z-[11] block"
             onMouseEnter={() => setHoveredText("men")}
@@ -180,7 +180,7 @@ const CheckerboardHero = () => {
           </LocalizedClientLink>
 
           <LocalizedClientLink
-            href="/women"
+            href="/women?sale"
             aria-label="Shop womenswear from Up to 90% OFF text"
             className="absolute z-[11] block"
             onMouseEnter={() => setHoveredText("women")}

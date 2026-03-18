@@ -3,6 +3,7 @@
 import { clx } from "@medusajs/ui"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useTransition, useState, useEffect } from "react"
+import { buildPathWithQueryFlags } from "@lib/util/sale-query"
 
 export function Pagination({
   page,
@@ -50,7 +51,7 @@ export function Pagination({
     params.set("page", newPage.toString())
     
     startTransition(() => {
-      router.push(`${pathname}?${params.toString()}`)
+      router.push(buildPathWithQueryFlags(pathname, params))
     })
   }
 
@@ -59,7 +60,7 @@ export function Pagination({
     if (pageNum >= 1 && pageNum <= totalPages) {
       const params = new URLSearchParams(searchParams)
       params.set("page", pageNum.toString())
-      router.prefetch(`${pathname}?${params.toString()}`)
+      router.prefetch(buildPathWithQueryFlags(pathname, params))
     }
   }
 

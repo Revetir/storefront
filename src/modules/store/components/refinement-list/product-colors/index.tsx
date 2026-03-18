@@ -1,6 +1,7 @@
 "use client"
 import React from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
+import { buildPathWithQueryFlags } from "@lib/util/sale-query"
 
 // Color mapping for frontend filters (Multicolor is handled in backend but not shown to users)
 const COLOR_MAPPING = [
@@ -25,8 +26,7 @@ export default function ColorRefinementList({ selectedColor: propSelectedColor }
     }
 
     // Maintain current path but update query params
-    const queryString = params.toString()
-    router.push(queryString ? `${pathname}?${queryString}` : pathname)
+    router.push(buildPathWithQueryFlags(pathname, params))
   }
 
   const handleAllColors = () => {
@@ -35,8 +35,7 @@ export default function ColorRefinementList({ selectedColor: propSelectedColor }
 
     const params = new URLSearchParams(searchParams)
     params.delete('color')
-    const queryString = params.toString()
-    router.push(queryString ? `${pathname}?${queryString}` : pathname)
+    router.push(buildPathWithQueryFlags(pathname, params))
   }
 
   return (

@@ -6,6 +6,7 @@ import { listCategories } from "@lib/data/categories"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CategoryTemplate from "@modules/categories/templates"
 import { searchProductsWithAlgolia, convertAlgoliaProductsToMedusaFormat } from "@lib/util/algolia-filters"
+import { isSaleValueEnabled } from "@lib/util/sale-query"
 
 type Props = {
   params: Promise<{ countryCode: string; gender: string; brandSlug: string }>
@@ -13,6 +14,7 @@ type Props = {
     sortBy?: SortOptions
     page?: string
     color?: string
+    sale?: string
   }>
 }
 
@@ -64,7 +66,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export default async function BrandPage(props: Props) {
   const searchParams = await props.searchParams
   const params = await props.params
-  const { sortBy, page, color } = searchParams
+  const { sortBy, page, color, sale } = searchParams
   const { countryCode, gender, brandSlug } = params
 
   // Validate gender
@@ -86,11 +88,14 @@ export default async function BrandPage(props: Props) {
   // Fetch products using Algolia filtering
   const pageNumber = page ? parseInt(page, 10) : 1
   const sort = sortBy || "created_at"
+  const saleOnly = isSaleValueEnabled(sale)
 
   const algoliaResult = await searchProductsWithAlgolia({
     gender: gender as "men" | "women",
     brandSlug: brand.slug,
     color: color,
+    saleOnly,
+    countryCode,
     sortBy: sort,
     page: pageNumber,
     hitsPerPage: 20

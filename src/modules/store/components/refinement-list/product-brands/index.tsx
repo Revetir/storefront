@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react"
 import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Brand, listBrands } from "@lib/data/brands"
+import { buildPathWithQueryFlags, isSaleQueryEnabled } from "@lib/util/sale-query"
 
 export default function BrandRefinementList({ selectedBrand: propSelectedBrand }: { selectedBrand?: string }) {
   const [brands, setBrands] = useState<Brand[]>([])
@@ -12,6 +13,7 @@ export default function BrandRefinementList({ selectedBrand: propSelectedBrand }
   const searchParams = useSearchParams()
   const selectedBrand = propSelectedBrand || ""
   const colorParam = searchParams.get('color') || undefined
+  const saleOnly = isSaleQueryEnabled(searchParams)
 
   useEffect(() => {
     const fetchBrands = async () => {
@@ -29,7 +31,9 @@ export default function BrandRefinementList({ selectedBrand: propSelectedBrand }
           getAvailableBrands({
             gender: gender as "men" | "women",
             categoryHandle: categorySlug,
-            color: colorParam
+            color: colorParam,
+            saleOnly,
+            countryCode: (params?.countryCode as string) || "us"
           }),
           listBrands()
         ])
@@ -51,7 +55,14 @@ export default function BrandRefinementList({ selectedBrand: propSelectedBrand }
     }
 
     fetchBrands()
-  }, [params?.gender, params?.categorySlug, params?.brandSlug, colorParam])
+  }, [params?.gender, params?.categorySlug, params?.brandSlug, colorParam, saleOnly, params?.countryCode])
+
+  const getNavigationTarget = (basePath: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete("page")
+    const queryPath = buildPathWithQueryFlags(basePath, params)
+    return queryPath
+  }
 
   const handleSelect = (slug: string) => {
     const countryCode = params?.countryCode as string
@@ -63,21 +74,21 @@ export default function BrandRefinementList({ selectedBrand: propSelectedBrand }
     if (selectedBrand === slug) {
       // If we're on a brand+category page, go to just category page
       if (categorySlug) {
-        router.push(`/${countryCode}/${gender}/${categorySlug}`)
+        router.push(getNavigationTarget(`/${countryCode}/${gender}/${categorySlug}`))
       } else {
         // If we're on just brand page, go to gender page
-        router.push(`/${countryCode}/${gender}`)
+        router.push(getNavigationTarget(`/${countryCode}/${gender}`))
       }
     } else {
       // If we're on a category page, add brand to make it brand+category
       if (categorySlug && !pathname.includes('/brands/')) {
-        router.push(`/${countryCode}/${gender}/brands/${brandSlug}/${categorySlug}`)
+        router.push(getNavigationTarget(`/${countryCode}/${gender}/brands/${brandSlug}/${categorySlug}`))
       } else if (categorySlug && pathname.includes('/brands/')) {
         // If we're on a different brand+category page, switch to this brand
-        router.push(`/${countryCode}/${gender}/brands/${brandSlug}/${categorySlug}`)
+        router.push(getNavigationTarget(`/${countryCode}/${gender}/brands/${brandSlug}/${categorySlug}`))
       } else {
         // If we're on gender page or different brand page, go to this brand page
-        router.push(`/${countryCode}/${gender}/brands/${brandSlug}`)
+        router.push(getNavigationTarget(`/${countryCode}/${gender}/brands/${brandSlug}`))
       }
     }
   }

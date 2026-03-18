@@ -1,5 +1,6 @@
 import { searchClient } from "@lib/config"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import { getSaleFacetForCountryCode } from "./sale-region"
 
 export interface AlgoliaProduct {
   objectID: string
@@ -50,6 +51,8 @@ export interface AlgoliaProduct {
   minPrice?: number | null
   minPriceUs?: number | null
   minPriceEu?: number | null
+  on_sale_us?: boolean
+  on_sale_eu?: boolean
   primaryColor?: string[]
   created_at: string
   updated_at: string
@@ -69,6 +72,8 @@ export interface AlgoliaFilterOptions {
   brandSlug?: string
   color?: string
   tagId?: string
+  saleOnly?: boolean
+  countryCode?: string
   sortBy?: SortOptions
   page?: number
   hitsPerPage?: number
@@ -95,6 +100,8 @@ export async function searchProductsWithAlgolia(
     brandSlug,
     color,
     tagId,
+    saleOnly,
+    countryCode,
     sortBy = "created_at",
     page = 1,
     hitsPerPage = 20
@@ -140,6 +147,11 @@ export async function searchProductsWithAlgolia(
     // Tag filter
     if (tagId) {
       filters.push(`tags.id:"${tagId}"`)
+    }
+
+    if (saleOnly) {
+      const saleFacet = getSaleFacetForCountryCode(countryCode)
+      filters.push(`${saleFacet}:true`)
     }
 
 
@@ -191,6 +203,8 @@ export async function searchProductsWithAlgolia(
           'minPrice',
           'minPriceUs',
           'minPriceEu',
+          'on_sale_us',
+          'on_sale_eu',
           'primaryColor',
           'created_at',
           'updated_at'
@@ -243,6 +257,8 @@ export function convertAlgoliaProductsToMedusaFormat(products: AlgoliaProduct[])
     minPrice: product.minPrice,
     minPriceUs: product.minPriceUs,
     minPriceEu: product.minPriceEu,
+    on_sale_us: product.on_sale_us,
+    on_sale_eu: product.on_sale_eu,
     created_at: product.created_at,
     updated_at: product.updated_at,
     // Add any other fields that might be expected by UI components
