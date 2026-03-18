@@ -40,6 +40,25 @@ export const isSaleValueEnabled = (value?: string | null): boolean => {
   return true
 }
 
+export const isSaleEnabledFromServerSearchParams = (
+  searchParams: Record<string, string | string[] | undefined>,
+  key: string = SALE_QUERY_PARAM
+) => {
+  const hasKey = Object.prototype.hasOwnProperty.call(searchParams, key)
+  if (!hasKey) {
+    return false
+  }
+
+  const rawValue = searchParams[key]
+  const value = Array.isArray(rawValue) ? rawValue[0] : rawValue
+
+  if (value === undefined) {
+    return true
+  }
+
+  return isSaleValueEnabled(value)
+}
+
 export const setSaleQuery = (
   params: URLSearchParams,
   enabled: boolean,

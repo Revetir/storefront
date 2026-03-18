@@ -186,10 +186,9 @@ const CartDropdown = ({
                                 } as any}
                               />
                             </LocalizedClientLink>
-                            <div className="flex flex-col justify-start flex-1">
-                              <div className="flex flex-col">
-                                <div className="flex items-start justify-between">
-                                  <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
+                            <div className="flex flex-col flex-1 min-h-[132px]">
+                              <div className="flex items-center justify-between flex-1">
+                                <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
                                     {getBrandsArray((item.product as any)?.brands).length > 0 && (
                                       <span className="text-ui-fg-muted text-xs font-medium truncate block">
                                         {getBrandsArray((item.product as any)?.brands).map((brand, idx, arr) => (
@@ -217,8 +216,8 @@ const CartDropdown = ({
                                         size="text-xs"
                                       />
                                     </div>
-                                  </div>
-                                  <div className="flex flex-col items-end gap-1">
+                                </div>
+                                <div className="flex flex-col items-end gap-1">
                                     <LineItemPrice
                                       item={item}
                                       style="tight"
@@ -227,11 +226,11 @@ const CartDropdown = ({
                                       showTotal={false}
                                     />
                                     <div
-                                      className="flex items-center gap-1 text-ui-fg-muted text-xs"
+                                      className="inline-flex items-center gap-1 text-ui-fg-muted text-xs whitespace-nowrap"
                                       data-testid="cart-item-quantity"
                                       data-value={item.quantity}
                                     >
-                                      <span className="normal-case">Quantity: {item.quantity}</span>
+                                      <span className="normal-case whitespace-nowrap">Quantity: {item.quantity}</span>
                                       <div className="flex flex-col gap-[1px]">
                                         <button
                                           type="button"
@@ -254,11 +253,10 @@ const CartDropdown = ({
                                       </div>
                                     </div>
                                   </div>
-                                </div>
                               </div>
                               <DeleteButton
                                 id={item.id}
-                                className="mt-2"
+                                className="mt-4 self-start"
                                 data-testid="cart-item-remove-button"
                               >
                                 Remove
