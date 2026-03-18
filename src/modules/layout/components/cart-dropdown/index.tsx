@@ -256,7 +256,7 @@ const CartDropdown = ({
                               </div>
                               <DeleteButton
                                 id={item.id}
-                                className="mt-4 self-start"
+                                className="mt-4 mb-1 self-start"
                                 data-testid="cart-item-remove-button"
                               >
                                 Remove
@@ -270,7 +270,7 @@ const CartDropdown = ({
                     <div className="flex items-center justify-between">
                       <span className="text-ui-fg-base font-semibold">
                         Subtotal{" "}
-                        <span className="font-normal"> (excl. taxes)</span>
+                        <span className="font-normal"> (excluding taxes)</span>
                       </span>
                       <span
                         className="text-large-semi"
