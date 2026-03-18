@@ -6,6 +6,7 @@ import {
   PopoverPanel,
   Transition,
 } from "@headlessui/react"
+import { updateLineItem } from "@lib/data/cart"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
@@ -28,6 +29,7 @@ const CartDropdown = ({
     undefined
   )
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
+  const [updatingLineId, setUpdatingLineId] = useState<string | null>(null)
 
   const open = () => setCartDropdownOpen(true)
   const close = () => setCartDropdownOpen(false)
@@ -66,14 +68,39 @@ const CartDropdown = ({
   }, [activeTimer])
 
   const pathname = usePathname()
+  const isCartLikePage = pathname.includes("/cart") || pathname.includes("/bag")
+
+  const changeItemQuantity = async (
+    item: HttpTypes.StoreCartLineItem,
+    nextQuantity: number
+  ) => {
+    const maxQtyFromInventory = 10
+    const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
+    const clampedQuantity = Math.max(1, Math.min(maxQuantity, nextQuantity))
+
+    if (clampedQuantity === item.quantity) {
+      return
+    }
+
+    try {
+      setUpdatingLineId(item.id)
+      await updateLineItem({
+        lineId: item.id,
+        quantity: clampedQuantity,
+      })
+    } finally {
+      setUpdatingLineId(null)
+    }
+  }
 
   // open cart dropdown when modifying the cart items, but only if we're not on the cart page
   useEffect(() => {
-    if (itemRef.current !== totalItems && !pathname.includes("/cart")) {
+    if (itemRef.current !== totalItems && !isCartLikePage) {
       timedOpen()
     }
+    itemRef.current = totalItems
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalItems, itemRef.current])
+  }, [totalItems, isCartLikePage])
 
   return (
     <div
@@ -134,86 +161,112 @@ const CartDropdown = ({
                           ? -1
                           : 1
                       })
-                      .map((item) => (
-                        <div
-                          className="grid grid-cols-[132px_1fr] gap-x-4"
-                          key={item.id}
-                          data-testid="cart-item"
-                        >
-                          <LocalizedClientLink
-                            href={getProductUrl((item.product as any)?.brands, item.product_handle || '')}
-                            className="w-full"
+                      .map((item) => {
+                        const maxQtyFromInventory = 10
+                        const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
+                        const isUpdating = updatingLineId === item.id
+
+                        return (
+                          <div
+                            className="grid grid-cols-[132px_1fr] gap-x-4"
+                            key={item.id}
+                            data-testid="cart-item"
                           >
-                            <Thumbnail
-                              thumbnail={item.thumbnail}
-                              images={item.variant?.product?.images}
-                              size="square"
-                              product={{
-                                brand: { name: (item.product as any)?.brands?.[0]?.name || "Product" },
-                                title: item.title || ""
-                              } as any}
-                            />
-                          </LocalizedClientLink>
-                          <div className="flex flex-col justify-start flex-1">
-                            <div className="flex flex-col">
-                              <div className="flex items-start justify-between">
-                                <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
-                                  {getBrandsArray((item.product as any)?.brands).length > 0 && (
-                                    <span className="text-ui-fg-muted text-xs font-medium truncate block">
-                                      {getBrandsArray((item.product as any)?.brands).map((brand, idx, arr) => (
-                                        <Fragment key={brand.slug}>
-                                          <span className="uppercase">{brand.name}</span>
-                                          {idx < arr.length - 1 && <span> x </span>}
-                                        </Fragment>
-                                      ))}
-                                    </span>
-                                  )}
-                                  <h3 className="text-base-regular overflow-hidden text-ellipsis normal-case">
-                                    <LocalizedClientLink
-                                      href={getProductUrl((item.product as any)?.brands, item.product_handle || '')}
-                                      data-testid="product-link"
-                                      className="normal-case"
-                                    >
-                                      {item.title}
-                                    </LocalizedClientLink>
-                                  </h3>
-                                  <div className="text-ui-fg-subtle text-xs">
-                                    <LineItemOptions
-                                      variant={item.variant}
-                                      data-testid="cart-item-variant"
-                                      data-value={item.variant}
-                                      size="text-xs"
+                            <LocalizedClientLink
+                              href={getProductUrl((item.product as any)?.brands, item.product_handle || '')}
+                              className="w-full"
+                            >
+                              <Thumbnail
+                                thumbnail={item.thumbnail}
+                                images={item.variant?.product?.images}
+                                size="square"
+                                product={{
+                                  brand: { name: (item.product as any)?.brands?.[0]?.name || "Product" },
+                                  title: item.title || ""
+                                } as any}
+                              />
+                            </LocalizedClientLink>
+                            <div className="flex flex-col justify-start flex-1">
+                              <div className="flex flex-col">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
+                                    {getBrandsArray((item.product as any)?.brands).length > 0 && (
+                                      <span className="text-ui-fg-muted text-xs font-medium truncate block">
+                                        {getBrandsArray((item.product as any)?.brands).map((brand, idx, arr) => (
+                                          <Fragment key={brand.slug}>
+                                            <span className="uppercase">{brand.name}</span>
+                                            {idx < arr.length - 1 && <span> x </span>}
+                                          </Fragment>
+                                        ))}
+                                      </span>
+                                    )}
+                                    <h3 className="text-base-regular overflow-hidden text-ellipsis normal-case">
+                                      <LocalizedClientLink
+                                        href={getProductUrl((item.product as any)?.brands, item.product_handle || '')}
+                                        data-testid="product-link"
+                                        className="normal-case"
+                                      >
+                                        {item.title}
+                                      </LocalizedClientLink>
+                                    </h3>
+                                    <div className="text-ui-fg-subtle text-xs">
+                                      <LineItemOptions
+                                        variant={item.variant}
+                                        data-testid="cart-item-variant"
+                                        data-value={item.variant}
+                                        size="text-xs"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="flex flex-col items-end gap-1">
+                                    <LineItemPrice
+                                      item={item}
+                                      style="tight"
+                                      currencyCode={cartState.currency_code}
+                                      forceVertical={true}
+                                      showTotal={false}
                                     />
+                                    <div
+                                      className="flex items-center gap-1 text-ui-fg-muted text-xs"
+                                      data-testid="cart-item-quantity"
+                                      data-value={item.quantity}
+                                    >
+                                      <span className="normal-case">Quantity: {item.quantity}</span>
+                                      <div className="flex flex-col gap-[1px]">
+                                        <button
+                                          type="button"
+                                          aria-label="Increase quantity"
+                                          onClick={() => changeItemQuantity(item, item.quantity + 1)}
+                                          disabled={isUpdating || item.quantity >= maxQuantity}
+                                          className="w-3 h-2 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                          <span className="w-0 h-0 border-l-[3px] border-r-[3px] border-b-[4px] border-l-transparent border-r-transparent border-b-current" />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          aria-label="Decrease quantity"
+                                          onClick={() => changeItemQuantity(item, item.quantity - 1)}
+                                          disabled={isUpdating || item.quantity <= 1}
+                                          className="w-3 h-2 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                          <span className="w-0 h-0 border-l-[3px] border-r-[3px] border-t-[4px] border-l-transparent border-r-transparent border-t-current" />
+                                        </button>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
-                                <div className="flex flex-col items-end gap-1">
-                                  <LineItemPrice
-                                    item={item}
-                                    style="tight"
-                                    currencyCode={cartState.currency_code}
-                                    forceVertical={true}
-                                    showTotal={false}
-                                  />
-                                  <span
-                                    className="text-ui-fg-muted text-xs"
-                                    data-testid="cart-item-quantity"
-                                    data-value={item.quantity}
-                                  >
-                                    <span className="normal-case">Quantity:</span> {item.quantity}
-                                  </span>
-                                </div>
                               </div>
+                              <DeleteButton
+                                id={item.id}
+                                className="mt-2"
+                                data-testid="cart-item-remove-button"
+                              >
+                                Remove
+                              </DeleteButton>
                             </div>
-                            <DeleteButton
-                              id={item.id}
-                              className="mt-2"
-                              data-testid="cart-item-remove-button"
-                            >
-                              Remove
-                            </DeleteButton>
                           </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                   </div>
                   <div className="p-4 flex flex-col gap-y-4 text-small-regular">
                     <div className="flex items-center justify-between">
