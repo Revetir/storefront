@@ -185,15 +185,8 @@ const CartDropdown = ({
                                       size="text-xs"
                                     />
                                   </div>
-                                  <span
-                                    className="text-ui-fg-muted text-xs"
-                                    data-testid="cart-item-quantity"
-                                    data-value={item.quantity}
-                                  >
-                                    <span className="normal-case">Quantity:</span> {item.quantity}
-                                  </span>
                                 </div>
-                                <div className="flex justify-end">
+                                <div className="flex flex-col items-end gap-1">
                                   <LineItemPrice
                                     item={item}
                                     style="tight"
@@ -201,6 +194,13 @@ const CartDropdown = ({
                                     forceVertical={true}
                                     showTotal={false}
                                   />
+                                  <span
+                                    className="text-ui-fg-muted text-xs"
+                                    data-testid="cart-item-quantity"
+                                    data-value={item.quantity}
+                                  >
+                                    <span className="normal-case">Quantity:</span> {item.quantity}
+                                  </span>
                                 </div>
                               </div>
                             </div>

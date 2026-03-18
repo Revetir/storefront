@@ -166,13 +166,14 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             item={item}
             style="tight"
             currencyCode={currencyCode}
-            showTotal={true}
+            showTotal={type === "full"}
+            showOriginal={type !== "full"}
           />
 
-          {/* Preview mode: quantity x unit price below */}
+          {/* Preview mode: show quantity below unit price */}
           {type === "preview" && item.quantity >= 2 && (
-            <Text className="text-xs flex items-baseline absolute bottom-1 right-0 whitespace-nowrap text-ui-fg-muted leading-none">
-              ({item.quantity}{" "}x{" "}<LineItemUnitPrice item={item} style="tight" currencyCode={currencyCode} />)
+            <Text className="text-xs absolute bottom-1 right-0 whitespace-nowrap text-ui-fg-muted leading-none">
+              Quantity: {item.quantity}
             </Text>
           )}
 
