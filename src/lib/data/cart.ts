@@ -11,13 +11,10 @@ import {
   getCacheTag,
   getCartId,
   getCheckoutCartId,
+  removeCartId,
   setCartId,
 } from "./cookies"
 import { getRegion } from "./regions"
-import {
-  finalizePrivateCheckoutSession,
-  validatePrivateCheckoutQuotedTotal,
-} from "./private-checkout"
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -546,14 +543,6 @@ export async function placeOrder(cartId?: string) {
     ...(await getAuthHeaders()),
   }
 
-  const cartSnapshot = await retrieveCheckoutCart(id)
-  const privateCheckoutValidationError = await validatePrivateCheckoutQuotedTotal(
-    cartSnapshot?.total
-  )
-  if (privateCheckoutValidationError) {
-    throw new Error(privateCheckoutValidationError)
-  }
-
   let attempts = 0
   const maxAttempts = 4
 
@@ -579,7 +568,7 @@ export async function placeOrder(cartId?: string) {
       const orderCacheTag = await getCacheTag("orders")
       revalidateTag(orderCacheTag, "max")
 
-      await finalizePrivateCheckoutSession(cartRes.order.id)
+      await removeCartId()
       return {
         orderId: cartRes.order.id,
         countryCode,

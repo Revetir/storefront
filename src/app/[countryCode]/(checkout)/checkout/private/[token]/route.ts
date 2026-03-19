@@ -2,16 +2,12 @@ import { sdk } from "@lib/config"
 import { NextRequest, NextResponse } from "next/server"
 
 type ResolvePrivateCheckoutResponse = {
-  cart_id: string
+  payment_collection_id: string
   session_id: string
   expires_at: string
-  quoted_total?: number | null
+  order_id?: string
+  country_code?: string
 }
-
-const PRIVATE_CHECKOUT_CART_COOKIE = "_medusa_private_checkout_cart_id"
-const PRIVATE_CHECKOUT_TOKEN_COOKIE = "_medusa_private_checkout_token"
-const PRIVATE_CHECKOUT_QUOTED_TOTAL_COOKIE = "_medusa_private_checkout_quoted_total"
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 
 export async function GET(
   req: NextRequest,
@@ -32,49 +28,13 @@ export async function GET(
     })
     .catch(() => null)
 
-  if (!session?.cart_id) {
+  if (!session?.payment_collection_id) {
     return new NextResponse(null, { status: 404 })
   }
 
-  const privateCookiePath = `/${countryCode}/checkout/private`
-  const redirectUrl = new URL(`/${countryCode}/checkout/private/${token}/session`, req.url)
-  const response = NextResponse.redirect(redirectUrl)
-
-  response.cookies.set(PRIVATE_CHECKOUT_TOKEN_COOKIE, token, {
-    maxAge: COOKIE_MAX_AGE,
-    httpOnly: true,
-    sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-  })
-
-  response.cookies.set(PRIVATE_CHECKOUT_CART_COOKIE, session.cart_id, {
-    maxAge: COOKIE_MAX_AGE,
-    httpOnly: true,
-    sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
-    path: privateCookiePath,
-  })
-
-  const quotedTotal =
-    typeof session.quoted_total === "number" && Number.isFinite(session.quoted_total)
-      ? session.quoted_total
-      : null
-
-  if (quotedTotal !== null) {
-    response.cookies.set(PRIVATE_CHECKOUT_QUOTED_TOTAL_COOKIE, String(quotedTotal), {
-      maxAge: COOKIE_MAX_AGE,
-      httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
-      path: privateCookiePath,
-    })
-  } else {
-    response.cookies.set(PRIVATE_CHECKOUT_QUOTED_TOTAL_COOKIE, "", {
-      maxAge: -1,
-      path: privateCookiePath,
-    })
-  }
-
-  return response
+  const redirectUrl = new URL(
+    `/${countryCode}/payment-collection/${session.payment_collection_id}`,
+    req.url
+  )
+  return NextResponse.redirect(redirectUrl)
 }
