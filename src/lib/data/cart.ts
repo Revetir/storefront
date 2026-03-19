@@ -10,10 +10,10 @@ import {
   getCacheOptions,
   getCacheTag,
   getCartId,
-  removeCartId,
   setCartId,
 } from "./cookies"
 import { getRegion } from "./regions"
+import { finalizePrivateCheckoutSession } from "./private-checkout"
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -520,7 +520,7 @@ export async function placeOrder(cartId?: string) {
       const orderCacheTag = await getCacheTag("orders")
       revalidateTag(orderCacheTag, "max")
 
-      await removeCartId()
+      await finalizePrivateCheckoutSession(cartRes.order.id)
       return {
         orderId: cartRes.order.id,
         countryCode,

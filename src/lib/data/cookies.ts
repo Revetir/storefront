@@ -1,6 +1,9 @@
 import "server-only"
 import { cookies as nextCookies } from "next/headers"
 
+const PRIVATE_CHECKOUT_TOKEN_COOKIE = "_medusa_private_checkout_token"
+const PRIVATE_CHECKOUT_BACKUP_CART_COOKIE = "_medusa_private_checkout_backup_cart_id"
+
 export const getAuthHeaders = async (): Promise<
   { authorization: string } | {}
 > => {
@@ -84,6 +87,50 @@ export const setCartId = async (cartId: string) => {
 export const removeCartId = async () => {
   const cookies = await nextCookies()
   cookies.set("_medusa_cart_id", "", {
+    maxAge: -1,
+  })
+}
+
+export const getPrivateCheckoutToken = async () => {
+  const cookies = await nextCookies()
+  return cookies.get(PRIVATE_CHECKOUT_TOKEN_COOKIE)?.value
+}
+
+export const setPrivateCheckoutToken = async (token: string) => {
+  const cookies = await nextCookies()
+  cookies.set(PRIVATE_CHECKOUT_TOKEN_COOKIE, token, {
+    maxAge: 60 * 60 * 24 * 7,
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+  })
+}
+
+export const removePrivateCheckoutToken = async () => {
+  const cookies = await nextCookies()
+  cookies.set(PRIVATE_CHECKOUT_TOKEN_COOKIE, "", {
+    maxAge: -1,
+  })
+}
+
+export const getPrivateCheckoutBackupCartId = async () => {
+  const cookies = await nextCookies()
+  return cookies.get(PRIVATE_CHECKOUT_BACKUP_CART_COOKIE)?.value
+}
+
+export const setPrivateCheckoutBackupCartId = async (cartId: string) => {
+  const cookies = await nextCookies()
+  cookies.set(PRIVATE_CHECKOUT_BACKUP_CART_COOKIE, cartId, {
+    maxAge: 60 * 60 * 24 * 7,
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+  })
+}
+
+export const removePrivateCheckoutBackupCartId = async () => {
+  const cookies = await nextCookies()
+  cookies.set(PRIVATE_CHECKOUT_BACKUP_CART_COOKIE, "", {
     maxAge: -1,
   })
 }

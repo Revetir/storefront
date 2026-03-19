@@ -1,6 +1,7 @@
 import { retrieveCart } from "@lib/data/cart"
+import { finalizePrivateCheckoutSession } from "@lib/data/private-checkout"
 import { sdk } from "@lib/config"
-import { getAuthHeaders, removeCartId } from "@lib/data/cookies"
+import { getAuthHeaders } from "@lib/data/cookies"
 import { NextRequest, NextResponse } from "next/server"
 
 type Params = Promise<{ cartId: string }>
@@ -77,7 +78,7 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
     }
 
     if (cartRes.type === "order") {
-      await removeCartId()
+      await finalizePrivateCheckoutSession(cartRes.order.id)
       return NextResponse.redirect(
         `${origin}/${countryCode}/order/${cartRes.order.id}/confirmed`
       )
