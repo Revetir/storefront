@@ -1,0 +1,47 @@
+import { retrieveCheckoutCart } from "@lib/data/cart"
+import { retrieveCustomer } from "@lib/data/customer"
+import { Metadata } from "next"
+import { redirect } from "next/navigation"
+import dynamic from "next/dynamic"
+import { PaymentProvider } from "@modules/checkout/components/payment/payment-context"
+import PaymentReturnHandler from "@modules/checkout/components/payment-return-handler"
+
+const PaymentWrapper = dynamic(() => import("@modules/checkout/components/payment-wrapper"))
+const CheckoutForm = dynamic(() => import("@modules/checkout/templates/checkout-form"))
+const CheckoutSummary = dynamic(() => import("@modules/checkout/templates/checkout-summary"))
+const CheckoutWrapper = dynamic(() => import("@modules/checkout/components/checkout-wrapper"))
+
+export const metadata: Metadata = {
+  title: "Private Checkout",
+}
+
+export default async function PrivateCheckoutSessionPage({
+  params,
+}: {
+  params: Promise<{ countryCode: string; token: string }>
+}) {
+  const { countryCode, token } = await params
+  const cart = await retrieveCheckoutCart()
+
+  if (!cart) {
+    redirect(`/${countryCode}/checkout/private/${token}`)
+  }
+
+  const customer = await retrieveCustomer()
+
+  return (
+    <CheckoutWrapper>
+      <PaymentProvider>
+        <PaymentWrapper cart={cart}>
+          <PaymentReturnHandler cartId={cart.id} />
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_416px] content-container gap-x-40 py-6">
+            <CheckoutForm cart={cart} customer={customer} />
+            <div className="lg:sticky lg:top-20 lg:self-start">
+              <CheckoutSummary cart={cart} />
+            </div>
+          </div>
+        </PaymentWrapper>
+      </PaymentProvider>
+    </CheckoutWrapper>
+  )
+}

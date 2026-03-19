@@ -36,7 +36,8 @@ export async function GET(
     return new NextResponse(null, { status: 404 })
   }
 
-  const redirectUrl = new URL(`/${countryCode}/checkout`, req.url)
+  const privateCookiePath = `/${countryCode}/checkout/private`
+  const redirectUrl = new URL(`/${countryCode}/checkout/private/${token}/session`, req.url)
   const response = NextResponse.redirect(redirectUrl)
 
   response.cookies.set(PRIVATE_CHECKOUT_TOKEN_COOKIE, token, {
@@ -52,7 +53,7 @@ export async function GET(
     httpOnly: true,
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
-    path: "/",
+    path: privateCookiePath,
   })
 
   const quotedTotal =
@@ -66,12 +67,12 @@ export async function GET(
       httpOnly: true,
       sameSite: "strict",
       secure: process.env.NODE_ENV === "production",
-      path: "/",
+      path: privateCookiePath,
     })
   } else {
     response.cookies.set(PRIVATE_CHECKOUT_QUOTED_TOTAL_COOKIE, "", {
       maxAge: -1,
-      path: "/",
+      path: privateCookiePath,
     })
   }
 
