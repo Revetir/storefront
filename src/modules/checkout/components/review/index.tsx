@@ -1,7 +1,7 @@
 "use client"
 
 import { ExpressCheckoutElement, useStripe, useElements } from "@stripe/react-stripe-js"
-import { placeOrder, updateCart } from "@lib/data/cart"
+import { placeOrder, updateCheckoutCart } from "@lib/data/cart"
 import { useState, useContext } from "react"
 import { validateCheckout, triggerFieldErrors, scrollToTop } from "../../utils/validate-checkout"
 import { US_STATES } from "../../utils/us-states"
@@ -170,7 +170,7 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
       // Update the cart with the Express Checkout data
       if (Object.keys(cartUpdateData).length > 0) {
         console.log('Syncing Express Checkout data to cart:', cartUpdateData)
-        updatedCart = await updateCart(cartUpdateData)
+        updatedCart = await updateCheckoutCart(cartUpdateData)
       }
 
       // Validate checkout fields before proceeding to payment

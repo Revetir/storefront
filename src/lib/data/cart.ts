@@ -10,6 +10,7 @@ import {
   getCacheOptions,
   getCacheTag,
   getCartId,
+  getCheckoutCartId,
   setCartId,
 } from "./cookies"
 import { getRegion } from "./regions"
@@ -40,6 +41,36 @@ const isRetryableCartCompletionError = (
  */
 export async function retrieveCart(cartId?: string) {
   const id = cartId || (await getCartId())
+
+  if (!id) {
+    return null
+  }
+
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  const next = {
+    ...(await getCacheOptions("carts")),
+  }
+
+  return await sdk.client
+    .fetch<HttpTypes.StoreCartResponse>(`/store/carts/${id}`, {
+      method: "GET",
+      query: {
+        fields:
+          "*items, *region, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, +items.subtotal, +items.original_total, +items.original_subtotal, +items.discount_total, *promotions, +shipping_methods.name, +items.product.brands.*",
+      },
+      headers,
+      next,
+      cache: "force-cache",
+    })
+    .then(({ cart }) => cart)
+    .catch(() => null)
+}
+
+export async function retrieveCheckoutCart(cartId?: string) {
+  const id = cartId || (await getCheckoutCartId())
 
   if (!id) {
     return null
@@ -107,13 +138,10 @@ export async function getOrSetCart(countryCode: string) {
   return cart
 }
 
-export async function updateCart(data: HttpTypes.StoreUpdateCart) {
-  const cartId = await getCartId()
-
-  if (!cartId) {
-    throw new Error("No existing cart found, please create one before updating")
-  }
-
+const updateCartById = async (
+  cartId: string,
+  data: HttpTypes.StoreUpdateCart
+) => {
   const headers = {
     ...(await getAuthHeaders()),
   }
@@ -130,6 +158,26 @@ export async function updateCart(data: HttpTypes.StoreUpdateCart) {
       return cart
     })
     .catch(medusaError)
+}
+
+export async function updateCart(data: HttpTypes.StoreUpdateCart) {
+  const cartId = await getCartId()
+
+  if (!cartId) {
+    throw new Error("No existing cart found, please create one before updating")
+  }
+
+  return updateCartById(cartId, data)
+}
+
+export async function updateCheckoutCart(data: HttpTypes.StoreUpdateCart) {
+  const cartId = await getCheckoutCartId()
+
+  if (!cartId) {
+    throw new Error("No checkout cart found, please restart checkout")
+  }
+
+  return updateCartById(cartId, data)
 }
 
 export async function addToCart({
@@ -281,7 +329,7 @@ export async function initiatePaymentSession(
 }
 
 export async function applyPromotions(codes: string[]) {
-  const cartId = await getCartId()
+  const cartId = await getCheckoutCartId()
 
   if (!cartId) {
     throw new Error("No existing cart found")
@@ -365,12 +413,12 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
       throw new Error("No form data found when setting addresses")
     }
 
-    const cartId = await getCartId()
+    const cartId = await getCheckoutCartId()
     if (!cartId) {
       throw new Error("No existing cart found when setting addresses")
     }
 
-    const cart = await retrieveCart(cartId)
+    const cart = await retrieveCheckoutCart(cartId)
     if (!cart) {
       throw new Error("No existing cart found when setting addresses")
     }
@@ -475,7 +523,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     }
 
     if (Object.keys(data).length > 0) {
-      await updateCart(data)
+      await updateCheckoutCart(data)
     }
   } catch (e: any) {
     return e.message
@@ -488,7 +536,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
  * @returns The cart object if the order was successful, or null if not.
  */
 export async function placeOrder(cartId?: string) {
-  const id = cartId || (await getCartId())
+  const id = cartId || (await getCheckoutCartId())
 
   if (!id) {
     throw new Error("No existing cart found when placing an order")
@@ -498,7 +546,7 @@ export async function placeOrder(cartId?: string) {
     ...(await getAuthHeaders()),
   }
 
-  const cartSnapshot = await retrieveCart(id)
+  const cartSnapshot = await retrieveCheckoutCart(id)
   const privateCheckoutValidationError = await validatePrivateCheckoutQuotedTotal(
     cartSnapshot?.total
   )

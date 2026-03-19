@@ -1,4 +1,4 @@
-import { retrieveCart } from "@lib/data/cart"
+import { retrieveCheckoutCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 }
 
 export default async function Checkout() {
-  const cart = await retrieveCart()
+  const cart = await retrieveCheckoutCart()
 
   if (!cart) {
     return notFound()

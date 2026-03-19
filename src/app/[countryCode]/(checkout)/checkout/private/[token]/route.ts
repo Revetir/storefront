@@ -8,9 +8,8 @@ type ResolvePrivateCheckoutResponse = {
   quoted_total?: number | null
 }
 
-const CART_COOKIE = "_medusa_cart_id"
+const PRIVATE_CHECKOUT_CART_COOKIE = "_medusa_private_checkout_cart_id"
 const PRIVATE_CHECKOUT_TOKEN_COOKIE = "_medusa_private_checkout_token"
-const PRIVATE_CHECKOUT_BACKUP_CART_COOKIE = "_medusa_private_checkout_backup_cart_id"
 const PRIVATE_CHECKOUT_QUOTED_TOTAL_COOKIE = "_medusa_private_checkout_quoted_total"
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 
@@ -40,23 +39,6 @@ export async function GET(
   const redirectUrl = new URL(`/${countryCode}/checkout`, req.url)
   const response = NextResponse.redirect(redirectUrl)
 
-  const existingCartId = req.cookies.get(CART_COOKIE)?.value
-  const existingBackupCartId = req.cookies.get(PRIVATE_CHECKOUT_BACKUP_CART_COOKIE)?.value
-
-  if (
-    !existingBackupCartId &&
-    existingCartId &&
-    existingCartId !== session.cart_id
-  ) {
-    response.cookies.set(PRIVATE_CHECKOUT_BACKUP_CART_COOKIE, existingCartId, {
-      maxAge: COOKIE_MAX_AGE,
-      httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-    })
-  }
-
   response.cookies.set(PRIVATE_CHECKOUT_TOKEN_COOKIE, token, {
     maxAge: COOKIE_MAX_AGE,
     httpOnly: true,
@@ -65,7 +47,7 @@ export async function GET(
     path: "/",
   })
 
-  response.cookies.set(CART_COOKIE, session.cart_id, {
+  response.cookies.set(PRIVATE_CHECKOUT_CART_COOKIE, session.cart_id, {
     maxAge: COOKIE_MAX_AGE,
     httpOnly: true,
     sameSite: "strict",

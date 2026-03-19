@@ -3,14 +3,12 @@
 import { sdk } from "@lib/config"
 import {
   getAuthHeaders,
-  getPrivateCheckoutBackupCartId,
   getPrivateCheckoutQuotedTotal,
   getPrivateCheckoutToken,
   removeCartId,
-  removePrivateCheckoutBackupCartId,
+  removePrivateCheckoutCartId,
   removePrivateCheckoutQuotedTotal,
   removePrivateCheckoutToken,
-  setCartId,
 } from "./cookies"
 
 export const consumePrivateCheckoutSession = async ({
@@ -39,27 +37,21 @@ export const consumePrivateCheckoutSession = async ({
 
 export const finalizePrivateCheckoutSession = async (orderId: string) => {
   const token = await getPrivateCheckoutToken()
-  const backupCartId = await getPrivateCheckoutBackupCartId()
 
   if (token) {
     await consumePrivateCheckoutSession({ token, orderId })
-    if (backupCartId) {
-      await setCartId(backupCartId)
-    } else {
-      await removeCartId()
-    }
+    await removePrivateCheckoutCartId()
   } else {
     await removeCartId()
   }
 
   await removePrivateCheckoutToken()
-  await removePrivateCheckoutBackupCartId()
   await removePrivateCheckoutQuotedTotal()
 }
 
 export const clearPrivateCheckoutSessionState = async () => {
   await removePrivateCheckoutToken()
-  await removePrivateCheckoutBackupCartId()
+  await removePrivateCheckoutCartId()
   await removePrivateCheckoutQuotedTotal()
 }
 
