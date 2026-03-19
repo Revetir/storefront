@@ -5,11 +5,13 @@ type ResolvePrivateCheckoutResponse = {
   cart_id: string
   session_id: string
   expires_at: string
+  quoted_total?: number | null
 }
 
 const CART_COOKIE = "_medusa_cart_id"
 const PRIVATE_CHECKOUT_TOKEN_COOKIE = "_medusa_private_checkout_token"
 const PRIVATE_CHECKOUT_BACKUP_CART_COOKIE = "_medusa_private_checkout_backup_cart_id"
+const PRIVATE_CHECKOUT_QUOTED_TOTAL_COOKIE = "_medusa_private_checkout_quoted_total"
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 
 export async function GET(
@@ -70,6 +72,26 @@ export async function GET(
     secure: process.env.NODE_ENV === "production",
     path: "/",
   })
+
+  const quotedTotal =
+    typeof session.quoted_total === "number" && Number.isFinite(session.quoted_total)
+      ? session.quoted_total
+      : null
+
+  if (quotedTotal !== null) {
+    response.cookies.set(PRIVATE_CHECKOUT_QUOTED_TOTAL_COOKIE, String(quotedTotal), {
+      maxAge: COOKIE_MAX_AGE,
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    })
+  } else {
+    response.cookies.set(PRIVATE_CHECKOUT_QUOTED_TOTAL_COOKIE, "", {
+      maxAge: -1,
+      path: "/",
+    })
+  }
 
   return response
 }

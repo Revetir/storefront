@@ -13,7 +13,10 @@ import {
   setCartId,
 } from "./cookies"
 import { getRegion } from "./regions"
-import { finalizePrivateCheckoutSession } from "./private-checkout"
+import {
+  finalizePrivateCheckoutSession,
+  validatePrivateCheckoutQuotedTotal,
+} from "./private-checkout"
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -493,6 +496,14 @@ export async function placeOrder(cartId?: string) {
 
   const headers = {
     ...(await getAuthHeaders()),
+  }
+
+  const cartSnapshot = await retrieveCart(id)
+  const privateCheckoutValidationError = await validatePrivateCheckoutQuotedTotal(
+    cartSnapshot?.total
+  )
+  if (privateCheckoutValidationError) {
+    throw new Error(privateCheckoutValidationError)
   }
 
   let attempts = 0

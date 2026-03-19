@@ -3,6 +3,7 @@ import { cookies as nextCookies } from "next/headers"
 
 const PRIVATE_CHECKOUT_TOKEN_COOKIE = "_medusa_private_checkout_token"
 const PRIVATE_CHECKOUT_BACKUP_CART_COOKIE = "_medusa_private_checkout_backup_cart_id"
+const PRIVATE_CHECKOUT_QUOTED_TOTAL_COOKIE = "_medusa_private_checkout_quoted_total"
 
 export const getAuthHeaders = async (): Promise<
   { authorization: string } | {}
@@ -131,6 +132,34 @@ export const setPrivateCheckoutBackupCartId = async (cartId: string) => {
 export const removePrivateCheckoutBackupCartId = async () => {
   const cookies = await nextCookies()
   cookies.set(PRIVATE_CHECKOUT_BACKUP_CART_COOKIE, "", {
+    maxAge: -1,
+  })
+}
+
+export const getPrivateCheckoutQuotedTotal = async () => {
+  const cookies = await nextCookies()
+  const rawValue = cookies.get(PRIVATE_CHECKOUT_QUOTED_TOTAL_COOKIE)?.value
+  if (!rawValue) {
+    return null
+  }
+
+  const parsed = Number(rawValue)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+export const setPrivateCheckoutQuotedTotal = async (total: number) => {
+  const cookies = await nextCookies()
+  cookies.set(PRIVATE_CHECKOUT_QUOTED_TOTAL_COOKIE, String(total), {
+    maxAge: 60 * 60 * 24 * 7,
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+  })
+}
+
+export const removePrivateCheckoutQuotedTotal = async () => {
+  const cookies = await nextCookies()
+  cookies.set(PRIVATE_CHECKOUT_QUOTED_TOTAL_COOKIE, "", {
     maxAge: -1,
   })
 }

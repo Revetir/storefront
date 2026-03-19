@@ -159,14 +159,18 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         </Table.Cell>
       )}
 
-      <Table.Cell className="!pr-0">
+      <Table.Cell
+        className={clx("!pr-0", {
+          "align-middle": type === "preview",
+        })}
+      >
         <div
           className={clx("h-full flex justify-end", {
             "relative items-center": type === "full",
-            "items-end flex-col gap-1": type === "preview",
+            "items-center": type === "preview",
           })}
         >
-          {/* Total price - centered vertically */}
+          {/* Total price */}
           <LineItemPrice
             item={item}
             style="tight"
@@ -174,13 +178,6 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             showTotal={type === "full"}
             showOriginal={type !== "full"}
           />
-
-          {/* Preview mode: show quantity below unit price */}
-          {type === "preview" && item.quantity >= 2 && (
-            <Text className="text-xs whitespace-nowrap text-ui-fg-muted leading-none">
-              Quantity: {item.quantity}
-            </Text>
-          )}
 
           {/* Full mode mobile: quantity controls and delete button at bottom right */}
           {type === "full" && (
