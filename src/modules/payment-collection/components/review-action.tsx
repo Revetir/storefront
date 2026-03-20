@@ -3,6 +3,9 @@
 import { Button } from "@medusajs/ui"
 import AfterpayButton from "@modules/checkout/components/afterpay-button"
 import { PaymentMethodType } from "@modules/checkout/components/payment/payment-methods-config"
+import ApplePay from "@modules/common/icons/apple-pay"
+import GooglePay from "@modules/common/icons/google-pay"
+import Klarna from "@modules/common/icons/klarna"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { useEffect, useState } from "react"
 import {
@@ -29,6 +32,37 @@ const getButtonText = (paymentMethod: PaymentMethodType | null): string => {
     default:
       return "Place Order"
   }
+}
+
+const PaymentButtonBrand = ({ paymentMethod }: { paymentMethod: PaymentMethodType | null }) => {
+  if (paymentMethod === "apple_pay") {
+    return (
+      <span className="flex items-center justify-center gap-2 [&>svg]:h-5 [&>svg]:w-auto">
+        <span className="sr-only">Pay with Apple Pay</span>
+        <ApplePay />
+      </span>
+    )
+  }
+
+  if (paymentMethod === "google_pay") {
+    return (
+      <span className="flex items-center justify-center gap-2 [&>svg]:h-5 [&>svg]:w-auto">
+        <span className="sr-only">Pay with Google Pay</span>
+        <GooglePay />
+      </span>
+    )
+  }
+
+  if (paymentMethod === "klarna") {
+    return (
+      <span className="flex items-center justify-center gap-2 [&>svg]:h-5 [&>svg]:w-auto">
+        <span className="sr-only">Pay with Klarna</span>
+        <Klarna />
+      </span>
+    )
+  }
+
+  return <>{getButtonText(paymentMethod)}</>
 }
 
 const PaymentCollectionReviewAction = () => {
@@ -72,7 +106,7 @@ const PaymentCollectionReviewAction = () => {
           isLoading={submitting}
           className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer"
         >
-          {getButtonText(selectedMethod)}
+          <PaymentButtonBrand paymentMethod={selectedMethod} />
         </Button>
       )}
       <footer className="w-full bg-white pt-6 pb-4">
