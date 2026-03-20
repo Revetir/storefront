@@ -2,9 +2,8 @@
 
 import { isStripe } from "@lib/constants"
 import { sdk } from "@lib/config"
-import { Button, Heading } from "@medusajs/ui"
+import { Heading } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
-import AfterpayButton from "@modules/checkout/components/afterpay-button"
 import CustomPaymentSelector from "@modules/checkout/components/payment/custom-payment-selector"
 import { useAvailablePaymentMethods } from "@modules/checkout/components/payment/use-available-payment-methods"
 import {
@@ -12,6 +11,10 @@ import {
   PaymentMethodConfig,
 } from "@modules/checkout/components/payment/payment-methods-config"
 import Divider from "@modules/common/components/divider"
+import {
+  PAYMENT_COLLECTION_STATUS_EVENT,
+  PAYMENT_COLLECTION_SUBMIT_EVENT,
+} from "@modules/payment-collection/constants/events"
 import {
   CardElement,
   Elements,
@@ -21,7 +24,7 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 type PaymentSession = {
   id: string
@@ -410,7 +413,7 @@ const PaymentCollectionStripeContent = ({
     })
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (submitting || !selectedMethod) {
       return
     }
@@ -435,12 +438,53 @@ const PaymentCollectionStripeContent = ({
         selectedMethod === "klarna"
       ) {
         await handleExpressCheckoutConfirm()
-        return
       }
     } finally {
       setSubmitting(false)
     }
-  }
+  }, [
+    selectedMethod,
+    submitting,
+    handleAfterpayPayment,
+    handleCardPayment,
+    handleExpressCheckoutConfirm,
+  ])
+
+  const canSubmit = Boolean(selectedMethod) && Boolean(stripe) && Boolean(elements) && !isChecking
+
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent(PAYMENT_COLLECTION_STATUS_EVENT, {
+        detail: {
+          submitting,
+          canSubmit,
+        },
+      })
+    )
+
+    return () => {
+      window.dispatchEvent(
+        new CustomEvent(PAYMENT_COLLECTION_STATUS_EVENT, {
+          detail: {
+            submitting: false,
+            canSubmit: false,
+          },
+        })
+      )
+    }
+  }, [canSubmit, submitting])
+
+  useEffect(() => {
+    const handleExternalSubmit = () => {
+      void handleSubmit()
+    }
+
+    window.addEventListener(PAYMENT_COLLECTION_SUBMIT_EVENT, handleExternalSubmit)
+
+    return () => {
+      window.removeEventListener(PAYMENT_COLLECTION_SUBMIT_EVENT, handleExternalSubmit)
+    }
+  }, [handleSubmit])
 
   const renderMethodDetail = (method: PaymentMethodType) => {
     if (method === "card") {
@@ -527,23 +571,6 @@ const PaymentCollectionStripeContent = ({
           />
         </div>
       )}
-
-      {selectedMethod === "afterpay_clearpay" ? (
-        <AfterpayButton
-          onClick={handleSubmit}
-          disabled={!stripe || submitting}
-          isLoading={submitting}
-        />
-      ) : !isExpressCheckoutMethod ? (
-        <Button
-          onClick={handleSubmit}
-          disabled={!stripe || !elements || submitting || !selectedMethod}
-          isLoading={submitting}
-          className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer"
-        >
-          Place Order
-        </Button>
-      ) : null}
 
       <ErrorMessage error={errorMessage} data-testid="payment-collection-error-message" />
     </div>

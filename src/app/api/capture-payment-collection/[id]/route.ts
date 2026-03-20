@@ -59,7 +59,7 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
   const countryCodeParam = (searchParams.get("country_code") || "").toLowerCase()
 
   const fallbackCountryCode = countryCodeParam || "us"
-  const fallbackUrl = `${origin}/${fallbackCountryCode}/payment-collection/${paymentCollectionId}`
+  const fallbackUrl = `${origin}/${fallbackCountryCode}/checkout/private/${paymentCollectionId}`
 
   if (!paymentIntent || !paymentIntentClientSecret || !redirectStatus) {
     return NextResponse.redirect(`${fallbackUrl}?error=payment_failed`)

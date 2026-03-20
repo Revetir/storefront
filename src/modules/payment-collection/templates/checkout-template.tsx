@@ -6,6 +6,8 @@ import ItemsPreviewTemplate from "@modules/cart/templates/preview"
 import CartTotals from "@modules/common/components/cart-totals"
 import Divider from "@modules/common/components/divider"
 import PaymentForm from "@modules/payment-collection/components/payment-form"
+import PaymentCollectionReviewAction from "@modules/payment-collection/components/review-action"
+import { US_STATES } from "@modules/checkout/utils/us-states"
 import { notFound, redirect } from "next/navigation"
 
 const ReadOnlyAddressSection = ({
@@ -15,6 +17,43 @@ const ReadOnlyAddressSection = ({
   title: string
   address: any
 }) => {
+  const resolveCountryName = (countryCode: string | undefined) => {
+    if (!countryCode) {
+      return ""
+    }
+
+    try {
+      const displayNames = new Intl.DisplayNames(["en"], { type: "region" })
+      return displayNames.of(countryCode.toUpperCase()) || countryCode.toUpperCase()
+    } catch {
+      return countryCode.toUpperCase()
+    }
+  }
+
+  const resolveStateName = (
+    province: string | undefined,
+    countryCode: string | undefined
+  ) => {
+    if (!province) {
+      return ""
+    }
+
+    const country = (countryCode || "").toLowerCase()
+    const normalized = province.trim().toLowerCase()
+
+    if (country === "us") {
+      const stateCode = normalized.startsWith("us-")
+        ? normalized.slice(3)
+        : normalized
+      const state = US_STATES.find((entry) => entry.code.toLowerCase() === stateCode)
+      if (state) {
+        return state.name
+      }
+    }
+
+    return province
+  }
+
   const fields = [
     { label: "First Name", value: address?.first_name || "" },
     { label: "Last Name", value: address?.last_name || "" },
@@ -22,11 +61,14 @@ const ReadOnlyAddressSection = ({
     { label: "Apt. / Unit #", value: address?.address_2 || "" },
     { label: "Company", value: address?.company || "" },
     { label: "City", value: address?.city || "" },
-    { label: "State", value: address?.province || "" },
+    {
+      label: "State",
+      value: resolveStateName(address?.province, address?.country_code),
+    },
     { label: "Zip Code", value: address?.postal_code || "" },
     {
       label: "Country",
-      value: address?.country_code ? String(address.country_code).toUpperCase() : "",
+      value: resolveCountryName(address?.country_code),
     },
     { label: "Phone", value: address?.phone || "" },
   ]
@@ -42,14 +84,12 @@ const ReadOnlyAddressSection = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {fields.map((field) => (
           <div key={`${title}-${field.label}`}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs uppercase tracking-wide text-ui-fg-subtle mb-1.5">
               {field.label}
             </label>
-            <input
-              value={field.value}
-              readOnly
-              className="w-full px-3 py-2 border border-gray-300 bg-gray-50 text-gray-700"
-            />
+            <div className="w-full px-3 py-2 border border-ui-border-base bg-ui-bg-subtle text-ui-fg-base min-h-[42px] cursor-default select-text">
+              {field.value || "\u2014"}
+            </div>
           </div>
         ))}
       </div>
@@ -159,10 +199,11 @@ export default async function PaymentCollectionCheckoutTemplate({
             </div>
             <Divider className="my-4" />
             <CartTotals totals={summaryLikeCart as any} forceFinalLabel />
+            <Divider className="my-6" />
+            <PaymentCollectionReviewAction />
           </div>
         </div>
       </div>
     </div>
   )
 }
-

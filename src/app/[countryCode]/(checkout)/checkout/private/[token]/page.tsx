@@ -1,10 +1,15 @@
 import { sdk } from "@lib/config"
 import { getAuthHeaders } from "@lib/data/cookies"
 import PaymentCollectionCheckoutTemplate from "@modules/payment-collection/templates/checkout-template"
+import { Metadata } from "next"
 import { notFound, redirect } from "next/navigation"
 
 type ResolvePrivateCheckoutResponse = {
   payment_collection_id: string
+}
+
+export const metadata: Metadata = {
+  title: "Private Checkout",
 }
 
 export default async function PrivateCheckoutPage({
@@ -42,4 +47,3 @@ export default async function PrivateCheckoutPage({
 
   redirect(`/${countryCode}/checkout/private/${session.payment_collection_id}`)
 }
-

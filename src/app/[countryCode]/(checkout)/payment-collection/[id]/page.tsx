@@ -6,7 +6,7 @@ type PageProps = {
 }
 
 export const metadata: Metadata = {
-  title: "Payment Collection Checkout",
+  title: "Private Checkout",
 }
 
 export default async function PaymentCollectionRedirectPage({ params }: PageProps) {
