@@ -153,7 +153,7 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
     measurement_points: {
       waist: {
         x_percent: 47,
-        y_percent: 13,
+        y_percent: 12,
         label: "Waist"
       },
       rise: {

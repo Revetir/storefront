@@ -1,18 +1,21 @@
 "use client"
 
+import { isStripe } from "@lib/constants"
 import { sdk } from "@lib/config"
 import { Button, Heading } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import AfterpayButton from "@modules/checkout/components/afterpay-button"
 import CustomPaymentSelector from "@modules/checkout/components/payment/custom-payment-selector"
+import { useAvailablePaymentMethods } from "@modules/checkout/components/payment/use-available-payment-methods"
 import {
   PaymentMethodType,
-  PAYMENT_METHODS,
+  PaymentMethodConfig,
 } from "@modules/checkout/components/payment/payment-methods-config"
 import Divider from "@modules/common/components/divider"
 import {
   CardElement,
   Elements,
+  ExpressCheckoutElement,
   PaymentMethodMessagingElement,
   useElements,
   useStripe,
@@ -41,14 +44,11 @@ type PaymentFormProps = {
   order: any
   countryCode: string
   stripeEnabled: boolean
+  stripeProviderId?: string | null
 }
 
 const stripeKey = process.env.NEXT_PUBLIC_STRIPE_KEY
 const stripePromise = stripeKey ? loadStripe(stripeKey) : null
-
-const SUPPORTED_METHODS = PAYMENT_METHODS.filter(
-  (method) => method.id === "card" || method.id === "afterpay_clearpay"
-)
 
 const isSuccessfulPaymentIntentStatus = (status: string | undefined | null) => {
   const normalized = String(status || "").toLowerCase()
@@ -84,7 +84,7 @@ const toStripeState = (
   return trimmed
 }
 
-const redirectToCaptureValidation = ({
+const buildCaptureValidationUrl = ({
   paymentCollectionId,
   countryCode,
   orderId,
@@ -108,26 +108,31 @@ const redirectToCaptureValidation = ({
   url.searchParams.set("payment_intent_client_secret", clientSecret)
   url.searchParams.set("redirect_status", "succeeded")
 
-  window.location.assign(url.toString())
+  return url
 }
 
-const getPaymentIntentId = (session: PaymentSession) =>
-  session?.data?.id ||
-  session?.data?.payment_intent_id ||
-  session?.data?.payment_intent
+const redirectToCaptureValidation = (args: {
+  paymentCollectionId: string
+  countryCode: string
+  orderId: string
+  paymentIntentId: string
+  clientSecret: string
+}) => {
+  window.location.assign(buildCaptureValidationUrl(args).toString())
+}
 
 const resolveStripeSession = (paymentCollection: PaymentCollection) => {
   const sessions = paymentCollection.payment_sessions || []
   return (
     sessions.find(
       (session) =>
-        session.provider_id === "pp_stripe_stripe" &&
+        isStripe(session.provider_id) &&
         session.status === "pending" &&
         Boolean(session.data?.client_secret)
     ) ||
     sessions.find(
       (session) =>
-        session.provider_id === "pp_stripe_stripe" &&
+        isStripe(session.provider_id) &&
         session.status !== "canceled" &&
         Boolean(session.data?.client_secret)
     ) ||
@@ -135,29 +140,81 @@ const resolveStripeSession = (paymentCollection: PaymentCollection) => {
   )
 }
 
-const PaymentCollectionStripeForm = ({
+const PaymentCollectionStripeContent = ({
   paymentCollectionId,
   order,
   countryCode,
   clientSecret,
-  selectedMethod,
 }: {
   paymentCollectionId: string
   order: any
   countryCode: string
   clientSecret: string
-  selectedMethod: PaymentMethodType
 }) => {
   const stripe = useStripe()
   const elements = useElements()
+  const { availableMethods, isChecking } = useAvailablePaymentMethods()
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethodType | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!selectedMethod && availableMethods.length > 0 && !isChecking) {
+      setSelectedMethod(availableMethods[0].id)
+    }
+  }, [availableMethods, isChecking, selectedMethod])
 
   const billingAddress = order?.billing_address || order?.shipping_address || {}
   const shippingAddress = order?.shipping_address || order?.billing_address || {}
 
   const billingName = `${billingAddress.first_name || ""} ${billingAddress.last_name || ""}`.trim()
   const shippingName = `${shippingAddress.first_name || ""} ${shippingAddress.last_name || ""}`.trim()
+
+  const totalInCents = Math.round((order?.total || 0) * 100)
+  const currencyCode = String(order?.currency_code || "usd").toUpperCase()
+
+  const expressCheckoutOptions = useMemo(() => {
+    if (selectedMethod === "apple_pay") {
+      return {
+        paymentMethods: {
+          applePay: "always" as const,
+          googlePay: "never" as const,
+          link: "never" as const,
+          paypal: "never" as const,
+          amazonPay: "never" as const,
+          klarna: "never" as const,
+        },
+      }
+    }
+
+    if (selectedMethod === "google_pay") {
+      return {
+        paymentMethods: {
+          applePay: "never" as const,
+          googlePay: "always" as const,
+          link: "never" as const,
+          paypal: "never" as const,
+          amazonPay: "never" as const,
+          klarna: "never" as const,
+        },
+      }
+    }
+
+    if (selectedMethod === "klarna") {
+      return {
+        paymentMethods: {
+          applePay: "never" as const,
+          googlePay: "never" as const,
+          link: "never" as const,
+          paypal: "never" as const,
+          amazonPay: "never" as const,
+          klarna: "auto" as const,
+        },
+      }
+    }
+
+    return undefined
+  }, [selectedMethod])
 
   const handleCardPayment = async () => {
     if (!stripe || !elements) {
@@ -282,8 +339,79 @@ const PaymentCollectionStripeForm = ({
     }
   }
 
+  const handleExpressCheckoutConfirm = async () => {
+    if (!stripe || !elements) {
+      setErrorMessage("Stripe is not initialized")
+      return
+    }
+
+    const submitResult = await elements.submit()
+    if (submitResult?.error) {
+      setErrorMessage(submitResult.error.message || "Failed to submit payment")
+      return
+    }
+
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      clientSecret,
+      confirmParams: {
+        return_url: (() => {
+          const captureUrl = new URL(
+            `/api/capture-payment-collection/${paymentCollectionId}`,
+            window.location.origin
+          )
+          captureUrl.searchParams.set("country_code", countryCode)
+          captureUrl.searchParams.set("order_id", order.id)
+          return captureUrl.toString()
+        })(),
+      },
+      redirect: "if_required",
+    })
+
+    if (error) {
+      setErrorMessage(error.message || "Payment failed")
+      return
+    }
+
+    if (isSuccessfulPaymentIntentStatus(paymentIntent?.status) && paymentIntent?.id) {
+      redirectToCaptureValidation({
+        paymentCollectionId,
+        countryCode,
+        orderId: order.id,
+        paymentIntentId: paymentIntent.id,
+        clientSecret,
+      })
+    }
+  }
+
+  const handleExpressCheckoutClick = (event: any) => {
+    const allowedCountry = String(
+      order?.shipping_address?.country_code || order?.billing_address?.country_code || "us"
+    )
+      .toUpperCase()
+      .trim()
+
+    const shippingRates = (order?.shipping_methods || []).map((method: any, index: number) => ({
+      id: method.shipping_option_id || method.id || `shipping_${index}`,
+      displayName: method.name || "Shipping",
+      amount: Math.round(Number(method.amount || 0) * 100),
+      deliveryEstimate: {
+        minimum: { unit: "day", value: 3 },
+        maximum: { unit: "day", value: 7 },
+      },
+    }))
+
+    event.resolve({
+      emailRequired: true,
+      phoneNumberRequired: true,
+      shippingAddressRequired: true,
+      allowedShippingCountries: [allowedCountry],
+      shippingRates,
+    })
+  }
+
   const handleSubmit = async () => {
-    if (submitting) {
+    if (submitting || !selectedMethod) {
       return
     }
 
@@ -293,19 +421,30 @@ const PaymentCollectionStripeForm = ({
     try {
       if (selectedMethod === "afterpay_clearpay") {
         await handleAfterpayPayment()
-      } else {
+        return
+      }
+
+      if (selectedMethod === "card") {
         await handleCardPayment()
+        return
+      }
+
+      if (
+        selectedMethod === "apple_pay" ||
+        selectedMethod === "google_pay" ||
+        selectedMethod === "klarna"
+      ) {
+        await handleExpressCheckoutConfirm()
+        return
       }
     } finally {
       setSubmitting(false)
     }
   }
 
-  const totalInCents = Math.round((order?.total || 0) * 100)
-
-  return (
-    <div className="space-y-4">
-      {selectedMethod === "card" ? (
+  const renderMethodDetail = (method: PaymentMethodType) => {
+    if (method === "card") {
+      return (
         <div className="max-w-md">
           <CardElement
             options={{
@@ -323,18 +462,69 @@ const PaymentCollectionStripeForm = ({
             }}
           />
         </div>
-      ) : (
+      )
+    }
+
+    if (method === "afterpay_clearpay" || method === "klarna") {
+      return (
         <div className="space-y-2">
           {totalInCents > 0 && (
             <PaymentMethodMessagingElement
               options={{
                 amount: totalInCents,
                 currency: "USD",
-                paymentMethodTypes: ["afterpay_clearpay"],
+                paymentMethodTypes: [method],
                 countryCode: "US",
               }}
             />
           )}
+        </div>
+      )
+    }
+
+    if (method === "apple_pay" || method === "google_pay") {
+      return null
+    }
+
+    return null
+  }
+
+  const isExpressCheckoutMethod =
+    selectedMethod === "apple_pay" ||
+    selectedMethod === "google_pay" ||
+    selectedMethod === "klarna"
+
+  return (
+    <div className="bg-white">
+      <div className="flex flex-row items-center gap-x-2 justify-left mb-4">
+        <Heading level="h2" className="text-xl gap-x-2 items-baseline uppercase">
+          Payment Method
+        </Heading>
+      </div>
+      <Divider className="mb-6" />
+
+      {isChecking ? (
+        <div className="py-4 text-sm text-gray-500">Loading payment methods...</div>
+      ) : (
+        <CustomPaymentSelector
+          availableMethods={availableMethods as PaymentMethodConfig[]}
+          selectedMethod={selectedMethod}
+          onMethodSelect={(method) => {
+            setSelectedMethod(method)
+            setErrorMessage(null)
+          }}
+          renderPaymentDetails={(method) => renderMethodDetail(method)}
+        />
+      )}
+
+      {isExpressCheckoutMethod && expressCheckoutOptions && (
+        <div className="mt-4">
+          <ExpressCheckoutElement
+            key={selectedMethod}
+            options={expressCheckoutOptions}
+            onConfirm={handleExpressCheckoutConfirm}
+            onClick={handleExpressCheckoutClick}
+          />
         </div>
       )}
 
@@ -344,16 +534,16 @@ const PaymentCollectionStripeForm = ({
           disabled={!stripe || submitting}
           isLoading={submitting}
         />
-      ) : (
+      ) : !isExpressCheckoutMethod ? (
         <Button
           onClick={handleSubmit}
-          disabled={!stripe || !elements || submitting}
+          disabled={!stripe || !elements || submitting || !selectedMethod}
           isLoading={submitting}
           className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer"
         >
           Place Order
         </Button>
-      )}
+      ) : null}
 
       <ErrorMessage error={errorMessage} data-testid="payment-collection-error-message" />
     </div>
@@ -366,9 +556,9 @@ const PaymentForm = ({
   order,
   countryCode,
   stripeEnabled,
+  stripeProviderId,
 }: PaymentFormProps) => {
   const [collection, setCollection] = useState<PaymentCollection>(paymentCollection)
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethodType>("card")
   const [initializing, setInitializing] = useState(false)
   const [initError, setInitError] = useState<string | null>(null)
 
@@ -392,7 +582,7 @@ const PaymentForm = ({
           {
             method: "POST",
             body: {
-              provider_id: "pp_stripe_stripe",
+              provider_id: stripeProviderId || "pp_stripe_stripe",
             },
             cache: "no-store",
           }
@@ -420,7 +610,7 @@ const PaymentForm = ({
     return () => {
       mounted = false
     }
-  }, [initializing, paymentCollectionId, stripeEnabled, stripeSession])
+  }, [initializing, paymentCollectionId, stripeEnabled, stripeSession, stripeProviderId])
 
   if (!stripeEnabled) {
     return (
@@ -440,53 +630,45 @@ const PaymentForm = ({
     )
   }
 
-  return (
-    <div className="bg-white">
-      <div className="flex flex-row items-center gap-x-2 justify-left mb-4">
-        <Heading level="h2" className="text-xl gap-x-2 items-baseline uppercase">
-          Payment Method
-        </Heading>
-      </div>
-      <Divider className="mb-6" />
-
-      <CustomPaymentSelector
-        availableMethods={SUPPORTED_METHODS}
-        selectedMethod={selectedMethod}
-        onMethodSelect={setSelectedMethod}
-        renderPaymentDetails={() => null}
-      />
-
-      {!clientSecret && (
+  if (!clientSecret) {
+    return (
+      <div className="bg-white">
+        <div className="flex flex-row items-center gap-x-2 justify-left mb-4">
+          <Heading level="h2" className="text-xl gap-x-2 items-baseline uppercase">
+            Payment Method
+          </Heading>
+        </div>
+        <Divider className="mb-6" />
         <div className="py-4 text-sm text-gray-500">
           {initializing ? "Initializing payment..." : "Preparing payment session..."}
         </div>
-      )}
+        {initError && (
+          <ErrorMessage error={initError} data-testid="payment-collection-init-error" />
+        )}
+      </div>
+    )
+  }
 
-      {initError && <ErrorMessage error={initError} data-testid="payment-collection-init-error" />}
-
-      {clientSecret && (
-        <Elements
-          stripe={stripePromise}
-          options={{
-            clientSecret,
-            appearance: {
-              variables: {
-                fontSizeBase: "14px",
-                fontFamily: "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
-              },
-            },
-          }}
-        >
-          <PaymentCollectionStripeForm
-            paymentCollectionId={paymentCollectionId}
-            order={order}
-            countryCode={countryCode}
-            clientSecret={clientSecret}
-            selectedMethod={selectedMethod}
-          />
-        </Elements>
-      )}
-    </div>
+  return (
+    <Elements
+      stripe={stripePromise}
+      options={{
+        clientSecret,
+        appearance: {
+          variables: {
+            fontSizeBase: "14px",
+            fontFamily: "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
+          },
+        },
+      }}
+    >
+      <PaymentCollectionStripeContent
+        paymentCollectionId={paymentCollectionId}
+        order={order}
+        countryCode={countryCode}
+        clientSecret={clientSecret}
+      />
+    </Elements>
   )
 }
 

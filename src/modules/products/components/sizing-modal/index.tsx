@@ -409,7 +409,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         <div className="hidden lg:flex gap-8 items-center justify-center h-full w-full">
           {/* Left side - Diagram with measurements */}
           <div className="flex justify-start items-center flex-1 pr-8">
-            <div className="relative w-full flex justify-start items-center">
+            <div className="relative w-full flex justify-start items-center overflow-visible">
               {renderDiagram() ?? (
                 <div className="w-full flex items-center justify-start text-sm text-gray-500">
                   Diagram unavailable
@@ -470,7 +470,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         {/* Tablet/Phone: Vertically stacked */}
         <div className="flex lg:hidden flex-col gap-6 w-full">
           {/* Diagram */}
-            <div className="relative w-full flex justify-center items-center">
+            <div className="relative w-full flex justify-center items-center overflow-visible">
               {renderDiagram() ?? (
                 <div className="w-full flex items-center justify-center text-sm text-gray-500">
                   Diagram unavailable
@@ -910,7 +910,11 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               </div>
 
               {/* Main content */}
-              <div className={`flex-1 flex flex-col overflow-hidden ${currentPage === "SCC" ? "mr-8" : ""}`}>
+              <div
+                className={`flex-1 flex flex-col ${
+                  currentPage === "PM" ? "overflow-visible" : "overflow-hidden"
+                } ${currentPage === "SCC" ? "mr-8" : ""}`}
+              >
                 {currentPage === "PM" && renderPMPage()}
                 {currentPage === "SCC" && renderSCCPage()}
               </div>
@@ -939,7 +943,7 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
               </div>
 
               {/* Main content - scrollable with padding for fixed button */}
-              <div className="flex-1 overflow-hidden px-6 pb-20">
+              <div className={`flex-1 px-6 pb-20 ${currentPage === "PM" ? "overflow-x-visible overflow-y-auto" : "overflow-hidden"}`}>
                 {currentPage === "PM" && renderPMPage()}
                 {currentPage === "SCC" && renderSCCPage()}
               </div>
