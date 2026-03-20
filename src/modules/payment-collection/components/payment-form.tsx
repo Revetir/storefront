@@ -50,6 +50,12 @@ type PaymentFormProps = {
   stripeProviderId?: string | null
 }
 
+type PaymentCollectionStatusDetail = {
+  submitting?: boolean
+  canSubmit?: boolean
+  selectedMethod?: PaymentMethodType | null
+}
+
 const stripeKey = process.env.NEXT_PUBLIC_STRIPE_KEY
 const stripePromise = stripeKey ? loadStripe(stripeKey) : null
 
@@ -454,25 +460,27 @@ const PaymentCollectionStripeContent = ({
 
   useEffect(() => {
     window.dispatchEvent(
-      new CustomEvent(PAYMENT_COLLECTION_STATUS_EVENT, {
+      new CustomEvent<PaymentCollectionStatusDetail>(PAYMENT_COLLECTION_STATUS_EVENT, {
         detail: {
           submitting,
           canSubmit,
+          selectedMethod,
         },
       })
     )
 
     return () => {
       window.dispatchEvent(
-        new CustomEvent(PAYMENT_COLLECTION_STATUS_EVENT, {
+        new CustomEvent<PaymentCollectionStatusDetail>(PAYMENT_COLLECTION_STATUS_EVENT, {
           detail: {
             submitting: false,
             canSubmit: false,
+            selectedMethod: null,
           },
         })
       )
     }
-  }, [canSubmit, submitting])
+  }, [canSubmit, submitting, selectedMethod])
 
   useEffect(() => {
     const handleExternalSubmit = () => {
@@ -562,7 +570,7 @@ const PaymentCollectionStripeContent = ({
       )}
 
       {isExpressCheckoutMethod && expressCheckoutOptions && (
-        <div className="mt-4">
+        <div className="absolute left-[-10000px] top-0 w-px h-px overflow-hidden opacity-0 pointer-events-none">
           <ExpressCheckoutElement
             key={selectedMethod}
             options={expressCheckoutOptions}
