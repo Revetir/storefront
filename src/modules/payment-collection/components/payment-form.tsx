@@ -25,6 +25,7 @@ import {
 } from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { createPortal } from "react-dom"
 
 type PaymentSession = {
   id: string
@@ -166,12 +167,34 @@ const PaymentCollectionStripeContent = ({
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethodType | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [expressButtonSlot, setExpressButtonSlot] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
     if (!selectedMethod && availableMethods.length > 0 && !isChecking) {
       setSelectedMethod(availableMethods[0].id)
     }
   }, [availableMethods, isChecking, selectedMethod])
+
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return
+    }
+
+    const resolveSlot = () => {
+      setExpressButtonSlot(
+        document.getElementById("payment-collection-express-button-slot")
+      )
+    }
+
+    resolveSlot()
+
+    const observer = new MutationObserver(resolveSlot)
+    observer.observe(document.body, { childList: true, subtree: true })
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
 
   const billingAddress = order?.billing_address || order?.shipping_address || {}
   const shippingAddress = order?.shipping_address || order?.billing_address || {}
@@ -569,16 +592,18 @@ const PaymentCollectionStripeContent = ({
         />
       )}
 
-      {isExpressCheckoutMethod && expressCheckoutOptions && (
-        <div className="absolute left-[-10000px] top-0 w-px h-px overflow-hidden opacity-0 pointer-events-none">
+      {isExpressCheckoutMethod &&
+        expressCheckoutOptions &&
+        expressButtonSlot &&
+        createPortal(
           <ExpressCheckoutElement
             key={selectedMethod}
             options={expressCheckoutOptions}
             onConfirm={handleExpressCheckoutConfirm}
             onClick={handleExpressCheckoutClick}
-          />
-        </div>
-      )}
+          />,
+          expressButtonSlot
+        )}
 
       <ErrorMessage error={errorMessage} data-testid="payment-collection-error-message" />
     </div>
