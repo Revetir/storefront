@@ -7,6 +7,7 @@ type Params = Promise<{ id: string }>
 type PaymentCollectionCheckoutContext = {
   payment_collection: {
     id: string
+    status?: string
     payment_sessions?: Array<{
       id?: string
       provider_id?: string
@@ -38,12 +39,77 @@ const SUCCESSFUL_ORDER_PAYMENT_STATUSES = new Set([
   "refunded",
 ])
 
+const SUCCESSFUL_PAYMENT_COLLECTION_STATUSES = new Set([
+  "authorized",
+  "partially_authorized",
+  "partially_captured",
+  "completed",
+])
+
+const SUCCESSFUL_PAYMENT_SESSION_STATUSES = new Set([
+  "authorized",
+  "captured",
+])
+
 const getPaymentIntentId = (paymentSession: Record<string, any>): string | undefined => {
   return (
     paymentSession?.data?.id ||
     paymentSession?.data?.payment_intent_id ||
     paymentSession?.data?.payment_intent
   )
+}
+
+const resolveMatchingSession = ({
+  context,
+  paymentIntent,
+}: {
+  context: PaymentCollectionCheckoutContext | null
+  paymentIntent?: string | null
+}) => {
+  if (!paymentIntent) {
+    return null
+  }
+
+  return (context?.payment_collection?.payment_sessions || []).find(
+    (session) => getPaymentIntentId(session as Record<string, any>) === paymentIntent
+  )
+}
+
+const hasSuccessfulPaymentState = ({
+  context,
+  paymentIntent,
+  paymentIntentClientSecret,
+}: {
+  context: PaymentCollectionCheckoutContext | null
+  paymentIntent?: string | null
+  paymentIntentClientSecret?: string | null
+}) => {
+  const orderPaymentStatus = String(context?.order?.payment_status || "").toLowerCase()
+  if (SUCCESSFUL_ORDER_PAYMENT_STATUSES.has(orderPaymentStatus)) {
+    return true
+  }
+
+  const paymentCollectionStatus = String(
+    context?.payment_collection?.status || ""
+  ).toLowerCase()
+  if (SUCCESSFUL_PAYMENT_COLLECTION_STATUSES.has(paymentCollectionStatus)) {
+    return true
+  }
+
+  const matchingSession = resolveMatchingSession({ context, paymentIntent })
+  if (!matchingSession) {
+    return false
+  }
+
+  if (
+    paymentIntentClientSecret &&
+    matchingSession.data?.client_secret !== paymentIntentClientSecret
+  ) {
+    return false
+  }
+
+  const sessionStatus = String(matchingSession.status || "").toLowerCase()
+  return SUCCESSFUL_PAYMENT_SESSION_STATUSES.has(sessionStatus)
 }
 
 export async function GET(req: NextRequest, { params }: { params: Params }) {
@@ -54,16 +120,12 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
   const paymentIntentClientSecret = searchParams.get(
     "payment_intent_client_secret"
   )
-  const redirectStatus = searchParams.get("redirect_status") || ""
+  const redirectStatus = (searchParams.get("redirect_status") || "").toLowerCase()
   const orderIdParam = searchParams.get("order_id")
   const countryCodeParam = (searchParams.get("country_code") || "").toLowerCase()
 
   const fallbackCountryCode = countryCodeParam || "us"
   const fallbackUrl = `${origin}/${fallbackCountryCode}/checkout/private/${paymentCollectionId}`
-
-  if (!paymentIntent || !paymentIntentClientSecret || !redirectStatus) {
-    return NextResponse.redirect(`${fallbackUrl}?error=payment_failed`)
-  }
 
   const headers = {
     ...(await getAuthHeaders()),
@@ -95,32 +157,31 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
     context.order.billing_address?.country_code ||
     "us"
 
-  const paymentSession = (context.payment_collection.payment_sessions || []).find(
-    (session) => getPaymentIntentId(session as Record<string, any>) === paymentIntent
-  )
-
-  if (
-    !paymentSession ||
-    paymentSession.data?.client_secret !== paymentIntentClientSecret ||
-    !["pending", "succeeded"].includes(redirectStatus)
-  ) {
+  if (redirectStatus && !["pending", "succeeded"].includes(redirectStatus)) {
     return NextResponse.redirect(`${fallbackUrl}?error=payment_failed`)
   }
 
-  const paymentSessionStatus = String(paymentSession.status || "").toLowerCase()
-
-  if (paymentSessionStatus === "authorized" || paymentSessionStatus === "captured") {
+  if (
+    hasSuccessfulPaymentState({
+      context,
+      paymentIntent,
+      paymentIntentClientSecret,
+    })
+  ) {
     return NextResponse.redirect(`${origin}/${countryCode}/order/${orderId}/confirmed`)
   }
 
-  const maxAttempts = 8
+  const maxAttempts = 12
   for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     const refreshedContext = await fetchCheckoutContext()
-    const paymentStatus = String(
-      refreshedContext?.order?.payment_status || ""
-    ).toLowerCase()
 
-    if (SUCCESSFUL_ORDER_PAYMENT_STATUSES.has(paymentStatus)) {
+    if (
+      hasSuccessfulPaymentState({
+        context: refreshedContext,
+        paymentIntent,
+        paymentIntentClientSecret,
+      })
+    ) {
       return NextResponse.redirect(`${origin}/${countryCode}/order/${orderId}/confirmed`)
     }
 
