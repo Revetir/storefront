@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import ChevronDown from "@modules/common/icons/chevron-down"
 
 interface FAQItem {
   question: string
@@ -201,83 +202,77 @@ const faqData: FAQCategory[] = [
 ]
 
 export default function FAQPage() {
-  const [openItems, setOpenItems] = useState<Set<string>>(new Set())
+  const [openItem, setOpenItem] = useState<string | null>(null)
+  const flattenedItems = faqData.flatMap((category) => category.items)
 
-  const toggleItem = (categoryIndex: number, itemIndex: number) => {
-    const key = `${categoryIndex}-${itemIndex}`
-    const newOpenItems = new Set(openItems)
-    
-    if (newOpenItems.has(key)) {
-      newOpenItems.delete(key)
-    } else {
-      newOpenItems.add(key)
-    }
-    
-    setOpenItems(newOpenItems)
+  const toggleItem = (itemKey: string) => {
+    setOpenItem((currentOpenItem) => (currentOpenItem === itemKey ? null : itemKey))
   }
 
   return (
-    <>
-      <h1 className="text-3xl font-bold mb-10">FAQ</h1>
+    <div className="bg-white text-black">
+      <div className="mx-auto w-full max-w-3xl">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-10">
+          <header className="pb-10 lg:col-span-5 lg:py-16">
+            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-neutral-500">FAQ</p>
+            <h1 className="mt-8 max-w-[16ch] text-[clamp(2.15rem,7vw,3.25rem)] font-medium leading-[0.94] tracking-[-0.03em] text-black">
+              Answers to our most frequently asked questions
+            </h1>
 
-        {/* FAQ Categories */}
-        <div className="space-y-8">
-          {faqData.map((category, categoryIndex) => (
-            <div key={categoryIndex} id={`category-${categoryIndex}`}>
-              <h2 className="text-2xl font-semibold mb-6 text-gray-900 border-b border-gray-200 pb-2">
-                {category.title}
-              </h2>
-              
-              <div className="space-y-4">
-                {category.items.map((item, itemIndex) => {
-                  const key = `${categoryIndex}-${itemIndex}`
-                  const isOpen = openItems.has(key)
-                  
-                  return (
-                    <div
-                      key={itemIndex}
-                      className="border border-gray-200 overflow-hidden"
-                    >
-                      <button
-                        onClick={() => toggleItem(categoryIndex, itemIndex)}
-                        className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50"
-                      >
-                        <div className="flex justify-between items-center">
-                          <h3 className="font-medium text-gray-900 pr-4">
-                            {item.question}
-                          </h3>
-                          <svg
-                            className={`w-5 h-5 text-gray-500 transform transition-transform ${
-                              isOpen ? "rotate-180" : ""
-                            }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </div>
-                      </button>
-                      
-                      {isOpen && (
-                        <div className="px-6 pb-4">
-                          <p className="text-gray-700 leading-relaxed">
-                            {item.answer}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
+            <div className="mt-10 border-t border-neutral-300 pt-4 text-xs leading-relaxed text-neutral-600">
+              <p>Need support beyond the FAQ?</p>
+              <p className="mt-1">
+                <LocalizedClientLink href="/customer-care/contact-us" className="underline hover:text-black">
+                  Contact Customer Care
+                </LocalizedClientLink>{" "}
+                at care@revetir.com, Monday-Saturday, 9AM-11PM EST.
+              </p>
             </div>
-          ))}
+          </header>
+
+          <section aria-label="Frequently asked questions" className="border-t border-neutral-300 lg:col-span-7 lg:border-t-0 lg:py-16">
+            <div className="border-y border-neutral-300">
+              {flattenedItems.map((item, itemIndex) => {
+                const itemKey = `faq-item-${itemIndex}`
+                const answerId = `${itemKey}-answer`
+                const isOpen = openItem === itemKey
+
+                return (
+                  <div key={itemKey} className="border-b border-neutral-300 last:border-b-0">
+                    <button
+                      type="button"
+                      onClick={() => toggleItem(itemKey)}
+                      aria-expanded={isOpen}
+                      aria-controls={answerId}
+                      className="group flex w-full items-start justify-between gap-6 px-0 py-6 text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black focus-visible:ring-offset-2"
+                    >
+                      <h2 className="pr-2 text-[clamp(1.2rem,2.2vw,1.8rem)] font-medium leading-[1.02] tracking-[-0.02em] text-black">
+                        {item.question}
+                      </h2>
+                      <ChevronDown
+                        size={18}
+                        className={`mt-1 shrink-0 text-neutral-700 transition-transform duration-300 ease-out motion-reduce:transition-none ${
+                          isOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    <div
+                      id={answerId}
+                      aria-hidden={!isOpen}
+                      className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-out motion-reduce:transition-none ${
+                        isOpen ? "max-h-[48rem] opacity-100" : "max-h-0 opacity-0"
+                      }`}
+                    >
+                      <div className="pb-6 pr-8 text-[0.94rem] leading-relaxed text-neutral-700">{item.answer}</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
         </div>
-    </>
+      </div>
+    </div>
   )
 } 
