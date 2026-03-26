@@ -73,7 +73,7 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
       },
       outseam: {
         x_percent: 8,
-        y_percent: 46,
+        y_percent: 45,
         label: "Outseam"
       },
       leg_opening: {
