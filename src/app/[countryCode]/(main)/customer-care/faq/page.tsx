@@ -219,7 +219,7 @@ export default function FAQPage() {
               Answers to our most frequently asked questions
             </h1>
 
-            <div className="mt-8 w-full text-sm leading-relaxed text-neutral-700 lg:mt-10 lg:border-t lg:border-neutral-300 lg:pt-4">
+            <div className="mt-10 hidden w-full border-t border-neutral-300 pt-4 text-sm leading-relaxed text-neutral-700 lg:block">
               Need help beyond the FAQ?{" "}
               <LocalizedClientLink href="/customer-care/contact-us" className="underline hover:text-black">
                 Contact Customer Care
@@ -268,6 +268,13 @@ export default function FAQPage() {
               })}
             </div>
           </section>
+
+          <div className="mt-8 w-full text-center text-sm leading-relaxed text-neutral-700 lg:hidden">
+            Need help beyond the FAQ?{" "}
+            <LocalizedClientLink href="/customer-care/contact-us" className="underline hover:text-black">
+              Contact Customer Care
+            </LocalizedClientLink>
+          </div>
         </div>
       </div>
     </div>
