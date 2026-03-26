@@ -92,7 +92,7 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
     units: "cm",
     measurement_points: {
       sleeve: {
-        x_percent: 9,
+        x_percent: 8,
         y_percent: 26,
         label: "Sleeve"
       },
