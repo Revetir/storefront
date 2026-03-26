@@ -16,47 +16,96 @@ interface FAQCategory {
 
 const faqData: FAQCategory[] = [
   {
-    title: "Orders & Shipping",
+    title: "",
     items: [
       {
-        question: "What payment methods do you accept?",
-        answer: "We offer a wide variety of payment methods through Stripe, including major credit and debit cards (Visa, Mastercard, American Express, Discover), digital wallets like Apple Pay and Google Pay, and buy now, pay later through Klarna, Affirm, and Afterpay."
-      },
-      {
-        question: "Do I need to make an account to place an order?",
-        answer: "No, all you need is an email to place and receive updates for your order. To checkout faster, easily view and manage orders online, and gain access to exclusive discounts and sales, we recommend creating a REVETIR account."
-      },
-      {
-        question: "Can I cancel or modify my order?",
+        question: "Are your products authentic?",
         answer: (
           <>
-            Modifying or canceling an order is possible so long as the merchandise has not yet entered the processing or shipment phase, usually within 3 hours after placing the order — contact us{" "}
-            <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
+            All items sold by REVETIR are sourced directly from brands or trusted vendors. You can read about our authentication process{" "}
+            <LocalizedClientLink href="" className="text-gray-900 hover:text-black font-semibold underline">
               here
-            </LocalizedClientLink>{" "}
-            as soon as possible.
+            </LocalizedClientLink>.
           </>
         )
       },
       {
-        question: "What are your shipping options?",
-        answer: "We offer complimentary standard shipping (10-15 days*) on most orders and express shipping (5-10 days*) for an additional charge. *Shipping times are subject to customs delays"
+        question: "Why are your prices different from other retailers?",
+        answer:
+          "Our inventory is aggregated from a wide network of partners and global marketplaces, allowing us to surface the most competitive pricing for each item. While pricing may vary, every item is held to consistent quality and verification standards."
+      },
+      {
+        question: "Do you have customer reviews?",
+        answer: (
+          <>
+            You can find independent customer reviews on Trustpilot{" "}
+            <a
+              href="https://www.trustpilot.com/review/www.revetir.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-900 hover:text-black font-semibold underline"
+            >
+              here
+            </a>
+            .
+          </>
+        )
+      },
+      {
+        question: "Are your items new or pre-owned?",
+        answer: "Our selection includes new and pre-owned items in pristine condition."
+      },
+      {
+        question: "Can I request more item photos or details?",
+        answer: (
+          <>
+            Yes, we would be happy to provide more precise information about any of our items - please contact us{" "}
+            <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
+              here
+            </LocalizedClientLink>.
+          </>
+        )
+      },
+      {
+        question: "Can I request an item that isn't listed?",
+        answer: (
+          <>
+            Yes - if you're looking for a specific item that isn't currently listed, feel free to contact us{" "}
+            <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
+              here
+            </LocalizedClientLink>{" "}
+            with details and we will check availability across our network.
+          </>
+        )
       },
       {
         question: "When will I receive my order?",
-        answer: "Once your order has been shipped, you will receive an e-mail with with your shipment’s tracking information, allowing you to monitor the progress of your delivery."
+        answer:
+          "Most orders arrive within 2-3 weeks from the time they are placed. Once your order has been shipped, you will receive an e-mail with your shipment's tracking information, allowing you to monitor the progress of your delivery."
       },
       {
-        question: "Will I need to pay duties and taxes?",
-        answer: "No, we ship all orders on a Delivery Duties Paid (DDP) basis, meaning you will never pay anything in addition to your order total."
-      }
-    ]
-  },
-  {
-    title: "Returns & Refunds",
-    items: [
+        question: "Why hasn't my order shipped yet?",
+        answer: (
+          <>
+            Orders may take time to prepare before shipment, as fulfillment can vary depending on the items in your order. For detailed status updates, feel free to contact us with your order number{" "}
+            <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
+              here
+            </LocalizedClientLink>{" "}
+            at any time.
+          </>
+        )
+      },
       {
-        question: "Do you accept returns?",
+        question: "Where will my order ship from?",
+        answer:
+          "Orders may ship directly from a partner vendor or one of our international distribution centers, depending on where items in your order are held. Whenever possible, we aim to reduce our global footprint by prioritizing fulfillment from the nearest available inventory location to minimize distance and transit time."
+      },
+      {
+        question: "Will I have to pay duties or import fees?",
+        answer: "No, we ship all orders on a Delivery Duties Paid (DDP) basis, meaning you will never pay anything in addition to your order total."
+      },
+      {
+        question: "Do you offer free returns?",
         answer: (
           <>
             Yes, we offer free returns on most orders within 7 days of delivery for items in their original condition and packaging. For more information, please consult our return policy{" "}
@@ -67,140 +116,70 @@ const faqData: FAQCategory[] = [
         )
       },
       {
-        question: "How long will it take to process my refund?",
-        answer: "Once we receive your return and confirm items are in their original state, we issue your refund immediately. Refunds are processed through Stripe and can take anywhere from 5-10 business days, depending on your bank."
-      },
-      {
-        question: "What items can't be returned?",
-        answer: "Face masks and items marked as final sale cannot be returned. Swimwear and undergarments must have the hygiene seal intact."
-      }
-    ]
-  },
-  {
-    title: "Product Information",
-    items: [
-      {
-        question: "How do I find the right size?",
+        question: "What if I receive a damaged or incorrect item?",
         answer: (
           <>
-            Item-specific measurements can be found by clicking the Size Guide link on each product page. If measurements aren't listed or you would like additional guidance, please contact us{" "}
+            If you receive a damaged or incorrect item, please contact us{" "}
             <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
               here
-            </LocalizedClientLink>. You can also refer to our general size chart{" "}
-            <LocalizedClientLink href="/customer-care/product-information" className="text-gray-900 hover:text-black font-semibold underline">
-              here
             </LocalizedClientLink>{" "}
-            for standardized sizing guidelines across categories.
+            to request a free return. We will review the issue promptly and arrange a replacement or full refund at no cost to you.
           </>
         )
       },
       {
-        question: "Are your products authentic?",
-        answer: "Our offering is expertly curated and directly supplied by brands, department stores, and manufacturers — all our items are guaranteed authentic or your money back. "
+        question: "When will I receive my refund?",
+        answer:
+          "Once we receive your return and confirm items are in their original state, we issue your refund immediately. Refunds are processed through Stripe back to your original payment method and can take anywhere from 5-10 business days, depending on your bank."
       },
       {
-        question: "Can I request more product photos or details?",
+        question: "Can I modify or cancel my order after placing it?",
         answer: (
           <>
-            Yes, we would be happy to provide more precise information about any of our products — please contact us{" "}
+            Orders may be modified or canceled before they are processed for shipment. Please contact us{" "}
             <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
-              here.
+              here
             </LocalizedClientLink>{" "}
+            as soon as possible with your request.
           </>
         )
       },
       {
-        question: "How do I care for my products?",
+        question: "What payment methods do you accept?",
+        answer:
+          "We offer a wide variety of payment methods through Stripe, including major credit and debit cards (Visa, Mastercard, American Express, Discover), digital wallets like Apple Pay and Google Pay, and buy now, pay later through Afterpay and Klarna."
+      },
+      {
+        question: "Do I need to make an account to place an order?",
+        answer:
+          "No, all you need is an email and phone number to place and receive updates for your order. To checkout faster, easily view and manage orders online, and gain access to exclusive discounts and sales, we recommend creating a REVETIR account."
+      },
+      {
+        question: "Do you offer loyalty programs or incentives?",
         answer: (
           <>
-            Specific care instructions for your product can be found on the product's interior care label or inside the packaging in the care manual, while general care guidelines for all products can be found{" "}
-            <LocalizedClientLink href="/customer-care/product-information" className="text-gray-900 hover:text-black font-semibold underline">
+            We periodically offer promotions and incentives to our customers. You can visit our promotions page{" "}
+            <LocalizedClientLink href="/customer-care/promotions" className="text-gray-900 hover:text-black font-semibold underline">
               here
-            </LocalizedClientLink>.
+            </LocalizedClientLink>{" "}
+            for current offers, and returning customers may receive access to select, limited releases over time.
           </>
         )
-      }
-    ]
-  },
-  {
-    title: "Account & Rewards",
-    items: [
-      {
-        question: "How do I create an account?",
-        answer: "You can create an account during checkout or by clicking 'Log In' in the top navigation. You'll need to provide your email address and create a password."
-      },
-      {
-        question: "What are the benefits of having an account?",
-        answer: "Members can check out faster, easily view and manage orders online, and gain access to exclusive discounts and sales."
-      },
-      {
-        question: "How do I reset my password?",
-        answer: "The functionality to reset your password will be available very soon."
       },
       {
         question: "Can I delete my account?",
         answer: (
           <>
-            Yes, though we're sorry to see you go — please contact us{" "}
-            <LocalizedClientLink href="/customer-care/product-information" className="text-gray-900 hover:text-black font-semibold underline">
+            Yes, though we're sorry to see you go - please contact us{" "}
+            <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
               here
             </LocalizedClientLink>.
-          </>
-        )
-      },
-      {
-        question: "Do you give discounts?",
-        answer: (
-          <>
-            Please visit our promotions page{" "}
-            <LocalizedClientLink href="/customer-care/promotions" className="text-gray-900 hover:text-black font-semibold underline">
-              here
-            </LocalizedClientLink>{" "}
-            for our latest (member-only) promotions.
-          </>
-        )
-      }
-    ]
-  },
-  {
-    title: "Customer Service",
-    items: [
-              {
-          question: "How can I contact customer service?",
-          answer: (
-            <>
-              You can reach our customer care team via email at care@revetir.com or through our contact form{" "}
-              <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
-                here
-              </LocalizedClientLink>. We're available Monday-Saturday, 9AM-11PM EST.
-            </>
-          )
-        },
-      {
-        question: "When can I expect a response to my inquiry?",
-        answer: "We typically respond to all inquiries within minutes, though certain requests may take up to 48 hours for a response."
-      },
-      {
-        question: "Where can I find reviews from your customers?",
-        answer: (
-          <>
-            We're on TrustPilot! Click{" "}
-            <a 
-              href="https://www.trustpilot.com/review/www.revetir.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-gray-900 hover:text-black font-semibold underline"
-            >
-              here
-            </a>{" "}
-            to see what our customers are saying.
           </>
         )
       }
     ]
   }
 ]
-
 export default function FAQPage() {
   const [openItem, setOpenItem] = useState<string | null>(null)
   const flattenedItems = faqData.flatMap((category) => category.items)
@@ -214,13 +193,13 @@ export default function FAQPage() {
       <div className="mx-auto w-full max-w-3xl lg:max-w-5xl">
         <div className="lg:grid lg:grid-cols-12 lg:gap-16 xl:gap-20">
           <header className="flex flex-col items-center pb-10 text-center lg:col-span-5 lg:items-start lg:py-16 lg:text-left">
-            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-black">FAQ</p>
+            <p className="text-[12px] font-medium uppercase text-black">FAQ</p>
             <h1 className="mt-4 max-w-[16ch] text-[clamp(2.15rem,7vw,3.25rem)] font-medium leading-[0.94] tracking-[-0.03em] text-black lg:mt-6">
               Answers to our most frequently asked questions
             </h1>
 
             <div className="mt-10 hidden w-full border-t border-neutral-300 pt-4 text-sm leading-relaxed text-neutral-700 lg:block">
-              Need help beyond the FAQ?{" "}
+              Need more help?{" "}
               <LocalizedClientLink href="/customer-care/contact-us" className="underline hover:text-black">
                 Contact Customer Care
               </LocalizedClientLink>
@@ -270,7 +249,7 @@ export default function FAQPage() {
           </section>
 
           <div className="mt-8 w-full text-center text-sm leading-relaxed text-neutral-700 lg:hidden">
-            Need help beyond the FAQ?{" "}
+            Need more help?{" "}
             <LocalizedClientLink href="/customer-care/contact-us" className="underline hover:text-black">
               Contact Customer Care
             </LocalizedClientLink>
@@ -280,3 +259,4 @@ export default function FAQPage() {
     </div>
   )
 } 
+
