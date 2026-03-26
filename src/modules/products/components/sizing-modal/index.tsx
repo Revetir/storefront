@@ -469,10 +469,10 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         </div>
 
         {/* Tablet/Phone: Vertically stacked */}
-        <div className="flex lg:hidden flex-col gap-6 w-full">
+        <div className="flex lg:hidden flex-col gap-6 w-full min-h-full justify-center py-4">
           {/* Diagram */}
-          <div className="w-full flex justify-center items-center overflow-visible">
-            <div className="w-full max-w-md px-4 overflow-visible">
+          <div className="w-full flex justify-center items-center overflow-visible py-4">
+            <div className="w-full max-w-md p-4 overflow-visible">
               <div className="relative w-full overflow-visible">
                 {renderDiagram() ?? (
                   <div className="w-full flex items-center justify-center text-sm text-gray-500">
