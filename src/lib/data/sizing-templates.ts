@@ -93,22 +93,22 @@ export const SIZING_TEMPLATES: SizingTemplate[] = [
     measurement_points: {
       sleeve: {
         x_percent: 9,
-        y_percent: 26,
+        y_percent: 28,
         label: "Sleeve"
       },
       shoulder: {
-        x_percent: 46,
-        y_percent: 16,
+        x_percent: 47,
+        y_percent: 18,
         label: "Shoulder"
       },
       chest: {
-        x_percent: 46,
-        y_percent: 40,
+        x_percent: 47,
+        y_percent: 41,
         label: "Chest"
       },
       length: {
-        x_percent: 100,
-        y_percent: 48,
+        x_percent: 101,
+        y_percent: 49,
         label: "Length"
       }
     },
