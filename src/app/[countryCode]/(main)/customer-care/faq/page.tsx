@@ -211,15 +211,15 @@ export default function FAQPage() {
 
   return (
     <div className="bg-white text-black">
-      <div className="mx-auto w-full max-w-3xl">
-        <div className="lg:grid lg:grid-cols-12 lg:gap-10">
+      <div className="mx-auto w-full max-w-3xl lg:max-w-5xl">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-16 xl:gap-20">
           <header className="flex flex-col items-center pb-10 text-center lg:col-span-5 lg:items-start lg:py-16 lg:text-left">
             <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-black">FAQ</p>
-            <h1 className="mt-8 max-w-[16ch] text-[clamp(2.15rem,7vw,3.25rem)] font-medium leading-[0.94] tracking-[-0.03em] text-black">
+            <h1 className="mt-4 max-w-[16ch] text-[clamp(2.15rem,7vw,3.25rem)] font-medium leading-[0.94] tracking-[-0.03em] text-black lg:mt-6">
               Answers to our most frequently asked questions
             </h1>
 
-            <div className="mt-10 w-full border-t border-neutral-300 pt-4 text-sm leading-relaxed text-neutral-700">
+            <div className="mt-8 w-full text-sm leading-relaxed text-neutral-700 lg:mt-10 lg:border-t lg:border-neutral-300 lg:pt-4">
               Need help beyond the FAQ?{" "}
               <LocalizedClientLink href="/customer-care/contact-us" className="underline hover:text-black">
                 Contact Customer Care
