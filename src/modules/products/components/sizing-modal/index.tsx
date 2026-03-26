@@ -287,25 +287,25 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         return null
 
       case "PantsDiagram":
-        return <PantsDiagram className="w-full h-auto max-w-md" />
+        return <PantsDiagram className="w-full h-auto" />
 
       case "TShirtsDiagram":
-        return <TShirtsDiagram className="w-full h-auto max-w-md" />
+        return <TShirtsDiagram className="w-full h-auto" />
 
       case "SweatersDiagram":
-        return <SweatersDiagram className="w-full h-auto max-w-md" />
+        return <SweatersDiagram className="w-full h-auto" />
 
       case "ShortsDiagram":
-        return <ShortsDiagram className="w-full h-auto max-w-md" />
+        return <ShortsDiagram className="w-full h-auto" />
 
       case "JacketsDiagram":
-        return <JacketsDiagram className="w-full h-auto max-w-md" />
+        return <JacketsDiagram className="w-full h-auto" />
 
       case "LongSleeveShirtsDiagram":
-        return <LongSleeveShirtsDiagram className="w-full h-auto max-w-md" />
+        return <LongSleeveShirtsDiagram className="w-full h-auto" />
 
       case "ShortSleeveShirtsDiagram":
-        return <ShortSleeveShirtsDiagram className="w-full h-auto max-w-md" />
+        return <ShortSleeveShirtsDiagram className="w-full h-auto" />
 
       default:
         return null
@@ -383,7 +383,6 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
       }
 
       const formattedValue = useInches ? `${displayValue}"` : `${displayValue}cm`
-
       return (
         <div
           key={key}
@@ -408,14 +407,16 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         {/* Desktop/Laptop: Horizontal layout */}
         <div className="hidden lg:flex gap-8 items-center justify-center h-full w-full">
           {/* Left side - Diagram with measurements */}
-          <div className="flex justify-start items-center flex-1 pr-8">
-            <div className="relative w-full flex justify-start items-center overflow-visible">
-              {renderDiagram() ?? (
-                <div className="w-full flex items-center justify-start text-sm text-gray-500">
-                  Diagram unavailable
-                </div>
-              )}
-              {renderMeasurementOverlays()}
+          <div className="flex justify-center items-center flex-1 pr-8">
+            <div className="w-full max-w-md px-4 overflow-visible">
+              <div className="relative w-full overflow-visible">
+                {renderDiagram() ?? (
+                  <div className="w-full flex items-center justify-start text-sm text-gray-500">
+                    Diagram unavailable
+                  </div>
+                )}
+                {renderMeasurementOverlays()}
+              </div>
             </div>
           </div>
 
@@ -470,14 +471,18 @@ const SizingModal: React.FC<SizingModalProps> = ({ isOpen, close, product }) => 
         {/* Tablet/Phone: Vertically stacked */}
         <div className="flex lg:hidden flex-col gap-6 w-full">
           {/* Diagram */}
-            <div className="relative w-full flex justify-center items-center overflow-visible">
-              {renderDiagram() ?? (
-                <div className="w-full flex items-center justify-center text-sm text-gray-500">
-                  Diagram unavailable
-                </div>
-              )}
-              {renderMeasurementOverlays()}
+          <div className="w-full flex justify-center items-center overflow-visible">
+            <div className="w-full max-w-md px-4 overflow-visible">
+              <div className="relative w-full overflow-visible">
+                {renderDiagram() ?? (
+                  <div className="w-full flex items-center justify-center text-sm text-gray-500">
+                    Diagram unavailable
+                  </div>
+                )}
+                {renderMeasurementOverlays()}
+              </div>
             </div>
+          </div>
 
           {/* Controls */}
           <div className="flex flex-col gap-4 w-full items-center">
