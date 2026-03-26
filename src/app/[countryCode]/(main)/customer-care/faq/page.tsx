@@ -213,20 +213,17 @@ export default function FAQPage() {
     <div className="bg-white text-black">
       <div className="mx-auto w-full max-w-3xl">
         <div className="lg:grid lg:grid-cols-12 lg:gap-10">
-          <header className="pb-10 lg:col-span-5 lg:py-16">
-            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-neutral-500">FAQ</p>
+          <header className="flex flex-col items-center pb-10 text-center lg:col-span-5 lg:items-start lg:py-16 lg:text-left">
+            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-black">FAQ</p>
             <h1 className="mt-8 max-w-[16ch] text-[clamp(2.15rem,7vw,3.25rem)] font-medium leading-[0.94] tracking-[-0.03em] text-black">
               Answers to our most frequently asked questions
             </h1>
 
-            <div className="mt-10 border-t border-neutral-300 pt-4 text-xs leading-relaxed text-neutral-600">
-              <p>Need support beyond the FAQ?</p>
-              <p className="mt-1">
-                <LocalizedClientLink href="/customer-care/contact-us" className="underline hover:text-black">
-                  Contact Customer Care
-                </LocalizedClientLink>{" "}
-                at care@revetir.com, Monday-Saturday, 9AM-11PM EST.
-              </p>
+            <div className="mt-10 w-full border-t border-neutral-300 pt-4 text-sm leading-relaxed text-neutral-700">
+              Need help beyond the FAQ?{" "}
+              <LocalizedClientLink href="/customer-care/contact-us" className="underline hover:text-black">
+                Contact Customer Care
+              </LocalizedClientLink>
             </div>
           </header>
 
