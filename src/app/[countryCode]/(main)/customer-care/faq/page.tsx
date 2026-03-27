@@ -59,7 +59,7 @@ const faqData: FAQCategory[] = [
         question: "Can I request more item photos or details?",
         answer: (
           <>
-            Yes, we would be happy to provide more precise information about any of our items - please contact us{" "}
+            Yes, we would be happy to provide more precise information about any of our items — please contact us{" "}
             <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
               here
             </LocalizedClientLink>.
@@ -70,7 +70,7 @@ const faqData: FAQCategory[] = [
         question: "Can I request an item that isn't listed?",
         answer: (
           <>
-            Yes - if you're looking for a specific item that isn't currently listed, feel free to contact us{" "}
+            Yes — if you're looking for a specific item that isn't currently listed, feel free to contact us{" "}
             <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
               here
             </LocalizedClientLink>{" "}
@@ -119,7 +119,7 @@ const faqData: FAQCategory[] = [
         question: "What if I receive a damaged or incorrect item?",
         answer: (
           <>
-            If you receive a damaged or incorrect item, please contact us{" "}
+            If there is an issue with any items you receive, please contact us{" "}
             <LocalizedClientLink href="/customer-care/contact-us" className="text-gray-900 hover:text-black font-semibold underline">
               here
             </LocalizedClientLink>{" "}
