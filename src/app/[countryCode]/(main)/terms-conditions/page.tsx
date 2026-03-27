@@ -249,6 +249,11 @@ export default function TermsConditionsPage() {
             <p className="text-gray-600 mb-4">
               <strong>Important Note on Chinese-Origin Goods:</strong> U.S. Customs and Border Protection may apply additional scrutiny to shipments from China, as well as shipments containing goods made wholly or partly in China. Such inspections may result in delays due to examination, repackaging, or, in rare cases, temporary seizure of merchandise. REVETIR and its carriers will make reasonable efforts to follow corrective procedures to facilitate delivery, but cannot guarantee outcomes or override decisions made by federal authorities.
             </p>
+
+            <h3 className="text-xl font-semibold mb-3">14.5 Order Cancellations.</h3>
+            <p className="text-gray-600 mb-4">
+              Orders may be canceled prior to processing for shipment at no cost. Once an order has been processed for shipment, cancellations are subject to a 3% processing fee to cover non-recoverable payment and handling costs. This fee will be deducted from the total refund amount.
+            </p>
           </section>
           
           <section className="mb-8">
