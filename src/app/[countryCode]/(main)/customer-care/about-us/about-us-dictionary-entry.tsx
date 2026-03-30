@@ -1,5 +1,6 @@
 ﻿"use client"
 
+import Image from "next/image"
 import { useEffect, useRef, useState } from "react"
 
 type TermId = "global" | "marketplace" | "discovery" | "luxury" | "independentFashion"
@@ -18,8 +19,6 @@ interface DefinitionTerm {
   label: string
   guidedPreview: string
   fullInline: string[]
-  expandedClassName: string
-  guidedClassName: string
 }
 
 const GUIDED_DISCOVERY_KEY = "revetir_about_us_guided_seen_v1"
@@ -33,10 +32,6 @@ const TERMS: Record<TermId, DefinitionTerm> = {
     fullInline: [
       "from fashion capitals to craft districts, we source from over 30 countries around the world",
     ],
-    expandedClassName:
-      "ml-[0.10em] mr-[0.26em] mt-[0.08em] mb-[0.20em] max-w-[21ch] px-[0.28em] py-[0.20em]",
-    guidedClassName:
-      "mx-[0.08em] my-[0.08em] max-w-[15ch] px-[0.20em] py-[0.14em]",
   },
   marketplace: {
     label: "marketplace",
@@ -44,10 +39,6 @@ const TERMS: Record<TermId, DefinitionTerm> = {
     fullInline: [
       "we maintain a growing network of partner brands, stores and independent resellers that list new items for sale every single day",
     ],
-    expandedClassName:
-      "ml-[0.18em] mr-[0.12em] mt-[0.14em] mb-[0.12em] max-w-[22ch] px-[0.32em] py-[0.24em]",
-    guidedClassName:
-      "mx-[0.10em] my-[0.06em] max-w-[16ch] px-[0.22em] py-[0.16em]",
   },
   discovery: {
     label: "discovery",
@@ -56,10 +47,6 @@ const TERMS: Record<TermId, DefinitionTerm> = {
       "our curation tracks emerging labels, seasonal shifts and regional scenes.",
       "every shape, size and taste is accounted for",
     ],
-    expandedClassName:
-      "ml-[0.08em] mr-[0.30em] mt-[0.06em] mb-[0.26em] max-w-[23ch] px-[0.24em] py-[0.20em]",
-    guidedClassName:
-      "mx-[0.12em] my-[0.10em] max-w-[17ch] px-[0.20em] py-[0.15em]",
   },
   luxury: {
     label: "luxury",
@@ -67,10 +54,6 @@ const TERMS: Record<TermId, DefinitionTerm> = {
     fullInline: [
       "high-end clothing, shoes, and accessories made of superior-quality materials with meticulous attention-to-detail",
     ],
-    expandedClassName:
-      "ml-[0.24em] mr-[0.10em] mt-[0.10em] mb-[0.18em] max-w-[20ch] px-[0.30em] py-[0.20em]",
-    guidedClassName:
-      "mx-[0.08em] my-[0.07em] max-w-[15ch] px-[0.20em] py-[0.14em]",
   },
   independentFashion: {
     label: "independent fashion",
@@ -78,10 +61,6 @@ const TERMS: Record<TermId, DefinitionTerm> = {
     fullInline: [
       "design-forward clothing, shoes, and accessories rooted in culture and originality",
     ],
-    expandedClassName:
-      "ml-[0.10em] mr-[0.22em] mt-[0.16em] mb-[0.14em] max-w-[26ch] px-[0.26em] py-[0.24em]",
-    guidedClassName:
-      "mx-[0.12em] my-[0.10em] max-w-[18ch] px-[0.22em] py-[0.16em]",
   },
 }
 
@@ -99,8 +78,7 @@ const DEFINITION_TOKENS: DefinitionToken[] = [
 ]
 
 export default function AboutUsDictionaryEntry() {
-  const [hoveredTerm, setHoveredTerm] = useState<TermId | null>(null)
-  const [pinnedTerm, setPinnedTerm] = useState<TermId | null>(null)
+  const [activeTerm, setActiveTerm] = useState<TermId | null>(null)
   const [guidedActive, setGuidedActive] = useState(false)
   const [guidedEligible, setGuidedEligible] = useState(false)
   const [guidedHasPlayed, setGuidedHasPlayed] = useState(false)
@@ -224,47 +202,49 @@ export default function AboutUsDictionaryEntry() {
   }
 
   const handleTermHover = (termId: TermId) => {
-    if (!canHover || pinnedTerm || guidedActive) {
+    if (!canHover || guidedActive) {
       return
     }
 
     markGuidedSeen()
-    setHoveredTerm(termId)
+    setActiveTerm(termId)
   }
 
   const handleTermLeave = (termId: TermId) => {
-    if (!canHover || pinnedTerm || guidedActive) {
+    if (!canHover || guidedActive) {
       return
     }
 
-    setHoveredTerm((currentTerm) => (currentTerm === termId ? null : currentTerm))
+    setActiveTerm((currentTerm) => (currentTerm === termId ? null : currentTerm))
   }
 
   const handleTermFocus = (termId: TermId) => {
-    if (pinnedTerm || guidedActive) {
+    if (guidedActive) {
       return
     }
 
     markGuidedSeen()
-    setHoveredTerm(termId)
+    setActiveTerm(termId)
   }
 
   const handleTermBlur = (termId: TermId) => {
-    if (pinnedTerm || guidedActive) {
+    if (guidedActive) {
       return
     }
 
-    setHoveredTerm((currentTerm) => (currentTerm === termId ? null : currentTerm))
+    setActiveTerm((currentTerm) => (currentTerm === termId ? null : currentTerm))
   }
 
-  const handleTermSelect = (termId: TermId) => {
+  const handleTermTap = (termId: TermId) => {
     markGuidedSeen()
     setGuidedActive(false)
-    setHoveredTerm(null)
-    setPinnedTerm((currentTerm) => (currentTerm === termId ? null : termId))
-  }
 
-  const activeTerm = pinnedTerm || hoveredTerm
+    if (canHover) {
+      return
+    }
+
+    setActiveTerm((currentTerm) => (currentTerm === termId ? null : termId))
+  }
 
   return (
     <div className="content-container py-10 lg:py-14">
@@ -272,10 +252,19 @@ export default function AboutUsDictionaryEntry() {
         <h1 className="sr-only">About REVETIR</h1>
 
         <div className="max-w-[54rem]">
-          <p className="text-[clamp(2.75rem,9vw,6rem)] font-light leading-none tracking-[0.05em]">
-            <span className="tracking-[0.08em]">REVETIR</span>{" "}
-            <span className="align-[0.14em] text-[0.42em] tracking-normal text-black/80">noun</span>
-          </p>
+          <div className="flex items-end gap-5 md:gap-7">
+            <Image
+              src="/images/logo_transparent.svg"
+              alt="REVETIR"
+              width={560}
+              height={120}
+              priority
+              className="h-auto w-[clamp(15.5rem,42vw,26rem)]"
+            />
+            <span className="pb-[0.25em] text-[clamp(1.95rem,4vw,3rem)] font-light leading-none text-black/80">
+              noun
+            </span>
+          </div>
 
           <p className="mt-5 text-[clamp(1.75rem,5.2vw,3.1rem)] font-light leading-none tracking-[0.01em]">
             \ rə-və-tir \
@@ -287,7 +276,7 @@ export default function AboutUsDictionaryEntry() {
 
           <p className="mt-10 text-[clamp(2.05rem,6vw,4rem)] leading-tight tracking-[-0.02em]">
             <span className="font-bold">Definition</span>{" "}
-            <span className="font-light text-black/70">(entry 1 of 1)</span>
+            <span className="font-light text-black/65">(entry 1 of 1)</span>
           </p>
 
           <p className="mt-8 max-w-[31ch] text-[clamp(2rem,6.4vw,4.15rem)] font-light leading-[1.12] tracking-[-0.018em]">
@@ -299,59 +288,30 @@ export default function AboutUsDictionaryEntry() {
 
               const term = TERMS[token.id]
               const isExpanded = guidedActive || activeTerm === token.id
-              const isGuidedExpansion = guidedActive
-
-              if (!isExpanded) {
-                return (
-                  <button
-                    key={token.id}
-                    type="button"
-                    className="inline-flex cursor-pointer items-baseline border-b border-black/35 px-[0.02em] text-left text-inherit transition-colors duration-200 hover:border-black focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45"
-                    aria-expanded={false}
-                    onMouseEnter={() => handleTermHover(token.id)}
-                    onMouseLeave={() => handleTermLeave(token.id)}
-                    onFocus={() => handleTermFocus(token.id)}
-                    onBlur={() => handleTermBlur(token.id)}
-                    onClick={() => handleTermSelect(token.id)}
-                  >
-                    {term.label}
-                  </button>
-                )
-              }
+              const inlineDefinition = guidedActive
+                ? term.guidedPreview
+                : term.fullInline.join(" ")
 
               return (
-                <span
-                  key={token.id}
-                  className={`inline-flex align-top flex-col border border-black/20 bg-black/[0.025] text-black transition-all duration-300 ease-out motion-reduce:transition-none ${
-                    isGuidedExpansion ? term.guidedClassName : term.expandedClassName
-                  }`}
-                >
+                <span key={token.id} className="inline">
                   <button
                     type="button"
-                    className="cursor-pointer text-left text-current focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45"
-                    aria-expanded={true}
+                    className="inline cursor-pointer border-b border-black/30 bg-transparent p-0 text-left text-inherit transition-colors duration-200 hover:border-black focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45"
+                    aria-expanded={isExpanded}
                     onMouseEnter={() => handleTermHover(token.id)}
                     onMouseLeave={() => handleTermLeave(token.id)}
                     onFocus={() => handleTermFocus(token.id)}
                     onBlur={() => handleTermBlur(token.id)}
-                    onClick={() => handleTermSelect(token.id)}
+                    onClick={() => handleTermTap(token.id)}
                   >
                     {term.label}
                   </button>
 
-                  <span className="mt-[0.16em] h-px w-[1.5em] bg-black/20" />
-
-                  <span className="mt-[0.16em] text-[0.31em] leading-[1.35] tracking-[0.01em] text-black/70">
-                    {isGuidedExpansion ? (
-                      term.guidedPreview
-                    ) : (
-                      term.fullInline.map((line) => (
-                        <span key={line} className="block">
-                          {line}
-                        </span>
-                      ))
-                    )}
-                  </span>
+                  {isExpanded && (
+                    <span className="ml-[0.14em] text-[0.33em] leading-[1.24] tracking-[0.01em] text-black/62">
+                      {inlineDefinition}
+                    </span>
+                  )}
                 </span>
               )
             })}
