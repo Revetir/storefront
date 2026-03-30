@@ -1,7 +1,14 @@
 ﻿"use client"
 
 import Image from "next/image"
-import { Fragment, type MouseEvent, useEffect, useRef, useState } from "react"
+import {
+  Fragment,
+  type CSSProperties,
+  type MouseEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 
 type TermId = "global" | "marketplace" | "discovery" | "luxury" | "independentFashion"
 
@@ -17,11 +24,9 @@ type DefinitionToken =
 
 interface DefinitionTerm {
   label: string
+  subdefinition: string
   guidedPreview: string
-  inlineLead: string
-  blockRemainder?: string
-  subdefinitionClassName: string
-  guidedInlineClassName: string
+  constraintCh: number
 }
 
 const GUIDED_DISCOVERY_KEY = "revetir_about_us_guided_seen_v1"
@@ -31,46 +36,38 @@ const GUIDED_VISIBLE_MS = 3000
 const TERMS: Record<TermId, DefinitionTerm> = {
   global: {
     label: "global",
-    guidedPreview: "from fashion capitals to craft districts",
-    inlineLead: "from fashion capitals to craft districts,",
-    blockRemainder: "we source from over 30 countries around the world",
-    subdefinitionClassName: "max-w-[29ch] md:ml-[8%]",
-    guidedInlineClassName: "text-black/62",
+    subdefinition:
+      "from fashion capitals to craft districts, we source from over 30 countries around the world",
+    guidedPreview: "sourced across 30+ countries",
+    constraintCh: 6.2,
   },
   marketplace: {
     label: "marketplace",
-    guidedPreview: "partner brands, stores, and independent resellers",
-    inlineLead: "we maintain a growing network of partner brands,",
-    blockRemainder:
-      "stores and independent resellers that list new items for sale every single day",
-    subdefinitionClassName: "max-w-[34ch] md:ml-[21%]",
-    guidedInlineClassName: "text-black/62",
+    subdefinition:
+      "we maintain a growing network of partner brands, stores and independent resellers that list new items for sale every single day",
+    guidedPreview: "network of brands, stores, and resellers",
+    constraintCh: 10.8,
   },
   discovery: {
     label: "discovery",
-    guidedPreview: "emerging labels, seasonal shifts, and regional scenes",
-    inlineLead:
-      "our curation tracks emerging labels, seasonal shifts and regional scenes with",
-    blockRemainder: "every shape, size and taste accounted for",
-    subdefinitionClassName: "max-w-[34ch] md:ml-[4%]",
-    guidedInlineClassName: "text-black/62",
+    subdefinition:
+      "our curation tracks emerging labels, seasonal shifts and regional scenes. every shape, size and taste is accounted for",
+    guidedPreview: "curation across labels, seasons, and regions",
+    constraintCh: 8.8,
   },
   luxury: {
     label: "luxury",
-    guidedPreview: "high-end materials with meticulous attention-to-detail",
-    inlineLead: "high-end clothing, shoes, and accessories",
-    blockRemainder:
-      "made of superior-quality materials with meticulous attention-to-detail",
-    subdefinitionClassName: "max-w-[35ch] md:ml-[26%]",
-    guidedInlineClassName: "text-black/62",
+    subdefinition:
+      "high-end clothing, shoes, and accessories made of superior-quality materials with meticulous attention-to-detail",
+    guidedPreview: "high-end materials and meticulous construction",
+    constraintCh: 6,
   },
   independentFashion: {
     label: "independent fashion",
-    guidedPreview: "design-forward, culture-rooted originality",
-    inlineLead: "design-forward clothing, shoes, and accessories",
-    blockRemainder: "rooted in culture and originality",
-    subdefinitionClassName: "max-w-[34ch] md:ml-[12%]",
-    guidedInlineClassName: "text-black/62",
+    subdefinition:
+      "design-forward clothing, shoes, and accessories rooted in culture and originality",
+    guidedPreview: "design-forward and culture-rooted",
+    constraintCh: 17,
   },
 }
 
@@ -89,11 +86,13 @@ const DEFINITION_TOKENS: DefinitionToken[] = [
 
 export default function AboutUsDictionaryEntry() {
   const [activeTerm, setActiveTerm] = useState<TermId | null>(null)
+  const [triggerWidths, setTriggerWidths] = useState<Partial<Record<TermId, number>>>({})
   const [guidedActive, setGuidedActive] = useState(false)
   const [guidedEligible, setGuidedEligible] = useState(false)
   const [guidedHasPlayed, setGuidedHasPlayed] = useState(false)
   const [canHover, setCanHover] = useState(false)
   const guidedActiveRef = useRef(false)
+  const triggerRefs = useRef<Partial<Record<TermId, HTMLButtonElement | null>>>({})
 
   useEffect(() => {
     guidedActiveRef.current = guidedActive
@@ -201,6 +200,43 @@ export default function AboutUsDictionaryEntry() {
     }
   }, [guidedEligible, guidedHasPlayed])
 
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof ResizeObserver === "undefined") {
+      return
+    }
+
+    const observers: ResizeObserver[] = []
+
+    ;(Object.keys(TERMS) as TermId[]).forEach((termId) => {
+      const triggerEl = triggerRefs.current[termId]
+
+      if (!triggerEl) {
+        return
+      }
+
+      const updateWidth = () => {
+        const nextWidth = Math.ceil(triggerEl.getBoundingClientRect().width)
+        setTriggerWidths((current) => {
+          if (current[termId] === nextWidth) {
+            return current
+          }
+
+          return { ...current, [termId]: nextWidth }
+        })
+      }
+
+      updateWidth()
+
+      const observer = new ResizeObserver(updateWidth)
+      observer.observe(triggerEl)
+      observers.push(observer)
+    })
+
+    return () => {
+      observers.forEach((observer) => observer.disconnect())
+    }
+  }, [activeTerm, guidedActive])
+
   const markGuidedSeen = () => {
     if (!guidedEligible || typeof window === "undefined") {
       return
@@ -273,6 +309,11 @@ export default function AboutUsDictionaryEntry() {
     setActiveTerm(null)
   }
 
+  const setTriggerRef =
+    (termId: TermId) => (element: HTMLButtonElement | null) => {
+      triggerRefs.current[termId] = element
+    }
+
   return (
     <div className="content-container py-10 font-sans lg:py-14">
       <div className="mx-auto max-w-4xl text-black">
@@ -294,7 +335,7 @@ export default function AboutUsDictionaryEntry() {
           </div>
 
           <p className="mt-5 text-[clamp(1.75rem,5.2vw,3.1rem)] font-light leading-none">
-            \ rə-və-tir \
+            /ˌrɛvəˈtɪr/
           </p>
 
           <p className="mt-10 text-[clamp(2.05rem,6vw,4rem)] leading-tight">
@@ -315,41 +356,44 @@ export default function AboutUsDictionaryEntry() {
 
               const term = TERMS[token.id]
               const isExpanded = guidedActive || activeTerm === token.id
-              const inlineLead = guidedActive ? term.guidedPreview : term.inlineLead
+              const subdefinition = guidedActive
+                ? term.guidedPreview
+                : term.subdefinition
+
+              const subdefinitionStyle = {
+                "--term-width": triggerWidths[token.id]
+                  ? `${triggerWidths[token.id]}px`
+                  : `${term.constraintCh}ch`,
+              } as CSSProperties
 
               return (
                 <Fragment key={token.id}>
-                  <button
-                    type="button"
-                    data-term-trigger="true"
-                    data-term-id={token.id}
-                    className="inline cursor-pointer bg-transparent p-0 text-left text-inherit [font:inherit] underline decoration-dotted decoration-[1px] underline-offset-[0.14em] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45"
-                    aria-expanded={isExpanded}
-                    onFocus={() => handleTermFocus(token.id)}
-                    onBlur={() => handleTermBlur(token.id)}
-                    onClick={() => handleTermTap(token.id)}
-                  >
-                    {term.label}
-                  </button>
+                  <span className="inline-flex align-top flex-col">
+                    <button
+                      type="button"
+                      ref={setTriggerRef(token.id)}
+                      data-term-trigger="true"
+                      data-term-id={token.id}
+                      className={`inline cursor-pointer bg-transparent p-0 text-left text-inherit [font:inherit] underline decoration-dotted decoration-[1px] underline-offset-[0.14em] transition-[font-size,line-height] duration-150 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45 ${
+                        isExpanded ? "text-[1.34em] leading-[0.95]" : ""
+                      }`}
+                      aria-expanded={isExpanded}
+                      onFocus={() => handleTermFocus(token.id)}
+                      onBlur={() => handleTermBlur(token.id)}
+                      onClick={() => handleTermTap(token.id)}
+                    >
+                      {term.label}
+                    </button>
 
-                  {isExpanded && (
-                    <>
+                    {isExpanded && (
                       <span
-                        className={`ml-[0.14em] text-[clamp(0.95rem,1.35vw,1.22rem)] leading-[1.45] text-black/70 ${
-                          guidedActive ? term.guidedInlineClassName : ""
-                        }`}
+                        style={subdefinitionStyle}
+                        className="mt-[0.04em] w-[var(--term-width)] text-[clamp(0.72rem,0.95vw,0.9rem)] leading-[1.28] text-black/68"
                       >
-                        {inlineLead}
+                        {subdefinition}
                       </span>
-                      {!guidedActive && term.blockRemainder && (
-                        <p
-                          className={`mt-[0.08em] mb-[0.18em] pl-[0.22em] text-[clamp(0.95rem,1.35vw,1.22rem)] leading-[1.45] text-black/70 ${term.subdefinitionClassName}`}
-                        >
-                          {term.blockRemainder}
-                        </p>
-                      )}
-                    </>
-                  )}
+                    )}
+                  </span>
                 </Fragment>
               )
             })}
