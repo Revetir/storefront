@@ -368,16 +368,13 @@ export default function AboutUsDictionaryEntry() {
 
               return (
                 <Fragment key={token.id}>
-                  <span className="inline-flex align-top flex-col">
+                  <span className="inline-flex align-top flex-col items-center">
                     <button
                       type="button"
                       ref={setTriggerRef(token.id)}
                       data-term-trigger="true"
                       data-term-id={token.id}
-                      className={`inline cursor-pointer bg-transparent p-0 text-left text-inherit underline decoration-dotted decoration-[1px] underline-offset-[0.14em] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45 ${
-                        isExpanded ? "text-[1.34em] leading-[0.95]" : ""
-                      }`}
-                      style={{ transitionProperty: "font-size, line-height" }}
+                      className="inline cursor-pointer bg-transparent p-0 text-left text-inherit underline decoration-dotted decoration-[1px] underline-offset-[0.14em] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45"
                       aria-expanded={isExpanded}
                       onFocus={() => handleTermFocus(token.id)}
                       onBlur={() => handleTermBlur(token.id)}
@@ -389,7 +386,7 @@ export default function AboutUsDictionaryEntry() {
                     {isExpanded && (
                       <span
                         style={subdefinitionStyle}
-                        className="mt-[0.04em] w-[var(--term-width)] text-[clamp(0.72rem,0.95vw,0.9rem)] leading-[1.28] text-black/68"
+                        className="mx-auto mt-[0.04em] w-[var(--term-width)] text-center text-[clamp(0.72rem,0.95vw,0.9rem)] leading-[1.28] text-black/68"
                       >
                         {subdefinition}
                       </span>
