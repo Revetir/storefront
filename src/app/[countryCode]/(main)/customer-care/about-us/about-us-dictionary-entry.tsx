@@ -1,7 +1,7 @@
 ﻿"use client"
 
 import Image from "next/image"
-import { Fragment, useEffect, useRef, useState } from "react"
+import { Fragment, type MouseEvent, useEffect, useRef, useState } from "react"
 
 type TermId = "global" | "marketplace" | "discovery" | "luxury" | "independentFashion"
 
@@ -18,9 +18,10 @@ type DefinitionToken =
 interface DefinitionTerm {
   label: string
   guidedPreview: string
-  fullInline: string[]
+  inlineLead: string
+  blockRemainder?: string
   subdefinitionClassName: string
-  guidedSubdefinitionClassName: string
+  guidedInlineClassName: string
 }
 
 const GUIDED_DISCOVERY_KEY = "revetir_about_us_guided_seen_v1"
@@ -31,48 +32,45 @@ const TERMS: Record<TermId, DefinitionTerm> = {
   global: {
     label: "global",
     guidedPreview: "from fashion capitals to craft districts",
-    fullInline: [
-      "from fashion capitals to craft districts, we source from over 30 countries around the world",
-    ],
-    subdefinitionClassName: "max-w-[30ch] md:ml-[8%]",
-    guidedSubdefinitionClassName: "max-w-[24ch] md:ml-[5%]",
+    inlineLead: "from fashion capitals to craft districts,",
+    blockRemainder: "we source from over 30 countries around the world",
+    subdefinitionClassName: "max-w-[29ch] md:ml-[8%]",
+    guidedInlineClassName: "text-black/62",
   },
   marketplace: {
     label: "marketplace",
     guidedPreview: "partner brands, stores, and independent resellers",
-    fullInline: [
-      "we maintain a growing network of partner brands, stores and independent resellers that list new items for sale every single day",
-    ],
-    subdefinitionClassName: "max-w-[36ch] md:ml-[22%]",
-    guidedSubdefinitionClassName: "max-w-[26ch] md:ml-[14%]",
+    inlineLead: "we maintain a growing network of partner brands,",
+    blockRemainder:
+      "stores and independent resellers that list new items for sale every single day",
+    subdefinitionClassName: "max-w-[34ch] md:ml-[21%]",
+    guidedInlineClassName: "text-black/62",
   },
   discovery: {
     label: "discovery",
     guidedPreview: "emerging labels, seasonal shifts, and regional scenes",
-    fullInline: [
-      "our curation tracks emerging labels, seasonal shifts and regional scenes.",
-      "every shape, size and taste is accounted for",
-    ],
-    subdefinitionClassName: "max-w-[33ch] md:ml-[4%]",
-    guidedSubdefinitionClassName: "max-w-[25ch] md:ml-[2%]",
+    inlineLead:
+      "our curation tracks emerging labels, seasonal shifts and regional scenes with",
+    blockRemainder: "every shape, size and taste accounted for",
+    subdefinitionClassName: "max-w-[34ch] md:ml-[4%]",
+    guidedInlineClassName: "text-black/62",
   },
   luxury: {
     label: "luxury",
     guidedPreview: "high-end materials with meticulous attention-to-detail",
-    fullInline: [
-      "high-end clothing, shoes, and accessories made of superior-quality materials with meticulous attention-to-detail",
-    ],
+    inlineLead: "high-end clothing, shoes, and accessories",
+    blockRemainder:
+      "made of superior-quality materials with meticulous attention-to-detail",
     subdefinitionClassName: "max-w-[35ch] md:ml-[26%]",
-    guidedSubdefinitionClassName: "max-w-[25ch] md:ml-[17%]",
+    guidedInlineClassName: "text-black/62",
   },
   independentFashion: {
     label: "independent fashion",
     guidedPreview: "design-forward, culture-rooted originality",
-    fullInline: [
-      "design-forward clothing, shoes, and accessories rooted in culture and originality",
-    ],
-    subdefinitionClassName: "max-w-[35ch] md:ml-[12%]",
-    guidedSubdefinitionClassName: "max-w-[26ch] md:ml-[9%]",
+    inlineLead: "design-forward clothing, shoes, and accessories",
+    blockRemainder: "rooted in culture and originality",
+    subdefinitionClassName: "max-w-[34ch] md:ml-[12%]",
+    guidedInlineClassName: "text-black/62",
   },
 }
 
@@ -213,23 +211,6 @@ export default function AboutUsDictionaryEntry() {
     setGuidedActive(false)
   }
 
-  const handleTermHover = (termId: TermId) => {
-    if (!canHover || guidedActive) {
-      return
-    }
-
-    markGuidedSeen()
-    setActiveTerm(termId)
-  }
-
-  const handleTermLeave = (termId: TermId) => {
-    if (!canHover || guidedActive) {
-      return
-    }
-
-    setActiveTerm((currentTerm) => (currentTerm === termId ? null : currentTerm))
-  }
-
   const handleTermFocus = (termId: TermId) => {
     if (!canHover || guidedActive) {
       return
@@ -258,6 +239,40 @@ export default function AboutUsDictionaryEntry() {
     setActiveTerm((currentTerm) => (currentTerm === termId ? null : termId))
   }
 
+  const handleDefinitionMouseMove = (event: MouseEvent<HTMLDivElement>) => {
+    if (!canHover || guidedActive) {
+      return
+    }
+
+    const hoveredTrigger = (event.target as HTMLElement).closest<HTMLButtonElement>(
+      "[data-term-trigger='true']"
+    )
+
+    if (!hoveredTrigger) {
+      setActiveTerm((currentTerm) => (currentTerm ? null : currentTerm))
+      return
+    }
+
+    const hoveredTerm = hoveredTrigger.dataset.termId as TermId | undefined
+
+    if (!hoveredTerm) {
+      return
+    }
+
+    markGuidedSeen()
+    setActiveTerm((currentTerm) =>
+      currentTerm === hoveredTerm ? currentTerm : hoveredTerm
+    )
+  }
+
+  const handleDefinitionMouseLeave = () => {
+    if (!canHover || guidedActive) {
+      return
+    }
+
+    setActiveTerm(null)
+  }
+
   return (
     <div className="content-container py-10 font-sans lg:py-14">
       <div className="mx-auto max-w-4xl text-black">
@@ -282,16 +297,16 @@ export default function AboutUsDictionaryEntry() {
             \ rə-və-tir \
           </p>
 
-          <p className="mt-3 text-[12px] uppercase text-black/55">
-            from French <span className="normal-case italic">revêtir</span>, to dress in
-          </p>
-
           <p className="mt-10 text-[clamp(2.05rem,6vw,4rem)] leading-tight">
             <span className="font-bold">Definition</span>{" "}
             <span className="font-light text-black/65">(entry 1 of 1)</span>
           </p>
 
-          <div className="mt-8 max-w-[31ch] text-[clamp(2rem,6.4vw,4.15rem)] font-light leading-[1.12]">
+          <div
+            className="mt-8 max-w-[31ch] text-[clamp(2rem,6.4vw,4.15rem)] font-light leading-[1.12]"
+            onMouseMove={handleDefinitionMouseMove}
+            onMouseLeave={handleDefinitionMouseLeave}
+          >
             <span className="mr-[0.18em]">:</span>
             {DEFINITION_TOKENS.map((token, index) => {
               if (token.type === "text") {
@@ -300,18 +315,16 @@ export default function AboutUsDictionaryEntry() {
 
               const term = TERMS[token.id]
               const isExpanded = guidedActive || activeTerm === token.id
-              const subdefinition = guidedActive
-                ? term.guidedPreview
-                : term.fullInline.join(" ")
+              const inlineLead = guidedActive ? term.guidedPreview : term.inlineLead
 
               return (
                 <Fragment key={token.id}>
                   <button
                     type="button"
+                    data-term-trigger="true"
+                    data-term-id={token.id}
                     className="inline cursor-pointer bg-transparent p-0 text-left text-inherit [font:inherit] underline decoration-dotted decoration-[1px] underline-offset-[0.14em] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45"
                     aria-expanded={isExpanded}
-                    onMouseEnter={() => handleTermHover(token.id)}
-                    onMouseLeave={() => handleTermLeave(token.id)}
                     onFocus={() => handleTermFocus(token.id)}
                     onBlur={() => handleTermBlur(token.id)}
                     onClick={() => handleTermTap(token.id)}
@@ -320,15 +333,22 @@ export default function AboutUsDictionaryEntry() {
                   </button>
 
                   {isExpanded && (
-                    <p
-                      className={`my-[0.18em] border-l border-black/18 pl-[0.38em] text-[clamp(0.95rem,1.35vw,1.22rem)] leading-[1.45] text-black/72 ${
-                        guidedActive
-                          ? term.guidedSubdefinitionClassName
-                          : term.subdefinitionClassName
-                      }`}
-                    >
-                      {subdefinition}
-                    </p>
+                    <>
+                      <span
+                        className={`ml-[0.14em] text-[clamp(0.95rem,1.35vw,1.22rem)] leading-[1.45] text-black/70 ${
+                          guidedActive ? term.guidedInlineClassName : ""
+                        }`}
+                      >
+                        {inlineLead}
+                      </span>
+                      {!guidedActive && term.blockRemainder && (
+                        <p
+                          className={`mt-[0.08em] mb-[0.18em] pl-[0.22em] text-[clamp(0.95rem,1.35vw,1.22rem)] leading-[1.45] text-black/70 ${term.subdefinitionClassName}`}
+                        >
+                          {term.blockRemainder}
+                        </p>
+                      )}
+                    </>
                   )}
                 </Fragment>
               )
