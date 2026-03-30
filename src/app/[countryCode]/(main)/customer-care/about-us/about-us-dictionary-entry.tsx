@@ -51,8 +51,8 @@ const TERMS: Record<TermId, DefinitionTerm> = {
   discovery: {
     label: "discovery",
     subdefinition:
-      "curation that tracks emerging labels, seasonal shifts and regional scenes",
-    guidedPreview: "tracks emerging labels, seasonal shifts, and regional scenes",
+      "curated collections, heritage designers and emerging labels",
+    guidedPreview: "curated collections, heritage designers, and emerging labels",
     constraintCh: 8.8,
   },
   luxury: {

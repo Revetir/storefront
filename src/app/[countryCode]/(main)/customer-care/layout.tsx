@@ -130,7 +130,7 @@ export default function CustomerCareLayout({
             <span className="font-medium">Email:</span> care@revetir.com
           </div>
           <div>
-            <span className="italic">Monday to Saturday, 9 AM to 11 PM (EST)</span>
+            <span className="italic">Monday to Saturday, 11 AM to 11 PM (EST)</span>
           </div>
           <div>
             <span className="font-medium">Live Chat:</span> <em>Coming Soon</em>
