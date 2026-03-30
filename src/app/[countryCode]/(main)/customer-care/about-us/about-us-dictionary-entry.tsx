@@ -10,7 +10,7 @@ import {
   useState,
 } from "react"
 
-type TermId = "global" | "marketplace" | "discovery" | "luxury" | "independentFashion"
+type TermId = "global" | "platform" | "discovery" | "luxury" | "independentFashion"
 
 type DefinitionToken =
   | {
@@ -37,36 +37,36 @@ const TERMS: Record<TermId, DefinitionTerm> = {
   global: {
     label: "global",
     subdefinition:
-      "from fashion capitals to craft districts, we source from over 30 countries around the world",
-    guidedPreview: "sourced across 30+ countries",
+      "spanning over 30 countries",
+    guidedPreview: "spanning over 30 countries worldwide",
     constraintCh: 6.2,
   },
-  marketplace: {
-    label: "marketplace",
+  platform: {
+    label: "platform",
     subdefinition:
-      "we maintain a growing network of partner brands, stores and independent resellers that list new items for sale every single day",
-    guidedPreview: "network of brands, stores, and resellers",
+      "a network of partner brands, stores and independent resellers",
+    guidedPreview: "network of partner brands, stores, and independent resellers",
     constraintCh: 10.8,
   },
   discovery: {
     label: "discovery",
     subdefinition:
-      "our curation tracks emerging labels, seasonal shifts and regional scenes with all shapes, sizes and tastes accounted for",
-    guidedPreview: "curation across labels, seasons, and regions",
+      "curation that tracks emerging labels, seasonal shifts and regional scenes",
+    guidedPreview: "tracks emerging labels, seasonal shifts, and regional scenes",
     constraintCh: 8.8,
   },
   luxury: {
     label: "luxury",
     subdefinition:
       "high-end clothing, shoes, and accessories made of superior-quality materials with meticulous attention-to-detail",
-    guidedPreview: "high-end materials and meticulous construction",
+    guidedPreview: "superior-quality materials and meticulous attention-to-detail",
     constraintCh: 6,
   },
   independentFashion: {
     label: "independent fashion",
     subdefinition:
       "design-forward clothing, shoes, and accessories rooted in culture and originality",
-    guidedPreview: "design-forward and culture-rooted",
+    guidedPreview: "design-forward clothing rooted in culture and originality",
     constraintCh: 17,
   },
 }
@@ -75,7 +75,7 @@ const DEFINITION_TOKENS: DefinitionToken[] = [
   { type: "text", value: "a " },
   { type: "term", id: "global" },
   { type: "text", value: " " },
-  { type: "term", id: "marketplace" },
+  { type: "term", id: "platform" },
   { type: "text", value: " for the " },
   { type: "term", id: "discovery" },
   { type: "text", value: " of " },
@@ -386,7 +386,7 @@ export default function AboutUsDictionaryEntry() {
                     {isExpanded && (
                       <span
                         style={subdefinitionStyle}
-                        className="mx-auto mt-[0.04em] w-[var(--term-width)] text-center text-[clamp(0.72rem,0.95vw,0.9rem)] leading-[1.28] text-black/68"
+                        className="mx-auto mt-[0.04em] w-[var(--term-width)] text-center text-[clamp(0.72rem,0.95vw,0.9rem)] italic leading-[1.28] text-black/68"
                       >
                         {subdefinition}
                       </span>
