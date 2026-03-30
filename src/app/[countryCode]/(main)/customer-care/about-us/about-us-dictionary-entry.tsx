@@ -51,7 +51,7 @@ const TERMS: Record<TermId, DefinitionTerm> = {
   discovery: {
     label: "discovery",
     subdefinition:
-      "our curation tracks emerging labels, seasonal shifts and regional scenes. every shape, size and taste is accounted for",
+      "our curation tracks emerging labels, seasonal shifts and regional scenes with all shapes, sizes and tastes accounted for",
     guidedPreview: "curation across labels, seasons, and regions",
     constraintCh: 8.8,
   },
@@ -374,9 +374,10 @@ export default function AboutUsDictionaryEntry() {
                       ref={setTriggerRef(token.id)}
                       data-term-trigger="true"
                       data-term-id={token.id}
-                      className={`inline cursor-pointer bg-transparent p-0 text-left text-inherit [font:inherit] underline decoration-dotted decoration-[1px] underline-offset-[0.14em] transition-[font-size,line-height] duration-150 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45 ${
+                      className={`inline cursor-pointer bg-transparent p-0 text-left text-inherit underline decoration-dotted decoration-[1px] underline-offset-[0.14em] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45 ${
                         isExpanded ? "text-[1.34em] leading-[0.95]" : ""
                       }`}
+                      style={{ transitionProperty: "font-size, line-height" }}
                       aria-expanded={isExpanded}
                       onFocus={() => handleTermFocus(token.id)}
                       onBlur={() => handleTermBlur(token.id)}
