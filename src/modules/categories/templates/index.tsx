@@ -129,7 +129,7 @@ const CategoryTemplate = ({
               </div>
             </div>
 
-            <div className="mb-6 border-x border-gray-300 px-4 pt-2 pb-3">
+            <div className="mb-6 border-x border-gray-300 px-4 pt-4 pb-3">
               <SaleToggle checked={saleOnly} onToggle={handleToggleSale} />
             </div>
 
