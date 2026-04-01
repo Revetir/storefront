@@ -66,6 +66,8 @@ export async function getAvailableCategories(
 
     // Build filters for contextual faceting
     const filters: string[] = []
+    // Keep facet-driven UI aligned with storefront product queries.
+    filters.push("status:published")
     if (gender) {
       const genderValue = gender === "men" ? "menswear" : "womenswear"
       filters.push(`gender:${genderValue}`)
@@ -148,6 +150,8 @@ export async function getAvailableBrands(
 
     // Build filters for contextual faceting
     const filters: string[] = []
+    // Keep facet-driven UI aligned with storefront product queries.
+    filters.push("status:published")
     if (gender) {
       const genderValue = gender === "men" ? "menswear" : "womenswear"
       filters.push(`gender:${genderValue}`)
