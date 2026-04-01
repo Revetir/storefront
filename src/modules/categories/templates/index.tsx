@@ -106,7 +106,7 @@ const CategoryTemplate = ({
             </div>
 
             {/* Refine/Sort Buttons - Full width */}
-            <div className="mb-6">
+            <div>
               <div className="flex w-full border border-gray-300">
                 <button
                   onClick={() => {
@@ -129,7 +129,7 @@ const CategoryTemplate = ({
               </div>
             </div>
 
-            <div className="mb-6 border border-gray-300 border-t-0 px-4 py-3">
+            <div className="mb-6 border-x border-gray-300 px-4 pt-2 pb-3">
               <SaleToggle checked={saleOnly} onToggle={handleToggleSale} />
             </div>
 

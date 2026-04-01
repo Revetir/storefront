@@ -57,7 +57,7 @@ export default function OrderingPage() {
           <h2 className="text-2xl font-semibold mb-4 mt-8">Order Processing</h2>
           
           <p className="text-gray-600 leading-relaxed mb-6 font-bold">
-            Once your order is placed, a standard processing time of up to 5 business days is required before the order is shipped out.
+            Once your order is placed, a processing time of up to 7 business days before shipment is standard.
           </p>
           
           <p className="text-gray-600 leading-relaxed mb-6">
