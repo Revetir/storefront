@@ -7,6 +7,8 @@ import ChevronRight from "@modules/common/icons/chevron-right"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Category } from "@lib/data/categories"
 
+const toSlugKey = (value?: string) => (value || "").trim().toLowerCase()
+
 interface MobileSidePanelProps {
   isOpen: boolean
   onClose: () => void
@@ -29,6 +31,13 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
   const [activeNestedPanel, setActiveNestedPanel] = useState<string | null>(null)
   const [subPanelStack, setSubPanelStack] = useState<Array<{type: string, categoryId?: string}>>([])
   const [filteredCategories, setFilteredCategories] = useState<Category[]>(categories)
+  const [availableBrandSlugs, setAvailableBrandSlugs] = useState<{
+    men: Set<string> | null
+    women: Set<string> | null
+  }>({
+    men: null,
+    women: null,
+  })
 
   const toggleCategory = (categoryId: string) => {
     const newExpanded = new Set(expandedCategories)
@@ -168,6 +177,41 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
       isMounted = false
     }
   }, [categories])
+
+  useEffect(() => {
+    let isMounted = true
+
+    const fetchVisibleBrands = async () => {
+      try {
+        const { getAvailableBrands } = await import("@lib/util/algolia-facets")
+        const [menBrandFacets, womenBrandFacets] = await Promise.all([
+          getAvailableBrands({ gender: "men" }),
+          getAvailableBrands({ gender: "women" }),
+        ])
+
+        if (isMounted) {
+          setAvailableBrandSlugs({
+            men: new Set(menBrandFacets.map((facet) => toSlugKey(facet.slug)).filter(Boolean)),
+            women: new Set(womenBrandFacets.map((facet) => toSlugKey(facet.slug)).filter(Boolean)),
+          })
+        }
+      } catch (error) {
+        console.error("[MobileSidePanel] Error filtering brands:", error)
+        if (isMounted) {
+          setAvailableBrandSlugs({
+            men: null,
+            women: null,
+          })
+        }
+      }
+    }
+
+    fetchVisibleBrands()
+
+    return () => {
+      isMounted = false
+    }
+  }, [brands])
 
   const allCategories = flattenCategories(filteredCategories)
 
@@ -435,11 +479,6 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
 
                   // Brands panel
                   if (currentPanel.type === 'brands') {
-                    // Sort brands alphabetically
-                    const sortedBrands = [...brands].sort((a, b) =>
-                      a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
-                    )
-
                     // Get gender context from previous panel (if it exists)
                     const previousPanel = subPanelStack.length > 1 ? subPanelStack[0] : null
                     let genderPath = 'men' // default
@@ -450,18 +489,34 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                       }
                     }
 
+                    const visibleBrandSlugSet =
+                      genderPath === 'women' ? availableBrandSlugs.women : availableBrandSlugs.men
+
+                    const visibleBrands = visibleBrandSlugSet
+                      ? brands.filter((brand) => visibleBrandSlugSet.has(toSlugKey(brand.slug)))
+                      : brands
+
+                    // Sort brands alphabetically
+                    const sortedBrands = [...visibleBrands].sort((a, b) =>
+                      a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+                    )
+
                     return (
                       <div className="space-y-3">
-                        {sortedBrands.map((brand) => (
-                          <LocalizedClientLink
-                            key={brand.id}
-                            href={`/${genderPath}/brands/${brand.slug}`}
-                            className="block text-sm uppercase text-gray-700 hover:text-black py-2"
-                            onClick={closeAllPanels}
-                          >
-                            {brand.name}
-                          </LocalizedClientLink>
-                        ))}
+                        {sortedBrands.length > 0 ? (
+                          sortedBrands.map((brand) => (
+                            <LocalizedClientLink
+                              key={brand.id}
+                              href={`/${genderPath}/brands/${brand.slug}`}
+                              className="block text-sm uppercase text-gray-700 hover:text-black py-2"
+                              onClick={closeAllPanels}
+                            >
+                              {brand.name}
+                            </LocalizedClientLink>
+                          ))
+                        ) : (
+                          <div className="text-sm text-gray-500">No brands available</div>
+                        )}
                       </div>
                     )
                   }
