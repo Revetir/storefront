@@ -4,6 +4,8 @@ import { useParams, usePathname, useRouter, useSearchParams } from "next/navigat
 import { Brand, listBrands } from "@lib/data/brands"
 import { buildPathWithQueryFlags, isSaleQueryEnabled } from "@lib/util/sale-query"
 
+const toSlugKey = (value?: string) => (value || "").trim().toLowerCase()
+
 export default function BrandRefinementList({ selectedBrand: propSelectedBrand }: { selectedBrand?: string }) {
   const [brands, setBrands] = useState<Brand[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,11 +41,15 @@ export default function BrandRefinementList({ selectedBrand: propSelectedBrand }
         ])
 
         // Build set of available brand slugs from Algolia facets
-        const availableSlugs = new Set(brandFacets.map((f: any) => f.slug))
+        const availableSlugs = new Set(
+          brandFacets
+            .map((f: any) => toSlugKey(f.slug))
+            .filter(Boolean)
+        )
 
         // Filter brands to only those with products in current context
         const filteredBrands = allBrands
-          .filter(brand => availableSlugs.has(brand.slug))
+          .filter((brand) => availableSlugs.has(toSlugKey(brand.slug)))
           .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
 
         setBrands(filteredBrands)

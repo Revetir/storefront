@@ -18,6 +18,15 @@ export interface AlgoliaFacetOptions {
   countryCode?: string
 }
 
+const BRAND_FACET_CACHE_TTL_MS = 60_000
+const BRAND_VERIFICATION_CHUNK_SIZE = 50
+const brandFacetCache = new Map<string, { expiresAt: number; value: BrandFacet[] }>()
+
+const normalizeSlug = (value: string) => value.trim().toLowerCase()
+const escapeFilterValue = (value: string) => value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')
+
+const joinFilters = (filters: string[]) => filters.filter(Boolean).join(" AND ")
+
 async function disableNextCache() {
   if (!process.env.NEXT_RUNTIME) {
     return
@@ -169,13 +178,20 @@ export async function getAvailableBrands(
       filters.push(`${saleFacet}:true`)
     }
 
-    console.log("[Algolia Facets] Fetching brands with filters:", filters.join(" AND ") || "none")
+    const baseFilter = joinFilters(filters)
+    const cacheKey = `${indexName}::${baseFilter || "none"}`
+    const cached = brandFacetCache.get(cacheKey)
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.value
+    }
+
+    console.log("[Algolia Facets] Fetching brands with filters:", baseFilter || "none")
 
     const result = await searchClient.search([{
       indexName,
       params: {
         query: '',
-        filters: filters.length > 0 ? filters.join(" AND ") : undefined,
+        filters: baseFilter || undefined,
         facets: ['brands.slug'],
         maxValuesPerFacet: 1000,
         hitsPerPage: 0
@@ -185,10 +201,58 @@ export async function getAvailableBrands(
     const searchResult = result.results[0] as any
     const facets = searchResult.facets?.['brands.slug'] || {}
 
-    const brandSlugs = Object.keys(facets)
-    console.log(`[Algolia Facets] Found ${brandSlugs.length} brands with products`)
+    const facetBrandSlugs = Object.keys(facets)
+      .map(normalizeSlug)
+      .filter(Boolean)
 
-    return brandSlugs.map(slug => ({ slug }))
+    console.log(`[Algolia Facets] Found ${facetBrandSlugs.length} brand facet values, verifying product hits`)
+
+    if (facetBrandSlugs.length === 0) {
+      brandFacetCache.set(cacheKey, {
+        expiresAt: Date.now() + BRAND_FACET_CACHE_TTL_MS,
+        value: [],
+      })
+      return []
+    }
+
+    const verifiedSlugs: string[] = []
+    for (let i = 0; i < facetBrandSlugs.length; i += BRAND_VERIFICATION_CHUNK_SIZE) {
+      const chunk = facetBrandSlugs.slice(i, i + BRAND_VERIFICATION_CHUNK_SIZE)
+      const verificationResult = await searchClient.search(
+        chunk.map((slug) => {
+          const escapedSlug = escapeFilterValue(slug)
+          const scopedFilter = joinFilters([
+            baseFilter,
+            `brands.slug:"${escapedSlug}"`,
+          ])
+
+          return {
+            indexName,
+            params: {
+              query: '',
+              filters: scopedFilter,
+              hitsPerPage: 0,
+            },
+          }
+        })
+      )
+
+      verificationResult.results.forEach((res: any, idx: number) => {
+        if ((res?.nbHits || 0) > 0) {
+          verifiedSlugs.push(chunk[idx])
+        }
+      })
+    }
+
+    const deduped = Array.from(new Set(verifiedSlugs)).map((slug) => ({ slug }))
+    console.log(`[Algolia Facets] Returning ${deduped.length} brands with published products after verification`)
+
+    brandFacetCache.set(cacheKey, {
+      expiresAt: Date.now() + BRAND_FACET_CACHE_TTL_MS,
+      value: deduped,
+    })
+
+    return deduped
   } catch (error) {
     console.error("[Algolia Facets] Error fetching brand facets:", error)
     return []

@@ -26,6 +26,8 @@ interface SelectedFilters {
 
 type SectionTab = 'brands' | 'categories' | 'colors'
 
+const toSlugKey = (value?: string) => (value || "").trim().toLowerCase()
+
 const COLOR_MAPPING = [
   'Black', 'White', 'Gray', 'Blue', 'Red', 'Brown', 'Green', 'Pink',
   'Purple', 'Yellow', 'Orange', 'Gold', 'Silver'
@@ -133,11 +135,15 @@ const MobileRefinementPanel: React.FC<MobileRefinementPanelProps> = ({
           ])
 
           // Build set of available brand slugs from Algolia facets
-          const availableSlugs = new Set(brandFacets.map((f: any) => f.slug))
+          const availableSlugs = new Set(
+            brandFacets
+              .map((f: any) => toSlugKey(f.slug))
+              .filter(Boolean)
+          )
 
           // Filter brands to only those with products in current context
           const filteredBrands = allBrands
-            .filter(brand => availableSlugs.has(brand.slug))
+            .filter((brand) => availableSlugs.has(toSlugKey(brand.slug)))
             .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
 
           setBrands(filteredBrands)
