@@ -23,7 +23,7 @@ const faqData: FAQCategory[] = [
         answer: (
           <>
             All items sold by REVETIR are sourced directly from brands or trusted vendors. You can read about our authentication process{" "}
-            <LocalizedClientLink href="" className="text-gray-900 hover:text-black font-semibold underline">
+            <LocalizedClientLink href="/customer-care/authentication" className="text-gray-900 hover:text-black font-semibold underline">
               here
             </LocalizedClientLink>.
           </>
@@ -259,4 +259,3 @@ export default function FAQPage() {
     </div>
   )
 } 
-
