@@ -53,6 +53,9 @@ const INTAKE_INTRO_TEXT =
 const ANALYSIS_INTRO_TEXT =
   "Analysis is the granular item-level review stage where each submitted listing is evaluated against known brand and model characteristics. At this stage, shape, materials, construction details, and identity markers are digitally examined in context to assess whether the product is consistent with expected design standards and free from well-known counterfeit patterns."
 const ASSURANCE_LOOP_ROTATION_SECONDS = 8.4
+const MOBILE_ASSURANCE_HOLD_DELAY_MS = 180
+const MOBILE_ASSURANCE_MOVE_TOLERANCE_PX = 8
+const MOBILE_ASSURANCE_SCROLL_CANCEL_PX = 10
 const ASSURANCE_STAMP_ITEMS: AssuranceStampItem[] = [
   {
     id: "customer-feedback",
@@ -628,6 +631,10 @@ export default function VerificationWhitepaperShell() {
   const assuranceLoopFrameRef = useRef<number | null>(null)
   const assuranceLoopLastTimestampRef = useRef<number | null>(null)
   const assuranceLoopRotationRef = useRef(0)
+  const assurancePointerIdRef = useRef<number | null>(null)
+  const assuranceHoldTimerRef = useRef<number | null>(null)
+  const assurancePointerStartRef = useRef<{ x: number; y: number } | null>(null)
+  const assuranceHoldActivatedRef = useRef(false)
 
   const activeSection = useMemo(
     () => DOSSIER_SECTIONS.find((section) => section.id === activeSectionId) ?? DOSSIER_SECTIONS[0],
@@ -813,8 +820,15 @@ export default function VerificationWhitepaperShell() {
 
   useEffect(() => {
     if (viewMode === "dossier" && activeSectionId === "assurance") return
+    resetAssurancePointerGesture()
     setIsAssuranceLoopHeld(false)
   }, [activeSectionId, viewMode])
+
+  useEffect(() => {
+    return () => {
+      clearAssuranceHoldTimer()
+    }
+  }, [])
 
   useEffect(() => {
     if (viewMode !== "dossier" || activeSectionId !== "assurance") return
@@ -918,6 +932,68 @@ export default function VerificationWhitepaperShell() {
     const clamped = Math.max(0, Math.min(1, index))
     carousel.scrollTo({ left: carousel.clientWidth * clamped, behavior: "smooth" })
     setMobileIntakeSlide(clamped)
+  }
+
+  const clearAssuranceHoldTimer = () => {
+    if (assuranceHoldTimerRef.current === null) return
+    window.clearTimeout(assuranceHoldTimerRef.current)
+    assuranceHoldTimerRef.current = null
+  }
+
+  const resetAssurancePointerGesture = () => {
+    clearAssuranceHoldTimer()
+    assurancePointerIdRef.current = null
+    assurancePointerStartRef.current = null
+    assuranceHoldActivatedRef.current = false
+  }
+
+  const endAssuranceHoldInteraction = () => {
+    resetAssurancePointerGesture()
+    setIsAssuranceLoopHeld(false)
+  }
+
+  const isMobileTouchPointer = (pointerType: string) =>
+    isMobileViewport && (pointerType === "touch" || pointerType === "pen")
+
+  const onAssurancePointerDown = (event: { pointerType: string; pointerId: number; clientX: number; clientY: number }) => {
+    if (!isMobileTouchPointer(event.pointerType)) {
+      setIsAssuranceLoopHeld(true)
+      return
+    }
+
+    assurancePointerIdRef.current = event.pointerId
+    assurancePointerStartRef.current = { x: event.clientX, y: event.clientY }
+    assuranceHoldActivatedRef.current = false
+    clearAssuranceHoldTimer()
+
+    assuranceHoldTimerRef.current = window.setTimeout(() => {
+      const isSamePointer = assurancePointerIdRef.current === event.pointerId
+      if (!isSamePointer || !assurancePointerStartRef.current) return
+
+      assuranceHoldActivatedRef.current = true
+      setIsAssuranceLoopHeld(true)
+    }, MOBILE_ASSURANCE_HOLD_DELAY_MS)
+  }
+
+  const onAssurancePointerMove = (event: { pointerType: string; pointerId: number; clientX: number; clientY: number }) => {
+    if (!isMobileTouchPointer(event.pointerType)) return
+    if (assurancePointerIdRef.current !== event.pointerId) return
+
+    const start = assurancePointerStartRef.current
+    if (!start) return
+
+    const absDx = Math.abs(event.clientX - start.x)
+    const absDy = Math.abs(event.clientY - start.y)
+    const isVerticalScrollGesture = absDy > absDx && absDy >= MOBILE_ASSURANCE_SCROLL_CANCEL_PX
+
+    if (isVerticalScrollGesture) {
+      endAssuranceHoldInteraction()
+      return
+    }
+
+    if (!assuranceHoldActivatedRef.current && (absDx > MOBILE_ASSURANCE_MOVE_TOLERANCE_PX || absDy > MOBILE_ASSURANCE_MOVE_TOLERANCE_PX)) {
+      clearAssuranceHoldTimer()
+    }
   }
 
   const onAnalysisCheckpointClick = (id: string) => {
@@ -1529,10 +1605,11 @@ export default function VerificationWhitepaperShell() {
                                   <div className="flex w-full flex-col items-center md:w-[42%] md:justify-start">
                                     <button
                                       type="button"
-                                      onPointerDown={() => setIsAssuranceLoopHeld(true)}
-                                      onPointerUp={() => setIsAssuranceLoopHeld(false)}
-                                      onPointerLeave={() => setIsAssuranceLoopHeld(false)}
-                                      onPointerCancel={() => setIsAssuranceLoopHeld(false)}
+                                      onPointerDown={onAssurancePointerDown}
+                                      onPointerMove={onAssurancePointerMove}
+                                      onPointerUp={endAssuranceHoldInteraction}
+                                      onPointerLeave={endAssuranceHoldInteraction}
+                                      onPointerCancel={endAssuranceHoldInteraction}
                                       onKeyDown={(event) => {
                                         if (event.key === " " || event.key === "Enter") {
                                           event.preventDefault()
@@ -1545,7 +1622,7 @@ export default function VerificationWhitepaperShell() {
                                           setIsAssuranceLoopHeld(false)
                                         }
                                       }}
-                                      onBlur={() => setIsAssuranceLoopHeld(false)}
+                                      onBlur={endAssuranceHoldInteraction}
                                       aria-label="Press and hold to rotate assurance inputs around the stamp"
                                       aria-pressed={isAssuranceLoopHeld}
                                       aria-describedby="assurance-loop-hint"
@@ -1922,7 +1999,7 @@ export default function VerificationWhitepaperShell() {
           border-radius: 0;
           background: transparent;
           cursor: pointer;
-          touch-action: none;
+          touch-action: pan-y;
           user-select: none;
         }
 
