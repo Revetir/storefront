@@ -391,8 +391,8 @@ type ModeControlsProps = {
 
 function ModeControls({ viewMode, onSelect, compact = false, whitepaperEnabled = true }: ModeControlsProps) {
   const base = compact
-    ? "w-[104px] whitespace-nowrap px-1.5 py-1 text-center text-[8px] tracking-[0.06em] min-[431px]:w-auto"
-    : "w-[116px] px-3 py-1.5 text-center text-[11px] tracking-[0.14em] min-[431px]:w-auto"
+    ? "w-[104px] whitespace-nowrap px-1.5 py-1 text-center text-[8px] tracking-[0.05em] min-[431px]:w-auto"
+    : "w-[116px] px-3 py-1.5 text-center text-[11px] tracking-[0.05em] min-[431px]:w-auto"
   const isWhitepaperDisabled = !whitepaperEnabled
 
   return (

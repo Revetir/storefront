@@ -98,7 +98,7 @@ export default function CustomerCareLayout({
   const pathname = usePathname()
   const isVerificationPreview = /\/customer-care\/verification\/?$/.test(pathname)
 
-  const renderNavSection = (pages: typeof shoppingPages, title: string, disableLinks = false) => (
+  const renderNavSection = (pages: typeof shoppingPages, title: string) => (
     <div className="mb-6">
       <h3 className="text-medium font-semibold mb-3 text-gray-800">{title}</h3>
       <nav className="space-y-1">
@@ -109,18 +109,6 @@ export default function CustomerCareLayout({
               ? "font-bold underline text-black"
               : "text-gray-700"
           }`
-
-          if (disableLinks) {
-            return (
-              <span
-                key={page.href}
-                className={`${baseClass} cursor-default opacity-85`}
-                aria-current={isActive ? "page" : undefined}
-              >
-                {page.title}
-              </span>
-            )
-          }
 
           return (
             <LocalizedClientLink
@@ -140,10 +128,10 @@ export default function CustomerCareLayout({
     <div className="py-8 relative">
       {/* Left Sidebar - Navigation */}
       <div className="hidden xl:block fixed left-8 top-32 w-48">
-        {renderNavSection(customerCarePages, "Help", isVerificationPreview)}
-        {renderNavSection(trustPages, "Trust", isVerificationPreview)}
-        {renderNavSection(shoppingPages, "Shopping", isVerificationPreview)}
-        {renderNavSection(revetirPages, "REVETIR", isVerificationPreview)}
+        {renderNavSection(customerCarePages, "Help")}
+        {renderNavSection(trustPages, "Trust")}
+        {renderNavSection(shoppingPages, "Shopping")}
+        {renderNavSection(revetirPages, "REVETIR")}
       </div>
 
       {/* Right Sidebar - Contact Information */}
