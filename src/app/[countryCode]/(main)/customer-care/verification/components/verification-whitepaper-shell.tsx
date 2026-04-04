@@ -64,7 +64,7 @@ const ASSURANCE_STAMP_ITEMS: AssuranceStampItem[] = [
     id: "issue-resolution",
     label: "ISSUE RESOLUTION",
     excerpt:
-      "Issue resolution is our commitment to upholding end-to-end accountability across the platform. When issues arise—whether related to listing accuracy, product flaws, or delivery—we take immediate action to investigate and remedy points of failure. We offer free returns for any items that do not meet our standards, including items with quality issues or found to be inauthentic, and provide appropriate compensation in cases of service disruptions, such as order processing delays.",
+      "Issue resolution is our commitment to upholding end-to-end accountability across the platform. When issues arise—whether related to listing accuracy, product flaws, or delivery—we take immediate action to investigate and remedy points of failure. We offer free returns for any items that do not meet our standards, including defective or inauthentic items, and provide appropriate compensation in cases of service disruptions, such as order processing delays.",
   },
   {
     id: "user-reports",
@@ -945,7 +945,7 @@ export default function VerificationWhitepaperShell() {
       <div className="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-6 lg:px-8">
         {isDossierView ? (
           <section>
-            <div className="relative h-[70vh] min-h-[70vh] w-full md:h-[78vh] md:min-h-[78vh]">
+            <div className="relative h-[70vh] min-h-[70vh] w-full md:h-[84vh] md:min-h-[84vh]">
               <div className="absolute -top-1 right-2 z-40 hidden min-[431px]:block">
                 <ModeControls viewMode={viewMode} onSelect={setViewMode} whitepaperEnabled={WHITEPAPER_VIEW_ENABLED} />
               </div>
@@ -1085,7 +1085,7 @@ export default function VerificationWhitepaperShell() {
                       </div>
                     </div>
 
-                    <div ref={dossierSectionScrollRef} className="mt-6 grid h-[39rem] min-w-0 flex-1 gap-4 overflow-x-hidden overflow-y-auto [&>*]:min-w-0 [&_li]:break-words [&_p]:break-words max-[430px]:[&_h2]:text-center max-[430px]:[&_h3]:text-center max-[430px]:[&_h4]:text-center max-[430px]:[&_p]:text-center max-[430px]:[&_li]:text-center min-[431px]:mt-7 min-[431px]:h-[40rem] min-[431px]:gap-6 md:h-[38rem] md:overflow-hidden">
+                    <div ref={dossierSectionScrollRef} className="mt-6 grid h-[39rem] min-w-0 flex-1 gap-4 overflow-x-hidden overflow-y-auto [&>*]:min-w-0 [&_li]:break-words [&_p]:break-words max-[430px]:[&_h2]:text-center max-[430px]:[&_h3]:text-center max-[430px]:[&_h4]:text-center max-[430px]:[&_p]:text-center max-[430px]:[&_li]:text-center min-[431px]:mt-7 min-[431px]:h-[40rem] min-[431px]:gap-6 md:h-[clamp(41rem,78vh,46rem)] md:overflow-visible">
                       {activeSection.id === "intake" ? (
                         <>
                           <div className="relative md:min-h-[38rem]">
@@ -1525,7 +1525,7 @@ export default function VerificationWhitepaperShell() {
                               </div>
 
                               <div className="w-full pt-1 md:flex md:flex-1 md:min-h-0 md:justify-center md:pt-0">
-                                <div className="mx-auto flex w-full max-w-[17.5rem] flex-col items-center gap-4 min-[431px]:max-w-[30rem] md:min-h-0 md:flex-1 md:max-w-none md:flex-row md:items-start md:justify-center md:gap-8">
+                                <div className="mx-auto flex w-full max-w-[17.5rem] flex-col items-center gap-4 min-[431px]:max-w-[30rem] md:min-h-0 md:flex-1 md:max-w-none md:flex-row md:items-center md:justify-center md:gap-8">
                                   <div className="flex w-full flex-col items-center md:w-[42%] md:justify-start">
                                     <button
                                       type="button"
