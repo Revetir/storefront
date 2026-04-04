@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export default function ProductInformationPage() {
   const [useInches, setUseInches] = useState(true)
@@ -20,7 +21,11 @@ export default function ProductInformationPage() {
         <div className="prose prose-lg max-w-none">
           <h2 className="text-2xl font-bold mb-6 mt-8">Product Authenticity</h2>
           <p className="text-gray-600 leading-relaxed mb-6">
-            The REVETIR Marketplace is directly supplied by brands, department stores, and manufacturers verified by our team to sell authentic products. For added assurance, every order that REVETIR ships undergoes a thorough examination and comparison against known authentic references to the best of our ability and based on available information and expertise. Certain items may also include the designer's own proof of authenticity, such as an authenticity card, RFID/NFC tag, dust bag or other packaging.
+            All items sold by REVETIR are sourced directly from brands or trusted vendors. Certain items may also include the designer's own proof of authenticity, such as an authenticity card, RFID/NFC tag, dust bag or other packaging. You can read about our verification process{" "}
+            <LocalizedClientLink href="/customer-care/verification" className="underline hover:text-black">
+              here
+            </LocalizedClientLink>
+            .
           </p>
           
           <h2 className="text-2xl font-bold mb-6 mt-8">Product Details</h2>

@@ -64,6 +64,14 @@ const customerCarePages = [
   }
 ]
 
+const trustPages = [
+  {
+    title: "Verification",
+    href: "/customer-care/verification",
+    description: "Verification process overview"
+  }
+]
+
 const revetirPages = [
   {
     title: "About Us",
@@ -131,14 +139,15 @@ export default function CustomerCareLayout({
   return (
     <div className="py-8 relative">
       {/* Left Sidebar - Navigation */}
-      <div className="hidden lg:block fixed left-8 top-32 w-48">
+      <div className="hidden xl:block fixed left-8 top-32 w-48">
         {renderNavSection(customerCarePages, "Help", isVerificationPreview)}
+        {renderNavSection(trustPages, "Trust", isVerificationPreview)}
         {renderNavSection(shoppingPages, "Shopping", isVerificationPreview)}
         {renderNavSection(revetirPages, "REVETIR", isVerificationPreview)}
       </div>
 
       {/* Right Sidebar - Contact Information */}
-      <div className="hidden lg:block fixed right-8 top-32 w-48">
+      <div className="hidden 2xl:block fixed right-8 top-32 w-48">
         <h3 className="text-lg font-semibold mb-4">Customer Care</h3>
         <div className="space-y-1 text-sm">
           <div>
@@ -154,7 +163,7 @@ export default function CustomerCareLayout({
       </div>
 
       {/* Main Content */}
-      <div className="lg:mx-96 px-4">
+      <div className="xl:ml-96 2xl:mx-96 px-4">
         <div className={isVerificationPreview ? "mx-auto max-w-none" : "max-w-3xl mx-auto"}>
           {children}
         </div>

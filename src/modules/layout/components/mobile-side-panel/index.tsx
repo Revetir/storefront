@@ -379,6 +379,13 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                       FAQ
                     </LocalizedClientLink>
                     <LocalizedClientLink
+                      href="/customer-care/verification"
+                      className="block text-sm uppercase text-gray-700 hover:text-black py-2"
+                      onClick={closeAllPanels}
+                    >
+                      Verification
+                    </LocalizedClientLink>
+                    <LocalizedClientLink
                       href="/customer-care/ordering"
                       className="block text-sm uppercase text-gray-700 hover:text-black py-2"
                       onClick={closeAllPanels}

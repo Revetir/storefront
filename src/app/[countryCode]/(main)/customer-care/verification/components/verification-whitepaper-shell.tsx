@@ -12,6 +12,7 @@ type GraphicSlot = {
 type DossierSection = {
   id: string
   tabLabel: string
+  mobileTabLabel?: string
   heading: string
   bodyToken: string
   slots: GraphicSlot[]
@@ -46,6 +47,7 @@ type AssuranceStampItem = {
 type ViewMode = "dossier" | "whitepaper"
 
 const COVER_DISMISSED_SESSION_KEY = "verification-dossier-cover-dismissed"
+const WHITEPAPER_VIEW_ENABLED = false
 const INTAKE_INTRO_TEXT =
   "Intake is the initial filtering stage where every item is evaluated for general eligibility to be sold on our platform. At this stage, seller qualification, product metadata, and listing integrity are reviewed together to ensure the submitted listing is complete, consistent, and supported by sufficient detail."
 const ANALYSIS_INTRO_TEXT =
@@ -348,6 +350,7 @@ const DOSSIER_SECTIONS: DossierSection[] = [
   {
     id: "decision",
     tabLabel: "RECONCILIATION",
+    mobileTabLabel: "RECONCIL.",
     heading: "RECONCILIATION",
     bodyToken: RECONCILIATION_INTRO_TEXT,
     slots: [
@@ -380,12 +383,14 @@ type ModeControlsProps = {
   viewMode: ViewMode
   onSelect: (mode: ViewMode) => void
   compact?: boolean
+  whitepaperEnabled?: boolean
 }
 
-function ModeControls({ viewMode, onSelect, compact = false }: ModeControlsProps) {
+function ModeControls({ viewMode, onSelect, compact = false, whitepaperEnabled = true }: ModeControlsProps) {
   const base = compact
     ? "w-[104px] whitespace-nowrap px-1.5 py-1 text-center text-[8px] tracking-[0.06em] min-[431px]:w-auto"
     : "w-[116px] px-3 py-1.5 text-center text-[11px] tracking-[0.14em] min-[431px]:w-auto"
+  const isWhitepaperDisabled = !whitepaperEnabled
 
   return (
     <div className="inline-flex flex-col border border-black bg-white min-[431px]:flex-row">
@@ -400,9 +405,17 @@ function ModeControls({ viewMode, onSelect, compact = false }: ModeControlsProps
       </button>
       <button
         type="button"
-        onClick={() => onSelect("whitepaper")}
+        onClick={() => {
+          if (!isWhitepaperDisabled) onSelect("whitepaper")
+        }}
+        disabled={isWhitepaperDisabled}
+        aria-disabled={isWhitepaperDisabled}
         className={`border-t border-black min-[431px]:border-l min-[431px]:border-t-0 ${base} uppercase ${
-          viewMode === "whitepaper" ? "bg-black text-white" : "bg-white text-black"
+          isWhitepaperDisabled
+            ? "cursor-not-allowed bg-white text-black/25"
+            : viewMode === "whitepaper"
+              ? "bg-black text-white"
+              : "bg-white text-black"
         }`}
       >
         White Paper View
@@ -634,6 +647,12 @@ export default function VerificationWhitepaperShell() {
   )
   const activeAssurancePanelHeader =
     ASSURANCE_PANEL_HEADERS_BY_ITEM_ID[activeAssuranceItem.id] ?? "CLOSING THE LOOP"
+  const isDossierView = !WHITEPAPER_VIEW_ENABLED || viewMode === "dossier"
+
+  useEffect(() => {
+    if (WHITEPAPER_VIEW_ENABLED || viewMode === "dossier") return
+    setViewMode("dossier")
+  }, [viewMode])
 
   useEffect(() => {
     const navEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined
@@ -830,7 +849,7 @@ export default function VerificationWhitepaperShell() {
       const delta = timestamp - lastTimestamp
       assuranceLoopLastTimestampRef.current = timestamp
 
-      const nextRotation = (assuranceLoopRotationRef.current + delta * degreesPerMillisecond) % 360
+      const nextRotation = (assuranceLoopRotationRef.current - delta * degreesPerMillisecond + 360) % 360
       assuranceLoopRotationRef.current = nextRotation
       ring.setAttribute("transform", `rotate(${nextRotation.toFixed(3)} 50 50)`)
 
@@ -924,11 +943,11 @@ export default function VerificationWhitepaperShell() {
   return (
     <div className="relative overflow-hidden bg-white text-black">
       <div className="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-6 lg:px-8">
-        {viewMode === "dossier" ? (
+        {isDossierView ? (
           <section>
             <div className="relative h-[70vh] min-h-[70vh] w-full md:h-[78vh] md:min-h-[78vh]">
               <div className="absolute -top-1 right-2 z-40 hidden min-[431px]:block">
-                <ModeControls viewMode={viewMode} onSelect={setViewMode} />
+                <ModeControls viewMode={viewMode} onSelect={setViewMode} whitepaperEnabled={WHITEPAPER_VIEW_ENABLED} />
               </div>
               <div className="pointer-events-none absolute inset-0 z-20">
                 <svg
@@ -1016,8 +1035,13 @@ export default function VerificationWhitepaperShell() {
                   </div>
                 ) : (
                   <>
-                    <div className="absolute -top-6 right-2 z-40 min-[431px]:hidden">
-                      <ModeControls viewMode={viewMode} onSelect={setViewMode} compact />
+                    <div className="absolute -top-7 right-2 z-40 min-[431px]:hidden">
+                      <ModeControls
+                        viewMode={viewMode}
+                        onSelect={setViewMode}
+                        compact
+                        whitepaperEnabled={WHITEPAPER_VIEW_ENABLED}
+                      />
                     </div>
 
                     <div className="border-b border-black pb-2">
@@ -1029,11 +1053,12 @@ export default function VerificationWhitepaperShell() {
                               key={`mobile-${section.id}`}
                               type="button"
                               onClick={() => setActiveSectionId(section.id)}
+                              aria-label={section.tabLabel}
                               className={`h-7 border border-black border-b-0 px-1 text-[8px] uppercase tracking-[0.11em] ${
                                 isActive ? "bg-black text-white" : "bg-white text-black hover:bg-black hover:text-white"
                               }`}
                             >
-                              {section.tabLabel}
+                              {section.mobileTabLabel ?? section.tabLabel}
                             </button>
                           )
                         })}
@@ -1060,7 +1085,7 @@ export default function VerificationWhitepaperShell() {
                       </div>
                     </div>
 
-                    <div ref={dossierSectionScrollRef} className="mt-6 grid h-[39rem] flex-1 gap-4 overflow-x-hidden overflow-y-auto min-[431px]:mt-7 min-[431px]:h-[40rem] min-[431px]:gap-6 md:h-[38rem] md:overflow-hidden">
+                    <div ref={dossierSectionScrollRef} className="mt-6 grid h-[39rem] min-w-0 flex-1 gap-4 overflow-x-hidden overflow-y-auto [&>*]:min-w-0 [&_li]:break-words [&_p]:break-words max-[430px]:[&_h2]:text-center max-[430px]:[&_h3]:text-center max-[430px]:[&_h4]:text-center max-[430px]:[&_p]:text-center max-[430px]:[&_li]:text-center min-[431px]:mt-7 min-[431px]:h-[40rem] min-[431px]:gap-6 md:h-[38rem] md:overflow-hidden">
                       {activeSection.id === "intake" ? (
                         <>
                           <div className="relative md:min-h-[38rem]">
@@ -1438,7 +1463,9 @@ export default function VerificationWhitepaperShell() {
                                               .map((line) => line.trim())
                                               .filter(Boolean)
                                               .map((line) => (
-                                                <li key={`${checkpoint.id}-${line}`}>{line}</li>
+                                                <li key={`${checkpoint.id}-${line}`} className="max-[430px]:text-left">
+                                                  {line}
+                                                </li>
                                               ))}
                                           </ul>
                                         </div>
@@ -1636,7 +1663,7 @@ export default function VerificationWhitepaperShell() {
                           height={10}
                           className="h-[10px] w-auto"
                         />
-                        <span className="text-[11px] uppercase tracking-[0.13em] text-black/70">
+                        <span className="select-none text-[11px] uppercase tracking-[0.13em] text-black/70">
                           IARA
                           <span className="align-super text-[7px] tracking-normal">{"\u00A9"}</span>
                         </span>
@@ -1651,12 +1678,17 @@ export default function VerificationWhitepaperShell() {
           <section>
             <div className="relative w-full min-h-[70vh] md:min-h-[78vh]">
               <div className="absolute -top-1 right-2 z-40 hidden min-[431px]:block">
-                <ModeControls viewMode={viewMode} onSelect={setViewMode} />
+                <ModeControls viewMode={viewMode} onSelect={setViewMode} whitepaperEnabled={WHITEPAPER_VIEW_ENABLED} />
               </div>
 
               <div className="relative space-y-8 pt-10 min-[431px]:pt-0">
-                <div className="absolute -top-6 right-2 z-40 min-[431px]:hidden">
-                  <ModeControls viewMode={viewMode} onSelect={setViewMode} compact />
+                <div className="absolute -top-7 right-2 z-40 min-[431px]:hidden">
+                  <ModeControls
+                    viewMode={viewMode}
+                    onSelect={setViewMode}
+                    compact
+                    whitepaperEnabled={WHITEPAPER_VIEW_ENABLED}
+                  />
                 </div>
                 <div className="sticky top-[72px] z-10 border border-black bg-white px-3 py-2">
                   <div className="flex flex-wrap gap-1">
@@ -1696,7 +1728,7 @@ export default function VerificationWhitepaperShell() {
                                 <p className="text-[11px] leading-relaxed text-black/80">{INTAKE_INTRO_TEXT}</p>
                               </div>
                               <div className="pt-3">
-                                <div className="flex justify-center md:block">
+                                <div className="block">
                                   <div className="w-fit max-w-[18rem] text-left md:w-full md:max-w-none">
                                     <div className="grid grid-cols-1 gap-y-5 md:grid-cols-3 md:gap-x-6">
                                       {INTAKE_INPUT_COLUMNS.map((column) => (
