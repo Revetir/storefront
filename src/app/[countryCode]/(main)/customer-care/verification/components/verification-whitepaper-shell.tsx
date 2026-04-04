@@ -52,7 +52,7 @@ const INTAKE_INTRO_TEXT =
   "Intake is the initial filtering stage where every item is evaluated for general eligibility to be sold on our platform. At this stage, seller qualification, product metadata, and listing integrity are reviewed together to ensure the submitted listing is complete, consistent, and supported by sufficient detail."
 const ANALYSIS_INTRO_TEXT =
   "Analysis is the granular item-level review stage where each submitted listing is evaluated against known brand and model characteristics. At this stage, shape, materials, construction details, and identity markers are digitally examined in context to assess whether the product is consistent with expected design standards and free from well-known counterfeit patterns."
-const ASSURANCE_LOOP_ROTATION_SECONDS = 10.8
+const ASSURANCE_LOOP_ROTATION_SECONDS = 8.4
 const ASSURANCE_STAMP_ITEMS: AssuranceStampItem[] = [
   {
     id: "customer-feedback",
