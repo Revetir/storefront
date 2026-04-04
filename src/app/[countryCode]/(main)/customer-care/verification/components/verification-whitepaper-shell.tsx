@@ -1257,13 +1257,13 @@ export default function VerificationWhitepaperShell() {
                                       </div>
                                     </div>
                                     <div className="w-full shrink-0 snap-start">
-                                      <div className="mx-auto w-[11rem]">
+                                      <div className="mobile-intake-flow-shell mx-auto w-[11rem]">
                                         <Image
                                           src="/images/intake_flow_v2.svg"
                                           alt="Intake flow"
                                           width={616}
                                           height={662}
-                                          className="intake-flow-image block h-auto w-full"
+                                          className="intake-flow-image mobile-intake-flow-image block h-auto w-full"
                                         />
                                       </div>
                                     </div>
@@ -1336,8 +1336,8 @@ export default function VerificationWhitepaperShell() {
                               </div>
                             </div>
 
-                            <div className="mt-4 hidden min-[431px]:block md:absolute md:bottom-[4rem] md:right-0 md:mt-0 md:w-[31%] md:max-w-[21rem] lg:bottom-[5rem] lg:w-[34%] lg:max-w-[24rem] xl:bottom-[5.5rem] xl:w-[36%] xl:max-w-[26rem]">
-                              <div className="intake-flow-shell min-h-[16rem] overflow-hidden md:min-h-0">
+                            <div className="mt-4 hidden min-[431px]:block md:hidden">
+                              <div className="intake-flow-shell min-h-[16rem] overflow-hidden">
                                 <Image
                                 src="/images/intake_flow_v2.svg"
                                 alt="Intake flow"
@@ -1950,6 +1950,21 @@ export default function VerificationWhitepaperShell() {
           box-shadow: none;
           clip-path: none;
           -webkit-clip-path: none;
+        }
+
+        @media (max-width: 767px) {
+          .mobile-intake-flow-shell {
+            overflow: hidden;
+          }
+
+          .mobile-intake-flow-image {
+            width: calc(100% + 2px);
+            max-width: none;
+            margin-left: -1px;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+          }
         }
 
         .intake-chart-bar {
