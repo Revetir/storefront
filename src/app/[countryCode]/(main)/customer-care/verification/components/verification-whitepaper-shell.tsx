@@ -1085,7 +1085,7 @@ export default function VerificationWhitepaperShell() {
                 </svg>
               </div>
 
-              <div className="relative z-10 flex h-full flex-col bg-white px-4 pb-6 pt-[5.25rem] min-[431px]:pb-8 min-[431px]:pt-[5.25rem] md:px-8 md:pb-10 md:pt-16">
+              <div className="relative z-10 flex h-full flex-col bg-white px-4 pb-3 pt-[5.25rem] min-[431px]:pb-4 min-[431px]:pt-[5.25rem] md:px-8 md:pb-0 md:pt-16">
                 {showCover ? (
                   <div className="flex min-h-[58vh] flex-1 flex-col items-center justify-center px-4 text-center">
                     <h2 className="text-[clamp(1.35rem,6vw,2.2rem)] tracking-[-0.02em] text-black">
@@ -1731,8 +1731,8 @@ export default function VerificationWhitepaperShell() {
                       )}
                     </div>
 
-                    <div className="mt-6 border-t border-black pt-3 text-[11px] uppercase tracking-[0.13em] text-black/70">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="mt-6 border-t border-black pt-3 text-[11px] uppercase tracking-[0.13em] text-black/70 md:py-1.5">
+                      <div className="flex flex-wrap items-center justify-between gap-2 leading-none">
                         <Image
                           src="/images/logo_transparent.svg"
                           alt="REVETIR"
