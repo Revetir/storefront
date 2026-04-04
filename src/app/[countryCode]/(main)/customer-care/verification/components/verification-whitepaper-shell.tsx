@@ -116,6 +116,13 @@ const ASSURANCE_STAMP_RING_SEGMENTS = (() => {
   })
 })()
 
+const ASSURANCE_INITIAL_ITEM_ID = ASSURANCE_STAMP_ITEMS[0]?.id ?? ""
+const ASSURANCE_INITIAL_ROTATION_DEG = (() => {
+  const initialItem = ASSURANCE_STAMP_RING_SEGMENTS.find((item) => item.id === ASSURANCE_INITIAL_ITEM_ID)
+  if (!initialItem) return 0
+  return (360 - (initialItem.centerAngleDeg % 360)) % 360
+})()
+
 const getUprightAssuranceItemId = (rotationDeg: number) => {
   let activeItemId = ASSURANCE_STAMP_RING_SEGMENTS[0]?.id ?? ASSURANCE_STAMP_ITEMS[0]?.id ?? ""
   let closestDistance = Number.POSITIVE_INFINITY
@@ -617,7 +624,7 @@ export default function VerificationWhitepaperShell() {
   const [mobileIntakeSlide, setMobileIntakeSlide] = useState(0)
   const [isAssuranceLoopHeld, setIsAssuranceLoopHeld] = useState(false)
   const [activeAssuranceItemId, setActiveAssuranceItemId] = useState<string>(
-    ASSURANCE_STAMP_ITEMS[0]?.id ?? ""
+    getUprightAssuranceItemId(ASSURANCE_INITIAL_ROTATION_DEG)
   )
   const [activeAnalysisCheckpointId, setActiveAnalysisCheckpointId] = useState<string | null>(null)
   const [isAnalysisHintHovered, setIsAnalysisHintHovered] = useState(false)
@@ -630,7 +637,7 @@ export default function VerificationWhitepaperShell() {
   const assuranceLoopRingRef = useRef<SVGGElement | null>(null)
   const assuranceLoopFrameRef = useRef<number | null>(null)
   const assuranceLoopLastTimestampRef = useRef<number | null>(null)
-  const assuranceLoopRotationRef = useRef(0)
+  const assuranceLoopRotationRef = useRef(ASSURANCE_INITIAL_ROTATION_DEG)
   const assurancePointerIdRef = useRef<number | null>(null)
   const assuranceHoldTimerRef = useRef<number | null>(null)
   const assurancePointerStartRef = useRef<{ x: number; y: number } | null>(null)
@@ -835,8 +842,9 @@ export default function VerificationWhitepaperShell() {
     const ring = assuranceLoopRingRef.current
     if (!ring) return
 
-    ring.setAttribute("transform", `rotate(${assuranceLoopRotationRef.current.toFixed(3)} 50 50)`)
-    const uprightId = getUprightAssuranceItemId(assuranceLoopRotationRef.current)
+    assuranceLoopRotationRef.current = ASSURANCE_INITIAL_ROTATION_DEG
+    ring.setAttribute("transform", `rotate(${ASSURANCE_INITIAL_ROTATION_DEG.toFixed(3)} 50 50)`)
+    const uprightId = getUprightAssuranceItemId(ASSURANCE_INITIAL_ROTATION_DEG)
     setActiveAssuranceItemId((current) => (current === uprightId ? current : uprightId))
   }, [activeSectionId, viewMode])
 
