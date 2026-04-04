@@ -1281,7 +1281,7 @@ export default function VerificationWhitepaperShell() {
                               <div className="w-full pt-1 md:flex md:flex-1 md:min-h-0 md:justify-center md:pt-0">
                                 <div className="mx-auto flex w-full max-w-[17.5rem] flex-col items-center min-[431px]:max-w-[30rem] md:h-full md:min-h-0 md:max-w-full md:justify-center">
                                   <div className="w-full md:flex md:h-full md:flex-col md:items-center">
-                                  <div className="relative w-full md:h-[calc(100%-2.25rem)] md:w-fit md:max-w-full">
+                                  <div className="relative w-full md:min-h-0 md:flex-1 md:w-fit md:max-w-full">
                                   <svg
                                     viewBox={`${ANALYSIS_VIEWBOX_MIN_X} 0 ${ANALYSIS_SVG_WIDTH} ${ANALYSIS_SVG_HEIGHT}`}
                                     className="h-auto w-full md:h-full md:w-auto md:max-h-full md:max-w-full"
@@ -1463,7 +1463,7 @@ export default function VerificationWhitepaperShell() {
                                               .map((line) => line.trim())
                                               .filter(Boolean)
                                               .map((line) => (
-                                                <li key={`${checkpoint.id}-${line}`} className="max-[430px]:text-left">
+                                                <li key={`${checkpoint.id}-${line}`} className="max-[430px]:!text-left">
                                                   {line}
                                                 </li>
                                               ))}
@@ -1525,7 +1525,7 @@ export default function VerificationWhitepaperShell() {
                               </div>
 
                               <div className="w-full pt-1 md:flex md:flex-1 md:min-h-0 md:justify-center md:pt-0">
-                                <div className="mx-auto flex w-full max-w-[17.5rem] flex-col items-center gap-4 min-[431px]:max-w-[30rem] md:h-full md:min-h-0 md:max-w-none md:flex-row md:items-center md:justify-center md:gap-8">
+                                <div className="mx-auto flex w-full max-w-[17.5rem] flex-col items-center gap-4 min-[431px]:max-w-[30rem] md:min-h-0 md:flex-1 md:max-w-none md:flex-row md:items-start md:justify-center md:gap-8">
                                   <div className="flex w-full flex-col items-center md:w-[42%] md:justify-start">
                                     <button
                                       type="button"
@@ -1598,7 +1598,7 @@ export default function VerificationWhitepaperShell() {
                                       Press and hold to switch focus area.
                                     </p>
                                   </div>
-                                  <div className="w-full border border-black bg-white/90 px-3 py-3 text-left min-[431px]:px-4 min-[431px]:py-4 md:w-[50%]">
+                                  <div className="w-full border border-black bg-white/90 px-3 py-3 text-left min-[431px]:px-4 min-[431px]:py-4 md:w-[50%] md:max-h-full md:overflow-y-auto">
                                     <p className="text-[11px] uppercase tracking-[0.08em] text-black/70">
                                       {activeAssurancePanelHeader}
                                     </p>
