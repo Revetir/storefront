@@ -88,22 +88,37 @@ export default function CustomerCareLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const isVerificationPreview = /\/customer-care\/verification\/?$/.test(pathname)
 
-  const renderNavSection = (pages: typeof shoppingPages, title: string) => (
+  const renderNavSection = (pages: typeof shoppingPages, title: string, disableLinks = false) => (
     <div className="mb-6">
       <h3 className="text-medium font-semibold mb-3 text-gray-800">{title}</h3>
       <nav className="space-y-1">
         {pages.map((page) => {
           const isActive = pathname.endsWith(page.href)
+          const baseClass = `block text-sm transition-colors ${
+            isActive
+              ? "font-bold underline text-black"
+              : "text-gray-700"
+          }`
+
+          if (disableLinks) {
+            return (
+              <span
+                key={page.href}
+                className={`${baseClass} cursor-default opacity-85`}
+                aria-current={isActive ? "page" : undefined}
+              >
+                {page.title}
+              </span>
+            )
+          }
+
           return (
             <LocalizedClientLink
               key={page.href}
               href={page.href}
-              className={`block text-sm transition-colors ${
-                isActive
-                  ? "font-bold underline text-black hover:underline"
-                  : "text-gray-700 hover:text-black hover:underline"
-              }`}
+              className={`${baseClass} ${isActive ? "hover:underline" : "hover:text-black hover:underline"}`}
             >
               {page.title}
             </LocalizedClientLink>
@@ -117,9 +132,9 @@ export default function CustomerCareLayout({
     <div className="py-8 relative">
       {/* Left Sidebar - Navigation */}
       <div className="hidden lg:block fixed left-8 top-32 w-48">
-        {renderNavSection(customerCarePages, "Help")}
-        {renderNavSection(shoppingPages, "Shopping")}
-        {renderNavSection(revetirPages, "REVETIR")}
+        {renderNavSection(customerCarePages, "Help", isVerificationPreview)}
+        {renderNavSection(shoppingPages, "Shopping", isVerificationPreview)}
+        {renderNavSection(revetirPages, "REVETIR", isVerificationPreview)}
       </div>
 
       {/* Right Sidebar - Contact Information */}
@@ -140,7 +155,7 @@ export default function CustomerCareLayout({
 
       {/* Main Content */}
       <div className="lg:mx-96 px-4">
-        <div className="max-w-3xl mx-auto">
+        <div className={isVerificationPreview ? "mx-auto max-w-none" : "max-w-3xl mx-auto"}>
           {children}
         </div>
       </div>

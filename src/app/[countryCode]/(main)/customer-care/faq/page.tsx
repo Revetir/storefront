@@ -22,8 +22,8 @@ const faqData: FAQCategory[] = [
         question: "Are your products authentic?",
         answer: (
           <>
-            All items sold by REVETIR are sourced directly from brands or trusted vendors. You can read about our authentication process{" "}
-            <LocalizedClientLink href="/customer-care/authentication" className="text-gray-900 hover:text-black font-semibold underline">
+            All items sold by REVETIR are sourced directly from brands or trusted vendors. You can read about our verification process{" "}
+            <LocalizedClientLink href="/customer-care/verification" className="text-gray-900 hover:text-black font-semibold underline">
               here
             </LocalizedClientLink>.
           </>
