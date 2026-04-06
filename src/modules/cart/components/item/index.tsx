@@ -167,7 +167,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         <div
           className={clx("h-full flex justify-end", {
             "relative items-center": type === "full",
-            "items-center": type === "preview",
+            "items-end flex-col": type === "preview",
           })}
         >
           {/* Total price */}
@@ -178,6 +178,11 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             showTotal={type === "full"}
             showOriginal={type !== "full"}
           />
+          {type === "preview" && item.quantity > 1 && (
+            <Text className="text-xs text-ui-fg-muted mt-1" data-testid="product-quantity">
+              Quantity: {item.quantity}
+            </Text>
+          )}
 
           {/* Full mode mobile: quantity controls and delete button at bottom right */}
           {type === "full" && (
