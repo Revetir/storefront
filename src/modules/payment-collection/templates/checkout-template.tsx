@@ -152,8 +152,9 @@ export default async function PaymentCollectionCheckoutTemplate({
 
   const paymentMethods = await listCartPaymentMethods(context.order.region_id || "")
   const stripeProviderId =
-    paymentMethods?.find((provider) => isStripe(provider.id))?.id || null
-  const stripeEnabled = Boolean(stripeProviderId)
+    paymentMethods?.find((provider) => isStripe(provider.id))?.id ||
+    "pp_stripe_stripe"
+  const stripeEnabled = true
 
   const summaryLikeCart = {
     ...context.order,

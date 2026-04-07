@@ -620,13 +620,20 @@ const PaymentForm = ({
 }: PaymentFormProps) => {
   const [collection, setCollection] = useState<PaymentCollection>(paymentCollection)
   const [initializing, setInitializing] = useState(false)
+  const [initializedCollectionId, setInitializedCollectionId] = useState<string | null>(
+    null
+  )
   const [initError, setInitError] = useState<string | null>(null)
+  const sessionReady = initializedCollectionId === paymentCollectionId
 
-  const stripeSession = useMemo(() => resolveStripeSession(collection), [collection])
+  const stripeSession = useMemo(
+    () => (sessionReady ? resolveStripeSession(collection) : null),
+    [collection, sessionReady]
+  )
   const clientSecret = stripeSession?.data?.client_secret as string | undefined
 
   useEffect(() => {
-    if (!stripeEnabled || stripeSession || initializing) {
+    if (!stripeEnabled || initializing || sessionReady) {
       return
     }
 
@@ -653,6 +660,7 @@ const PaymentForm = ({
         }
 
         setCollection(response.payment_collection)
+        setInitializedCollectionId(paymentCollectionId)
       } catch (error: any) {
         if (!mounted) {
           return
@@ -670,7 +678,7 @@ const PaymentForm = ({
     return () => {
       mounted = false
     }
-  }, [initializing, paymentCollectionId, stripeEnabled, stripeSession, stripeProviderId])
+  }, [initializing, paymentCollectionId, stripeEnabled, stripeProviderId, sessionReady])
 
   if (!stripeEnabled) {
     return (
