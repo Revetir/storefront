@@ -31,6 +31,7 @@ type PaymentSession = {
   id: string
   provider_id: string
   status: string
+  amount?: number
   data?: Record<string, any> | null
 }
 
@@ -620,20 +621,34 @@ const PaymentForm = ({
 }: PaymentFormProps) => {
   const [collection, setCollection] = useState<PaymentCollection>(paymentCollection)
   const [initializing, setInitializing] = useState(false)
-  const [initializedCollectionId, setInitializedCollectionId] = useState<string | null>(
-    null
-  )
+  const [initAttempts, setInitAttempts] = useState(0)
   const [initError, setInitError] = useState<string | null>(null)
-  const sessionReady = initializedCollectionId === paymentCollectionId
 
-  const stripeSession = useMemo(
-    () => (sessionReady ? resolveStripeSession(collection) : null),
-    [collection, sessionReady]
-  )
+  const stripeSession = useMemo(() => resolveStripeSession(collection), [collection])
+  const hasUsableStripeSession = useMemo(() => {
+    if (!stripeSession) {
+      return false
+    }
+
+    const sessionAmount = Number(stripeSession.amount)
+    const collectionAmount = Number(collection.amount)
+
+    if (!Number.isFinite(sessionAmount) || !Number.isFinite(collectionAmount)) {
+      return false
+    }
+
+    return Math.abs(sessionAmount - collectionAmount) < 0.0001
+  }, [collection.amount, stripeSession])
   const clientSecret = stripeSession?.data?.client_secret as string | undefined
 
   useEffect(() => {
-    if (!stripeEnabled || initializing || sessionReady) {
+    setCollection(paymentCollection)
+    setInitAttempts(0)
+    setInitError(null)
+  }, [paymentCollection, paymentCollectionId])
+
+  useEffect(() => {
+    if (!stripeEnabled || initializing || hasUsableStripeSession || initAttempts >= 3) {
       return
     }
 
@@ -660,11 +675,12 @@ const PaymentForm = ({
         }
 
         setCollection(response.payment_collection)
-        setInitializedCollectionId(paymentCollectionId)
+        setInitAttempts(0)
       } catch (error: any) {
         if (!mounted) {
           return
         }
+        setInitAttempts((attempts) => attempts + 1)
         setInitError(error?.message || "Failed to initialize payment session")
       } finally {
         if (mounted) {
@@ -678,7 +694,14 @@ const PaymentForm = ({
     return () => {
       mounted = false
     }
-  }, [initializing, paymentCollectionId, stripeEnabled, stripeProviderId, sessionReady])
+  }, [
+    hasUsableStripeSession,
+    initAttempts,
+    initializing,
+    paymentCollectionId,
+    stripeEnabled,
+    stripeProviderId,
+  ])
 
   if (!stripeEnabled) {
     return (
