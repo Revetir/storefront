@@ -277,7 +277,8 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                       {hasChildren && (
                         <button
                           onClick={() => openSubSubPanel(category.id)}
-                          className="p-1 hover:bg-gray-100 rounded"
+                          className="ml-3 flex flex-1 items-center justify-end p-1 hover:bg-gray-100 rounded"
+                          aria-label={`Open ${category.name} submenu`}
                         >
                           <ChevronRight className="w-4 h-4" />
                         </button>
@@ -307,7 +308,8 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                   </LocalizedClientLink>
                   <button
                     onClick={() => openSubPanel("account")}
-                    className="p-1 hover:bg-gray-100 rounded"
+                    className="ml-3 flex flex-1 items-center justify-end p-1 hover:bg-gray-100 rounded"
+                    aria-label="Open account submenu"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -325,7 +327,8 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                 </LocalizedClientLink>
                 <button
                   onClick={() => openSubPanel("customer-care")}
-                  className="p-1 hover:bg-gray-100 rounded"
+                  className="ml-3 flex flex-1 items-center justify-end p-1 hover:bg-gray-100 rounded"
+                  aria-label="Open customer care submenu"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -568,7 +571,8 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                                   </span>
                                   <button
                                     onClick={openBrandsPanel}
-                                    className="p-1 hover:bg-gray-100 rounded"
+                                    className="ml-3 flex flex-1 items-center justify-end p-1 hover:bg-gray-100 rounded"
+                                    aria-label="Open brands submenu"
                                   >
                                     <ChevronRight className="w-4 h-4" />
                                   </button>
@@ -617,7 +621,8 @@ const MobileSidePanel: React.FC<MobileSidePanelProps> = ({
                                   {hasChildren && (
                                     <button
                                       onClick={() => openSubSubPanel(childCategory.id)}
-                                      className="p-1 hover:bg-gray-100 rounded"
+                                      className="ml-3 flex flex-1 items-center justify-end p-1 hover:bg-gray-100 rounded"
+                                      aria-label={`Open ${childCategory.name} submenu`}
                                     >
                                       <ChevronRight className="w-4 h-4" />
                                     </button>

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2017",
     "lib": [
       "dom",
       "dom.iterable",
@@ -18,28 +18,33 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "baseUrl": "./src",
     "paths": {
       "@lib/*": [
-        "lib/*"
+        "./src/lib/*"
       ],
       "@/lib/*": [
-        "lib/*"
+        "./src/lib/*"
       ],
       "@modules/*": [
-        "modules/*"
+        "./src/modules/*"
       ],
       "@pages/*": [
-        "pages/*"
+        "./src/pages/*"
+      ],
+      "styles/*": [
+        "./src/styles/*"
+      ],
+      "types/*": [
+        "./src/types/*"
       ],
       "sanity": [
-        "../node_modules/sanity"
+        "./node_modules/sanity"
       ],
       "sanity/*": [
-        "../node_modules/sanity/*"
+        "./node_modules/sanity/*"
       ],
       "@sanity/*": [
-        "../node_modules/@sanity/*"
+        "./node_modules/@sanity/*"
       ]
     },
     "plugins": [
@@ -56,7 +61,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "../sanity.config.ts",
+    "./sanity.config.ts",
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [

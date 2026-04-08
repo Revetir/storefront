@@ -1557,15 +1557,13 @@ export default function VerificationWhitepaperShell() {
                                     )
                                   })}
                                   </div>
-                                  {!activeAnalysisCheckpoint ? (
-                                    <p
-                                      onMouseEnter={() => setIsAnalysisHintHovered(true)}
-                                      onMouseLeave={() => setIsAnalysisHintHovered(false)}
-                                      className="mt-1 text-center text-[12px] leading-relaxed text-black/75 md:mt-2 md:shrink-0"
-                                    >
-                                      Select a checkpoint to view analysis details.
-                                    </p>
-                                  ) : null}
+                                  <p
+                                    onMouseEnter={() => setIsAnalysisHintHovered(true)}
+                                    onMouseLeave={() => setIsAnalysisHintHovered(false)}
+                                    className="mt-1 text-center text-[12px] leading-relaxed text-black/75 md:mt-2 md:shrink-0"
+                                  >
+                                    Select a checkpoint to view analysis details.
+                                  </p>
                                   </div>
                                 </div>
                               </div>
