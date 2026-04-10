@@ -277,8 +277,8 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
         displayName: method.name || 'Standard Shipping',
         amount: Math.round((method.amount || 0) * 100), // Convert to cents
         deliveryEstimate: {
-          minimum: { unit: 'day', value: 3 },
-          maximum: { unit: 'day', value: 7 }
+          minimum: { unit: 'day', value: 10 },
+          maximum: { unit: 'day', value: 14 }
         }
       })) || [
         {
@@ -286,8 +286,8 @@ const StripeReviewContent = ({ cart }: { cart: any }) => {
           displayName: 'Standard Shipping',
           amount: 0,
           deliveryEstimate: {
-            minimum: { unit: 'day', value: 3 },
-            maximum: { unit: 'day', value: 7 }
+            minimum: { unit: 'day', value: 10 },
+            maximum: { unit: 'day', value: 14 }
           }
         }
       ]
