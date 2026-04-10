@@ -101,8 +101,11 @@ const readAutocompleteFieldValue = (testId: string): string | undefined => {
     ".radar-autocomplete-input"
   ) as HTMLInputElement | null
 
-  const value = input?.value?.trim()
-  return value ? value : undefined
+  if (!input) {
+    return undefined
+  }
+
+  return input.value?.trim() ?? ""
 }
 
 const readFieldValue = (name: string): string | undefined => {
@@ -113,8 +116,7 @@ const readFieldValue = (name: string): string | undefined => {
   ) as HTMLInputElement | HTMLSelectElement | null
 
   if (field) {
-    const value = field.value?.trim()
-    return value ? value : undefined
+    return field.value?.trim() ?? ""
   }
 
   if (name === "shipping_address.address_1") {
@@ -132,17 +134,17 @@ const readAddressFromForm = (
   prefix: "shipping_address" | "billing_address"
 ): Partial<HttpTypes.StoreCartAddress> | null => {
   const address: Partial<HttpTypes.StoreCartAddress> = {}
-  let hasAnyValue = false
+  let hasAnyField = false
 
   ADDRESS_FIELDS.forEach((field) => {
     const value = readFieldValue(`${prefix}.${field}`)
     if (value !== undefined) {
-      hasAnyValue = true
+      hasAnyField = true
       address[field] = value
     }
   })
 
-  return hasAnyValue ? address : null
+  return hasAnyField ? address : null
 }
 
 const isSameAsBillingChecked = (): boolean => {

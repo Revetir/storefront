@@ -124,9 +124,8 @@ const ShippingAddress = ({
     const formDataObj = new FormData()
 
     Object.keys(values).forEach((key) => {
-      if (values[key]) {
-        formDataObj.append(key, values[key])
-      }
+      const value = values[key]
+      formDataObj.append(key, value === undefined || value === null ? "" : String(value))
     })
 
     formDataObj.append("same_as_billing", sameAsBilling ? "on" : "off")
