@@ -13,7 +13,7 @@ export default function ReturnPolicyPage() {
         
         <div className="prose prose-lg max-w-none">
           <p className="text-gray-600 leading-relaxed mb-6">
-            REVETIR offers <strong>free returns</strong> for most orders.* The following criteria must be met for a return:
+            REVETIR offers <strong>free returns</strong> on all orders.* The following criteria must be met for a return:
           </p>
           <p className="text-gray-600 leading-relaxed mb-8">
             <strong>Return window:</strong> The return must be requested within 7 calendar days of the delivery date.
