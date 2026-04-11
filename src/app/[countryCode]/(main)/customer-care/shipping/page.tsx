@@ -26,7 +26,7 @@ export default function ShippingPage() {
 
           <h2 className="text-2xl font-semibold mb-6">Shipping Methods and Costs</h2>
           <p className="text-gray-600 leading-relaxed mb-6">
-            REVETIR is pleased to offer <strong>free standard shipping</strong> on most orders.*
+            REVETIR is pleased to offer <strong>free standard shipping</strong> on all orders.*
           </p>
           <p className="text-gray-600 leading-relaxed mb-8">
             Shipping options tailored to your selected items and delivery location will be presented at checkout, allowing you to choose your preferred shipping method. Our current options include:
