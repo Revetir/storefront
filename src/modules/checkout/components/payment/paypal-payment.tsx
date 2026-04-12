@@ -100,15 +100,18 @@ const PAYPAL_METHODS: PayPalMethodConfig[] = [
 
 const PAYPAL_CARD_FIELD_STYLE = {
   input: {
-    "font-size": "16px",
+    "font-size": "14px",
     "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
     color: "#111827",
     "background-color": "transparent",
+    border: "none",
+    padding: "0",
+    "line-height": "20px",
     "box-shadow": "none",
     "outline": "none",
   },
   "::placeholder": {
-    color: "#9ca3af",
+    color: "#6b7280",
   },
   ".invalid": {
     color: "#dc2626",
@@ -117,7 +120,7 @@ const PAYPAL_CARD_FIELD_STYLE = {
 
 const PAYPAL_FIELD_LABEL_CLASS = "block text-sm font-medium text-gray-700 mb-1"
 const PAYPAL_FIELD_INPUT_WRAPPER_CLASS =
-  "w-full px-3 py-2 border border-gray-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-black focus-within:border-transparent"
+  "w-full h-10 px-3 border border-gray-300 bg-white flex items-center focus-within:outline-none focus-within:ring-2 focus-within:ring-black focus-within:border-transparent"
 
 const resolvePayPalSession = (
   paymentCollection: PaymentCollectionLike | null | undefined,
@@ -593,30 +596,30 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
         }}
         style={PAYPAL_CARD_FIELD_STYLE as any}
       >
-        <div className="max-w-md pt-2 space-y-4">
+        <div className="max-w-md pt-2 space-y-3">
           <div>
             <label className={PAYPAL_FIELD_LABEL_CLASS}>Cardholder Name</label>
             <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
-              <PayPalNameField placeholder="Full name" />
+              <PayPalNameField placeholder="Full name" className="w-full" />
             </div>
           </div>
           <div>
             <label className={PAYPAL_FIELD_LABEL_CLASS}>Card Number</label>
             <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
-              <PayPalNumberField placeholder="1234 1234 1234 1234" />
+              <PayPalNumberField placeholder="1234 1234 1234 1234" className="w-full" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={PAYPAL_FIELD_LABEL_CLASS}>Expiration</label>
               <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
-                <PayPalExpiryField placeholder="MM/YY" />
+                <PayPalExpiryField placeholder="MM/YY" className="w-full" />
               </div>
             </div>
             <div>
               <label className={PAYPAL_FIELD_LABEL_CLASS}>Security Code</label>
               <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
-                <PayPalCVVField placeholder="CVV" />
+                <PayPalCVVField placeholder="CVV" className="w-full" />
               </div>
             </div>
           </div>
