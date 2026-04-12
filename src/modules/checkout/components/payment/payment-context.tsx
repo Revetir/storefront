@@ -6,7 +6,6 @@ import { PaymentMethodType } from "./payment-methods-config"
 export type CheckoutPaymentMethod =
   | PaymentMethodType
   | "paypal_wallet"
-  | "paypal_pay_later"
   | "paypal_apple_pay"
   | "paypal_card"
 

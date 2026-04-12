@@ -389,7 +389,6 @@ const Review = ({ cart }: { cart: any }) => {
 
   const isPaypalCheckoutMethod =
     selectedPaymentMethod === "paypal_wallet" ||
-    selectedPaymentMethod === "paypal_pay_later" ||
     selectedPaymentMethod === "paypal_apple_pay" ||
     selectedPaymentMethod === "paypal_card"
 

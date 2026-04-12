@@ -329,6 +329,24 @@ li.ais-Hits-item::marker {
   display: none !important;
 }
 
+/* Keep PayPal Card Fields preload placeholders aligned with final input heights */
+.paypal-card-field-host {
+  position: relative;
+  height: 40px;
+  overflow: hidden;
+}
+
+.paypal-card-field-host > div {
+  height: 100% !important;
+  min-height: 100% !important;
+  margin: 0 !important;
+}
+
+.paypal-card-field-host iframe {
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
 
 
 

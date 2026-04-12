@@ -13,7 +13,6 @@ import ApplePayIcon from "@modules/common/icons/apple-pay"
 import Discover from "@modules/common/icons/discover"
 import Mastercard from "@modules/common/icons/mastercard"
 import PayPalPPIcon from "@modules/common/icons/paypal-pp"
-import PayPalPayLaterIcon from "@modules/common/icons/paypal-pay-later"
 import Visa from "@modules/common/icons/visa"
 import { checkWalletAvailability } from "@lib/util/wallet-availability"
 import {
@@ -33,10 +32,9 @@ const DEFAULT_PAYPAL_PROVIDER_ID = "pp_paypal_paypal"
 const CHECKOUT_REVIEW_ACTION_SLOT_ID = "checkout-review-payment-action-slot"
 
 type PayPalMethodType =
-  | "paypal_wallet"
-  | "paypal_pay_later"
-  | "paypal_apple_pay"
   | "paypal_card"
+  | "paypal_wallet"
+  | "paypal_apple_pay"
 
 type PayPalMethodConfig = {
   id: PayPalMethodType
@@ -82,24 +80,19 @@ const ADDRESS_FIELDS = [
 
 const PAYPAL_METHODS: PayPalMethodConfig[] = [
   {
+    id: "paypal_card",
+    label: "Pay with credit or debit card",
+    icons: [Visa, Mastercard, Amex, Discover],
+  },
+  {
     id: "paypal_wallet",
     label: "Pay with PayPal",
     icons: [PayPalPPIcon],
   },
   {
-    id: "paypal_pay_later",
-    label: "PayPal Pay in 4",
-    icons: [PayPalPayLaterIcon],
-  },
-  {
     id: "paypal_apple_pay",
     label: "Pay with Apple Pay",
     icons: [ApplePayIcon],
-  },
-  {
-    id: "paypal_card",
-    label: "Pay with credit or debit card",
-    icons: [Visa, Mastercard, Amex, Discover],
   },
 ]
 
@@ -408,7 +401,7 @@ const PayPalCardSubmitButton = ({
 }
 
 const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) => {
-  const [selectedMethod, setSelectedMethod] = useState<PayPalMethodType>("paypal_wallet")
+  const [selectedMethod, setSelectedMethod] = useState<PayPalMethodType>("paypal_card")
   const [clientToken, setClientToken] = useState<string | null>(null)
   const [loadingClientToken, setLoadingClientToken] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -656,7 +649,6 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
   const renderMethodDetail = (method: PayPalMethodType) => {
     if (
       method === "paypal_wallet" ||
-      method === "paypal_pay_later" ||
       method === "paypal_apple_pay"
     ) {
       return null
@@ -711,15 +703,12 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
   const walletReviewAction =
     reviewActionSlot &&
     (selectedMethod === "paypal_wallet" ||
-      selectedMethod === "paypal_pay_later" ||
       selectedMethod === "paypal_apple_pay")
       ? createPortal(
           <div className="w-full space-y-2">
             {(() => {
               const fundingSource =
-                selectedMethod === "paypal_pay_later"
-                  ? "paylater"
-                  : selectedMethod === "paypal_apple_pay"
+                selectedMethod === "paypal_apple_pay"
                     ? "applepay"
                     : "paypal"
               const isWalletLikeMethod = selectedMethod === "paypal_wallet"
@@ -731,9 +720,7 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
                 layout: "horizontal",
                 ...(isWalletLikeMethod ? { label: "paypal" } : {}),
                 color:
-                  selectedMethod === "paypal_pay_later"
-                    ? "white"
-                    : selectedMethod === "paypal_apple_pay"
+                  selectedMethod === "paypal_apple_pay"
                     ? "black"
                     : "gold",
                 shape: "rect",
@@ -784,7 +771,7 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
               options={{
                 clientId: paypalClientId,
                 components: "buttons,card-fields",
-                enableFunding: "paylater,applepay",
+                enableFunding: "applepay",
                 currency: currencyCode,
                 intent: "authorize",
                 dataClientToken: clientToken,
