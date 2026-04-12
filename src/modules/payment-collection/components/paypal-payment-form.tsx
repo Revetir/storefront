@@ -373,66 +373,6 @@ const PayPalPaymentCollectionForm = ({
             </div>
           </div>
         </div>
-        <style jsx global>{`
-          .paypal-card-fields-stack .paypal-card-field-host {
-            width: 100%;
-            min-height: 40px;
-            border: 0;
-            background: transparent;
-            border-radius: 0;
-            box-sizing: border-box;
-            display: block;
-          }
-
-          .paypal-card-fields-stack .paypal-card-field-host:focus-within {
-            border: 0;
-            outline: none;
-            box-shadow: none;
-          }
-
-          .paypal-card-fields-stack .paypal-card-field-host > div {
-            width: 100%;
-            min-height: 38px;
-            border: 0 !important;
-            border-radius: 0 !important;
-            background: transparent !important;
-            box-shadow: none !important;
-            outline: none !important;
-          }
-
-          .paypal-card-fields-stack .paypal-card-field-host > div > div {
-            border: 0 !important;
-            border-radius: 0 !important;
-            background: transparent !important;
-            box-shadow: none !important;
-            outline: none !important;
-          }
-
-          .paypal-card-fields-stack .paypal-card-field-host [data-client-version] {
-            border: 0 !important;
-            border-radius: 0 !important;
-            background: transparent !important;
-            box-shadow: none !important;
-            outline: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-
-          .paypal-card-fields-stack .paypal-card-field-host [data-client-version]:focus-within {
-            border: 0 !important;
-            box-shadow: none !important;
-            outline: none !important;
-          }
-
-          .paypal-card-fields-stack .paypal-card-field-host iframe {
-            border: 0 !important;
-            width: 100% !important;
-            min-height: 24px !important;
-            display: block !important;
-            background: transparent !important;
-          }
-        `}</style>
-
         {reviewActionSlot &&
           createPortal(
             <PayPalCardSubmitButton
