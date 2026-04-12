@@ -12,11 +12,8 @@ import PayPalIcon from "@modules/common/icons/paypal"
 import Visa from "@modules/common/icons/visa"
 import {
   PayPalButtons,
-  PayPalCVVField,
+  PayPalCardFieldsForm,
   PayPalCardFieldsProvider,
-  PayPalExpiryField,
-  PayPalNameField,
-  PayPalNumberField,
   PayPalScriptProvider,
   usePayPalCardFields,
 } from "@paypal/react-paypal-js"
@@ -62,7 +59,7 @@ const PAYPAL_CARD_FIELD_STYLE = {
     "font-size": "14px",
     "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
     color: "#111827",
-    background: "transparent",
+    "background-color": "transparent",
     "box-shadow": "none",
     "outline": "none",
   },
@@ -73,10 +70,6 @@ const PAYPAL_CARD_FIELD_STYLE = {
     color: "#dc2626",
   },
 } as const
-
-const PAYPAL_FIELD_LABEL_CLASS = "block text-sm font-medium text-gray-700 mb-1"
-const PAYPAL_FIELD_INPUT_WRAPPER_CLASS =
-  "w-full px-3 py-2 border border-gray-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-black focus-within:border-transparent"
 
 type PaymentSession = {
   provider_id?: string
@@ -342,34 +335,45 @@ const PayPalPaymentCollectionForm = ({
         }}
         style={PAYPAL_CARD_FIELD_STYLE as any}
       >
-        <div className="max-w-md pt-2 space-y-4">
-          <div>
-            <label className={PAYPAL_FIELD_LABEL_CLASS}>Cardholder Name</label>
-            <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
-              <PayPalNameField placeholder="Full name" />
-            </div>
-          </div>
-          <div>
-            <label className={PAYPAL_FIELD_LABEL_CLASS}>Card Number</label>
-            <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
-              <PayPalNumberField placeholder="1234 1234 1234 1234" />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={PAYPAL_FIELD_LABEL_CLASS}>Expiration</label>
-              <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
-                <PayPalExpiryField placeholder="MM/YY" />
-              </div>
-            </div>
-            <div>
-              <label className={PAYPAL_FIELD_LABEL_CLASS}>Security Code</label>
-              <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
-                <PayPalCVVField placeholder="CVV" />
-              </div>
-            </div>
-          </div>
+        <div className="max-w-md pt-2">
+          <PayPalCardFieldsForm className="paypal-card-fields-layout" />
         </div>
+        <style jsx global>{`
+          .paypal-card-fields-layout > div {
+            width: 100%;
+          }
+
+          .paypal-card-fields-layout > div + div {
+            margin-top: 1rem;
+          }
+
+          .paypal-card-fields-layout > div[style*="display: flex"] {
+            gap: 1rem;
+          }
+
+          .paypal-card-fields-layout > div:not([style*="display: flex"]),
+          .paypal-card-fields-layout > div[style*="display: flex"] > div > div {
+            border: 1px solid #d1d5db;
+            background: #ffffff;
+            padding: 8px 12px;
+            min-height: 42px;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+          }
+
+          .paypal-card-fields-layout > div:not([style*="display: flex"]):focus-within,
+          .paypal-card-fields-layout > div[style*="display: flex"] > div > div:focus-within {
+            border-color: transparent;
+            box-shadow: 0 0 0 2px #000000;
+          }
+
+          .paypal-card-fields-layout iframe {
+            border: 0 !important;
+            width: 100% !important;
+            min-height: 24px !important;
+            display: block !important;
+            background: transparent !important;
+          }
+        `}</style>
 
         {reviewActionSlot &&
           createPortal(
