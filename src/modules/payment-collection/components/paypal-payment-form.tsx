@@ -409,6 +409,20 @@ const PayPalPaymentCollectionForm = ({
             box-shadow: none !important;
             outline: none !important;
           }
+
+          .paypal-card-fields-stack .paypal-card-field-host [data-client-version] {
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
+          }
+
+          .paypal-card-fields-stack .paypal-card-field-host [data-client-version]:focus-within {
+            border: 0 !important;
+            box-shadow: none !important;
+            outline: none !important;
+          }
         `}</style>
 
         {reviewActionSlot &&
