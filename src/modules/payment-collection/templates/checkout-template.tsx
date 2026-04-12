@@ -1,11 +1,12 @@
 import { retrievePaymentCollectionCheckoutContext } from "@lib/data/payment-collection"
-import { isStripe } from "@lib/constants"
+import { isPaypal, isStripe } from "@lib/constants"
 import { listCartPaymentMethods } from "@lib/data/payment"
 import { Heading, Text } from "@medusajs/ui"
 import ItemsPreviewTemplate from "@modules/cart/templates/preview"
 import CartTotals from "@modules/common/components/cart-totals"
 import Divider from "@modules/common/components/divider"
 import PaymentForm from "@modules/payment-collection/components/payment-form"
+import PayPalPaymentCollectionForm from "@modules/payment-collection/components/paypal-payment-form"
 import PaymentCollectionReviewAction from "@modules/payment-collection/components/review-action"
 import { US_STATES } from "@modules/checkout/utils/us-states"
 import { notFound, redirect } from "next/navigation"
@@ -154,7 +155,11 @@ export default async function PaymentCollectionCheckoutTemplate({
   const stripeProviderId =
     paymentMethods?.find((provider) => isStripe(provider.id))?.id ||
     "pp_stripe_stripe"
-  const stripeEnabled = true
+  const paypalProviderId =
+    paymentMethods?.find((provider) => isPaypal(provider.id))?.id ||
+    "pp_paypal_paypal"
+  const paypalEnabled = Boolean(paymentMethods?.some((provider) => isPaypal(provider.id)))
+  const stripeEnabled = !paypalEnabled && Boolean(paymentMethods?.some((provider) => isStripe(provider.id)))
 
   const summaryLikeCart = {
     ...context.order,
@@ -178,14 +183,24 @@ export default async function PaymentCollectionCheckoutTemplate({
         <ReadOnlyAddressSection title="Billing Address" address={context.order.billing_address} />
         <ReadOnlyShippingMethod order={context.order} />
 
-        <PaymentForm
-          paymentCollectionId={context.payment_collection.id}
-          paymentCollection={context.payment_collection}
-          order={context.order}
-          countryCode={context.country_code || countryCode || "us"}
-          stripeEnabled={stripeEnabled}
-          stripeProviderId={stripeProviderId}
-        />
+        {paypalEnabled ? (
+          <PayPalPaymentCollectionForm
+            paymentCollectionId={context.payment_collection.id}
+            paymentCollection={context.payment_collection}
+            order={context.order}
+            countryCode={context.country_code || countryCode || "us"}
+            paypalProviderId={paypalProviderId}
+          />
+        ) : (
+          <PaymentForm
+            paymentCollectionId={context.payment_collection.id}
+            paymentCollection={context.payment_collection}
+            order={context.order}
+            countryCode={context.country_code || countryCode || "us"}
+            stripeEnabled={stripeEnabled}
+            stripeProviderId={stripeProviderId}
+          />
+        )}
       </div>
 
       <div className="lg:sticky lg:top-20 lg:self-start">
@@ -201,7 +216,7 @@ export default async function PaymentCollectionCheckoutTemplate({
             <Divider className="my-4" />
             <CartTotals totals={summaryLikeCart as any} forceFinalLabel />
             <Divider className="my-6" />
-            <PaymentCollectionReviewAction />
+            {!paypalEnabled && <PaymentCollectionReviewAction />}
           </div>
         </div>
       </div>

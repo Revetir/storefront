@@ -21,6 +21,7 @@
     "@medusajs/js-sdk": "latest",
     "@medusajs/medusa-js": "^6.1.10",
     "@medusajs/ui": "latest",
+    "@paypal/react-paypal-js": "^8.9.2",
     "@portabletext/react": "^6.0.2",
     "@radix-ui/react-accordion": "^1.2.1",
     "@react-three/drei": "latest",

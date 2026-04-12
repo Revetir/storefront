@@ -242,13 +242,13 @@ export default async function OrderSamplePage() {
         currency_code: "usd",
         amount: orderTotal,
         status: "completed",
-        payment_providers: [{ id: "pp_stripe_stripe" }],
+        payment_providers: [{ id: "pp_paypal_paypal" }],
         payments: [
           {
             id: "pay_01",
             amount: orderTotal,
             currency_code: "usd",
-            provider_id: "pp_stripe_stripe",
+            provider_id: "pp_paypal_paypal",
             data: {
               card_last4: "4242",
               card_brand: "visa",
@@ -301,3 +301,4 @@ export default async function OrderSamplePage() {
 
   return <OrderCompletedTemplate order={mockOrder} />
 }
+

@@ -11,7 +11,8 @@ import CustomPaymentSelector from "./custom-payment-selector"
 import { useAvailablePaymentMethods } from "./use-available-payment-methods"
 import { PaymentMethodType } from "./payment-methods-config"
 import { usePaymentContext } from "./payment-context"
-import { isStripe } from "@lib/constants"
+import { isPaypal, isStripe } from "@lib/constants"
+import PayPalCartPayment from "./paypal-payment"
 
 // Inner component that safely uses Stripe hooks - only rendered when inside Elements context
 const StripePaymentContent = ({ cart, activeSession }: { cart: any, activeSession: any }) => {
@@ -198,10 +199,17 @@ const Payment = ({
   const paymentCollectionStatus = cart.payment_collection?.status
   const stripeReady = useContext(StripeContext)
   const [error, setError] = useState<string | null>(null)
+  const hasPaypalProvider = availablePaymentMethods?.some((provider: any) =>
+    isPaypal(provider.id)
+  )
 
   // Initialize payment session if it doesn't exist (runs outside Elements context)
   useEffect(() => {
     const initStripe = async () => {
+      if (hasPaypalProvider) {
+        return
+      }
+
       if (paymentCollectionStatus === "authorized" || paymentCollectionStatus === "captured") {
         return
       }
@@ -223,7 +231,11 @@ const Payment = ({
     }
 
     initStripe()
-  }, [cart.id, hasStripeSession, availablePaymentMethods, paymentCollectionStatus])
+  }, [cart.id, hasPaypalProvider, hasStripeSession, availablePaymentMethods, paymentCollectionStatus])
+
+  if (hasPaypalProvider) {
+    return <PayPalCartPayment cart={cart} />
+  }
 
   // Only render Stripe-specific content if we're inside Stripe Elements context
   if (stripeReady && availablePaymentMethods?.length) {

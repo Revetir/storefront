@@ -130,7 +130,7 @@ const faqData: FAQCategory[] = [
       {
         question: "When will I receive my refund?",
         answer:
-          "Once we receive your return and confirm items are in their original state, we issue your refund immediately. Refunds are processed through Stripe back to your original payment method and can take anywhere from 5-10 business days, depending on your bank."
+          "Once we receive your return and confirm items are in their original state, we issue your refund immediately. Refunds are processed through PayPal back to your original payment method and can take anywhere from 5-10 business days, depending on your bank."
       },
       {
         question: "Can I modify or cancel my order after placing it?",
@@ -147,7 +147,7 @@ const faqData: FAQCategory[] = [
       {
         question: "What payment methods do you accept?",
         answer:
-          "We offer a wide variety of payment methods through Stripe, including major credit and debit cards (Visa, Mastercard, American Express, Discover), digital wallets like Apple Pay and Google Pay, and buy now, pay later through Afterpay and Klarna."
+          "We offer a wide variety of payment methods through PayPal, including major credit and debit cards (Visa, Mastercard, American Express, Discover), digital wallets like Apple Pay and Google Pay, and buy now, pay later through Afterpay and Klarna."
       },
       {
         question: "Do I need to make an account to place an order?",
@@ -259,3 +259,4 @@ export default function FAQPage() {
     </div>
   )
 } 
+

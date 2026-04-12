@@ -72,7 +72,7 @@ export default function ReturnPolicyPage() {
 
                     <p className="text-gray-600 leading-relaxed mb-6">
            Once we receive your return and confirm items are in their original state, REVETIR will issue your refund immediately. 
-           Refunds are processed through Stripe and can take anywhere from 5-10 business days, depending on your bank. 
+           Refunds are processed through PayPal and can take anywhere from 5-10 business days, depending on your bank. 
           </p>
           
           <p className="text-gray-600 leading-relaxed mb-6">
