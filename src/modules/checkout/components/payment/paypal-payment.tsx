@@ -102,23 +102,29 @@ const PAYPAL_CARD_FIELD_STYLE = {
     "font-size": "14px",
     "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
     color: "#111827",
-    background: "transparent",
-    border: "none",
+    background: "#ffffff",
+    border: "1px solid #d1d5db",
     "border-radius": "0",
     padding: "10px 12px",
     "line-height": "20px",
     "box-shadow": "none",
     outline: "none",
+    transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+  },
+  ":focus": {
+    border: "1px solid transparent",
+    "box-shadow": "0 0 0 2px #000000",
   },
   "::placeholder": {
     color: "#6b7280",
   },
   ".invalid": {
     color: "#dc2626",
-    border: "none",
+    border: "1px solid #ef4444",
+    "box-shadow": "none",
   },
   ".valid": {
-    border: "none",
+    border: "1px solid #d1d5db",
   },
 } as const
 
@@ -653,18 +659,17 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
           .paypal-card-fields-stack .paypal-card-field-host {
             width: 100%;
             min-height: 40px;
-            border: 1px solid #d1d5db;
-            background: #ffffff;
+            border: 0;
+            background: transparent;
             border-radius: 0;
             box-sizing: border-box;
             display: block;
-            transition: box-shadow 0.2s ease, border-color 0.2s ease;
           }
 
           .paypal-card-fields-stack .paypal-card-field-host:focus-within {
-            border-color: transparent;
+            border: 0;
             outline: none;
-            box-shadow: 0 0 0 2px #000000;
+            box-shadow: none;
           }
 
           .paypal-card-fields-stack .paypal-card-field-host > div {
@@ -691,12 +696,22 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
             background: transparent !important;
             box-shadow: none !important;
             outline: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
           }
 
           .paypal-card-fields-stack .paypal-card-field-host [data-client-version]:focus-within {
             border: 0 !important;
             box-shadow: none !important;
             outline: none !important;
+          }
+
+          .paypal-card-fields-stack .paypal-card-field-host iframe {
+            border: 0 !important;
+            width: 100% !important;
+            min-height: 24px !important;
+            display: block !important;
+            background: transparent !important;
           }
         `}</style>
 
