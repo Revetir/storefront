@@ -16,8 +16,11 @@ import PayPalIcon from "@modules/common/icons/paypal"
 import Visa from "@modules/common/icons/visa"
 import {
   PayPalButtons,
-  PayPalCardFieldsForm,
+  PayPalCVVField,
   PayPalCardFieldsProvider,
+  PayPalExpiryField,
+  PayPalNameField,
+  PayPalNumberField,
   PayPalScriptProvider,
   usePayPalCardFields,
 } from "@paypal/react-paypal-js"
@@ -97,7 +100,7 @@ const PAYPAL_METHODS: PayPalMethodConfig[] = [
 
 const PAYPAL_CARD_FIELD_STYLE = {
   input: {
-    "font-size": "14px",
+    "font-size": "16px",
     "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
     color: "#111827",
     "background-color": "transparent",
@@ -111,6 +114,10 @@ const PAYPAL_CARD_FIELD_STYLE = {
     color: "#dc2626",
   },
 } as const
+
+const PAYPAL_FIELD_LABEL_CLASS = "block text-sm font-medium text-gray-700 mb-1"
+const PAYPAL_FIELD_INPUT_WRAPPER_CLASS =
+  "w-full px-3 py-2 border border-gray-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-black focus-within:border-transparent"
 
 const resolvePayPalSession = (
   paymentCollection: PaymentCollectionLike | null | undefined,
@@ -366,10 +373,6 @@ const PayPalCardSubmitButton = ({
 }
 
 const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) => {
-  const [workingCart, setWorkingCart] = useState<CartLike>(cart)
-  const [workingCollection, setWorkingCollection] = useState<PaymentCollectionLike | null>(
-    cart?.payment_collection || null
-  )
   const [selectedMethod, setSelectedMethod] = useState<PayPalMethodType>("paypal_wallet")
   const [clientToken, setClientToken] = useState<string | null>(null)
   const [loadingClientToken, setLoadingClientToken] = useState(false)
@@ -379,11 +382,6 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
   const { setSelectedPaymentMethod } = usePaymentContext()
   const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || ""
   const resolvedPayPalProviderId = paypalProviderId || DEFAULT_PAYPAL_PROVIDER_ID
-
-  useEffect(() => {
-    setWorkingCart(cart)
-    setWorkingCollection(cart?.payment_collection || null)
-  }, [cart])
 
   useEffect(() => {
     setSelectedPaymentMethod(selectedMethod)
@@ -415,14 +413,8 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
   }, [])
 
   const currencyCode = useMemo(
-    () =>
-      String(
-        workingCart?.currency_code ||
-          workingCollection?.currency_code ||
-          cart?.currency_code ||
-          "usd"
-      ).toUpperCase(),
-    [cart?.currency_code, workingCart?.currency_code, workingCollection?.currency_code]
+    () => String(cart?.currency_code || cart?.payment_collection?.currency_code || "usd").toUpperCase(),
+    [cart?.currency_code, cart?.payment_collection?.currency_code]
   )
 
   const completeOrder = useCallback(async () => {
@@ -435,7 +427,7 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
       window.dispatchEvent(new Event("checkout:submit-intent"))
     }
 
-    const currentCart = (workingCart || cart) as HttpTypes.StoreCart
+    const currentCart = cart as HttpTypes.StoreCart
 
     if (!currentCart?.id) {
       throw new Error("Missing checkout cart. Please refresh and try again.")
@@ -447,7 +439,7 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
     const checkoutCart = (refreshedCart || (syncedCart as CartLike)) as CartLike
 
     if (!checkoutCart.payment_collection?.id) {
-      const fallbackCollection = workingCollection || cart?.payment_collection || null
+      const fallbackCollection = cart?.payment_collection || null
       if (fallbackCollection?.id) {
         checkoutCart.payment_collection = {
           ...(fallbackCollection as any),
@@ -468,11 +460,8 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
       throw new Error("Please complete all required checkout fields before placing your order.")
     }
 
-    setWorkingCart(checkoutCart)
-    setWorkingCollection(checkoutCart.payment_collection || null)
-
     return checkoutCart
-  }, [cart, workingCart, workingCollection])
+  }, [cart])
 
   const ensurePayPalSession = useCallback(async () => {
     const preparedCart = await validateAndPrepareCheckout()
@@ -487,16 +476,6 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
       if (createdCollection?.id) {
         paymentCollection = createdCollection
         paymentCollectionId = createdCollection.id
-
-        setWorkingCollection(createdCollection)
-        setWorkingCart((current) =>
-          current
-            ? ({
-                ...current,
-                payment_collection: createdCollection as any,
-              } as CartLike)
-            : current
-        )
       }
     }
 
@@ -517,16 +496,6 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
     )
 
     const nextCollection = response?.payment_collection || paymentCollection
-    setWorkingCollection(nextCollection || null)
-    setWorkingCart((current) =>
-      current
-        ? ({
-            ...current,
-            payment_collection: nextCollection,
-          } as CartLike)
-        : current
-    )
-
     const nextOrderId = resolvePayPalOrderId(nextCollection, resolvedPayPalProviderId)
     if (!nextOrderId) {
       throw new Error("Failed to initialize a PayPal order for this cart.")
@@ -551,14 +520,10 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
   }, [ensurePayPalSession])
 
   const handleApprove = useCallback(
-    async (_data?: any, actions?: any) => {
+    async () => {
       setSubmitting(true)
       setErrorMessage(null)
       try {
-        if (actions?.order?.authorize) {
-          await actions.order.authorize()
-        }
-
         await completeOrder()
       } catch (error) {
         setErrorMessage(toErrorMessage(error, "Failed to place order after PayPal approval."))
@@ -628,8 +593,33 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
         }}
         style={PAYPAL_CARD_FIELD_STYLE as any}
       >
-        <div className="max-w-md pt-2">
-          <PayPalCardFieldsForm />
+        <div className="max-w-md pt-2 space-y-4">
+          <div>
+            <label className={PAYPAL_FIELD_LABEL_CLASS}>Cardholder Name</label>
+            <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
+              <PayPalNameField placeholder="Full name" />
+            </div>
+          </div>
+          <div>
+            <label className={PAYPAL_FIELD_LABEL_CLASS}>Card Number</label>
+            <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
+              <PayPalNumberField placeholder="1234 1234 1234 1234" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={PAYPAL_FIELD_LABEL_CLASS}>Expiration</label>
+              <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
+                <PayPalExpiryField placeholder="MM/YY" />
+              </div>
+            </div>
+            <div>
+              <label className={PAYPAL_FIELD_LABEL_CLASS}>Security Code</label>
+              <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
+                <PayPalCVVField placeholder="CVV" />
+              </div>
+            </div>
+          </div>
         </div>
 
         {reviewActionSlot &&
@@ -662,7 +652,7 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
                 tagline: false,
                 height: 40,
               }}
-              forceReRender={[currencyCode, selectedMethod, String(workingCollection?.amount || "")]}
+              forceReRender={[currencyCode, selectedMethod]}
               createOrder={createOrder}
               onApprove={handleApprove}
               onCancel={() => {
