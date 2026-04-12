@@ -11,7 +11,6 @@ import Divider from "@modules/common/components/divider"
 import Amex from "@modules/common/icons/amex"
 import ApplePayIcon from "@modules/common/icons/apple-pay"
 import Discover from "@modules/common/icons/discover"
-import GooglePayIcon from "@modules/common/icons/google-pay"
 import Mastercard from "@modules/common/icons/mastercard"
 import PayPalPPIcon from "@modules/common/icons/paypal-pp"
 import PayPalPayLaterIcon from "@modules/common/icons/paypal-pay-later"
@@ -37,7 +36,6 @@ type PayPalMethodType =
   | "paypal_wallet"
   | "paypal_pay_later"
   | "paypal_apple_pay"
-  | "paypal_google_pay"
   | "paypal_card"
 
 type PayPalMethodConfig = {
@@ -97,11 +95,6 @@ const PAYPAL_METHODS: PayPalMethodConfig[] = [
     id: "paypal_apple_pay",
     label: "Pay with Apple Pay",
     icons: [ApplePayIcon],
-  },
-  {
-    id: "paypal_google_pay",
-    label: "Pay with Google Pay",
-    icons: [GooglePayIcon],
   },
   {
     id: "paypal_card",
@@ -402,10 +395,11 @@ const PayPalCardSubmitButton = ({
 
   return (
     <Button
+      variant="transparent"
       disabled={disabled || !cardFieldsForm || submitting}
       onClick={handleSubmit}
       isLoading={submitting}
-      className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer"
+      className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer !shadow-none after:!hidden focus-visible:!shadow-none"
       data-testid="paypal-card-submit-button"
     >
       Place order
@@ -421,7 +415,6 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [walletAvailability, setWalletAvailability] = useState({
     applePay: false,
-    googlePay: false,
   })
   const [reviewActionSlot, setReviewActionSlot] = useState<HTMLElement | null>(null)
   const { setSelectedPaymentMethod } = usePaymentContext()
@@ -447,7 +440,6 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
     const availability = checkWalletAvailability()
     setWalletAvailability({
       applePay: availability.applePay,
-      googlePay: availability.googlePay,
     })
   }, [])
 
@@ -481,13 +473,9 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
         return walletAvailability.applePay
       }
 
-      if (method.id === "paypal_google_pay") {
-        return walletAvailability.googlePay
-      }
-
       return true
     })
-  }, [walletAvailability.applePay, walletAvailability.googlePay])
+  }, [walletAvailability.applePay])
 
   const redirectToCheckoutCompletion = useCallback(() => {
     if (!cart?.id) {
@@ -669,8 +657,7 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
     if (
       method === "paypal_wallet" ||
       method === "paypal_pay_later" ||
-      method === "paypal_apple_pay" ||
-      method === "paypal_google_pay"
+      method === "paypal_apple_pay"
     ) {
       return null
     }
@@ -725,8 +712,7 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
     reviewActionSlot &&
     (selectedMethod === "paypal_wallet" ||
       selectedMethod === "paypal_pay_later" ||
-      selectedMethod === "paypal_apple_pay" ||
-      selectedMethod === "paypal_google_pay")
+      selectedMethod === "paypal_apple_pay")
       ? createPortal(
           <div className="w-full space-y-2">
             {(() => {
@@ -735,11 +721,8 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
                   ? "paylater"
                   : selectedMethod === "paypal_apple_pay"
                     ? "applepay"
-                    // Google Pay is exposed via PayPal's wallet flow in this Buttons integration.
                     : "paypal"
-              const isPayLaterSelected = selectedMethod === "paypal_pay_later"
-              const isWalletLikeMethod =
-                selectedMethod === "paypal_wallet" || selectedMethod === "paypal_google_pay"
+              const isWalletLikeMethod = selectedMethod === "paypal_wallet"
 
               return (
             <PayPalButtons
@@ -750,7 +733,7 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
                 color:
                   selectedMethod === "paypal_pay_later"
                     ? "white"
-                    : selectedMethod === "paypal_apple_pay" || selectedMethod === "paypal_google_pay"
+                    : selectedMethod === "paypal_apple_pay"
                     ? "black"
                     : "gold",
                 shape: "rect",

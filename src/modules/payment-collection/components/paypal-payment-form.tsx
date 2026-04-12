@@ -8,7 +8,6 @@ import Divider from "@modules/common/components/divider"
 import Amex from "@modules/common/icons/amex"
 import ApplePayIcon from "@modules/common/icons/apple-pay"
 import Discover from "@modules/common/icons/discover"
-import GooglePayIcon from "@modules/common/icons/google-pay"
 import Mastercard from "@modules/common/icons/mastercard"
 import PayPalPPIcon from "@modules/common/icons/paypal-pp"
 import PayPalPayLaterIcon from "@modules/common/icons/paypal-pay-later"
@@ -30,7 +29,6 @@ type PayPalMethodType =
   | "paypal_wallet"
   | "paypal_pay_later"
   | "paypal_apple_pay"
-  | "paypal_google_pay"
   | "paypal_card"
 
 const PAYMENT_COLLECTION_REVIEW_ACTION_SLOT_ID = "payment-collection-review-payment-action-slot"
@@ -56,11 +54,6 @@ const PAYPAL_METHODS: PayPalMethodConfig[] = [
     id: "paypal_apple_pay",
     label: "Pay with Apple Pay",
     icons: [ApplePayIcon],
-  },
-  {
-    id: "paypal_google_pay",
-    label: "Pay with Google Pay",
-    icons: [GooglePayIcon],
   },
   {
     id: "paypal_card",
@@ -222,7 +215,6 @@ const PayPalPaymentCollectionForm = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [walletAvailability, setWalletAvailability] = useState({
     applePay: false,
-    googlePay: false,
   })
   const [reviewActionSlot, setReviewActionSlot] = useState<HTMLElement | null>(null)
   const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || ""
@@ -239,7 +231,6 @@ const PayPalPaymentCollectionForm = ({
     const availability = checkWalletAvailability()
     setWalletAvailability({
       applePay: availability.applePay,
-      googlePay: availability.googlePay,
     })
   }, [])
 
@@ -273,13 +264,9 @@ const PayPalPaymentCollectionForm = ({
         return walletAvailability.applePay
       }
 
-      if (method.id === "paypal_google_pay") {
-        return walletAvailability.googlePay
-      }
-
       return true
     })
-  }, [walletAvailability.applePay, walletAvailability.googlePay])
+  }, [walletAvailability.applePay])
 
   const redirectToCaptureValidation = useCallback(() => {
     const url = new URL(
@@ -387,8 +374,7 @@ const PayPalPaymentCollectionForm = ({
     if (
       method === "paypal_wallet" ||
       method === "paypal_pay_later" ||
-      method === "paypal_apple_pay" ||
-      method === "paypal_google_pay"
+      method === "paypal_apple_pay"
     ) {
       return null
     }
@@ -443,8 +429,7 @@ const PayPalPaymentCollectionForm = ({
     reviewActionSlot &&
     (selectedMethod === "paypal_wallet" ||
       selectedMethod === "paypal_pay_later" ||
-      selectedMethod === "paypal_apple_pay" ||
-      selectedMethod === "paypal_google_pay")
+      selectedMethod === "paypal_apple_pay")
       ? createPortal(
           <div className="w-full space-y-2">
             {(() => {
@@ -453,10 +438,8 @@ const PayPalPaymentCollectionForm = ({
                   ? "paylater"
                   : selectedMethod === "paypal_apple_pay"
                     ? "applepay"
-                    // Google Pay is exposed via PayPal's wallet flow in this Buttons integration.
                     : "paypal"
-              const isWalletLikeMethod =
-                selectedMethod === "paypal_wallet" || selectedMethod === "paypal_google_pay"
+              const isWalletLikeMethod = selectedMethod === "paypal_wallet"
               return (
             <PayPalButtons
               fundingSource={fundingSource as any}
@@ -466,7 +449,7 @@ const PayPalPaymentCollectionForm = ({
                 color:
                   selectedMethod === "paypal_pay_later"
                     ? "white"
-                    : selectedMethod === "paypal_apple_pay" || selectedMethod === "paypal_google_pay"
+                    : selectedMethod === "paypal_apple_pay"
                     ? "black"
                     : "gold",
                 shape: "rect",
