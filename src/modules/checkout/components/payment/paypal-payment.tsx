@@ -1,7 +1,6 @@
 "use client"
 
 import { sdk } from "@lib/config"
-import { placeOrder } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button, Heading } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
@@ -24,6 +23,7 @@ import {
   PayPalScriptProvider,
   usePayPalCardFields,
 } from "@paypal/react-paypal-js"
+import { useParams } from "next/navigation"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 
@@ -172,6 +172,22 @@ const toErrorMessage = (error: unknown, fallback: string) => {
   }
 
   return fallback
+}
+
+const resolveCountryCodeForRedirect = (
+  routeCountryCode: string | string[] | undefined,
+  cartLike: CartLike | null | undefined
+) => {
+  const fromRoute = Array.isArray(routeCountryCode)
+    ? routeCountryCode[0]
+    : routeCountryCode
+
+  return (
+    fromRoute?.toLowerCase() ||
+    cartLike?.shipping_address?.country_code?.toLowerCase() ||
+    cartLike?.billing_address?.country_code?.toLowerCase() ||
+    "us"
+  )
 }
 
 const readAutocompleteFieldValue = (testId: string): string | undefined => {
@@ -383,6 +399,7 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [reviewActionSlot, setReviewActionSlot] = useState<HTMLElement | null>(null)
   const { setSelectedPaymentMethod } = usePaymentContext()
+  const params = useParams()
   const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || ""
   const resolvedPayPalProviderId = paypalProviderId || DEFAULT_PAYPAL_PROVIDER_ID
 
@@ -420,10 +437,24 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
     [cart?.currency_code, cart?.payment_collection?.currency_code]
   )
 
-  const completeOrder = useCallback(async () => {
-    const order = await placeOrder()
-    window.location.assign(`/${order.countryCode}/order/${order.orderId}/confirmed`)
-  }, [])
+  const redirectToCheckoutCompletion = useCallback(() => {
+    if (!cart?.id) {
+      throw new Error("Missing checkout cart. Please refresh and try again.")
+    }
+
+    const countryCode = resolveCountryCodeForRedirect(
+      params?.countryCode as string | string[] | undefined,
+      cart
+    )
+
+    const completionUrl = new URL(
+      `/api/complete-checkout/${cart.id}`,
+      window.location.origin
+    )
+    completionUrl.searchParams.set("country_code", countryCode)
+
+    window.location.assign(completionUrl.toString())
+  }, [cart, params?.countryCode])
 
   const validateAndPrepareCheckout = useCallback(async (): Promise<CartLike> => {
     if (typeof window !== "undefined") {
@@ -527,14 +558,14 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
       setSubmitting(true)
       setErrorMessage(null)
       try {
-        await completeOrder()
+        redirectToCheckoutCompletion()
       } catch (error) {
         setErrorMessage(toErrorMessage(error, "Failed to place order after PayPal approval."))
       } finally {
         setSubmitting(false)
       }
     },
-    [completeOrder]
+    [redirectToCheckoutCompletion]
   )
 
   useEffect(() => {
