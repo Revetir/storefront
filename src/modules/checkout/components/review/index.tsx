@@ -387,6 +387,15 @@ const Review = ({ cart }: { cart: any }) => {
     selectedPaymentMethod === 'google_pay' ||
     selectedPaymentMethod === 'klarna'
 
+  const isPaypalCheckoutMethod =
+    selectedPaymentMethod === "paypal_wallet" ||
+    selectedPaymentMethod === "paypal_pay_later" ||
+    selectedPaymentMethod === "paypal_card"
+
+  if (isPaypalCheckoutMethod) {
+    return <div id="checkout-review-payment-action-slot" className="w-full" />
+  }
+
   // Only render Stripe-specific content if we're inside Stripe Elements context
   if (stripeReady && isExpressCheckoutMethod) {
     return <StripeReviewContent cart={cart} />

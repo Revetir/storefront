@@ -10,7 +10,6 @@ import ErrorMessage from "../error-message"
 import { useParams } from "next/navigation"
 import { validateCheckout, triggerFieldErrors, scrollToTop } from "../../utils/validate-checkout"
 import { usePaymentContext } from "../payment/payment-context"
-import { PaymentMethodType } from "../payment/payment-methods-config"
 import AfterpayButton from "../afterpay-button"
 import { StripeContext } from "../payment-wrapper/stripe-wrapper"
 
@@ -199,7 +198,7 @@ const syncCartFromCheckoutForm = async (
  * Note: This component only handles Card and Afterpay payments.
  * Klarna, Apple Pay, and Google Pay are handled by ExpressCheckoutElement in Review component.
  */
-const getButtonText = (paymentMethod: PaymentMethodType | null): string => {
+const getButtonText = (paymentMethod: string | null): string => {
   return paymentMethod === 'afterpay_clearpay' ? 'Pay with Afterpay' : 'Place order'
 }
 

@@ -1,10 +1,13 @@
 "use client"
 
 import { sdk } from "@lib/config"
-import { placeOrder } from "@lib/data/cart"
-import { Heading } from "@medusajs/ui"
+import { placeOrder, updateCheckoutCart } from "@lib/data/cart"
+import { HttpTypes } from "@medusajs/types"
+import { Button, Heading } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
+import { usePaymentContext } from "@modules/checkout/components/payment/payment-context"
 import CustomPaymentSelector from "@modules/checkout/components/payment/custom-payment-selector"
+import { scrollToTop, triggerFieldErrors, validateCheckout } from "@modules/checkout/utils/validate-checkout"
 import Divider from "@modules/common/components/divider"
 import Amex from "@modules/common/icons/amex"
 import Discover from "@modules/common/icons/discover"
@@ -18,10 +21,11 @@ import {
   PayPalScriptProvider,
   usePayPalCardFields,
 } from "@paypal/react-paypal-js"
-import { Button } from "@medusajs/ui"
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { createPortal } from "react-dom"
 
 const DEFAULT_PAYPAL_PROVIDER_ID = "pp_paypal_paypal"
+const CHECKOUT_REVIEW_ACTION_SLOT_ID = "checkout-review-payment-action-slot"
 
 type PayPalMethodType = "paypal_wallet" | "paypal_pay_later" | "paypal_card"
 
@@ -30,6 +34,42 @@ type PayPalMethodConfig = {
   label: string
   icons: React.ComponentType[]
 }
+
+type PaymentSession = {
+  provider_id?: string
+  status?: string
+  amount?: number
+  data?: Record<string, any>
+}
+
+type PaymentCollectionLike = {
+  id?: string
+  currency_code?: string
+  amount?: number
+  payment_sessions?: PaymentSession[]
+}
+
+type CartLike = HttpTypes.StoreCart & {
+  payment_collection?: PaymentCollectionLike | null
+}
+
+type PayPalCartPaymentProps = {
+  cart: CartLike
+  paypalProviderId?: string
+}
+
+const ADDRESS_FIELDS = [
+  "first_name",
+  "last_name",
+  "address_1",
+  "address_2",
+  "company",
+  "postal_code",
+  "city",
+  "country_code",
+  "province",
+  "phone",
+] as const
 
 const PayIn4Badge = () => (
   <span className="text-[10px] uppercase tracking-wide border border-ui-border-base px-2 py-1 text-ui-fg-subtle">
@@ -55,28 +95,32 @@ const PAYPAL_METHODS: PayPalMethodConfig[] = [
   },
 ]
 
-type PaymentSession = {
-  provider_id?: string
-  status?: string
-  data?: Record<string, any>
-}
-
-type PaymentCollectionLike = {
-  id?: string
-  currency_code?: string
-  payment_sessions?: PaymentSession[]
-}
-
-type CartLike = {
-  id?: string
-  currency_code?: string
-  payment_collection?: PaymentCollectionLike | null
-}
-
-type PayPalCartPaymentProps = {
-  cart: CartLike
-  paypalProviderId?: string
-}
+const PAYPAL_CARD_FIELD_STYLE = {
+  input: {
+    "font-size": "14px",
+    "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
+    color: "#111827",
+    "background-color": "#ffffff",
+    "border-color": "#d1d5db",
+    "border-width": "1px",
+    "border-style": "solid",
+    "border-radius": "0px",
+    "padding": "8px 12px",
+    "box-shadow": "none",
+    "outline": "none",
+  },
+  ":focus": {
+    "border-color": "transparent",
+    "box-shadow": "0 0 0 2px #000000",
+  },
+  "::placeholder": {
+    color: "#9ca3af",
+  },
+  ".invalid": {
+    color: "#dc2626",
+    "border-color": "#ef4444",
+  },
+} as const
 
 const resolvePayPalSession = (
   paymentCollection: PaymentCollectionLike | null | undefined,
@@ -130,6 +174,125 @@ const toErrorMessage = (error: unknown, fallback: string) => {
   return fallback
 }
 
+const readAutocompleteFieldValue = (testId: string): string | undefined => {
+  if (typeof window === "undefined") return undefined
+
+  const container = document.querySelector(
+    `[data-testid="${testId}"]`
+  ) as HTMLElement | null
+  const input = container?.querySelector(
+    ".radar-autocomplete-input"
+  ) as HTMLInputElement | null
+
+  if (!input) {
+    return undefined
+  }
+
+  return input.value?.trim() ?? ""
+}
+
+const readFieldValue = (name: string): string | undefined => {
+  if (typeof window === "undefined") return undefined
+
+  const field = document.querySelector(
+    `[name="${name}"]`
+  ) as HTMLInputElement | HTMLSelectElement | null
+
+  if (field) {
+    return field.value?.trim() ?? ""
+  }
+
+  if (name === "shipping_address.address_1") {
+    return readAutocompleteFieldValue("shipping-address-input")
+  }
+
+  if (name === "billing_address.address_1") {
+    return readAutocompleteFieldValue("billing-address-input")
+  }
+
+  return undefined
+}
+
+const readAddressFromForm = (
+  prefix: "shipping_address" | "billing_address"
+): Partial<HttpTypes.StoreCartAddress> | null => {
+  const address: Partial<HttpTypes.StoreCartAddress> = {}
+  let hasAnyField = false
+
+  ADDRESS_FIELDS.forEach((field) => {
+    const value = readFieldValue(`${prefix}.${field}`)
+    if (value !== undefined) {
+      hasAnyField = true
+      address[field] = value
+    }
+  })
+
+  return hasAnyField ? address : null
+}
+
+const isSameAsBillingChecked = (): boolean => {
+  if (typeof window === "undefined") return true
+
+  const checkbox = document.querySelector(
+    '[data-testid="billing-address-checkbox"]'
+  ) as HTMLElement | null
+
+  return checkbox?.getAttribute("aria-checked") !== "false"
+}
+
+const syncCartFromCheckoutForm = async (
+  cart: HttpTypes.StoreCart
+): Promise<HttpTypes.StoreCart> => {
+  if (typeof window === "undefined") return cart
+
+  const shippingAddress = readAddressFromForm("shipping_address")
+  const billingAddress = readAddressFromForm("billing_address")
+  const email = readFieldValue("email")
+  const sameAsBilling = isSameAsBillingChecked()
+
+  const updateData: HttpTypes.StoreUpdateCart = {}
+
+  if (shippingAddress) {
+    updateData.shipping_address = shippingAddress
+  }
+
+  if (email !== undefined) {
+    updateData.email = email
+  }
+
+  if (sameAsBilling) {
+    if (shippingAddress || cart.shipping_address) {
+      updateData.billing_address = shippingAddress || cart.shipping_address || undefined
+    }
+  } else if (billingAddress) {
+    updateData.billing_address = billingAddress
+  }
+
+  if (Object.keys(updateData).length === 0) {
+    return cart
+  }
+
+  const updatedCart = await updateCheckoutCart(updateData)
+  return updatedCart || cart
+}
+
+const fetchCheckoutCartForPayment = async (cartId: string): Promise<CartLike | null> => {
+  try {
+    const response = await sdk.client.fetch<{ cart: CartLike }>(`/store/carts/${cartId}`, {
+      method: "GET",
+      query: {
+        fields:
+          "id,email,currency_code,*shipping_methods,*shipping_address,*billing_address,+total,+subtotal,+tax_total,+shipping_total,*payment_collection,*payment_collection.payment_sessions,+payment_collection.amount,+payment_collection.currency_code,+payment_collection.payment_sessions.amount,+payment_collection.payment_sessions.provider_id,+payment_collection.payment_sessions.status,+payment_collection.payment_sessions.data",
+      },
+      cache: "no-store",
+    })
+
+    return response?.cart || null
+  } catch {
+    return null
+  }
+}
+
 const PayPalCardSubmitButton = ({
   disabled,
   onSubmitStart,
@@ -181,6 +344,8 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
   const [loadingClientToken, setLoadingClientToken] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [reviewActionSlot, setReviewActionSlot] = useState<HTMLElement | null>(null)
+  const { setSelectedPaymentMethod } = usePaymentContext()
   const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || ""
   const resolvedPayPalProviderId = paypalProviderId || DEFAULT_PAYPAL_PROVIDER_ID
 
@@ -188,6 +353,35 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
     setWorkingCart(cart)
     setWorkingCollection(cart?.payment_collection || null)
   }, [cart])
+
+  useEffect(() => {
+    setSelectedPaymentMethod(selectedMethod)
+  }, [selectedMethod, setSelectedPaymentMethod])
+
+  useEffect(() => {
+    return () => {
+      setSelectedPaymentMethod(null)
+    }
+  }, [setSelectedPaymentMethod])
+
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return
+    }
+
+    const resolveSlot = () => {
+      setReviewActionSlot(document.getElementById(CHECKOUT_REVIEW_ACTION_SLOT_ID))
+    }
+
+    resolveSlot()
+
+    const observer = new MutationObserver(resolveSlot)
+    observer.observe(document.body, { childList: true, subtree: true })
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
 
   const currencyCode = useMemo(
     () =>
@@ -205,17 +399,65 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
     window.location.assign(`/${order.countryCode}/order/${order.orderId}/confirmed`)
   }, [])
 
-  const ensurePayPalSession = useCallback(async () => {
-    const existingOrderId = resolvePayPalOrderId(workingCollection, resolvedPayPalProviderId)
-    if (existingOrderId) {
-      return existingOrderId
+  const validateAndPrepareCheckout = useCallback(async (): Promise<CartLike> => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("checkout:submit-intent"))
     }
 
-    const paymentCollectionId = workingCollection?.id
+    const currentCart = (workingCart || cart) as HttpTypes.StoreCart
+
+    if (!currentCart?.id) {
+      throw new Error("Missing checkout cart. Please refresh and try again.")
+    }
+
+    let syncedCart = currentCart
+
+    try {
+      syncedCart = await syncCartFromCheckoutForm(currentCart)
+    } catch {
+      throw new Error("Unable to save your checkout details. Please try again.")
+    }
+
+    const refreshedCart = await fetchCheckoutCartForPayment(currentCart.id)
+    const checkoutCart = (refreshedCart || (syncedCart as CartLike)) as CartLike
+
+    if (!checkoutCart.payment_collection?.id) {
+      const fallbackCollection = workingCollection || cart?.payment_collection || null
+      if (fallbackCollection?.id) {
+        checkoutCart.payment_collection = {
+          ...(fallbackCollection as any),
+          ...((checkoutCart.payment_collection || {}) as any),
+          id: fallbackCollection.id,
+        } as any
+      }
+    }
+
+    if (!checkoutCart.shipping_methods?.length) {
+      throw new Error("Please select a shipping method before continuing.")
+    }
+
+    const validationErrors = validateCheckout(checkoutCart)
+    if (validationErrors.length > 0) {
+      scrollToTop()
+      triggerFieldErrors(validationErrors)
+      throw new Error("Please complete all required checkout fields before placing your order.")
+    }
+
+    setWorkingCart(checkoutCart)
+    setWorkingCollection(checkoutCart.payment_collection || null)
+
+    return checkoutCart
+  }, [cart, workingCart, workingCollection])
+
+  const ensurePayPalSession = useCallback(async () => {
+    const preparedCart = await validateAndPrepareCheckout()
+
+    const paymentCollectionId = preparedCart.payment_collection?.id
     if (!paymentCollectionId) {
       throw new Error("Missing payment collection. Please refresh and try again.")
     }
 
+    // Always refresh the provider session so PayPal uses the latest cart totals (including tax).
     const response = await sdk.client.fetch<{ payment_collection: PaymentCollectionLike }>(
       `/store/payment-collections/${paymentCollectionId}/payment-sessions`,
       {
@@ -227,14 +469,14 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
       }
     )
 
-    const nextCollection = response?.payment_collection || workingCollection
-    setWorkingCollection(nextCollection)
+    const nextCollection = response?.payment_collection || preparedCart.payment_collection
+    setWorkingCollection(nextCollection || null)
     setWorkingCart((current) =>
       current
-        ? {
+        ? ({
             ...current,
             payment_collection: nextCollection,
-          }
+          } as CartLike)
         : current
     )
 
@@ -244,11 +486,21 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
     }
 
     return nextOrderId
-  }, [resolvedPayPalProviderId, workingCollection])
+  }, [resolvedPayPalProviderId, validateAndPrepareCheckout])
 
   const createOrder = useCallback(async () => {
     setErrorMessage(null)
-    return ensurePayPalSession()
+
+    try {
+      return await ensurePayPalSession()
+    } catch (error) {
+      const message = toErrorMessage(
+        error,
+        "Checkout is missing required information. Please review your details and try again."
+      )
+      setErrorMessage(message)
+      throw new Error(message)
+    }
   }, [ensurePayPalSession])
 
   const handleApprove = useCallback(
@@ -317,51 +569,24 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
 
   const renderMethodDetail = (method: PayPalMethodType) => {
     if (method === "paypal_wallet" || method === "paypal_pay_later") {
-      const isPayLater = method === "paypal_pay_later"
-      return (
-        <div className="max-w-md pt-2 space-y-2">
-          {isPayLater && <PayIn4Badge />}
-          <PayPalButtons
-            fundingSource={(isPayLater ? "paylater" : "paypal") as any}
-            style={{
-              layout: "horizontal",
-              label: isPayLater ? "installment" : "paypal",
-              tagline: false,
-              height: 40,
-            }}
-            forceReRender={[currencyCode, isPayLater ? "paylater" : "paypal"]}
-            createOrder={createOrder}
-            onApprove={handleApprove}
-            onCancel={() => {
-              setErrorMessage("PayPal checkout was canceled.")
-            }}
-            onError={(error) => {
-              setErrorMessage(toErrorMessage(error, "PayPal checkout failed. Please try again."))
-            }}
-          />
-        </div>
-      )
+      return <p className="pt-2 text-sm text-ui-fg-subtle">Continue in the Review section below.</p>
     }
 
     return (
-      <div className="max-w-md pt-2 space-y-4">
-        <PayPalCardFieldsProvider
-          createOrder={createOrder}
-          onApprove={handleApprove}
-          onError={(error) => {
-            setErrorMessage(toErrorMessage(error, "Card payment failed. Please try again."))
-          }}
-          style={{
-            input: {
-              "font-size": "14px",
-              "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
-              color: "#000000",
-            },
-            ".invalid": { color: "#dc2626" },
-          }}
-        >
-          <div className="space-y-4">
-            <PayPalCardFieldsForm />
+      <PayPalCardFieldsProvider
+        createOrder={createOrder}
+        onApprove={handleApprove}
+        onError={(error) => {
+          setErrorMessage(toErrorMessage(error, "Card payment failed. Please try again."))
+        }}
+        style={PAYPAL_CARD_FIELD_STYLE as any}
+      >
+        <div className="max-w-md pt-2 space-y-4">
+          <PayPalCardFieldsForm />
+        </div>
+
+        {reviewActionSlot &&
+          createPortal(
             <PayPalCardSubmitButton
               disabled={submitting}
               onSubmitStart={() => {
@@ -371,12 +596,40 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
               onSubmitEnd={() => {
                 setSubmitting(false)
               }}
-            />
-          </div>
-        </PayPalCardFieldsProvider>
-      </div>
+            />,
+            reviewActionSlot
+          )}
+      </PayPalCardFieldsProvider>
     )
   }
+
+  const walletReviewAction =
+    reviewActionSlot && (selectedMethod === "paypal_wallet" || selectedMethod === "paypal_pay_later")
+      ? createPortal(
+          <div className="w-full space-y-2">
+            {selectedMethod === "paypal_pay_later" && <PayIn4Badge />}
+            <PayPalButtons
+              fundingSource={(selectedMethod === "paypal_pay_later" ? "paylater" : "paypal") as any}
+              style={{
+                layout: "horizontal",
+                label: selectedMethod === "paypal_pay_later" ? "installment" : "paypal",
+                tagline: false,
+                height: 40,
+              }}
+              forceReRender={[currencyCode, selectedMethod, String(workingCollection?.amount || "")]}
+              createOrder={createOrder}
+              onApprove={handleApprove}
+              onCancel={() => {
+                setErrorMessage("PayPal checkout was canceled.")
+              }}
+              onError={(error) => {
+                setErrorMessage(toErrorMessage(error, "PayPal checkout failed. Please try again."))
+              }}
+            />
+          </div>,
+          reviewActionSlot
+        )
+      : null
 
   return (
     <div className="bg-white">
@@ -418,6 +671,7 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
                 }}
                 renderPaymentDetails={renderMethodDetail}
               />
+              {walletReviewAction}
             </PayPalScriptProvider>
           )}
 

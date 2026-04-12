@@ -3,15 +3,22 @@
 import { createContext, useContext, useState, ReactNode } from "react"
 import { PaymentMethodType } from "./payment-methods-config"
 
+export type CheckoutPaymentMethod =
+  | PaymentMethodType
+  | "paypal_wallet"
+  | "paypal_pay_later"
+  | "paypal_card"
+
 interface PaymentContextType {
-  selectedPaymentMethod: PaymentMethodType | null
-  setSelectedPaymentMethod: (method: PaymentMethodType | null) => void
+  selectedPaymentMethod: CheckoutPaymentMethod | null
+  setSelectedPaymentMethod: (method: CheckoutPaymentMethod | null) => void
 }
 
 const PaymentContext = createContext<PaymentContextType | undefined>(undefined)
 
 export const PaymentProvider = ({ children }: { children: ReactNode }) => {
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethodType | null>(null)
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<CheckoutPaymentMethod | null>(null)
 
   return (
     <PaymentContext.Provider value={{ selectedPaymentMethod, setSelectedPaymentMethod }}>

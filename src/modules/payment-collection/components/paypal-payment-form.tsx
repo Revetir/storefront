@@ -18,8 +18,11 @@ import {
   usePayPalCardFields,
 } from "@paypal/react-paypal-js"
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { createPortal } from "react-dom"
 
 type PayPalMethodType = "paypal_wallet" | "paypal_pay_later" | "paypal_card"
+
+const PAYMENT_COLLECTION_REVIEW_ACTION_SLOT_ID = "payment-collection-review-payment-action-slot"
 
 type PayPalMethodConfig = {
   id: PayPalMethodType
@@ -50,6 +53,33 @@ const PAYPAL_METHODS: PayPalMethodConfig[] = [
     icons: [Visa, Mastercard, Amex, Discover],
   },
 ]
+
+const PAYPAL_CARD_FIELD_STYLE = {
+  input: {
+    "font-size": "14px",
+    "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
+    color: "#111827",
+    "background-color": "#ffffff",
+    "border-color": "#d1d5db",
+    "border-width": "1px",
+    "border-style": "solid",
+    "border-radius": "0px",
+    "padding": "8px 12px",
+    "box-shadow": "none",
+    "outline": "none",
+  },
+  ":focus": {
+    "border-color": "transparent",
+    "box-shadow": "0 0 0 2px #000000",
+  },
+  "::placeholder": {
+    color: "#9ca3af",
+  },
+  ".invalid": {
+    color: "#dc2626",
+    "border-color": "#ef4444",
+  },
+} as const
 
 type PaymentSession = {
   provider_id?: string
@@ -168,11 +198,31 @@ const PayPalPaymentCollectionForm = ({
   const [loadingClientToken, setLoadingClientToken] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [reviewActionSlot, setReviewActionSlot] = useState<HTMLElement | null>(null)
   const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || ""
 
   useEffect(() => {
     setCollection(paymentCollection)
   }, [paymentCollection])
+
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return
+    }
+
+    const resolveSlot = () => {
+      setReviewActionSlot(document.getElementById(PAYMENT_COLLECTION_REVIEW_ACTION_SLOT_ID))
+    }
+
+    resolveSlot()
+
+    const observer = new MutationObserver(resolveSlot)
+    observer.observe(document.body, { childList: true, subtree: true })
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
 
   const currencyCode = useMemo(
     () => String(order?.currency_code || paymentCollection.currency_code || "usd").toUpperCase(),
@@ -287,51 +337,24 @@ const PayPalPaymentCollectionForm = ({
 
   const renderMethodDetail = (method: PayPalMethodType) => {
     if (method === "paypal_wallet" || method === "paypal_pay_later") {
-      const isPayLater = method === "paypal_pay_later"
-      return (
-        <div className="max-w-md pt-2 space-y-2">
-          {isPayLater && <PayIn4Badge />}
-          <PayPalButtons
-            fundingSource={(isPayLater ? "paylater" : "paypal") as any}
-            style={{
-              layout: "horizontal",
-              label: isPayLater ? "installment" : "paypal",
-              tagline: false,
-              height: 40,
-            }}
-            forceReRender={[currencyCode, isPayLater ? "paylater" : "paypal"]}
-            createOrder={createOrder}
-            onApprove={handleApprove}
-            onCancel={() => {
-              setErrorMessage("PayPal checkout was canceled.")
-            }}
-            onError={(error) => {
-              setErrorMessage(toErrorMessage(error, "PayPal checkout failed. Please try again."))
-            }}
-          />
-        </div>
-      )
+      return <p className="pt-2 text-sm text-ui-fg-subtle">Continue in the Review section below.</p>
     }
 
     return (
-      <div className="max-w-md pt-2 space-y-4">
-        <PayPalCardFieldsProvider
-          createOrder={createOrder}
-          onApprove={handleApprove}
-          onError={(error) => {
-            setErrorMessage(toErrorMessage(error, "Card payment failed. Please try again."))
-          }}
-          style={{
-            input: {
-              "font-size": "14px",
-              "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
-              color: "#000000",
-            },
-            ".invalid": { color: "#dc2626" },
-          }}
-        >
-          <div className="space-y-4">
-            <PayPalCardFieldsForm />
+      <PayPalCardFieldsProvider
+        createOrder={createOrder}
+        onApprove={handleApprove}
+        onError={(error) => {
+          setErrorMessage(toErrorMessage(error, "Card payment failed. Please try again."))
+        }}
+        style={PAYPAL_CARD_FIELD_STYLE as any}
+      >
+        <div className="max-w-md pt-2 space-y-4">
+          <PayPalCardFieldsForm />
+        </div>
+
+        {reviewActionSlot &&
+          createPortal(
             <PayPalCardSubmitButton
               disabled={submitting}
               onSubmitStart={() => {
@@ -341,12 +364,40 @@ const PayPalPaymentCollectionForm = ({
               onSubmitEnd={() => {
                 setSubmitting(false)
               }}
-            />
-          </div>
-        </PayPalCardFieldsProvider>
-      </div>
+            />,
+            reviewActionSlot
+          )}
+      </PayPalCardFieldsProvider>
     )
   }
+
+  const walletReviewAction =
+    reviewActionSlot && (selectedMethod === "paypal_wallet" || selectedMethod === "paypal_pay_later")
+      ? createPortal(
+          <div className="w-full space-y-2">
+            {selectedMethod === "paypal_pay_later" && <PayIn4Badge />}
+            <PayPalButtons
+              fundingSource={(selectedMethod === "paypal_pay_later" ? "paylater" : "paypal") as any}
+              style={{
+                layout: "horizontal",
+                label: selectedMethod === "paypal_pay_later" ? "installment" : "paypal",
+                tagline: false,
+                height: 40,
+              }}
+              forceReRender={[currencyCode, selectedMethod]}
+              createOrder={createOrder}
+              onApprove={handleApprove}
+              onCancel={() => {
+                setErrorMessage("PayPal checkout was canceled.")
+              }}
+              onError={(error) => {
+                setErrorMessage(toErrorMessage(error, "PayPal checkout failed. Please try again."))
+              }}
+            />
+          </div>,
+          reviewActionSlot
+        )
+      : null
 
   return (
     <div className="bg-white">
@@ -388,6 +439,7 @@ const PayPalPaymentCollectionForm = ({
                 }}
                 renderPaymentDetails={renderMethodDetail}
               />
+              {walletReviewAction}
             </PayPalScriptProvider>
           )}
 

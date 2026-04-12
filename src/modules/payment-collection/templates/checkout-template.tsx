@@ -212,6 +212,11 @@ export default async function PaymentCollectionCheckoutTemplate({
             </div>
             <Divider className="my-4" />
             <CartTotals totals={summaryLikeCart as any} forceFinalLabel />
+            {paypalEnabled && (
+              <div className="mt-4">
+                <div id="payment-collection-review-payment-action-slot" className="w-full" />
+              </div>
+            )}
           </div>
         </div>
       </div>
