@@ -15,8 +15,10 @@ import PayPalIcon from "@modules/common/icons/paypal"
 import Visa from "@modules/common/icons/visa"
 import {
   PayPalButtons,
-  PayPalCardFieldsForm,
+  PayPalCVVField,
   PayPalCardFieldsProvider,
+  PayPalExpiryField,
+  PayPalNumberField,
   PayPalScriptProvider,
   usePayPalCardFields,
 } from "@paypal/react-paypal-js"
@@ -100,17 +102,29 @@ const PAYPAL_CARD_FIELD_STYLE = {
     "font-size": "14px",
     "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
     color: "#111827",
-    "background-color": "transparent",
+    background: "#ffffff",
+    border: "1px solid #d1d5db",
+    "border-radius": "0",
+    padding: "10px 12px",
+    height: "40px",
+    "line-height": "20px",
     "box-shadow": "none",
-    "outline": "none",
+    outline: "none",
   },
   "::placeholder": {
-    color: "#9ca3af",
+    color: "#6b7280",
   },
   ".invalid": {
     color: "#dc2626",
+    border: "1px solid #ef4444",
+  },
+  ".valid": {
+    border: "1px solid #d1d5db",
   },
 } as const
+
+const PAYPAL_FIELD_LABEL_CLASS = "block text-sm font-medium text-gray-700 mb-1"
+const PAYPAL_FIELD_HOST_CLASS = "paypal-card-field-host"
 
 const resolvePayPalSession = (
   paymentCollection: PaymentCollectionLike | null | undefined,
@@ -617,43 +631,72 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
         }}
         style={PAYPAL_CARD_FIELD_STYLE as any}
       >
-        <div className="max-w-md pt-2">
-          <PayPalCardFieldsForm className="paypal-card-fields-layout" />
+        <div className="max-w-md pt-2 space-y-3 paypal-card-fields-stack">
+          <div>
+            <label className={PAYPAL_FIELD_LABEL_CLASS}>Card Number</label>
+            <PayPalNumberField
+              placeholder="1234 1234 1234 1234"
+              className={PAYPAL_FIELD_HOST_CLASS}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={PAYPAL_FIELD_LABEL_CLASS}>Expiration</label>
+              <PayPalExpiryField placeholder="MM/YY" className={PAYPAL_FIELD_HOST_CLASS} />
+            </div>
+            <div>
+              <label className={PAYPAL_FIELD_LABEL_CLASS}>Security Code</label>
+              <PayPalCVVField placeholder="CVV" className={PAYPAL_FIELD_HOST_CLASS} />
+            </div>
+          </div>
         </div>
         <style jsx global>{`
-          .paypal-card-fields-layout > div {
+          .paypal-card-fields-stack .paypal-card-field-host {
             width: 100%;
+            height: 40px;
+            border: 0;
+            background: transparent;
+            border-radius: 0;
+            box-sizing: border-box;
+            overflow: hidden;
           }
 
-          .paypal-card-fields-layout > div + div {
-            margin-top: 1rem;
+          .paypal-card-fields-stack .paypal-card-field-host:focus-within {
+            border: 0;
+            outline: none;
+            box-shadow: none;
           }
 
-          .paypal-card-fields-layout > div[style*="display: flex"] {
-            gap: 1rem;
-          }
-
-          .paypal-card-fields-layout > div:not([style*="display: flex"]),
-          .paypal-card-fields-layout > div[style*="display: flex"] > div > div {
-            border: 1px solid #d1d5db;
-            background: #ffffff;
-            padding: 8px 12px;
-            min-height: 42px;
-            transition: box-shadow 0.2s ease, border-color 0.2s ease;
-          }
-
-          .paypal-card-fields-layout > div:not([style*="display: flex"]):focus-within,
-          .paypal-card-fields-layout > div[style*="display: flex"] > div > div:focus-within {
-            border-color: transparent;
-            box-shadow: 0 0 0 2px #000000;
-          }
-
-          .paypal-card-fields-layout iframe {
+          .paypal-card-fields-stack .paypal-card-field-host > div {
+            width: 100%;
+            height: 100%;
             border: 0 !important;
-            width: 100% !important;
-            min-height: 24px !important;
-            display: block !important;
+            border-radius: 0 !important;
             background: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
+          }
+
+          .paypal-card-fields-stack .paypal-card-field-host > div > div {
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
+          }
+
+          .paypal-card-fields-stack .paypal-card-field-host [data-client-version] {
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
+          }
+
+          .paypal-card-fields-stack .paypal-card-field-host [data-client-version]:focus-within {
+            border: 0 !important;
+            box-shadow: none !important;
+            outline: none !important;
           }
         `}</style>
 
