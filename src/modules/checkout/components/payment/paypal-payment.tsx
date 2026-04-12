@@ -666,7 +666,12 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
   }, [])
 
   const renderMethodDetail = (method: PayPalMethodType) => {
-    if (method === "paypal_wallet" || method === "paypal_pay_later") {
+    if (
+      method === "paypal_wallet" ||
+      method === "paypal_pay_later" ||
+      method === "paypal_apple_pay" ||
+      method === "paypal_google_pay"
+    ) {
       return null
     }
 
