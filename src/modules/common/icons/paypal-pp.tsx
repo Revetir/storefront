@@ -1,17 +1,15 @@
-const PAYPAL_PP_ASSET_URL =
-  "https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png"
+const PAYPAL_PP_ASSET_URL = "/images/PayPal-Monogram-FullColor-RGB.png"
 
 const PayPalPPIcon = () => {
   return (
     <img
       src={PAYPAL_PP_ASSET_URL}
       alt="PayPal"
-      width={28}
+      width={20}
       height={20}
-      className="h-5 w-auto object-contain"
+      className="h-5 w-5 object-contain"
       loading="lazy"
       decoding="async"
-      referrerPolicy="no-referrer"
     />
   )
 }

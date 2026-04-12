@@ -7,6 +7,8 @@ export type CheckoutPaymentMethod =
   | PaymentMethodType
   | "paypal_wallet"
   | "paypal_pay_later"
+  | "paypal_apple_pay"
+  | "paypal_google_pay"
   | "paypal_card"
 
 interface PaymentContextType {

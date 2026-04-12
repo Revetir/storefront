@@ -9,11 +9,14 @@ import CustomPaymentSelector from "@modules/checkout/components/payment/custom-p
 import { scrollToTop, triggerFieldErrors, validateCheckout } from "@modules/checkout/utils/validate-checkout"
 import Divider from "@modules/common/components/divider"
 import Amex from "@modules/common/icons/amex"
+import ApplePayIcon from "@modules/common/icons/apple-pay"
 import Discover from "@modules/common/icons/discover"
+import GooglePayIcon from "@modules/common/icons/google-pay"
 import Mastercard from "@modules/common/icons/mastercard"
 import PayPalPPIcon from "@modules/common/icons/paypal-pp"
 import PayPalPayLaterIcon from "@modules/common/icons/paypal-pay-later"
 import Visa from "@modules/common/icons/visa"
+import { checkWalletAvailability } from "@lib/util/wallet-availability"
 import {
   PayPalButtons,
   PayPalCVVField,
@@ -30,7 +33,12 @@ import { createPortal } from "react-dom"
 const DEFAULT_PAYPAL_PROVIDER_ID = "pp_paypal_paypal"
 const CHECKOUT_REVIEW_ACTION_SLOT_ID = "checkout-review-payment-action-slot"
 
-type PayPalMethodType = "paypal_wallet" | "paypal_pay_later" | "paypal_card"
+type PayPalMethodType =
+  | "paypal_wallet"
+  | "paypal_pay_later"
+  | "paypal_apple_pay"
+  | "paypal_google_pay"
+  | "paypal_card"
 
 type PayPalMethodConfig = {
   id: PayPalMethodType
@@ -84,6 +92,16 @@ const PAYPAL_METHODS: PayPalMethodConfig[] = [
     id: "paypal_pay_later",
     label: "PayPal Pay in 4",
     icons: [PayPalPayLaterIcon],
+  },
+  {
+    id: "paypal_apple_pay",
+    label: "Pay with Apple Pay",
+    icons: [ApplePayIcon],
+  },
+  {
+    id: "paypal_google_pay",
+    label: "Pay with Google Pay",
+    icons: [GooglePayIcon],
   },
   {
     id: "paypal_card",
@@ -401,6 +419,10 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
   const [loadingClientToken, setLoadingClientToken] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [walletAvailability, setWalletAvailability] = useState({
+    applePay: false,
+    googlePay: false,
+  })
   const [reviewActionSlot, setReviewActionSlot] = useState<HTMLElement | null>(null)
   const { setSelectedPaymentMethod } = usePaymentContext()
   const params = useParams()
@@ -416,6 +438,18 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
       setSelectedPaymentMethod(null)
     }
   }, [setSelectedPaymentMethod])
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+
+    const availability = checkWalletAvailability()
+    setWalletAvailability({
+      applePay: availability.applePay,
+      googlePay: availability.googlePay,
+    })
+  }, [])
 
   useEffect(() => {
     if (typeof document === "undefined") {
@@ -440,6 +474,20 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
     () => String(cart?.currency_code || cart?.payment_collection?.currency_code || "usd").toUpperCase(),
     [cart?.currency_code, cart?.payment_collection?.currency_code]
   )
+
+  const availableMethods = useMemo(() => {
+    return PAYPAL_METHODS.filter((method) => {
+      if (method.id === "paypal_apple_pay") {
+        return walletAvailability.applePay
+      }
+
+      if (method.id === "paypal_google_pay") {
+        return walletAvailability.googlePay
+      }
+
+      return true
+    })
+  }, [walletAvailability.applePay, walletAvailability.googlePay])
 
   const redirectToCheckoutCompletion = useCallback(() => {
     if (!cart?.id) {
@@ -669,19 +717,39 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
   }
 
   const walletReviewAction =
-    reviewActionSlot && (selectedMethod === "paypal_wallet" || selectedMethod === "paypal_pay_later")
+    reviewActionSlot &&
+    (selectedMethod === "paypal_wallet" ||
+      selectedMethod === "paypal_pay_later" ||
+      selectedMethod === "paypal_apple_pay" ||
+      selectedMethod === "paypal_google_pay")
       ? createPortal(
           <div className="w-full space-y-2">
             {(() => {
+              const fundingSource =
+                selectedMethod === "paypal_pay_later"
+                  ? "paylater"
+                  : selectedMethod === "paypal_apple_pay"
+                    ? "applepay"
+                    // Google Pay is exposed via PayPal's wallet flow in this Buttons integration.
+                    : "paypal"
               const isPayLaterSelected = selectedMethod === "paypal_pay_later"
+              const isWalletLikeMethod =
+                selectedMethod === "paypal_wallet" || selectedMethod === "paypal_google_pay"
+
               return (
             <PayPalButtons
-              fundingSource={(isPayLaterSelected ? "paylater" : "paypal") as any}
+              fundingSource={fundingSource as any}
               style={{
                 layout: "horizontal",
-                ...(isPayLaterSelected ? {} : { label: "paypal" }),
-                color: "gold",
+                ...(isWalletLikeMethod ? { label: "paypal" } : {}),
+                color:
+                  selectedMethod === "paypal_pay_later"
+                    ? "white"
+                    : selectedMethod === "paypal_apple_pay" || selectedMethod === "paypal_google_pay"
+                    ? "black"
+                    : "gold",
                 shape: "rect",
+                borderRadius: 0,
                 tagline: false,
                 height: 40,
               }}
@@ -728,13 +796,14 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
               options={{
                 clientId: paypalClientId,
                 components: "buttons,card-fields",
+                enableFunding: "paylater,applepay",
                 currency: currencyCode,
                 intent: "authorize",
                 dataClientToken: clientToken,
               }}
             >
               <CustomPaymentSelector
-                availableMethods={PAYPAL_METHODS}
+                availableMethods={availableMethods}
                 selectedMethod={selectedMethod}
                 onMethodSelect={(method) => {
                   setSelectedMethod(method)

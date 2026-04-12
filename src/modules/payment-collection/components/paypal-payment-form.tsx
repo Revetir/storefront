@@ -6,11 +6,14 @@ import ErrorMessage from "@modules/checkout/components/error-message"
 import CustomPaymentSelector from "@modules/checkout/components/payment/custom-payment-selector"
 import Divider from "@modules/common/components/divider"
 import Amex from "@modules/common/icons/amex"
+import ApplePayIcon from "@modules/common/icons/apple-pay"
 import Discover from "@modules/common/icons/discover"
+import GooglePayIcon from "@modules/common/icons/google-pay"
 import Mastercard from "@modules/common/icons/mastercard"
 import PayPalPPIcon from "@modules/common/icons/paypal-pp"
 import PayPalPayLaterIcon from "@modules/common/icons/paypal-pay-later"
 import Visa from "@modules/common/icons/visa"
+import { checkWalletAvailability } from "@lib/util/wallet-availability"
 import {
   PayPalButtons,
   PayPalCVVField,
@@ -23,7 +26,12 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 
-type PayPalMethodType = "paypal_wallet" | "paypal_pay_later" | "paypal_card"
+type PayPalMethodType =
+  | "paypal_wallet"
+  | "paypal_pay_later"
+  | "paypal_apple_pay"
+  | "paypal_google_pay"
+  | "paypal_card"
 
 const PAYMENT_COLLECTION_REVIEW_ACTION_SLOT_ID = "payment-collection-review-payment-action-slot"
 
@@ -43,6 +51,16 @@ const PAYPAL_METHODS: PayPalMethodConfig[] = [
     id: "paypal_pay_later",
     label: "PayPal Pay in 4",
     icons: [PayPalPayLaterIcon],
+  },
+  {
+    id: "paypal_apple_pay",
+    label: "Pay with Apple Pay",
+    icons: [ApplePayIcon],
+  },
+  {
+    id: "paypal_google_pay",
+    label: "Pay with Google Pay",
+    icons: [GooglePayIcon],
   },
   {
     id: "paypal_card",
@@ -202,12 +220,28 @@ const PayPalPaymentCollectionForm = ({
   const [loadingClientToken, setLoadingClientToken] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [walletAvailability, setWalletAvailability] = useState({
+    applePay: false,
+    googlePay: false,
+  })
   const [reviewActionSlot, setReviewActionSlot] = useState<HTMLElement | null>(null)
   const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || ""
 
   useEffect(() => {
     setCollection(paymentCollection)
   }, [paymentCollection])
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+
+    const availability = checkWalletAvailability()
+    setWalletAvailability({
+      applePay: availability.applePay,
+      googlePay: availability.googlePay,
+    })
+  }, [])
 
   useEffect(() => {
     if (typeof document === "undefined") {
@@ -232,6 +266,20 @@ const PayPalPaymentCollectionForm = ({
     () => String(order?.currency_code || paymentCollection.currency_code || "usd").toUpperCase(),
     [order?.currency_code, paymentCollection.currency_code]
   )
+
+  const availableMethods = useMemo(() => {
+    return PAYPAL_METHODS.filter((method) => {
+      if (method.id === "paypal_apple_pay") {
+        return walletAvailability.applePay
+      }
+
+      if (method.id === "paypal_google_pay") {
+        return walletAvailability.googlePay
+      }
+
+      return true
+    })
+  }, [walletAvailability.applePay, walletAvailability.googlePay])
 
   const redirectToCaptureValidation = useCallback(() => {
     const url = new URL(
@@ -387,19 +435,37 @@ const PayPalPaymentCollectionForm = ({
   }
 
   const walletReviewAction =
-    reviewActionSlot && (selectedMethod === "paypal_wallet" || selectedMethod === "paypal_pay_later")
+    reviewActionSlot &&
+    (selectedMethod === "paypal_wallet" ||
+      selectedMethod === "paypal_pay_later" ||
+      selectedMethod === "paypal_apple_pay" ||
+      selectedMethod === "paypal_google_pay")
       ? createPortal(
           <div className="w-full space-y-2">
             {(() => {
-              const isPayLaterSelected = selectedMethod === "paypal_pay_later"
+              const fundingSource =
+                selectedMethod === "paypal_pay_later"
+                  ? "paylater"
+                  : selectedMethod === "paypal_apple_pay"
+                    ? "applepay"
+                    // Google Pay is exposed via PayPal's wallet flow in this Buttons integration.
+                    : "paypal"
+              const isWalletLikeMethod =
+                selectedMethod === "paypal_wallet" || selectedMethod === "paypal_google_pay"
               return (
             <PayPalButtons
-              fundingSource={(isPayLaterSelected ? "paylater" : "paypal") as any}
+              fundingSource={fundingSource as any}
               style={{
                 layout: "horizontal",
-                ...(isPayLaterSelected ? {} : { label: "paypal" }),
-                color: "gold",
+                ...(isWalletLikeMethod ? { label: "paypal" } : {}),
+                color:
+                  selectedMethod === "paypal_pay_later"
+                    ? "white"
+                    : selectedMethod === "paypal_apple_pay" || selectedMethod === "paypal_google_pay"
+                    ? "black"
+                    : "gold",
                 shape: "rect",
+                borderRadius: 0,
                 tagline: false,
                 height: 40,
               }}
@@ -446,13 +512,14 @@ const PayPalPaymentCollectionForm = ({
               options={{
                 clientId: paypalClientId,
                 components: "buttons,card-fields",
+                enableFunding: "paylater,applepay",
                 currency: currencyCode,
                 intent: "authorize",
                 dataClientToken: clientToken,
               }}
             >
               <CustomPaymentSelector
-                availableMethods={PAYPAL_METHODS}
+                availableMethods={availableMethods}
                 selectedMethod={selectedMethod}
                 onMethodSelect={(method) => {
                   setSelectedMethod(method)
