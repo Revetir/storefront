@@ -205,8 +205,8 @@ export default function ProductActions({
           isAdding ||
           !isValidVariant
         }
-        variant="primary"
-        className="w-full h-10 !rounded-none !bg-black !text-white hover:!bg-neutral-900 disabled:!bg-ui-bg-subtle disabled:!text-ui-fg-muted disabled:!border disabled:!border-ui-border-base disabled:hover:!bg-ui-bg-subtle transition-colors duration-200 after:!rounded-none [&>span>div]:!rounded-none"
+        variant="transparent"
+        className="w-full h-10 !rounded-none !bg-black !text-white hover:!bg-neutral-900 disabled:!bg-ui-bg-subtle disabled:!text-ui-fg-muted disabled:!border disabled:!border-ui-border-base disabled:hover:!bg-ui-bg-subtle transition-colors duration-200 !shadow-none after:!hidden focus-visible:!shadow-none [&>span>div]:!rounded-none"
         isLoading={isAdding}
         data-testid="add-product-button"
       >
