@@ -1,185 +1,11 @@
 "use client"
 
-import { initiatePaymentSession } from "@lib/data/cart"
+import { isPaypal } from "@lib/constants"
 import { Heading } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import Divider from "@modules/common/components/divider"
-import { useContext, useEffect, useState } from "react"
-import { CardElement, PaymentMethodMessagingElement, useElements, useStripe } from "@stripe/react-stripe-js"
-import { StripeContext } from "../payment-wrapper/stripe-wrapper"
-import CustomPaymentSelector from "./custom-payment-selector"
-import { useAvailablePaymentMethods } from "./use-available-payment-methods"
-import { PaymentMethodType } from "./payment-methods-config"
-import { usePaymentContext } from "./payment-context"
-import { isPaypal, isStripe } from "@lib/constants"
 import PayPalCartPayment from "./paypal-payment"
 
-// Inner component that safely uses Stripe hooks - only rendered when inside Elements context
-const StripePaymentContent = ({ cart, activeSession }: { cart: any, activeSession: any }) => {
-  const { setSelectedPaymentMethod } = usePaymentContext()
-  const [error, setError] = useState<string | null>(null)
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethodType | null>(null)
-  const isInstagramBrowser =
-    typeof navigator !== "undefined" && /Instagram/i.test(navigator.userAgent)
-
-  // Safe to call hooks here - we're inside Elements context
-  const stripe = useStripe()
-  const elements = useElements()
-
-  // Convert cart total to cents (smallest currency unit) for Stripe
-  // Medusa v2 returns amounts as decimal dollars (e.g., 813.75), but Stripe expects cents (e.g., 81375)
-  // Multiply by 100 and round to ensure we have a whole number in cents
-  const cartTotal = Math.round((cart?.total || 0) * 100)
-
-  // Detect available payment methods (filters Apple Pay/Google Pay based on device)
-  // Uses browser-based detection to check wallet availability
-  const { availableMethods, isChecking } = useAvailablePaymentMethods()
-
-  const paidByGiftcard =
-    cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
-
-  // Auto-select first available method
-  useEffect(() => {
-    if (!selectedMethod && availableMethods.length > 0 && !isChecking) {
-      setSelectedMethod(availableMethods[0].id)
-      setSelectedPaymentMethod(availableMethods[0].id)
-    }
-  }, [availableMethods, isChecking, selectedMethod, setSelectedPaymentMethod])
-
-  const handleMethodSelect = (method: PaymentMethodType) => {
-    setSelectedMethod(method)
-    setSelectedPaymentMethod(method)
-    setError(null)
-  }
-
-  const handleCardChange = (event: any) => {
-    if (event.error) {
-      setError(event.error.message)
-    } else if (event.complete) {
-      setError(null)
-    }
-  }
-
-  // Calculate installment amount for BNPL services (4 equal payments)
-  const calculateInstallment = () => {
-    // cartTotal is now in cents, so divide by 100 to get dollars
-    const totalInDollars = cartTotal / 100
-    const installmentAmount = (totalInDollars / 4).toFixed(2)
-    return installmentAmount
-  }
-
-  const renderPaymentDetails = (method: PaymentMethodType) => {
-    const installmentAmount = calculateInstallment()
-
-    switch (method) {
-      case 'card':
-        return (
-          <div className="max-w-md">
-            <CardElement
-              options={{
-                style: {
-                  base: {
-                    fontSize: '14px',
-                    fontFamily: 'Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif',
-                    color: '#000000',
-                    '::placeholder': {
-                      color: '#9CA3AF',
-                    },
-                  },
-                },
-                hidePostalCode: false,
-                ...(isInstagramBrowser ? { disableLink: true } : {}),
-                // Link is enabled by default to autofill saved card data into CardElement
-                // Disabled for Instagram's in-app browser to avoid Link-specific issues
-              }}
-              onChange={handleCardChange}
-            />
-          </div>
-        )
-
-      case 'apple_pay':
-        return null
-
-      case 'google_pay':
-        return null
-
-      case 'afterpay_clearpay':
-        return (
-          <div className="space-y-2">
-            {stripe && elements && cartTotal > 0 && (
-              <PaymentMethodMessagingElement
-                options={{
-                  amount: cartTotal,
-                  currency: 'USD',
-                  paymentMethodTypes: ['afterpay_clearpay'],
-                  countryCode: 'US',
-                }}
-              />
-            )}
-          </div>
-        )
-
-      case 'klarna':
-        return (
-          <div className="space-y-2">
-            {stripe && elements && cartTotal > 0 && (
-              <PaymentMethodMessagingElement
-                options={{
-                  amount: cartTotal,
-                  currency: 'USD',
-                  paymentMethodTypes: ['klarna'],
-                  countryCode: 'US',
-                }}
-              />
-            )}
-          </div>
-        )
-
-      default:
-        return null
-    }
-  }
-
-  return (
-    <div className="bg-white">
-      <div className="flex flex-row items-center gap-x-2 justify-left mb-4">
-        <Heading
-          level="h2"
-          className="text-xl gap-x-2 items-baseline uppercase"
-        >
-          Payment Method
-        </Heading>
-      </div>
-      <Divider className="mb-6" />
-      <div>
-        {!paidByGiftcard &&
-          !isChecking && (
-            <div className="transition-all duration-150 ease-in-out">
-              <CustomPaymentSelector
-                availableMethods={availableMethods}
-                selectedMethod={selectedMethod}
-                onMethodSelect={handleMethodSelect}
-                renderPaymentDetails={renderPaymentDetails}
-              />
-            </div>
-          )}
-
-        {isChecking && (
-          <div className="py-4 text-sm text-gray-500">
-            Loading payment methods...
-          </div>
-        )}
-
-        <ErrorMessage
-          error={error}
-          data-testid="payment-method-error-message"
-        />
-      </div>
-    </div>
-  )
-}
-
-// Outer component that checks if we're in Stripe context
 const Payment = ({
   cart,
   availablePaymentMethods,
@@ -187,76 +13,26 @@ const Payment = ({
   cart: any
   availablePaymentMethods: any[]
 }) => {
-  const stripeSession = cart.payment_collection?.payment_sessions?.find(
-    (paymentSession: any) =>
-      isStripe(paymentSession.provider_id) && paymentSession.status === "pending"
-  )
-  const hasStripeSession = cart.payment_collection?.payment_sessions?.some(
-    (paymentSession: any) =>
-      isStripe(paymentSession.provider_id) &&
-      (paymentSession.status === "pending" || paymentSession.status === "authorized")
-  )
-  const paymentCollectionStatus = cart.payment_collection?.status
-  const stripeReady = useContext(StripeContext)
-  const [error, setError] = useState<string | null>(null)
-  const hasPaypalProvider = availablePaymentMethods?.some((provider: any) =>
+  const paypalProviderId = availablePaymentMethods?.find((provider: any) =>
     isPaypal(provider.id)
-  )
+  )?.id
 
-  // Initialize payment session if it doesn't exist (runs outside Elements context)
-  useEffect(() => {
-    const initStripe = async () => {
-      if (hasPaypalProvider) {
-        return
-      }
-
-      if (paymentCollectionStatus === "authorized" || paymentCollectionStatus === "captured") {
-        return
-      }
-
-      const hasStripeProvider = availablePaymentMethods?.some(
-        (provider: any) => provider.id === "pp_stripe_stripe"
-      )
-
-      if (!hasStripeSession && hasStripeProvider) {
-        try {
-          await initiatePaymentSession(cart, {
-            provider_id: "pp_stripe_stripe",
-          })
-        } catch (err) {
-          console.error("Failed to initialize Stripe session:", err)
-          setError("Failed to initialize payment. Please try again.")
-        }
-      }
-    }
-
-    initStripe()
-  }, [cart.id, hasPaypalProvider, hasStripeSession, availablePaymentMethods, paymentCollectionStatus])
-
-  if (hasPaypalProvider) {
-    return <PayPalCartPayment cart={cart} />
+  if (paypalProviderId) {
+    return <PayPalCartPayment cart={cart} paypalProviderId={paypalProviderId} />
   }
 
-  // Only render Stripe-specific content if we're inside Stripe Elements context
-  if (stripeReady && availablePaymentMethods?.length) {
-    return <StripePaymentContent cart={cart} activeSession={stripeSession} />
-  }
-
-  // Fallback for non-Stripe payments or when Stripe isn't ready
   return (
     <div className="bg-white">
       <div className="flex flex-row items-center gap-x-2 justify-left mb-4">
-        <Heading
-          level="h2"
-          className="text-xl gap-x-2 items-baseline uppercase"
-        >
+        <Heading level="h2" className="text-xl gap-x-2 items-baseline uppercase">
           Payment Method
         </Heading>
       </div>
       <Divider className="mb-6" />
-      <div className="py-4 text-sm text-gray-500">
-        {error || "Loading payment options..."}
-      </div>
+      <ErrorMessage
+        error="PayPal isn't enabled for this region yet. Please contact support."
+        data-testid="paypal-provider-missing-message"
+      />
     </div>
   )
 }

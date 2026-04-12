@@ -3,21 +3,26 @@
 import { RadioGroup, Radio } from "@headlessui/react"
 import { clx } from "@medusajs/ui"
 import MedusaRadio from "@modules/common/components/radio"
-import { PaymentMethodType, PaymentMethodConfig } from "./payment-methods-config"
 
-interface CustomPaymentSelectorProps {
-  availableMethods: PaymentMethodConfig[]
-  selectedMethod: PaymentMethodType | null | undefined
-  onMethodSelect: (method: PaymentMethodType) => void
-  renderPaymentDetails: (method: PaymentMethodType) => React.ReactNode
+type SelectablePaymentMethod<TMethod extends string> = {
+  id: TMethod
+  label: string
+  icons: React.ComponentType[]
 }
 
-const CustomPaymentSelector: React.FC<CustomPaymentSelectorProps> = ({
+interface CustomPaymentSelectorProps<TMethod extends string> {
+  availableMethods: SelectablePaymentMethod<TMethod>[]
+  selectedMethod: TMethod | null | undefined
+  onMethodSelect: (method: TMethod) => void
+  renderPaymentDetails: (method: TMethod) => React.ReactNode
+}
+
+const CustomPaymentSelector = <TMethod extends string>({
   availableMethods,
   selectedMethod,
   onMethodSelect,
   renderPaymentDetails,
-}) => {
+}: CustomPaymentSelectorProps<TMethod>) => {
   return (
     <RadioGroup
       value={selectedMethod}

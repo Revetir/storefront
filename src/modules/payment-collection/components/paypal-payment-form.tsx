@@ -3,7 +3,13 @@
 import { sdk } from "@lib/config"
 import { Button, Heading } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
+import CustomPaymentSelector from "@modules/checkout/components/payment/custom-payment-selector"
 import Divider from "@modules/common/components/divider"
+import Amex from "@modules/common/icons/amex"
+import Discover from "@modules/common/icons/discover"
+import Mastercard from "@modules/common/icons/mastercard"
+import PayPalIcon from "@modules/common/icons/paypal"
+import Visa from "@modules/common/icons/visa"
 import {
   PayPalButtons,
   PayPalCardFieldsForm,
@@ -12,6 +18,38 @@ import {
   usePayPalCardFields,
 } from "@paypal/react-paypal-js"
 import { useCallback, useEffect, useMemo, useState } from "react"
+
+type PayPalMethodType = "paypal_wallet" | "paypal_pay_later" | "paypal_card"
+
+type PayPalMethodConfig = {
+  id: PayPalMethodType
+  label: string
+  icons: React.ComponentType[]
+}
+
+const PayIn4Badge = () => (
+  <span className="text-[10px] uppercase tracking-wide border border-ui-border-base px-2 py-1 text-ui-fg-subtle">
+    Pay in 4
+  </span>
+)
+
+const PAYPAL_METHODS: PayPalMethodConfig[] = [
+  {
+    id: "paypal_wallet",
+    label: "Pay with PayPal",
+    icons: [PayPalIcon],
+  },
+  {
+    id: "paypal_pay_later",
+    label: "PayPal Pay in 4",
+    icons: [PayPalIcon, PayIn4Badge],
+  },
+  {
+    id: "paypal_card",
+    label: "Pay with credit or debit card",
+    icons: [Visa, Mastercard, Amex, Discover],
+  },
+]
 
 type PaymentSession = {
   provider_id?: string
@@ -110,8 +148,9 @@ const PayPalCardSubmitButton = ({
       onClick={handleSubmit}
       isLoading={submitting}
       className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer"
+      data-testid="paypal-payment-collection-card-submit"
     >
-      Pay with card
+      Authorize payment
     </Button>
   )
 }
@@ -124,6 +163,7 @@ const PayPalPaymentCollectionForm = ({
   paypalProviderId,
 }: PayPalPaymentCollectionFormProps) => {
   const [collection, setCollection] = useState<PaymentCollection>(paymentCollection)
+  const [selectedMethod, setSelectedMethod] = useState<PayPalMethodType>("paypal_wallet")
   const [clientToken, setClientToken] = useState<string | null>(null)
   const [loadingClientToken, setLoadingClientToken] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -180,21 +220,25 @@ const PayPalPaymentCollectionForm = ({
     return orderId
   }, [collection, paymentCollectionId, paypalProviderId])
 
-  const handleApprove = useCallback(async (_data?: any, actions?: any) => {
-    setSubmitting(true)
-    setErrorMessage(null)
-    try {
-      if (actions?.order?.authorize) {
-        await actions.order.authorize()
+  const handleApprove = useCallback(
+    async (_data?: any, actions?: any) => {
+      setSubmitting(true)
+      setErrorMessage(null)
+      try {
+        if (actions?.order?.authorize) {
+          await actions.order.authorize()
+        }
+
+        redirectToCaptureValidation()
+      } catch (error) {
+        setErrorMessage(
+          toErrorMessage(error, "PayPal approval succeeded, but finalization failed.")
+        )
+        setSubmitting(false)
       }
-      redirectToCaptureValidation()
-    } catch (error) {
-      setErrorMessage(
-        toErrorMessage(error, "PayPal approval succeeded, but finalization failed.")
-      )
-      setSubmitting(false)
-    }
-  }, [redirectToCaptureValidation])
+    },
+    [redirectToCaptureValidation]
+  )
 
   useEffect(() => {
     let mounted = true
@@ -241,6 +285,69 @@ const PayPalPaymentCollectionForm = ({
     }
   }, [])
 
+  const renderMethodDetail = (method: PayPalMethodType) => {
+    if (method === "paypal_wallet" || method === "paypal_pay_later") {
+      const isPayLater = method === "paypal_pay_later"
+      return (
+        <div className="max-w-md pt-2 space-y-2">
+          {isPayLater && <PayIn4Badge />}
+          <PayPalButtons
+            fundingSource={(isPayLater ? "paylater" : "paypal") as any}
+            style={{
+              layout: "horizontal",
+              label: isPayLater ? "installment" : "paypal",
+              tagline: false,
+              height: 40,
+            }}
+            forceReRender={[currencyCode, isPayLater ? "paylater" : "paypal"]}
+            createOrder={createOrder}
+            onApprove={handleApprove}
+            onCancel={() => {
+              setErrorMessage("PayPal checkout was canceled.")
+            }}
+            onError={(error) => {
+              setErrorMessage(toErrorMessage(error, "PayPal checkout failed. Please try again."))
+            }}
+          />
+        </div>
+      )
+    }
+
+    return (
+      <div className="max-w-md pt-2 space-y-4">
+        <PayPalCardFieldsProvider
+          createOrder={createOrder}
+          onApprove={handleApprove}
+          onError={(error) => {
+            setErrorMessage(toErrorMessage(error, "Card payment failed. Please try again."))
+          }}
+          style={{
+            input: {
+              "font-size": "14px",
+              "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
+              color: "#000000",
+            },
+            ".invalid": { color: "#dc2626" },
+          }}
+        >
+          <div className="space-y-4">
+            <PayPalCardFieldsForm />
+            <PayPalCardSubmitButton
+              disabled={submitting}
+              onSubmitStart={() => {
+                setSubmitting(true)
+                setErrorMessage(null)
+              }}
+              onSubmitEnd={() => {
+                setSubmitting(false)
+              }}
+            />
+          </div>
+        </PayPalCardFieldsProvider>
+      </div>
+    )
+  }
+
   return (
     <div className="bg-white">
       <div className="flex flex-row items-center gap-x-2 justify-left mb-4">
@@ -257,76 +364,32 @@ const PayPalPaymentCollectionForm = ({
         />
       )}
 
-      {loadingClientToken && (
-        <div className="py-4 text-sm text-gray-500">Loading PayPal checkout...</div>
-      )}
+      {loadingClientToken && <div className="py-4 text-sm text-gray-500">Loading PayPal checkout...</div>}
 
-      {!paypalClientId ? null : !loadingClientToken && clientToken && (
-        <PayPalScriptProvider
-          options={{
-            clientId: paypalClientId,
-            components: "buttons,card-fields",
-            currency: currencyCode,
-            intent: "authorize",
-            dataClientToken: clientToken,
-          }}
-        >
-          <div className="space-y-6">
-            <div>
-              <p className="mb-3 text-sm text-gray-700">Pay with PayPal</p>
-              <PayPalButtons
-                style={{ layout: "vertical", label: "paypal", tagline: false }}
-                forceReRender={[currencyCode]}
-                createOrder={createOrder}
-                onApprove={handleApprove}
-                onCancel={() => {
-                  setErrorMessage("PayPal checkout was canceled.")
+      {!paypalClientId
+        ? null
+        : !loadingClientToken &&
+          clientToken && (
+            <PayPalScriptProvider
+              options={{
+                clientId: paypalClientId,
+                components: "buttons,card-fields",
+                currency: currencyCode,
+                intent: "authorize",
+                dataClientToken: clientToken,
+              }}
+            >
+              <CustomPaymentSelector
+                availableMethods={PAYPAL_METHODS}
+                selectedMethod={selectedMethod}
+                onMethodSelect={(method) => {
+                  setSelectedMethod(method)
+                  setErrorMessage(null)
                 }}
-                onError={(error) => {
-                  setErrorMessage(
-                    toErrorMessage(error, "PayPal checkout failed. Please try again.")
-                  )
-                }}
+                renderPaymentDetails={renderMethodDetail}
               />
-            </div>
-
-            <div className="border-t border-ui-border-base pt-5">
-              <p className="mb-3 text-sm text-gray-700">Or pay with card</p>
-              <PayPalCardFieldsProvider
-                createOrder={createOrder}
-                onApprove={handleApprove}
-                onError={(error) => {
-                  setErrorMessage(
-                    toErrorMessage(error, "Card payment failed. Please try again.")
-                  )
-                }}
-                style={{
-                  input: {
-                    "font-size": "14px",
-                    "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
-                    color: "#000000",
-                  },
-                  ".invalid": { color: "#dc2626" },
-                }}
-              >
-                <div className="space-y-4">
-                  <PayPalCardFieldsForm />
-                  <PayPalCardSubmitButton
-                    disabled={submitting}
-                    onSubmitStart={() => {
-                      setSubmitting(true)
-                      setErrorMessage(null)
-                    }}
-                    onSubmitEnd={() => {
-                      setSubmitting(false)
-                    }}
-                  />
-                </div>
-              </PayPalCardFieldsProvider>
-            </div>
-          </div>
-        </PayPalScriptProvider>
-      )}
+            </PayPalScriptProvider>
+          )}
 
       <ErrorMessage error={errorMessage} data-testid="paypal-payment-collection-error-message" />
     </div>

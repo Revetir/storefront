@@ -1,13 +1,11 @@
 import { retrievePaymentCollectionCheckoutContext } from "@lib/data/payment-collection"
-import { isPaypal, isStripe } from "@lib/constants"
+import { isPaypal } from "@lib/constants"
 import { listCartPaymentMethods } from "@lib/data/payment"
 import { Heading, Text } from "@medusajs/ui"
 import ItemsPreviewTemplate from "@modules/cart/templates/preview"
 import CartTotals from "@modules/common/components/cart-totals"
 import Divider from "@modules/common/components/divider"
-import PaymentForm from "@modules/payment-collection/components/payment-form"
 import PayPalPaymentCollectionForm from "@modules/payment-collection/components/paypal-payment-form"
-import PaymentCollectionReviewAction from "@modules/payment-collection/components/review-action"
 import { US_STATES } from "@modules/checkout/utils/us-states"
 import { notFound, redirect } from "next/navigation"
 
@@ -152,14 +150,10 @@ export default async function PaymentCollectionCheckoutTemplate({
   }
 
   const paymentMethods = await listCartPaymentMethods(context.order.region_id || "")
-  const stripeProviderId =
-    paymentMethods?.find((provider) => isStripe(provider.id))?.id ||
-    "pp_stripe_stripe"
   const paypalProviderId =
     paymentMethods?.find((provider) => isPaypal(provider.id))?.id ||
     "pp_paypal_paypal"
   const paypalEnabled = Boolean(paymentMethods?.some((provider) => isPaypal(provider.id)))
-  const stripeEnabled = !paypalEnabled && Boolean(paymentMethods?.some((provider) => isStripe(provider.id)))
 
   const summaryLikeCart = {
     ...context.order,
@@ -192,14 +186,17 @@ export default async function PaymentCollectionCheckoutTemplate({
             paypalProviderId={paypalProviderId}
           />
         ) : (
-          <PaymentForm
-            paymentCollectionId={context.payment_collection.id}
-            paymentCollection={context.payment_collection}
-            order={context.order}
-            countryCode={context.country_code || countryCode || "us"}
-            stripeEnabled={stripeEnabled}
-            stripeProviderId={stripeProviderId}
-          />
+          <div className="bg-white">
+            <div className="flex flex-row items-center justify-between mb-4">
+              <Heading level="h2" className="flex flex-row text-xl gap-x-2 items-baseline uppercase">
+                Payment Method
+              </Heading>
+            </div>
+            <Divider className="mb-6" />
+            <Text className="text-ui-fg-subtle">
+              PayPal is not enabled for this order&apos;s region. Please contact support.
+            </Text>
+          </div>
         )}
       </div>
 
@@ -215,8 +212,6 @@ export default async function PaymentCollectionCheckoutTemplate({
             </div>
             <Divider className="my-4" />
             <CartTotals totals={summaryLikeCart as any} forceFinalLabel />
-            <Divider className="my-6" />
-            {!paypalEnabled && <PaymentCollectionReviewAction />}
           </div>
         </div>
       </div>
