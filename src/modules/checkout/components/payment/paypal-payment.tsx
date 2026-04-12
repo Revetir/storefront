@@ -15,8 +15,11 @@ import PayPalIcon from "@modules/common/icons/paypal"
 import Visa from "@modules/common/icons/visa"
 import {
   PayPalButtons,
-  PayPalCardFieldsForm,
+  PayPalCVVField,
   PayPalCardFieldsProvider,
+  PayPalExpiryField,
+  PayPalNameField,
+  PayPalNumberField,
   PayPalScriptProvider,
   usePayPalCardFields,
 } from "@paypal/react-paypal-js"
@@ -100,7 +103,7 @@ const PAYPAL_CARD_FIELD_STYLE = {
     "font-size": "14px",
     "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
     color: "#111827",
-    "background-color": "transparent",
+    background: "transparent",
     "box-shadow": "none",
     "outline": "none",
   },
@@ -111,6 +114,10 @@ const PAYPAL_CARD_FIELD_STYLE = {
     color: "#dc2626",
   },
 } as const
+
+const PAYPAL_FIELD_LABEL_CLASS = "block text-sm font-medium text-gray-700 mb-1"
+const PAYPAL_FIELD_INPUT_WRAPPER_CLASS =
+  "w-full px-3 py-2 border border-gray-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-black focus-within:border-transparent"
 
 const resolvePayPalSession = (
   paymentCollection: PaymentCollectionLike | null | undefined,
@@ -617,8 +624,33 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
         }}
         style={PAYPAL_CARD_FIELD_STYLE as any}
       >
-        <div className="max-w-md pt-2">
-          <PayPalCardFieldsForm />
+        <div className="max-w-md pt-2 space-y-4">
+          <div>
+            <label className={PAYPAL_FIELD_LABEL_CLASS}>Cardholder Name</label>
+            <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
+              <PayPalNameField placeholder="Full name" />
+            </div>
+          </div>
+          <div>
+            <label className={PAYPAL_FIELD_LABEL_CLASS}>Card Number</label>
+            <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
+              <PayPalNumberField placeholder="1234 1234 1234 1234" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={PAYPAL_FIELD_LABEL_CLASS}>Expiration</label>
+              <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
+                <PayPalExpiryField placeholder="MM/YY" />
+              </div>
+            </div>
+            <div>
+              <label className={PAYPAL_FIELD_LABEL_CLASS}>Security Code</label>
+              <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
+                <PayPalCVVField placeholder="CVV" />
+              </div>
+            </div>
+          </div>
         </div>
 
         {reviewActionSlot &&
