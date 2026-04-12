@@ -102,11 +102,10 @@ const PAYPAL_CARD_FIELD_STYLE = {
     "font-size": "14px",
     "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
     color: "#111827",
-    background: "#ffffff",
-    border: "1px solid #d1d5db",
+    background: "transparent",
+    border: "none",
     "border-radius": "0",
     padding: "10px 12px",
-    height: "40px",
     "line-height": "20px",
     "box-shadow": "none",
     outline: "none",
@@ -116,10 +115,10 @@ const PAYPAL_CARD_FIELD_STYLE = {
   },
   ".invalid": {
     color: "#dc2626",
-    border: "1px solid #ef4444",
+    border: "none",
   },
   ".valid": {
-    border: "1px solid #d1d5db",
+    border: "none",
   },
 } as const
 
@@ -653,23 +652,24 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
         <style jsx global>{`
           .paypal-card-fields-stack .paypal-card-field-host {
             width: 100%;
-            height: 40px;
-            border: 0;
-            background: transparent;
+            min-height: 40px;
+            border: 1px solid #d1d5db;
+            background: #ffffff;
             border-radius: 0;
             box-sizing: border-box;
-            overflow: hidden;
+            display: block;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
           }
 
           .paypal-card-fields-stack .paypal-card-field-host:focus-within {
-            border: 0;
+            border-color: transparent;
             outline: none;
-            box-shadow: none;
+            box-shadow: 0 0 0 2px #000000;
           }
 
           .paypal-card-fields-stack .paypal-card-field-host > div {
             width: 100%;
-            height: 100%;
+            min-height: 38px;
             border: 0 !important;
             border-radius: 0 !important;
             background: transparent !important;
