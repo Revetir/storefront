@@ -119,8 +119,7 @@ const PAYPAL_CARD_FIELD_STYLE = {
 } as const
 
 const PAYPAL_FIELD_LABEL_CLASS = "block text-sm font-medium text-gray-700 mb-1"
-const PAYPAL_FIELD_INPUT_WRAPPER_CLASS =
-  "w-full h-10 px-3 border border-gray-300 bg-white flex items-center focus-within:outline-none focus-within:ring-2 focus-within:ring-black focus-within:border-transparent"
+const PAYPAL_FIELD_HOST_CLASS = "paypal-card-field-host"
 
 const resolvePayPalSession = (
   paymentCollection: PaymentCollectionLike | null | undefined,
@@ -627,34 +626,58 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
         }}
         style={PAYPAL_CARD_FIELD_STYLE as any}
       >
-        <div className="max-w-md pt-2 space-y-3">
+        <div className="max-w-md pt-2 space-y-3 paypal-card-fields-stack">
           <div>
             <label className={PAYPAL_FIELD_LABEL_CLASS}>Cardholder Name</label>
-            <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
-              <PayPalNameField placeholder="Full name" className="w-full" />
-            </div>
+            <PayPalNameField placeholder="Full name" className={PAYPAL_FIELD_HOST_CLASS} />
           </div>
           <div>
             <label className={PAYPAL_FIELD_LABEL_CLASS}>Card Number</label>
-            <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
-              <PayPalNumberField placeholder="1234 1234 1234 1234" className="w-full" />
-            </div>
+            <PayPalNumberField
+              placeholder="1234 1234 1234 1234"
+              className={PAYPAL_FIELD_HOST_CLASS}
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={PAYPAL_FIELD_LABEL_CLASS}>Expiration</label>
-              <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
-                <PayPalExpiryField placeholder="MM/YY" className="w-full" />
-              </div>
+              <PayPalExpiryField placeholder="MM/YY" className={PAYPAL_FIELD_HOST_CLASS} />
             </div>
             <div>
               <label className={PAYPAL_FIELD_LABEL_CLASS}>Security Code</label>
-              <div className={PAYPAL_FIELD_INPUT_WRAPPER_CLASS}>
-                <PayPalCVVField placeholder="CVV" className="w-full" />
-              </div>
+              <PayPalCVVField placeholder="CVV" className={PAYPAL_FIELD_HOST_CLASS} />
             </div>
           </div>
         </div>
+        <style jsx global>{`
+          .paypal-card-fields-stack .paypal-card-field-host {
+            width: 100%;
+          }
+
+          .paypal-card-fields-stack .paypal-card-field-host > div {
+            width: 100%;
+            min-height: 40px;
+            border: 1px solid #d1d5db;
+            background: #ffffff;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+          }
+
+          .paypal-card-fields-stack .paypal-card-field-host > div:focus-within {
+            border-color: transparent;
+            box-shadow: 0 0 0 2px #000000;
+          }
+
+          .paypal-card-fields-stack .paypal-card-field-host iframe {
+            width: 100% !important;
+            min-height: 20px !important;
+            height: 20px !important;
+            display: block !important;
+          }
+        `}</style>
 
         {reviewActionSlot &&
           createPortal(
