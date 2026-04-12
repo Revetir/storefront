@@ -8,7 +8,8 @@ import Divider from "@modules/common/components/divider"
 import Amex from "@modules/common/icons/amex"
 import Discover from "@modules/common/icons/discover"
 import Mastercard from "@modules/common/icons/mastercard"
-import PayPalIcon from "@modules/common/icons/paypal"
+import PayPalPPIcon from "@modules/common/icons/paypal-pp"
+import PayPalPayLaterIcon from "@modules/common/icons/paypal-pay-later"
 import Visa from "@modules/common/icons/visa"
 import {
   PayPalButtons,
@@ -32,22 +33,16 @@ type PayPalMethodConfig = {
   icons: React.ComponentType[]
 }
 
-const PayIn4Badge = () => (
-  <span className="text-[10px] uppercase tracking-wide border border-ui-border-base px-2 py-1 text-ui-fg-subtle">
-    Pay in 4
-  </span>
-)
-
 const PAYPAL_METHODS: PayPalMethodConfig[] = [
   {
     id: "paypal_wallet",
     label: "Pay with PayPal",
-    icons: [PayPalIcon],
+    icons: [PayPalPPIcon],
   },
   {
     id: "paypal_pay_later",
     label: "PayPal Pay in 4",
-    icons: [PayPalIcon, PayIn4Badge],
+    icons: [PayPalPayLaterIcon],
   },
   {
     id: "paypal_card",
@@ -395,11 +390,16 @@ const PayPalPaymentCollectionForm = ({
     reviewActionSlot && (selectedMethod === "paypal_wallet" || selectedMethod === "paypal_pay_later")
       ? createPortal(
           <div className="w-full space-y-2">
+            {(() => {
+              const isPayLaterSelected = selectedMethod === "paypal_pay_later"
+              return (
             <PayPalButtons
-              fundingSource={(selectedMethod === "paypal_pay_later" ? "paylater" : "paypal") as any}
+              fundingSource={(isPayLaterSelected ? "paylater" : "paypal") as any}
               style={{
                 layout: "horizontal",
-                label: selectedMethod === "paypal_pay_later" ? "installment" : "paypal",
+                ...(isPayLaterSelected ? {} : { label: "paypal" }),
+                color: "gold",
+                shape: "rect",
                 tagline: false,
                 height: 40,
               }}
@@ -413,6 +413,8 @@ const PayPalPaymentCollectionForm = ({
                 setErrorMessage(toErrorMessage(error, "PayPal checkout failed. Please try again."))
               }}
             />
+              )
+            })()}
           </div>,
           reviewActionSlot
         )
