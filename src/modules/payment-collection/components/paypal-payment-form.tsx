@@ -59,25 +59,15 @@ const PAYPAL_CARD_FIELD_STYLE = {
     "font-size": "14px",
     "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
     color: "#111827",
-    "background-color": "#ffffff",
-    "border-color": "#d1d5db",
-    "border-width": "1px",
-    "border-style": "solid",
-    "border-radius": "0px",
-    "padding": "8px 12px",
+    "background-color": "transparent",
     "box-shadow": "none",
     "outline": "none",
-  },
-  ":focus": {
-    "border-color": "transparent",
-    "box-shadow": "0 0 0 2px #000000",
   },
   "::placeholder": {
     color: "#9ca3af",
   },
   ".invalid": {
     color: "#dc2626",
-    "border-color": "#ef4444",
   },
 } as const
 
@@ -337,7 +327,7 @@ const PayPalPaymentCollectionForm = ({
 
   const renderMethodDetail = (method: PayPalMethodType) => {
     if (method === "paypal_wallet" || method === "paypal_pay_later") {
-      return <p className="pt-2 text-sm text-ui-fg-subtle">Continue in the Review section below.</p>
+      return null
     }
 
     return (
@@ -349,9 +339,45 @@ const PayPalPaymentCollectionForm = ({
         }}
         style={PAYPAL_CARD_FIELD_STYLE as any}
       >
-        <div className="max-w-md pt-2 space-y-4">
-          <PayPalCardFieldsForm />
+        <div className="max-w-md pt-2">
+          <PayPalCardFieldsForm className="paypal-card-fields-layout" />
         </div>
+        <style jsx global>{`
+          .paypal-card-fields-layout > div {
+            width: 100%;
+          }
+
+          .paypal-card-fields-layout > div + div {
+            margin-top: 1rem;
+          }
+
+          .paypal-card-fields-layout > div[style*="display: flex"] {
+            gap: 1rem;
+          }
+
+          .paypal-card-fields-layout > div:not([style*="display: flex"]),
+          .paypal-card-fields-layout > div[style*="display: flex"] > div > div {
+            border: 1px solid #d1d5db;
+            background: #ffffff;
+            padding: 8px 12px;
+            min-height: 42px;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+          }
+
+          .paypal-card-fields-layout > div:not([style*="display: flex"]):focus-within,
+          .paypal-card-fields-layout > div[style*="display: flex"] > div > div:focus-within {
+            border-color: transparent;
+            box-shadow: 0 0 0 2px #000000;
+          }
+
+          .paypal-card-fields-layout iframe {
+            border: 0 !important;
+            width: 100% !important;
+            min-height: 24px !important;
+            display: block !important;
+            background: transparent !important;
+          }
+        `}</style>
 
         {reviewActionSlot &&
           createPortal(

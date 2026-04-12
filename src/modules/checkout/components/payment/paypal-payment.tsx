@@ -1,7 +1,7 @@
 "use client"
 
 import { sdk } from "@lib/config"
-import { placeOrder, updateCheckoutCart } from "@lib/data/cart"
+import { placeOrder } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button, Heading } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
@@ -100,25 +100,15 @@ const PAYPAL_CARD_FIELD_STYLE = {
     "font-size": "14px",
     "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
     color: "#111827",
-    "background-color": "#ffffff",
-    "border-color": "#d1d5db",
-    "border-width": "1px",
-    "border-style": "solid",
-    "border-radius": "0px",
-    "padding": "8px 12px",
+    "background-color": "transparent",
     "box-shadow": "none",
     "outline": "none",
-  },
-  ":focus": {
-    "border-color": "transparent",
-    "box-shadow": "0 0 0 2px #000000",
   },
   "::placeholder": {
     color: "#9ca3af",
   },
   ".invalid": {
     color: "#dc2626",
-    "border-color": "#ef4444",
   },
 } as const
 
@@ -272,8 +262,17 @@ const syncCartFromCheckoutForm = async (
     return cart
   }
 
-  const updatedCart = await updateCheckoutCart(updateData)
-  return updatedCart || cart
+  if (!cart.id) {
+    return cart
+  }
+
+  try {
+    const response = await sdk.store.cart.update(cart.id, updateData, {}, {})
+    return response?.cart || cart
+  } catch (error) {
+    // If cart save fails here, keep going and let field validation surface actionable errors.
+    return cart
+  }
 }
 
 const fetchCheckoutCartForPayment = async (cartId: string): Promise<CartLike | null> => {
@@ -410,13 +409,7 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
       throw new Error("Missing checkout cart. Please refresh and try again.")
     }
 
-    let syncedCart = currentCart
-
-    try {
-      syncedCart = await syncCartFromCheckoutForm(currentCart)
-    } catch {
-      throw new Error("Unable to save your checkout details. Please try again.")
-    }
+    const syncedCart = await syncCartFromCheckoutForm(currentCart)
 
     const refreshedCart = await fetchCheckoutCartForPayment(currentCart.id)
     const checkoutCart = (refreshedCart || (syncedCart as CartLike)) as CartLike
@@ -569,7 +562,7 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
 
   const renderMethodDetail = (method: PayPalMethodType) => {
     if (method === "paypal_wallet" || method === "paypal_pay_later") {
-      return <p className="pt-2 text-sm text-ui-fg-subtle">Continue in the Review section below.</p>
+      return null
     }
 
     return (
@@ -581,9 +574,45 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
         }}
         style={PAYPAL_CARD_FIELD_STYLE as any}
       >
-        <div className="max-w-md pt-2 space-y-4">
-          <PayPalCardFieldsForm />
+        <div className="max-w-md pt-2">
+          <PayPalCardFieldsForm className="paypal-card-fields-layout" />
         </div>
+        <style jsx global>{`
+          .paypal-card-fields-layout > div {
+            width: 100%;
+          }
+
+          .paypal-card-fields-layout > div + div {
+            margin-top: 1rem;
+          }
+
+          .paypal-card-fields-layout > div[style*="display: flex"] {
+            gap: 1rem;
+          }
+
+          .paypal-card-fields-layout > div:not([style*="display: flex"]),
+          .paypal-card-fields-layout > div[style*="display: flex"] > div > div {
+            border: 1px solid #d1d5db;
+            background: #ffffff;
+            padding: 8px 12px;
+            min-height: 42px;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+          }
+
+          .paypal-card-fields-layout > div:not([style*="display: flex"]):focus-within,
+          .paypal-card-fields-layout > div[style*="display: flex"] > div > div:focus-within {
+            border-color: transparent;
+            box-shadow: 0 0 0 2px #000000;
+          }
+
+          .paypal-card-fields-layout iframe {
+            border: 0 !important;
+            width: 100% !important;
+            min-height: 24px !important;
+            display: block !important;
+            background: transparent !important;
+          }
+        `}</style>
 
         {reviewActionSlot &&
           createPortal(
