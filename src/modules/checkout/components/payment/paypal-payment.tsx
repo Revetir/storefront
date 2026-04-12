@@ -276,17 +276,49 @@ const syncCartFromCheckoutForm = async (
 }
 
 const fetchCheckoutCartForPayment = async (cartId: string): Promise<CartLike | null> => {
-  try {
-    const response = await sdk.client.fetch<{ cart: CartLike }>(`/store/carts/${cartId}`, {
-      method: "GET",
-      query: {
-        fields:
-          "id,email,currency_code,*shipping_methods,*shipping_address,*billing_address,+total,+subtotal,+tax_total,+shipping_total,*payment_collection,*payment_collection.payment_sessions,+payment_collection.amount,+payment_collection.currency_code,+payment_collection.payment_sessions.amount,+payment_collection.payment_sessions.provider_id,+payment_collection.payment_sessions.status,+payment_collection.payment_sessions.data",
-      },
-      cache: "no-store",
-    })
+  const attempts: Array<Record<string, unknown> | undefined> = [
+    {
+      fields:
+        "id,email,currency_code,*shipping_methods,*shipping_address,*billing_address,*payment_collection,*payment_collection.payment_sessions,+total,+subtotal,+tax_total,+shipping_total,+payment_collection.amount,+payment_collection.currency_code,+payment_collection.payment_sessions.amount,+payment_collection.payment_sessions.provider_id,+payment_collection.payment_sessions.status,+payment_collection.payment_sessions.data",
+    },
+    undefined,
+  ]
 
-    return response?.cart || null
+  for (const query of attempts) {
+    try {
+      const response = await sdk.client.fetch<{ cart: CartLike }>(`/store/carts/${cartId}`, {
+        method: "GET",
+        ...(query ? { query } : {}),
+        cache: "no-store",
+      })
+
+      if (response?.cart) {
+        return response.cart
+      }
+    } catch {
+      // Fall through to the next retrieval strategy.
+    }
+  }
+
+  return null
+}
+
+const ensureCartPaymentCollection = async (
+  cartId: string
+): Promise<PaymentCollectionLike | null> => {
+  try {
+    const response = await sdk.client.fetch<{ payment_collection?: PaymentCollectionLike }>(
+      "/store/payment-collections",
+      {
+        method: "POST",
+        body: {
+          cart_id: cartId,
+        },
+        cache: "no-store",
+      }
+    )
+
+    return response?.payment_collection || null
   } catch {
     return null
   }
@@ -445,7 +477,29 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
   const ensurePayPalSession = useCallback(async () => {
     const preparedCart = await validateAndPrepareCheckout()
 
-    const paymentCollectionId = preparedCart.payment_collection?.id
+    let paymentCollection: PaymentCollectionLike | null =
+      (preparedCart.payment_collection as PaymentCollectionLike | null) || null
+    let paymentCollectionId = paymentCollection?.id
+
+    if (!paymentCollectionId && preparedCart.id) {
+      const createdCollection = await ensureCartPaymentCollection(preparedCart.id)
+
+      if (createdCollection?.id) {
+        paymentCollection = createdCollection
+        paymentCollectionId = createdCollection.id
+
+        setWorkingCollection(createdCollection)
+        setWorkingCart((current) =>
+          current
+            ? ({
+                ...current,
+                payment_collection: createdCollection as any,
+              } as CartLike)
+            : current
+        )
+      }
+    }
+
     if (!paymentCollectionId) {
       throw new Error("Missing payment collection. Please refresh and try again.")
     }
@@ -462,7 +516,7 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
       }
     )
 
-    const nextCollection = response?.payment_collection || preparedCart.payment_collection
+    const nextCollection = response?.payment_collection || paymentCollection
     setWorkingCollection(nextCollection || null)
     setWorkingCart((current) =>
       current
@@ -575,44 +629,8 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
         style={PAYPAL_CARD_FIELD_STYLE as any}
       >
         <div className="max-w-md pt-2">
-          <PayPalCardFieldsForm className="paypal-card-fields-layout" />
+          <PayPalCardFieldsForm />
         </div>
-        <style jsx global>{`
-          .paypal-card-fields-layout > div {
-            width: 100%;
-          }
-
-          .paypal-card-fields-layout > div + div {
-            margin-top: 1rem;
-          }
-
-          .paypal-card-fields-layout > div[style*="display: flex"] {
-            gap: 1rem;
-          }
-
-          .paypal-card-fields-layout > div:not([style*="display: flex"]),
-          .paypal-card-fields-layout > div[style*="display: flex"] > div > div {
-            border: 1px solid #d1d5db;
-            background: #ffffff;
-            padding: 8px 12px;
-            min-height: 42px;
-            transition: box-shadow 0.2s ease, border-color 0.2s ease;
-          }
-
-          .paypal-card-fields-layout > div:not([style*="display: flex"]):focus-within,
-          .paypal-card-fields-layout > div[style*="display: flex"] > div > div:focus-within {
-            border-color: transparent;
-            box-shadow: 0 0 0 2px #000000;
-          }
-
-          .paypal-card-fields-layout iframe {
-            border: 0 !important;
-            width: 100% !important;
-            min-height: 24px !important;
-            display: block !important;
-            background: transparent !important;
-          }
-        `}</style>
 
         {reviewActionSlot &&
           createPortal(
@@ -636,7 +654,6 @@ const PayPalCartPayment = ({ cart, paypalProviderId }: PayPalCartPaymentProps) =
     reviewActionSlot && (selectedMethod === "paypal_wallet" || selectedMethod === "paypal_pay_later")
       ? createPortal(
           <div className="w-full space-y-2">
-            {selectedMethod === "paypal_pay_later" && <PayIn4Badge />}
             <PayPalButtons
               fundingSource={(selectedMethod === "paypal_pay_later" ? "paylater" : "paypal") as any}
               style={{

@@ -340,44 +340,8 @@ const PayPalPaymentCollectionForm = ({
         style={PAYPAL_CARD_FIELD_STYLE as any}
       >
         <div className="max-w-md pt-2">
-          <PayPalCardFieldsForm className="paypal-card-fields-layout" />
+          <PayPalCardFieldsForm />
         </div>
-        <style jsx global>{`
-          .paypal-card-fields-layout > div {
-            width: 100%;
-          }
-
-          .paypal-card-fields-layout > div + div {
-            margin-top: 1rem;
-          }
-
-          .paypal-card-fields-layout > div[style*="display: flex"] {
-            gap: 1rem;
-          }
-
-          .paypal-card-fields-layout > div:not([style*="display: flex"]),
-          .paypal-card-fields-layout > div[style*="display: flex"] > div > div {
-            border: 1px solid #d1d5db;
-            background: #ffffff;
-            padding: 8px 12px;
-            min-height: 42px;
-            transition: box-shadow 0.2s ease, border-color 0.2s ease;
-          }
-
-          .paypal-card-fields-layout > div:not([style*="display: flex"]):focus-within,
-          .paypal-card-fields-layout > div[style*="display: flex"] > div > div:focus-within {
-            border-color: transparent;
-            box-shadow: 0 0 0 2px #000000;
-          }
-
-          .paypal-card-fields-layout iframe {
-            border: 0 !important;
-            width: 100% !important;
-            min-height: 24px !important;
-            display: block !important;
-            background: transparent !important;
-          }
-        `}</style>
 
         {reviewActionSlot &&
           createPortal(
@@ -401,7 +365,6 @@ const PayPalPaymentCollectionForm = ({
     reviewActionSlot && (selectedMethod === "paypal_wallet" || selectedMethod === "paypal_pay_later")
       ? createPortal(
           <div className="w-full space-y-2">
-            {selectedMethod === "paypal_pay_later" && <PayIn4Badge />}
             <PayPalButtons
               fundingSource={(selectedMethod === "paypal_pay_later" ? "paylater" : "paypal") as any}
               style={{

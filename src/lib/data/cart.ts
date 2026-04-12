@@ -86,7 +86,7 @@ export async function retrieveCheckoutCart(cartId?: string) {
       method: "GET",
       query: {
         fields:
-          "*items, *region, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, +items.subtotal, +items.original_total, +items.original_subtotal, +items.discount_total, *promotions, +shipping_methods.name, +items.product.brands.*",
+          "*items, *region, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, +items.subtotal, +items.original_total, +items.original_subtotal, +items.discount_total, *promotions, +shipping_methods.name, +items.product.brands.*, *payment_collection, *payment_collection.payment_sessions, +payment_collection.amount, +payment_collection.currency_code, +payment_collection.payment_sessions.amount, +payment_collection.payment_sessions.provider_id, +payment_collection.payment_sessions.status, +payment_collection.payment_sessions.data, +total, +subtotal, +tax_total, +shipping_total",
       },
       headers,
       next,
