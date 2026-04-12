@@ -62,8 +62,9 @@ const PAYPAL_CARD_FIELD_STYLE = {
     "font-size": "14px",
     "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
     color: "#111827",
-    "background-color": "#ffffff",
+    "background-color": "transparent",
     border: "none",
+    "border-radius": "0",
     padding: "0 12px",
     height: "40px",
     "line-height": "40px",
@@ -75,6 +76,12 @@ const PAYPAL_CARD_FIELD_STYLE = {
   },
   ".invalid": {
     color: "#dc2626",
+    border: "none",
+    "box-shadow": "none",
+  },
+  ".valid": {
+    border: "none",
+    "box-shadow": "none",
   },
 } as const
 
@@ -374,13 +381,24 @@ const PayPalPaymentCollectionForm = ({
             height: 40px;
             border: 1px solid #d1d5db;
             background: #ffffff;
+            border-radius: 0;
             box-sizing: border-box;
-            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+            overflow: hidden;
+            transition: border-color 0.2s ease;
           }
 
           .paypal-card-fields-stack .paypal-card-field-host:focus-within {
-            border-color: transparent;
-            box-shadow: 0 0 0 2px #000000;
+            border-color: #000000;
+            box-shadow: none;
+          }
+
+          .paypal-card-fields-stack .paypal-card-field-host > div {
+            width: 100%;
+            height: 100%;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
           }
         `}</style>
 
