@@ -12,11 +12,8 @@ import PayPalIcon from "@modules/common/icons/paypal"
 import Visa from "@modules/common/icons/visa"
 import {
   PayPalButtons,
-  PayPalCVVField,
+  PayPalCardFieldsForm,
   PayPalCardFieldsProvider,
-  PayPalExpiryField,
-  PayPalNameField,
-  PayPalNumberField,
   PayPalScriptProvider,
   usePayPalCardFields,
 } from "@paypal/react-paypal-js"
@@ -62,31 +59,17 @@ const PAYPAL_CARD_FIELD_STYLE = {
     "font-size": "14px",
     "font-family": "Satoshi, Segoe UI, Roboto, Helvetica Neue, Ubuntu, sans-serif",
     color: "#111827",
-    "background-color": "#ffffff",
-    border: "1px solid #d1d5db",
-    "border-radius": "0",
-    padding: "10px 12px",
-    height: "40px",
-    "line-height": "20px",
+    "background-color": "transparent",
     "box-shadow": "none",
     "outline": "none",
   },
   "::placeholder": {
-    color: "#6b7280",
+    color: "#9ca3af",
   },
   ".invalid": {
     color: "#dc2626",
-    border: "none",
-    "box-shadow": "none",
-  },
-  ".valid": {
-    border: "none",
-    "box-shadow": "none",
   },
 } as const
-
-const PAYPAL_FIELD_LABEL_CLASS = "block text-sm font-medium text-gray-700 mb-1"
-const PAYPAL_FIELD_HOST_CLASS = "paypal-card-field-host"
 
 type PaymentSession = {
   provider_id?: string
@@ -352,78 +335,9 @@ const PayPalPaymentCollectionForm = ({
         }}
         style={PAYPAL_CARD_FIELD_STYLE as any}
       >
-        <div className="max-w-md pt-2 space-y-3 paypal-card-fields-stack">
-          <div>
-            <label className={PAYPAL_FIELD_LABEL_CLASS}>Cardholder Name</label>
-            <PayPalNameField placeholder="Full name" className={PAYPAL_FIELD_HOST_CLASS} />
-          </div>
-          <div>
-            <label className={PAYPAL_FIELD_LABEL_CLASS}>Card Number</label>
-            <PayPalNumberField
-              placeholder="1234 1234 1234 1234"
-              className={PAYPAL_FIELD_HOST_CLASS}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={PAYPAL_FIELD_LABEL_CLASS}>Expiration</label>
-              <PayPalExpiryField placeholder="MM/YY" className={PAYPAL_FIELD_HOST_CLASS} />
-            </div>
-            <div>
-              <label className={PAYPAL_FIELD_LABEL_CLASS}>Security Code</label>
-              <PayPalCVVField placeholder="CVV" className={PAYPAL_FIELD_HOST_CLASS} />
-            </div>
-          </div>
+        <div className="max-w-md pt-2">
+          <PayPalCardFieldsForm />
         </div>
-        <style jsx global>{`
-          .paypal-card-fields-stack .paypal-card-field-host {
-            width: 100%;
-            height: 40px;
-            border: 0;
-            background: transparent;
-            border-radius: 0;
-            box-sizing: border-box;
-            overflow: hidden;
-          }
-
-          .paypal-card-fields-stack .paypal-card-field-host:focus-within {
-            border: 0;
-            outline: none;
-            box-shadow: none;
-          }
-
-          .paypal-card-fields-stack .paypal-card-field-host > div {
-            width: 100%;
-            height: 100%;
-            border: 0 !important;
-            border-radius: 0 !important;
-            background: transparent !important;
-            box-shadow: none !important;
-            outline: none !important;
-          }
-
-          .paypal-card-fields-stack .paypal-card-field-host > div > div {
-            border: 0 !important;
-            border-radius: 0 !important;
-            background: transparent !important;
-            box-shadow: none !important;
-            outline: none !important;
-          }
-
-          .paypal-card-fields-stack .paypal-card-field-host [data-client-version] {
-            border: 0 !important;
-            border-radius: 0 !important;
-            background: transparent !important;
-            box-shadow: none !important;
-            outline: none !important;
-          }
-
-          .paypal-card-fields-stack .paypal-card-field-host [data-client-version]:focus-within {
-            border: 0 !important;
-            box-shadow: none !important;
-            outline: none !important;
-          }
-        `}</style>
 
         {reviewActionSlot &&
           createPortal(
