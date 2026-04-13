@@ -4,6 +4,7 @@ import { useState } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 const LISTING_ISSUE_REQUEST = "I want to report a listing as inaccurate or an item as inauthentic"
+const PRODUCT_DESIGNER_REQUEST = "I have a question about a product or designer"
 
 export default function ContactUsPage() {
   const [formData, setFormData] = useState({
@@ -70,8 +71,9 @@ export default function ContactUsPage() {
     setIsSubmitting(true)
     setSubmitStatus({ type: null, message: "" })
 
-    const isListingIssueRequest = formData.request === LISTING_ISSUE_REQUEST
-    const orderReference = isListingIssueRequest ? formData.productSku : formData.orderNumber
+    const usesProductSku =
+      formData.request === LISTING_ISSUE_REQUEST || formData.request === PRODUCT_DESIGNER_REQUEST
+    const orderReference = usesProductSku ? formData.productSku : formData.orderNumber
 
     try {
       const response = await fetch("/api/contact", {
@@ -117,9 +119,10 @@ export default function ContactUsPage() {
     }
   }
 
-  const isListingIssueRequest = formData.request === LISTING_ISSUE_REQUEST
-  const orderFieldName = isListingIssueRequest ? "productSku" : "orderNumber"
-  const orderFieldLabel = isListingIssueRequest ? "Product SKU" : "Order Number"
+  const usesProductSku =
+    formData.request === LISTING_ISSUE_REQUEST || formData.request === PRODUCT_DESIGNER_REQUEST
+  const orderFieldName = usesProductSku ? "productSku" : "orderNumber"
+  const orderFieldLabel = usesProductSku ? "Product SKU" : "Order Number"
 
   return (
     <>
