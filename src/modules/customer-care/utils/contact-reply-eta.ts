@@ -133,6 +133,14 @@ const getNextOpeningUtcMs = (cursorUtcMs: number) => {
 }
 
 export const computeReplyEtaSeconds = (nowUtcMs = Date.now()) => {
+  const nowParts = getZonedParts(new Date(nowUtcMs))
+
+  // While customer care is currently online, display a flat 4-hour "if sent now" SLA.
+  // Closed-hour carryover logic applies only when the store is currently offline.
+  if (isDuringOnlineHours(nowParts)) {
+    return SLA_SECONDS
+  }
+
   let cursorUtcMs = nowUtcMs
   let remainingSeconds = SLA_SECONDS
 
@@ -182,4 +190,3 @@ export const __private__ = {
   getNextOpeningUtcMs,
   zonedLocalToUtcMs,
 }
-

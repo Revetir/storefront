@@ -14,9 +14,9 @@ const CASES: EtaCase[] = [
     expectedSeconds: 4 * 60 * 60,
   },
   {
-    label: "Weekday near close carries into next day",
+    label: "Weekday near close while open returns flat SLA",
     nowIso: "2025-01-08T03:30:00.000Z", // Tue 22:30 ET
-    expectedSeconds: 16 * 60 * 60, // 00:30 today + overnight + 03:30 next day
+    expectedSeconds: 4 * 60 * 60,
   },
   {
     label: "After close includes overnight wait",
@@ -51,4 +51,3 @@ assert.equal(formatDurationHHMMSS(0), "00:00:00")
 assert.equal(formatDurationHHMMSS(3661), "01:01:01")
 
 console.log("contact-reply-eta tests passed")
-
