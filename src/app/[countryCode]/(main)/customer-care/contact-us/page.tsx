@@ -181,8 +181,8 @@ export default function ContactUsPage() {
 
   return (
     <>
-      <h1 className="text-[12px] font-medium uppercase text-black mb-4">Contact Us</h1>
-      <p className="mb-8 inline-flex items-baseline gap-2 whitespace-nowrap text-[clamp(2.15rem,7vw,3.25rem)] font-medium leading-[0.94] tracking-[-0.03em] text-black">
+      <h1 className="mb-5 text-[12px] font-medium uppercase text-black">Contact Us</h1>
+      <p className="mb-5 flex w-full items-baseline justify-center gap-1 whitespace-nowrap px-2 text-[clamp(1.05rem,4.8vw,3.25rem)] font-medium leading-[0.98] tracking-[-0.02em] text-black md:mb-6 md:justify-start md:gap-2 md:px-0 md:tracking-[-0.03em]">
         <span>We&apos;ll reply within</span>
         <span className="tabular-nums">{replyEta}</span>
       </p>
