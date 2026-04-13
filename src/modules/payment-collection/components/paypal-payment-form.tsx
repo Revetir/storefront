@@ -182,13 +182,14 @@ const PayPalCardSubmitButton = ({
 
   return (
     <Button
+      variant="transparent"
       disabled={!cardFieldsForm || disabled || submitting}
       onClick={handleSubmit}
       isLoading={submitting}
-      className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer"
+      className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer !shadow-none after:!hidden focus-visible:!shadow-none"
       data-testid="paypal-payment-collection-card-submit"
     >
-      Authorize payment
+      Place order
     </Button>
   )
 }
@@ -275,31 +276,36 @@ const PayPalPaymentCollectionForm = ({
   const createOrder = useCallback(async () => {
     setErrorMessage(null)
 
-    const existingOrderId = resolvePayPalOrderId(collection, paypalProviderId)
-    if (existingOrderId) {
-      return existingOrderId
-    }
+    try {
+      // Always refresh the provider session so PayPal uses the latest order totals.
+      const response = await sdk.client.fetch<{ payment_collection: PaymentCollection }>(
+        `/store/payment-collections/${paymentCollectionId}/payment-sessions`,
+        {
+          method: "POST",
+          body: {
+            provider_id: paypalProviderId,
+          },
+          cache: "no-store",
+        }
+      )
 
-    const response = await sdk.client.fetch<{ payment_collection: PaymentCollection }>(
-      `/store/payment-collections/${paymentCollectionId}/payment-sessions`,
-      {
-        method: "POST",
-        body: {
-          provider_id: paypalProviderId,
-        },
-        cache: "no-store",
+      const nextCollection = response?.payment_collection || collection
+      setCollection(nextCollection)
+
+      const orderId = resolvePayPalOrderId(nextCollection, paypalProviderId)
+      if (!orderId) {
+        throw new Error("Failed to initialize a PayPal order for this cart.")
       }
-    )
 
-    const nextCollection = response?.payment_collection || collection
-    setCollection(nextCollection)
-
-    const orderId = resolvePayPalOrderId(nextCollection, paypalProviderId)
-    if (!orderId) {
-      throw new Error("Failed to initialize a PayPal payment session.")
+      return orderId
+    } catch (error) {
+      const message = toErrorMessage(
+        error,
+        "Checkout is missing required information. Please review your details and try again."
+      )
+      setErrorMessage(message)
+      throw new Error(message)
     }
-
-    return orderId
   }, [collection, paymentCollectionId, paypalProviderId])
 
   const handleApprove = useCallback(
@@ -312,6 +318,7 @@ const PayPalPaymentCollectionForm = ({
         setErrorMessage(
           toErrorMessage(error, "PayPal approval succeeded, but finalization failed.")
         )
+      } finally {
         setSubmitting(false)
       }
     },

@@ -5,6 +5,7 @@ import { Heading, Text } from "@medusajs/ui"
 import ItemsPreviewTemplate from "@modules/cart/templates/preview"
 import CartTotals from "@modules/common/components/cart-totals"
 import Divider from "@modules/common/components/divider"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import PayPalPaymentCollectionForm from "@modules/payment-collection/components/paypal-payment-form"
 import { US_STATES } from "@modules/checkout/utils/us-states"
 import { notFound, redirect } from "next/navigation"
@@ -194,14 +195,14 @@ export default async function PaymentCollectionCheckoutTemplate({
             </div>
             <Divider className="mb-6" />
             <Text className="text-ui-fg-subtle">
-              PayPal is not enabled for this order&apos;s region. Please contact support.
+              PayPal isn&apos;t enabled for this region yet. Please contact support.
             </Text>
           </div>
         )}
       </div>
 
       <div className="lg:sticky lg:top-20 lg:self-start">
-        <div className="w-full bg-white flex flex-col gap-y-6">
+        <div className="w-full bg-white flex flex-col">
           <div>
             <Heading level="h2" className="text-xl uppercase mb-4">
               Review
@@ -217,6 +218,22 @@ export default async function PaymentCollectionCheckoutTemplate({
                 <div id="payment-collection-review-payment-action-slot" className="w-full" />
               </div>
             )}
+            <Divider className="my-6" />
+            <footer className="w-full bg-white pb-4">
+              <div className="flex flex-col items-center gap-y-2">
+                <div className="text-black text-xs text-center">
+                  REVETIR, 2 Park Avenue, 20th Floor, New York, NY 10016
+                </div>
+                <div className="flex flex-wrap justify-center items-center text-gray-400 text-xs gap-x-4">
+                  <LocalizedClientLink href="/terms-conditions" className="hover:text-ui-fg-base">
+                    Terms &amp; Conditions
+                  </LocalizedClientLink>
+                  <LocalizedClientLink href="/privacy-policy" className="hover:text-ui-fg-base">
+                    Privacy Policy
+                  </LocalizedClientLink>
+                </div>
+              </div>
+            </footer>
           </div>
         </div>
       </div>
