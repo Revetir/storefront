@@ -1,10 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import {
+  computeReplyEtaSeconds,
+  formatDurationHHMMSS,
+} from "@modules/customer-care/utils/contact-reply-eta"
 
 const LISTING_ISSUE_REQUEST = "I want to report a listing as inaccurate or an item as inauthentic"
 const PRODUCT_DESIGNER_REQUEST = "I have a question about a product or designer"
+const AUTO_RESET_INTERVAL_MS = 60 * 60 * 1000
+const MIN_DISPLAY_SECONDS = 3 * 60 * 60
 
 export default function ContactUsPage() {
   const [formData, setFormData] = useState({
@@ -22,6 +28,55 @@ export default function ContactUsPage() {
     message: string
   }>({ type: null, message: "" })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [replyEta, setReplyEta] = useState("04:00:00")
+  const replyEtaDeadlineMsRef = useRef<number>(0)
+  const replyEtaBaselineMsRef = useRef<number>(0)
+
+  useEffect(() => {
+    const resetReplyEtaDeadline = () => {
+      const nowUtcMs = Date.now()
+      replyEtaBaselineMsRef.current = nowUtcMs
+      replyEtaDeadlineMsRef.current = nowUtcMs + computeReplyEtaSeconds(nowUtcMs) * 1000
+    }
+
+    const refreshReplyEtaCountdown = () => {
+      const nowMs = Date.now()
+      const elapsedSinceBaselineMs = nowMs - replyEtaBaselineMsRef.current
+      let remainingSeconds = Math.max(0, Math.ceil((replyEtaDeadlineMsRef.current - nowMs) / 1000))
+
+      if (elapsedSinceBaselineMs >= AUTO_RESET_INTERVAL_MS || remainingSeconds < MIN_DISPLAY_SECONDS) {
+        resetReplyEtaDeadline()
+        remainingSeconds = Math.max(0, Math.ceil((replyEtaDeadlineMsRef.current - nowMs) / 1000))
+      }
+
+      setReplyEta(formatDurationHHMMSS(remainingSeconds))
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        resetReplyEtaDeadline()
+        refreshReplyEtaCountdown()
+      }
+    }
+
+    const handleFocus = () => {
+      resetReplyEtaDeadline()
+      refreshReplyEtaCountdown()
+    }
+
+    resetReplyEtaDeadline()
+    refreshReplyEtaCountdown()
+
+    const intervalId = window.setInterval(refreshReplyEtaCountdown, 1000)
+    window.addEventListener("focus", handleFocus)
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    return () => {
+      window.clearInterval(intervalId)
+      window.removeEventListener("focus", handleFocus)
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [])
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -126,9 +181,10 @@ export default function ContactUsPage() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold mb-4">Contact Us</h1>
-      <p className="text-sm text-gray-600 text-left">
-        To view and manage your order, including requesting returns, please visit your Account Orders. For all other inquiries, send us an email using the form below.
+      <h1 className="text-[12px] font-medium uppercase text-black mb-4">Contact Us</h1>
+      <p className="mb-8 inline-flex items-baseline gap-2 whitespace-nowrap text-[clamp(2.15rem,7vw,3.25rem)] font-medium leading-[0.94] tracking-[-0.03em] text-black">
+        <span>We&apos;ll reply within</span>
+        <span className="tabular-nums">{replyEta}</span>
       </p>
 
       {/* Contact Form */}
