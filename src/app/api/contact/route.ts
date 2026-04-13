@@ -4,7 +4,7 @@ import { sdk } from "@/lib/config"
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { request: requestType, name, email, orderNumber, productSku, subject, message } = body
+    const { request: requestType, name, email, orderNumber, productSku, message } = body
     const orderReference = productSku || orderNumber
 
     // Validate required fields
@@ -33,7 +33,6 @@ export async function POST(request: NextRequest) {
           name,
           email,
           orderNumber: orderReference,
-          subject,
           message,
         },
       })
