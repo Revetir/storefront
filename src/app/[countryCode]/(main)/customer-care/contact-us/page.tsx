@@ -3,12 +3,15 @@
 import { useState } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
+const LISTING_ISSUE_REQUEST = "I want to report a listing as inaccurate or an item as inauthentic"
+
 export default function ContactUsPage() {
   const [formData, setFormData] = useState({
     request: "",
     name: "",
     email: "",
     orderNumber: "",
+    productSku: "",
     subject: "",
     message: "",
   })
@@ -67,13 +70,19 @@ export default function ContactUsPage() {
     setIsSubmitting(true)
     setSubmitStatus({ type: null, message: "" })
 
+    const isListingIssueRequest = formData.request === LISTING_ISSUE_REQUEST
+    const orderReference = isListingIssueRequest ? formData.productSku : formData.orderNumber
+
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          orderNumber: orderReference,
+        }),
       })
 
       const data = await response.json()
@@ -83,7 +92,15 @@ export default function ContactUsPage() {
           type: "success",
           message: "Thank you! Your message has been sent successfully. We'll get back to you soon.",
         })
-        setFormData({ request: "", name: "", email: "", orderNumber: "", subject: "", message: "" })
+        setFormData({
+          request: "",
+          name: "",
+          email: "",
+          orderNumber: "",
+          productSku: "",
+          subject: "",
+          message: "",
+        })
       } else {
         setSubmitStatus({
           type: "error",
@@ -99,6 +116,10 @@ export default function ContactUsPage() {
       setIsSubmitting(false)
     }
   }
+
+  const isListingIssueRequest = formData.request === LISTING_ISSUE_REQUEST
+  const orderFieldName = isListingIssueRequest ? "productSku" : "orderNumber"
+  const orderFieldLabel = isListingIssueRequest ? "Product SKU" : "Order Number"
 
   return (
     <>
@@ -137,16 +158,14 @@ export default function ContactUsPage() {
                     errors.request ? 'border-red-500' : 'border-gray-300'
                   }`}
               >
-                <option value="" disabled>How can we help you?</option>
+                <option value="" disabled>How can we help you?</option>    
                 <option value="I want to modify or cancel my order">I want to modify or cancel my order</option>
-                <option value="I want to return an order">I want to return an order</option>
+                <option value="I want to return my order">I want to return my order</option>                            
                 <option value="I have a question about a product or designer">I have a question about a product or designer</option>
                 <option value="I have a question about shipping or returns">I have a question about shipping or returns</option>
-                <option value="I want to collaborate with Revetir">I want to collaborate with Revetir</option>
-                <option value="I have a general comment">I have a general comment</option>
+                <option value={LISTING_ISSUE_REQUEST}>{LISTING_ISSUE_REQUEST}</option>
+                <option value="I want to collaborate with REVETIR">I want to collaborate with REVETIR</option>                
                 <option value="My question doesn't fit into any of these categories">My question doesn't fit into any of these categories</option>
-                <option value="My request is URGENT">My request is URGENT</option>
-                <option value="I want to delete my account">I want to delete my account</option>
               </select>
               {errors.request && (
                 <p className="text-red-500 text-xs mt-1">Please enter your request</p>
@@ -176,14 +195,14 @@ export default function ContactUsPage() {
               </div>
 
               <div className="md:col-span-3">
-                <label htmlFor="orderNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                  Order Number
+                <label htmlFor={orderFieldName} className="block text-sm font-medium text-gray-700 mb-1">
+                  {orderFieldLabel}
                 </label>
                 <input
                   type="text"
-                  id="orderNumber"
-                  name="orderNumber"
-                  value={formData.orderNumber}
+                  id={orderFieldName}
+                  name={orderFieldName}
+                  value={formData[orderFieldName]}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                 />
