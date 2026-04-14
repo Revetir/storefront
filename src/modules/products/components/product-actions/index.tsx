@@ -7,13 +7,17 @@ import { Button } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
 import { isEqual } from "lodash"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
 import SizeGuideLink from "@modules/products/components/size-guide-link"
 import { trackAddToBag, trackVariantSelected } from "@lib/util/analytics"
 import { trackAddToCart } from "@lib/util/meta-pixel"
+import {
+  emitOptimisticCartAdd,
+  emitOptimisticCartRevert,
+} from "@lib/util/cart-events"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -38,6 +42,7 @@ export default function ProductActions({
   product,
   disabled,
 }: ProductActionsProps) {
+  const router = useRouter()
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
   const countryCode = useParams().countryCode as string
@@ -125,6 +130,7 @@ export default function ProductActions({
     if (!selectedVariant?.id) return null
 
     setIsAdding(true)
+    emitOptimisticCartAdd(1)
 
     try {
       await addToCart({
@@ -132,6 +138,8 @@ export default function ProductActions({
         quantity: 1,
         countryCode,
       })
+
+      router.refresh()
 
       // Track successful add to bag
       trackAddToBag({
@@ -165,6 +173,7 @@ export default function ProductActions({
         ],
       })
     } catch (error) {
+      emitOptimisticCartRevert(1)
       console.error('Error adding to cart:', error)
       // Could add toast notification here for error feedback
     } finally {

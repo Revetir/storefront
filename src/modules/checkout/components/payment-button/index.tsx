@@ -239,7 +239,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         <Button
           variant="transparent"
           disabled
-          className="uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 !shadow-none after:!hidden focus-visible:!shadow-none"
+          className="uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 !shadow-none after:!hidden focus-visible:!shadow-none [&>span>div]:!rounded-none"
           data-testid={dataTestId}
         >
           Loading payment...
@@ -505,7 +505,7 @@ const StripePaymentButton = ({
           onClick={handlePayment}
           isLoading={submitting}
           data-testid={dataTestId}
-          className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer !shadow-none after:!hidden focus-visible:!shadow-none"
+          className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer !shadow-none after:!hidden focus-visible:!shadow-none [&>span>div]:!rounded-none"
         >
           {buttonText}
         </Button>
@@ -581,7 +581,7 @@ const ManualTestPaymentButton = ({ notReady, cart }: { notReady: boolean, cart: 
         isLoading={submitting}
         onClick={handlePayment}
         data-testid="submit-order-button"
-        className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer !shadow-none after:!hidden focus-visible:!shadow-none"
+        className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer !shadow-none after:!hidden focus-visible:!shadow-none [&>span>div]:!rounded-none"
       >
         Place order
       </Button>

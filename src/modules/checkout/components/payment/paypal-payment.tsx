@@ -392,7 +392,7 @@ const PayPalCardSubmitButton = ({
       disabled={disabled || !cardFieldsForm || submitting}
       onClick={handleSubmit}
       isLoading={submitting}
-      className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer !shadow-none after:!hidden focus-visible:!shadow-none"
+      className="w-full h-10 uppercase !rounded-none !bg-black !text-white hover:!bg-neutral-900 transition-colors duration-200 cursor-pointer !shadow-none after:!hidden focus-visible:!shadow-none [&>span>div]:!rounded-none"
       data-testid="paypal-card-submit-button"
     >
       Place order

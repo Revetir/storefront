@@ -15,6 +15,7 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import React, { useState } from "react"
 import { trackQuantityChange } from "@lib/util/analytics"
 import { formatBrandNames, getProductUrl, getPrimaryBrand, getBrandsArray } from "@lib/util/brand-utils"
+import { useRouter } from "next/navigation"
 
 type ItemProps = {
   item: HttpTypes.StoreCartLineItem
@@ -23,6 +24,7 @@ type ItemProps = {
 }
 
 const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
+  const router = useRouter()
   const [updating, setUpdating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -49,6 +51,8 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         old_quantity: oldQuantity,
         new_quantity: quantity,
       })
+
+      router.refresh()
     } catch (err: any) {
       setError(err.message)
     } finally {

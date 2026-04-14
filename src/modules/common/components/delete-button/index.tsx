@@ -3,6 +3,7 @@ import { Spinner, Trash } from "@medusajs/icons"
 import { clx } from "@medusajs/ui"
 import { useState } from "react"
 import { trackRemoveFromBag, type CartEventData } from "@lib/util/analytics"
+import { useRouter } from "next/navigation"
 
 type DeleteButtonProps = {
   id: string
@@ -17,6 +18,7 @@ const DeleteButton = ({
   className,
   trackingData,
 }: DeleteButtonProps) => {
+  const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = async (id: string) => {
@@ -29,6 +31,8 @@ const DeleteButton = ({
       if (trackingData) {
         trackRemoveFromBag(trackingData)
       }
+
+      router.refresh()
     } catch (err) {
       setIsDeleting(false)
     }

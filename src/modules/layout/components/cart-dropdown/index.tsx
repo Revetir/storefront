@@ -16,28 +16,35 @@ import LineItemPrice from "@modules/common/components/line-item-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "@modules/products/components/thumbnail"
 import ShoppingBag from "@modules/common/icons/shopping-bag"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
 import { getProductUrl, formatBrandNames, getBrandsArray } from "@lib/util/brand-utils"
+import {
+  onOptimisticCartAdd,
+  onOptimisticCartRevert,
+} from "@lib/util/cart-events"
 
 const CartDropdown = ({
   cart: cartState,
 }: {
   cart?: HttpTypes.StoreCart | null
 }) => {
+  const router = useRouter()
   const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(
     undefined
   )
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
   const [updatingLineId, setUpdatingLineId] = useState<string | null>(null)
+  const [optimisticItemDelta, setOptimisticItemDelta] = useState(0)
 
   const open = () => setCartDropdownOpen(true)
   const close = () => setCartDropdownOpen(false)
 
-  const totalItems =
+  const serverTotalItems =
     cartState?.items?.reduce((acc, item) => {
       return acc + item.quantity
     }, 0) || 0
+  const totalItems = Math.max(0, serverTotalItems + optimisticItemDelta)
 
   const subtotal = cartState?.subtotal ?? 0
   const itemRef = useRef<number>(totalItems || 0)
@@ -67,6 +74,28 @@ const CartDropdown = ({
     }
   }, [activeTimer])
 
+  useEffect(() => {
+    const disposeAdd = onOptimisticCartAdd((detail) => {
+      const quantity = Math.max(0, detail.quantity ?? 1)
+      setOptimisticItemDelta((prev) => prev + quantity)
+    })
+
+    const disposeRevert = onOptimisticCartRevert((detail) => {
+      const quantity = Math.max(0, detail.quantity ?? 1)
+      setOptimisticItemDelta((prev) => Math.max(0, prev - quantity))
+    })
+
+    return () => {
+      disposeAdd()
+      disposeRevert()
+    }
+  }, [])
+
+  // Reset optimistic adjustments once server state catches up.
+  useEffect(() => {
+    setOptimisticItemDelta(0)
+  }, [serverTotalItems])
+
   const pathname = usePathname()
   const isCartLikePage = pathname.includes("/cart") || pathname.includes("/bag")
 
@@ -88,6 +117,7 @@ const CartDropdown = ({
         lineId: item.id,
         quantity: clampedQuantity,
       })
+      router.refresh()
     } finally {
       setUpdatingLineId(null)
     }
