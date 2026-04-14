@@ -1,7 +1,8 @@
 const CUSTOMER_CARE_TIMEZONE = "America/New_York"
 const OPEN_HOUR = 11
 const CLOSE_HOUR = 23
-const SLA_SECONDS = 4 * 60 * 60
+const DEFAULT_SLA_SECONDS = 4 * 60 * 60
+const SUNDAY_SLA_SECONDS = 6 * 60 * 60
 
 type ZonedParts = {
   year: number
@@ -90,10 +91,13 @@ const zonedLocalToUtcMs = (
   return utcMs
 }
 
-const isBusinessDay = (weekday: number) => weekday >= 1 && weekday <= 6
+const isOpenDay = (weekday: number) => weekday >= 0 && weekday <= 6
+
+const getSlaSecondsForWeekday = (weekday: number) =>
+  weekday === 0 ? SUNDAY_SLA_SECONDS : DEFAULT_SLA_SECONDS
 
 const isDuringOnlineHours = (parts: ZonedParts) => {
-  if (!isBusinessDay(parts.weekday)) {
+  if (!isOpenDay(parts.weekday)) {
     return false
   }
 
@@ -117,14 +121,14 @@ const getNextOpeningUtcMs = (cursorUtcMs: number) => {
   const beforeOpen =
     parts.hour < OPEN_HOUR || (parts.hour === OPEN_HOUR && parts.minute === 0 && parts.second === 0)
 
-  if (isBusinessDay(parts.weekday) && beforeOpen) {
+  if (isOpenDay(parts.weekday) && beforeOpen) {
     return zonedLocalToUtcMs(parts.year, parts.month, parts.day, OPEN_HOUR)
   }
 
   let candidate = addDays(parts.year, parts.month, parts.day, 1)
   let candidateWeekday = getWeekdayFromYmd(candidate.year, candidate.month, candidate.day)
 
-  while (!isBusinessDay(candidateWeekday)) {
+  while (!isOpenDay(candidateWeekday)) {
     candidate = addDays(candidate.year, candidate.month, candidate.day, 1)
     candidateWeekday = getWeekdayFromYmd(candidate.year, candidate.month, candidate.day)
   }
@@ -135,14 +139,16 @@ const getNextOpeningUtcMs = (cursorUtcMs: number) => {
 export const computeReplyEtaSeconds = (nowUtcMs = Date.now()) => {
   const nowParts = getZonedParts(new Date(nowUtcMs))
 
-  // While customer care is currently online, display a flat 4-hour "if sent now" SLA.
+  // While customer care is currently online, display a flat day-specific "if sent now" SLA.
   // Closed-hour carryover logic applies only when the store is currently offline.
   if (isDuringOnlineHours(nowParts)) {
-    return SLA_SECONDS
+    return getSlaSecondsForWeekday(nowParts.weekday)
   }
 
   let cursorUtcMs = nowUtcMs
-  let remainingSeconds = SLA_SECONDS
+  const nextOpenUtcMs = getNextOpeningUtcMs(nowUtcMs)
+  const nextOpenParts = getZonedParts(new Date(nextOpenUtcMs))
+  let remainingSeconds = getSlaSecondsForWeekday(nextOpenParts.weekday)
 
   while (remainingSeconds > 0) {
     const cursorParts = getZonedParts(new Date(cursorUtcMs))

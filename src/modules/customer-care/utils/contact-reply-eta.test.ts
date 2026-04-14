@@ -24,14 +24,19 @@ const CASES: EtaCase[] = [
     expectedSeconds: 15 * 60 * 60 + 50 * 60,
   },
   {
-    label: "Sunday waits for Monday opening",
+    label: "Sunday during online hours uses Sunday SLA",
     nowIso: "2025-01-05T17:00:00.000Z", // Sun 12:00 ET
-    expectedSeconds: 27 * 60 * 60,
+    expectedSeconds: 6 * 60 * 60,
   },
   {
-    label: "Saturday late-night carries over Sunday to Monday",
+    label: "Sunday before opening waits for Sunday opening plus Sunday SLA",
+    nowIso: "2025-01-05T12:00:00.000Z", // Sun 07:00 ET
+    expectedSeconds: 10 * 60 * 60,
+  },
+  {
+    label: "Saturday late-night carries over to Sunday opening",
     nowIso: "2025-01-05T04:30:00.000Z", // Sat 23:30 ET
-    expectedSeconds: 39 * 60 * 60 + 30 * 60,
+    expectedSeconds: 17 * 60 * 60 + 30 * 60,
   },
 ]
 
