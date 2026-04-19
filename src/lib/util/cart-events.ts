@@ -1,8 +1,25 @@
 const CART_OPTIMISTIC_ADD_EVENT = "revetir:cart-optimistic-add"
 const CART_OPTIMISTIC_REVERT_EVENT = "revetir:cart-optimistic-revert"
 
-type CartOptimisticDetail = {
+export type CartOptimisticBrandPreview = {
+  name: string
+  slug: string
+}
+
+export type CartOptimisticItemPreview = {
+  title?: string
+  variantTitle?: string | null
+  productHandle?: string
+  thumbnail?: string | null
+  brands?: CartOptimisticBrandPreview[]
+  unitPrice?: number
+  currencyCode?: string
+}
+
+export type CartOptimisticDetail = {
   quantity?: number
+  requestId?: string
+  item?: CartOptimisticItemPreview
 }
 
 const dispatchCartEvent = (eventName: string, detail: CartOptimisticDetail) => {
@@ -13,12 +30,20 @@ const dispatchCartEvent = (eventName: string, detail: CartOptimisticDetail) => {
   window.dispatchEvent(new CustomEvent<CartOptimisticDetail>(eventName, { detail }))
 }
 
-export const emitOptimisticCartAdd = (quantity = 1) => {
-  dispatchCartEvent(CART_OPTIMISTIC_ADD_EVENT, { quantity })
+export const emitOptimisticCartAdd = (detail: CartOptimisticDetail = {}) => {
+  dispatchCartEvent(CART_OPTIMISTIC_ADD_EVENT, {
+    ...detail,
+    quantity: Math.max(0, detail.quantity ?? 1),
+  })
 }
 
-export const emitOptimisticCartRevert = (quantity = 1) => {
-  dispatchCartEvent(CART_OPTIMISTIC_REVERT_EVENT, { quantity })
+export const emitOptimisticCartRevert = (
+  detail: CartOptimisticDetail = {}
+) => {
+  dispatchCartEvent(CART_OPTIMISTIC_REVERT_EVENT, {
+    ...detail,
+    quantity: Math.max(0, detail.quantity ?? 1),
+  })
 }
 
 export const onOptimisticCartAdd = (

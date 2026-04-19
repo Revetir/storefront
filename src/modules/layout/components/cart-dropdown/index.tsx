@@ -18,11 +18,18 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import ShoppingBag from "@modules/common/icons/shopping-bag"
 import { usePathname, useRouter } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
-import { getProductUrl, formatBrandNames, getBrandsArray } from "@lib/util/brand-utils"
+import { getProductUrl, getBrandsArray } from "@lib/util/brand-utils"
 import {
+  CartOptimisticItemPreview,
   onOptimisticCartAdd,
   onOptimisticCartRevert,
 } from "@lib/util/cart-events"
+
+type OptimisticCartItem = {
+  requestId: string
+  quantity: number
+  preview?: CartOptimisticItemPreview
+}
 
 const CartDropdown = ({
   cart: cartState,
@@ -30,12 +37,15 @@ const CartDropdown = ({
   cart?: HttpTypes.StoreCart | null
 }) => {
   const router = useRouter()
-  const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(
-    undefined
-  )
+  const [activeTimer, setActiveTimer] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null)
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
   const [updatingLineId, setUpdatingLineId] = useState<string | null>(null)
   const [optimisticItemDelta, setOptimisticItemDelta] = useState(0)
+  const [optimisticItems, setOptimisticItems] = useState<OptimisticCartItem[]>(
+    []
+  )
 
   const open = () => setCartDropdownOpen(true)
   const close = () => setCartDropdownOpen(false)
@@ -77,12 +87,56 @@ const CartDropdown = ({
   useEffect(() => {
     const disposeAdd = onOptimisticCartAdd((detail) => {
       const quantity = Math.max(0, detail.quantity ?? 1)
+      const requestId =
+        detail.requestId ||
+        `optimistic-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
       setOptimisticItemDelta((prev) => prev + quantity)
+      setOptimisticItems((prev) => [
+        {
+          requestId,
+          quantity,
+          preview: detail.item,
+        },
+        ...prev,
+      ])
     })
 
     const disposeRevert = onOptimisticCartRevert((detail) => {
       const quantity = Math.max(0, detail.quantity ?? 1)
       setOptimisticItemDelta((prev) => Math.max(0, prev - quantity))
+      setOptimisticItems((prev) => {
+        if (!prev.length) {
+          return prev
+        }
+
+        if (detail.requestId) {
+          return prev.filter((item) => item.requestId !== detail.requestId)
+        }
+
+        let remaining = quantity
+        const nextItems: OptimisticCartItem[] = []
+
+        for (const item of prev) {
+          if (remaining <= 0) {
+            nextItems.push(item)
+            continue
+          }
+
+          if (item.quantity > remaining) {
+            nextItems.push({
+              ...item,
+              quantity: item.quantity - remaining,
+            })
+            remaining = 0
+            continue
+          }
+
+          remaining -= item.quantity
+        }
+
+        return nextItems
+      })
     })
 
     return () => {
@@ -94,10 +148,13 @@ const CartDropdown = ({
   // Reset optimistic adjustments once server state catches up.
   useEffect(() => {
     setOptimisticItemDelta(0)
+    setOptimisticItems([])
   }, [serverTotalItems])
 
   const pathname = usePathname()
   const isCartLikePage = pathname.includes("/cart") || pathname.includes("/bag")
+  const hasServerItems = Boolean(cartState?.items?.length)
+  const hasRenderableItems = hasServerItems || optimisticItems.length > 0
 
   const changeItemQuantity = async (
     item: HttpTypes.StoreCartLineItem,
@@ -182,18 +239,107 @@ const CartDropdown = ({
               <div className="p-4 flex items-center justify-center">
                 <h3 className="text-large-semi">Shopping Bag</h3>
               </div>
-              {cartState && cartState.items?.length ? (
+              {hasRenderableItems ? (
                 <>
                   <div className="overflow-y-scroll max-h-[402px] px-4 grid grid-cols-1 gap-y-8 no-scrollbar p-px">
-                    {cartState.items
-                      .sort((a, b) => {
+                    {optimisticItems.map((optimisticItem) => {
+                      const preview = optimisticItem.preview
+                      const optimisticBrands = preview?.brands || []
+                      const optimisticHref =
+                        preview?.productHandle
+                          ? getProductUrl(optimisticBrands, preview.productHandle)
+                          : "/bag"
+                      const hasPrice =
+                        typeof preview?.unitPrice === "number" &&
+                        typeof preview?.currencyCode === "string"
+
+                      return (
+                        <div
+                          className="grid grid-cols-[132px_1fr] gap-x-4 opacity-80"
+                          key={optimisticItem.requestId}
+                          data-testid="cart-item-optimistic"
+                        >
+                          <LocalizedClientLink href={optimisticHref} className="w-full">
+                            <Thumbnail
+                              thumbnail={preview?.thumbnail ?? null}
+                              size="square"
+                              product={
+                                {
+                                  brands: optimisticBrands,
+                                  title: preview?.title || "",
+                                } as any
+                              }
+                            />
+                          </LocalizedClientLink>
+                          <div className="flex flex-col flex-1 min-h-[132px]">
+                            <div className="flex items-center justify-between flex-1">
+                              <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
+                                {optimisticBrands.length > 0 && (
+                                  <span className="text-ui-fg-muted text-xs font-medium truncate block">
+                                    {optimisticBrands.map((brand, idx, arr) => (
+                                      <Fragment key={`${brand.slug}-${idx}`}>
+                                        <span className="uppercase">{brand.name}</span>
+                                        {idx < arr.length - 1 && <span> x </span>}
+                                      </Fragment>
+                                    ))}
+                                  </span>
+                                )}
+                                <h3 className="text-base-regular overflow-hidden text-ellipsis normal-case">
+                                  <LocalizedClientLink
+                                    href={optimisticHref}
+                                    data-testid="product-link-optimistic"
+                                    className="normal-case"
+                                  >
+                                    {preview?.title || "Adding item..."}
+                                  </LocalizedClientLink>
+                                </h3>
+                                {preview?.variantTitle &&
+                                  preview.variantTitle.toLowerCase() !== "default variant" && (
+                                    <div className="text-ui-fg-subtle text-xs">
+                                      <span className="normal-case">Size:</span>{" "}
+                                      {preview.variantTitle.length <= 3
+                                        ? preview.variantTitle.toUpperCase()
+                                        : preview.variantTitle}
+                                    </div>
+                                  )}
+                              </div>
+                              <div className="flex flex-col items-end gap-1">
+                                {hasPrice && (
+                                  <span className="text-xs text-ui-fg-base font-medium">
+                                    {convertToLocale({
+                                      amount:
+                                        (preview?.unitPrice || 0) *
+                                        optimisticItem.quantity,
+                                      currency_code: preview?.currencyCode || "usd",
+                                    })}
+                                  </span>
+                                )}
+                                <div className="inline-flex items-center gap-2 text-ui-fg-muted text-xs whitespace-nowrap">
+                                  <span className="normal-case whitespace-nowrap">
+                                    Quantity: {optimisticItem.quantity}
+                                  </span>
+                                  <span className="uppercase tracking-[0.08em] animate-pulse">
+                                    Adding...
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+
+                    {cartState?.items
+                      ?.sort((a, b) => {
                         return (a.created_at ?? "") > (b.created_at ?? "")
                           ? -1
                           : 1
                       })
                       .map((item) => {
                         const maxQtyFromInventory = 10
-                        const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
+                        const maxQuantity = item.variant?.manage_inventory
+                          ? 10
+                          : maxQtyFromInventory
                         const isUpdating = updatingLineId === item.id
 
                         return (
@@ -203,86 +349,109 @@ const CartDropdown = ({
                             data-testid="cart-item"
                           >
                             <LocalizedClientLink
-                              href={getProductUrl((item.product as any)?.brands, item.product_handle || '')}
+                              href={getProductUrl(
+                                (item.product as any)?.brands,
+                                item.product_handle || ""
+                              )}
                               className="w-full"
                             >
                               <Thumbnail
                                 thumbnail={item.thumbnail}
                                 images={item.variant?.product?.images}
                                 size="square"
-                                product={{
-                                  brand: { name: (item.product as any)?.brands?.[0]?.name || "Product" },
-                                  title: item.title || ""
-                                } as any}
+                                product={
+                                  {
+                                    brand: {
+                                      name:
+                                        (item.product as any)?.brands?.[0]
+                                          ?.name || "Product",
+                                    },
+                                    title: item.title || "",
+                                  } as any
+                                }
                               />
                             </LocalizedClientLink>
                             <div className="flex flex-col flex-1 min-h-[132px]">
                               <div className="flex items-center justify-between flex-1">
                                 <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
-                                    {getBrandsArray((item.product as any)?.brands).length > 0 && (
-                                      <span className="text-ui-fg-muted text-xs font-medium truncate block">
-                                        {getBrandsArray((item.product as any)?.brands).map((brand, idx, arr) => (
-                                          <Fragment key={brand.slug}>
-                                            <span className="uppercase">{brand.name}</span>
-                                            {idx < arr.length - 1 && <span> x </span>}
-                                          </Fragment>
-                                        ))}
-                                      </span>
-                                    )}
-                                    <h3 className="text-base-regular overflow-hidden text-ellipsis normal-case">
-                                      <LocalizedClientLink
-                                        href={getProductUrl((item.product as any)?.brands, item.product_handle || '')}
-                                        data-testid="product-link"
-                                        className="normal-case"
-                                      >
-                                        {item.title}
-                                      </LocalizedClientLink>
-                                    </h3>
-                                    <div className="text-ui-fg-subtle text-xs">
-                                      <LineItemOptions
-                                        variant={item.variant}
-                                        data-testid="cart-item-variant"
-                                        data-value={item.variant}
-                                        size="text-xs"
-                                      />
-                                    </div>
+                                  {getBrandsArray((item.product as any)?.brands)
+                                    .length > 0 && (
+                                    <span className="text-ui-fg-muted text-xs font-medium truncate block">
+                                      {getBrandsArray(
+                                        (item.product as any)?.brands
+                                      ).map((brand, idx, arr) => (
+                                        <Fragment key={brand.slug}>
+                                          <span className="uppercase">
+                                            {brand.name}
+                                          </span>
+                                          {idx < arr.length - 1 && <span> x </span>}
+                                        </Fragment>
+                                      ))}
+                                    </span>
+                                  )}
+                                  <h3 className="text-base-regular overflow-hidden text-ellipsis normal-case">
+                                    <LocalizedClientLink
+                                      href={getProductUrl(
+                                        (item.product as any)?.brands,
+                                        item.product_handle || ""
+                                      )}
+                                      data-testid="product-link"
+                                      className="normal-case"
+                                    >
+                                      {item.title}
+                                    </LocalizedClientLink>
+                                  </h3>
+                                  <div className="text-ui-fg-subtle text-xs">
+                                    <LineItemOptions
+                                      variant={item.variant}
+                                      data-testid="cart-item-variant"
+                                      data-value={item.variant}
+                                      size="text-xs"
+                                    />
+                                  </div>
                                 </div>
                                 <div className="flex flex-col items-end gap-1">
-                                    <LineItemPrice
-                                      item={item}
-                                      style="tight"
-                                      currencyCode={cartState.currency_code}
-                                      forceVertical={true}
-                                      showTotal={false}
-                                    />
-                                    <div
-                                      className="inline-flex items-center gap-1 text-ui-fg-muted text-xs whitespace-nowrap"
-                                      data-testid="cart-item-quantity"
-                                      data-value={item.quantity}
-                                    >
-                                      <span className="normal-case whitespace-nowrap">Quantity: {item.quantity}</span>
-                                      <div className="flex flex-col gap-[1px]">
-                                        <button
-                                          type="button"
-                                          aria-label="Increase quantity"
-                                          onClick={() => changeItemQuantity(item, item.quantity + 1)}
-                                          disabled={isUpdating || item.quantity >= maxQuantity}
-                                          className="w-3 h-2 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                                        >
-                                          <span className="w-0 h-0 border-l-[3px] border-r-[3px] border-b-[4px] border-l-transparent border-r-transparent border-b-current" />
-                                        </button>
-                                        <button
-                                          type="button"
-                                          aria-label="Decrease quantity"
-                                          onClick={() => changeItemQuantity(item, item.quantity - 1)}
-                                          disabled={isUpdating || item.quantity <= 1}
-                                          className="w-3 h-2 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                                        >
-                                          <span className="w-0 h-0 border-l-[3px] border-r-[3px] border-t-[4px] border-l-transparent border-r-transparent border-t-current" />
-                                        </button>
-                                      </div>
+                                  <LineItemPrice
+                                    item={item}
+                                    style="tight"
+                                    currencyCode={cartState.currency_code}
+                                    forceVertical={true}
+                                    showTotal={false}
+                                  />
+                                  <div
+                                    className="inline-flex items-center gap-1 text-ui-fg-muted text-xs whitespace-nowrap"
+                                    data-testid="cart-item-quantity"
+                                    data-value={item.quantity}
+                                  >
+                                    <span className="normal-case whitespace-nowrap">
+                                      Quantity: {item.quantity}
+                                    </span>
+                                    <div className="flex flex-col gap-[1px]">
+                                      <button
+                                        type="button"
+                                        aria-label="Increase quantity"
+                                        onClick={() =>
+                                          changeItemQuantity(item, item.quantity + 1)
+                                        }
+                                        disabled={isUpdating || item.quantity >= maxQuantity}
+                                        className="w-3 h-2 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                      >
+                                        <span className="w-0 h-0 border-l-[3px] border-r-[3px] border-b-[4px] border-l-transparent border-r-transparent border-b-current" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        aria-label="Decrease quantity"
+                                        onClick={() =>
+                                          changeItemQuantity(item, item.quantity - 1)
+                                        }
+                                        disabled={isUpdating || item.quantity <= 1}
+                                        className="w-3 h-2 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                      >
+                                        <span className="w-0 h-0 border-l-[3px] border-r-[3px] border-t-[4px] border-l-transparent border-r-transparent border-t-current" />
+                                      </button>
                                     </div>
                                   </div>
+                                </div>
                               </div>
                               <DeleteButton
                                 id={item.id}
@@ -297,22 +466,28 @@ const CartDropdown = ({
                       })}
                   </div>
                   <div className="p-4 flex flex-col gap-y-4 text-small-regular">
-                    <div className="flex items-center justify-between">
-                      <span className="text-ui-fg-base font-semibold">
-                        Subtotal{" "}
-                        <span className="font-normal"> (excluding taxes)</span>
-                      </span>
-                      <span
-                        className="text-large-semi"
-                        data-testid="cart-subtotal"
-                        data-value={subtotal}
-                      >
-                        {convertToLocale({
-                          amount: subtotal,
-                          currency_code: cartState.currency_code,
-                        })}
-                      </span>
-                    </div>
+                    {cartState ? (
+                      <div className="flex items-center justify-between">
+                        <span className="text-ui-fg-base font-semibold">
+                          Subtotal{" "}
+                          <span className="font-normal"> (excluding taxes)</span>
+                        </span>
+                        <span
+                          className="text-large-semi"
+                          data-testid="cart-subtotal"
+                          data-value={subtotal}
+                        >
+                          {convertToLocale({
+                            amount: subtotal,
+                            currency_code: cartState.currency_code,
+                          })}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="text-ui-fg-subtle text-xs uppercase tracking-[0.08em]">
+                        Updating bag...
+                      </div>
+                    )}
                     <LocalizedClientLink href="/bag" passHref>
                       <Button
                         variant="transparent"

@@ -2,22 +2,26 @@
 
 import { addToCart } from "@lib/data/cart"
 import { useIntersection } from "@lib/hooks/use-in-view"
+import {
+  CartOptimisticBrandPreview,
+  emitOptimisticCartAdd,
+  emitOptimisticCartRevert,
+} from "@lib/util/cart-events"
+import { trackAddToBag, trackVariantSelected } from "@lib/util/analytics"
+import { trackAddToCart } from "@lib/util/meta-pixel"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
+import SizeGuideLink from "@modules/products/components/size-guide-link"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
 import { isEqual } from "lodash"
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
-import SizeGuideLink from "@modules/products/components/size-guide-link"
-import { trackAddToBag, trackVariantSelected } from "@lib/util/analytics"
-import { trackAddToCart } from "@lib/util/meta-pixel"
-import {
-  emitOptimisticCartAdd,
-  emitOptimisticCartRevert,
-} from "@lib/util/cart-events"
+
+const ADD_TO_BAG_SPINNER_MIN_MS = 250
+const ADD_TO_BAG_SPINNER_MAX_MS = 900
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -38,6 +42,26 @@ const optionsAsKeymap = (
   }, {} as Record<string, string>)
 }
 
+const buildOptimisticBrands = (
+  brands: unknown
+): CartOptimisticBrandPreview[] => {
+  if (!brands) {
+    return []
+  }
+
+  const rawBrands = Array.isArray(brands) ? brands : [brands]
+
+  return rawBrands
+    .filter(
+      (brand: any) =>
+        typeof brand?.name === "string" && typeof brand?.slug === "string"
+    )
+    .map((brand: any) => ({
+      name: brand.name,
+      slug: brand.slug,
+    }))
+}
+
 export default function ProductActions({
   product,
   disabled,
@@ -45,7 +69,16 @@ export default function ProductActions({
   const router = useRouter()
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
+  const [showAddLoading, setShowAddLoading] = useState(false)
   const countryCode = useParams().countryCode as string
+
+  const addLoadingStartedAtRef = useRef<number | null>(null)
+  const addLoadingMaxTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  )
+  const addLoadingMinTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  )
 
   // If there is only 1 variant, preselect the options
   useEffect(() => {
@@ -59,6 +92,7 @@ export default function ProductActions({
     if (!product.variants || product.variants.length === 0) {
       return undefined
     }
+
     return product.variants.find((v) => {
       const variantOptions = optionsAsKeymap(v.options)
       return isEqual(variantOptions, options)
@@ -73,13 +107,13 @@ export default function ProductActions({
     }))
 
     // Track variant selection
-    const option = product.options?.find(opt => opt.id === optionId)
+    const option = product.options?.find((opt) => opt.id === optionId)
     if (option) {
       trackVariantSelected({
-        product_id: product.id || '',
+        product_id: product.id || "",
         product_name: product.title,
         brand: (product as any)?.brands?.[0]?.name,
-        option_type: option.title || 'unknown',
+        option_type: option.title || "unknown",
         option_value: value,
       })
     }
@@ -95,12 +129,12 @@ export default function ProductActions({
 
   // check if the selected variant (or product with no variants) is in stock
   const inStock = useMemo(() => {
-    // No variants at all → treat as out of stock
+    // No variants at all: treat as out of stock
     if (!selectedVariant && (product.variants?.length ?? 0) === 0) {
       return false
     }
 
-    // If we don't manage inventory, we can always add to cart
+    // If we do not manage inventory, we can always add to cart
     if (selectedVariant && !selectedVariant.manage_inventory) {
       return true
     }
@@ -118,19 +152,71 @@ export default function ProductActions({
       return true
     }
 
-    // Otherwise, we can't add to cart
+    // Otherwise, we cannot add to cart
     return false
   }, [selectedVariant, product.variants])
 
   const actionsRef = useRef<HTMLDivElement>(null)
   const inView = useIntersection(actionsRef, "0px")
+  const isAddUiLocked = isAdding || showAddLoading
+
+  const clearAddLoadingTimers = () => {
+    if (addLoadingMaxTimerRef.current) {
+      clearTimeout(addLoadingMaxTimerRef.current)
+      addLoadingMaxTimerRef.current = null
+    }
+
+    if (addLoadingMinTimerRef.current) {
+      clearTimeout(addLoadingMinTimerRef.current)
+      addLoadingMinTimerRef.current = null
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      clearAddLoadingTimers()
+    }
+  }, [])
 
   // add the selected variant to the cart
   const handleAddToCart = async () => {
-    if (!selectedVariant?.id) return null
+    if (!selectedVariant?.id) {
+      return null
+    }
 
     setIsAdding(true)
-    emitOptimisticCartAdd(1)
+    setShowAddLoading(true)
+    addLoadingStartedAtRef.current = Date.now()
+    clearAddLoadingTimers()
+
+    addLoadingMaxTimerRef.current = setTimeout(() => {
+      setShowAddLoading(false)
+      addLoadingMaxTimerRef.current = null
+    }, ADD_TO_BAG_SPINNER_MAX_MS)
+
+    const optimisticRequestId = `${selectedVariant.id}-${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`
+
+    emitOptimisticCartAdd({
+      quantity: 1,
+      requestId: optimisticRequestId,
+      item: {
+        title: product.title ?? undefined,
+        variantTitle: selectedVariant.title ?? null,
+        productHandle: product.handle ?? undefined,
+        thumbnail: product.thumbnail ?? null,
+        brands: buildOptimisticBrands((product as any)?.brands),
+        unitPrice:
+          typeof selectedVariant.calculated_price?.calculated_amount === "number"
+            ? selectedVariant.calculated_price.calculated_amount
+            : undefined,
+        currencyCode:
+          typeof selectedVariant.calculated_price?.currency_code === "string"
+            ? selectedVariant.calculated_price.currency_code
+            : undefined,
+      },
+    })
 
     try {
       await addToCart({
@@ -143,7 +229,7 @@ export default function ProductActions({
 
       // Track successful add to bag
       trackAddToBag({
-        product_id: product.id || '',
+        product_id: product.id || "",
         product_name: product.title,
         brand: (product as any)?.brands?.[0]?.name,
         variant_id: selectedVariant.id,
@@ -173,19 +259,49 @@ export default function ProductActions({
         ],
       })
     } catch (error) {
-      emitOptimisticCartRevert(1)
-      console.error('Error adding to cart:', error)
+      emitOptimisticCartRevert({
+        quantity: 1,
+        requestId: optimisticRequestId,
+      })
+      console.error("Error adding to cart:", error)
       // Could add toast notification here for error feedback
     } finally {
       setIsAdding(false)
+
+      if (addLoadingMaxTimerRef.current) {
+        clearTimeout(addLoadingMaxTimerRef.current)
+        addLoadingMaxTimerRef.current = null
+      }
+
+      const elapsed = addLoadingStartedAtRef.current
+        ? Date.now() - addLoadingStartedAtRef.current
+        : 0
+      const remaining = Math.max(0, ADD_TO_BAG_SPINNER_MIN_MS - elapsed)
+
+      if (remaining > 0) {
+        addLoadingMinTimerRef.current = setTimeout(() => {
+          setShowAddLoading(false)
+          addLoadingMinTimerRef.current = null
+        }, remaining)
+      } else {
+        setShowAddLoading(false)
+      }
+
+      addLoadingStartedAtRef.current = null
     }
   }
 
   return (
     <div className="flex flex-col gap-y-2" ref={actionsRef}>
-      <ProductPrice product={product} variant={selectedVariant} countryCode={countryCode} />
+      <ProductPrice
+        product={product}
+        variant={selectedVariant}
+        countryCode={countryCode}
+      />
 
-      <p className="text-xs text-gray-600 mb-5">Enjoy complimentary shipping and returns within the United States</p>
+      <p className="text-xs text-gray-600 mb-5">
+        Enjoy complimentary shipping and returns within the United States
+      </p>
 
       {/* Variant selectors */}
       {(product.variants?.length ?? 0) > 1 && (
@@ -198,7 +314,7 @@ export default function ProductActions({
               updateOption={setOptionValue}
               title={option.title ?? ""}
               data-testid="product-options"
-              disabled={!!disabled || isAdding}
+              disabled={!!disabled || isAddUiLocked}
             />
           ))}
         </div>
@@ -207,28 +323,31 @@ export default function ProductActions({
       <Button
         onClick={handleAddToCart}
         disabled={
-          // disabled any time there's no valid, in-stock variant
+          // disabled any time there is no valid, in-stock variant
           (!selectedVariant && (product.variants?.length ?? 0) > 1) ||
           !inStock ||
           !!disabled ||
-          isAdding ||
+          isAddUiLocked ||
           !isValidVariant
         }
         variant="transparent"
         className="w-full h-10 !rounded-none !bg-black !text-white hover:!bg-neutral-900 disabled:!bg-ui-bg-subtle disabled:!text-ui-fg-muted disabled:!border disabled:!border-ui-border-base disabled:hover:!bg-ui-bg-subtle transition-colors duration-200 !shadow-none after:!hidden focus-visible:!shadow-none [&>span>div]:!rounded-none"
-        isLoading={isAdding}
+        isLoading={showAddLoading}
         data-testid="add-product-button"
       >
-        {
-          // 1) Multi-variant & none selected → prompt selection
-          product.variants && product.variants.length > 1 && (!selectedVariant || !isValidVariant)
+        {isAdding && !showAddLoading
+          ? "ADDING TO BAG..."
+          :
+            // 1) Multi-variant and none selected: prompt selection
+            product.variants &&
+              product.variants.length > 1 &&
+              (!selectedVariant || !isValidVariant)
             ? "SELECT A SIZE"
-            // 2) Out of stock (including no-variants scenario) → show out-of-stock
-            : !inStock
+            : // 2) Out of stock (including no-variants scenario)
+            !inStock
             ? "OUT OF STOCK"
-            // 3) Otherwise → ready to add
-            : "ADD TO BAG"
-        }
+            : // 3) Otherwise ready to add
+              "ADD TO BAG"}
       </Button>
 
       <div className="self-start mt-4">
@@ -249,9 +368,9 @@ export default function ProductActions({
           updateOptions={setOptionValue}
           inStock={inStock}
           handleAddToCart={handleAddToCart}
-          isAdding={isAdding}
+          isAdding={showAddLoading}
           show={!inView}
-          optionsDisabled={!!disabled || isAdding}
+          optionsDisabled={!!disabled || isAddUiLocked}
           countryCode={countryCode}
         />
       </div>
