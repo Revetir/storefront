@@ -33,6 +33,7 @@ interface AddressAutocompleteProps {
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void
   onAddressSelect: (address: RadarAddress) => void
   label: string
+  hasError?: boolean
   required?: boolean
   countryCodes?: string[]
   autoComplete?: string
@@ -51,6 +52,7 @@ const AddressAutocomplete = React.forwardRef<
       onBlur,
       onAddressSelect,
       label,
+      hasError = false,
       required = false,
       countryCodes,
       autoComplete,
@@ -300,7 +302,11 @@ const AddressAutocomplete = React.forwardRef<
 
     return (
       <div className="flex flex-col w-full">
-        <div className="flex relative w-full txt-compact-medium address-autocomplete-container">
+        <div
+          className={`flex relative w-full txt-compact-medium address-autocomplete-container${
+            hasError ? " has-error" : ""
+          }`}
+        >
           <div
             ref={containerRef}
             className="w-full"
@@ -373,6 +379,14 @@ const AddressAutocomplete = React.forwardRef<
           }
 
           .address-autocomplete-container .radar-autocomplete-input.checkout-invalid {
+            border-color: #ef4444 !important;
+          }
+
+          .address-autocomplete-container.has-error .radar-autocomplete-input {
+            border-color: #ef4444 !important;
+          }
+
+          .address-autocomplete-container.has-error .radar-autocomplete-input:focus {
             border-color: #ef4444 !important;
           }
 

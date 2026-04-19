@@ -85,6 +85,13 @@ const ShippingAddress = ({
     return `Please enter your ${label}`
   }, [])
 
+  const getRequiredInputClassName = (hasError: boolean) =>
+    `w-full px-3 py-2 border focus:outline-none focus:ring-0 ${
+      hasError
+        ? "border-red-500 focus:border-red-500"
+        : "border-gray-300 focus:border-black"
+    }`
+
   // Persist formData to sessionStorage when user is editing
   useEffect(() => {
     if (hasUserEdited && typeof window !== "undefined") {
@@ -467,9 +474,7 @@ const ShippingAddress = ({
             onInvalid={handleInvalid}
             required
             data-testid="shipping-first-name-input"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-              errors["shipping_address.first_name"] ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getRequiredInputClassName(Boolean(errors["shipping_address.first_name"]))}
           />
           {errors["shipping_address.first_name"] && (
             <p className="text-red-500 text-xs mt-1">{errors["shipping_address.first_name"]}</p>
@@ -490,9 +495,7 @@ const ShippingAddress = ({
             onInvalid={handleInvalid}
             required
             data-testid="shipping-last-name-input"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-              errors["shipping_address.last_name"] ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getRequiredInputClassName(Boolean(errors["shipping_address.last_name"]))}
           />
           {errors["shipping_address.last_name"] && (
             <p className="text-red-500 text-xs mt-1">{errors["shipping_address.last_name"]}</p>
@@ -502,20 +505,19 @@ const ShippingAddress = ({
           <label htmlFor="shipping_address.address_1" className="block text-sm font-medium text-gray-700 mb-1">
             Street Address<span className="text-red-500">*</span>
           </label>
-          <div className={errors["shipping_address.address_1"] ? 'border-red-500 border' : ''}>
-            <AddressAutocomplete
-              label=""
-              name="shipping_address.address_1"
-              autoComplete="address-line1"
-              value={formData["shipping_address.address_1"]}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              onAddressSelect={handleAddressSelect}
-              countryCodes={countriesInRegion}
-              required
-              data-testid="shipping-address-input"
-            />
-          </div>
+          <AddressAutocomplete
+            label=""
+            name="shipping_address.address_1"
+            autoComplete="address-line1"
+            value={formData["shipping_address.address_1"]}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            onAddressSelect={handleAddressSelect}
+            countryCodes={countriesInRegion}
+            required
+            hasError={Boolean(errors["shipping_address.address_1"])}
+            data-testid="shipping-address-input"
+          />
           {errors["shipping_address.address_1"] && (
             <p className="text-red-500 text-xs mt-1">{errors["shipping_address.address_1"]}</p>
           )}
@@ -567,9 +569,7 @@ const ShippingAddress = ({
             onInvalid={handleInvalid}
             required
             data-testid="shipping-city-input"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-              errors["shipping_address.city"] ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getRequiredInputClassName(Boolean(errors["shipping_address.city"]))}
           />
           {errors["shipping_address.city"] && (
             <p className="text-red-500 text-xs mt-1">{errors["shipping_address.city"]}</p>
@@ -590,9 +590,7 @@ const ShippingAddress = ({
               onInvalid={handleInvalid}
               required
               data-testid="shipping-province-input"
-              className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-                errors["shipping_address.province"] ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={getRequiredInputClassName(Boolean(errors["shipping_address.province"]))}
             >
               <option value="">Select a state</option>
               {US_STATES.map((state) => (
@@ -620,9 +618,7 @@ const ShippingAddress = ({
               onInvalid={handleInvalid}
               required
               data-testid="shipping-postal-code-input"
-              className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-                errors["shipping_address.postal_code"] ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={getRequiredInputClassName(Boolean(errors["shipping_address.postal_code"]))}
             />
             {errors["shipping_address.postal_code"] && (
               <p className="text-red-500 text-xs mt-1">{errors["shipping_address.postal_code"]}</p>
@@ -643,9 +639,7 @@ const ShippingAddress = ({
             onInvalid={handleInvalid}
             required
             data-testid="shipping-country-select"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-              errors["shipping_address.country_code"] ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getRequiredInputClassName(Boolean(errors["shipping_address.country_code"]))}
           >
             <option value="">Select a country</option>
             {cart?.region?.countries?.map((country) => (
@@ -685,9 +679,7 @@ const ShippingAddress = ({
             onInvalid={handleInvalid}
             required
             data-testid="shipping-email-input"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-              errors["email"] ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getRequiredInputClassName(Boolean(errors["email"]))}
           />
           {errors["email"] && (
             <p className="text-red-500 text-xs mt-1">{errors["email"]}</p>
@@ -708,9 +700,7 @@ const ShippingAddress = ({
             onInvalid={handleInvalid}
             required
             data-testid="shipping-phone-input"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-              errors["shipping_address.phone"] ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getRequiredInputClassName(Boolean(errors["shipping_address.phone"]))}
           />
           {errors["shipping_address.phone"] && (
             <p className="text-red-500 text-xs mt-1">{errors["shipping_address.phone"]}</p>

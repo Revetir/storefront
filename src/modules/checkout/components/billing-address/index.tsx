@@ -33,6 +33,13 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
     return `Please enter your ${label}`
   }, [])
 
+  const getRequiredInputClassName = (hasError: boolean) =>
+    `w-full px-3 py-2 border focus:outline-none focus:ring-0 ${
+      hasError
+        ? "border-red-500 focus:border-red-500"
+        : "border-gray-300 focus:border-black"
+    }`
+
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
@@ -205,9 +212,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
             onInvalid={handleInvalid}
             required
             data-testid="billing-first-name-input"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-              errors["billing_address.first_name"] ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getRequiredInputClassName(Boolean(errors["billing_address.first_name"]))}
           />
           {errors["billing_address.first_name"] && (
             <p className="text-red-500 text-xs mt-1">{errors["billing_address.first_name"]}</p>
@@ -228,9 +233,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
             onInvalid={handleInvalid}
             required
             data-testid="billing-last-name-input"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-              errors["billing_address.last_name"] ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getRequiredInputClassName(Boolean(errors["billing_address.last_name"]))}
           />
           {errors["billing_address.last_name"] && (
             <p className="text-red-500 text-xs mt-1">{errors["billing_address.last_name"]}</p>
@@ -240,20 +243,19 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           <label htmlFor="billing_address.address_1" className="block text-sm font-medium text-gray-700 mb-1">
             Street Address<span className="text-red-500">*</span>
           </label>
-          <div className={errors["billing_address.address_1"] ? 'border-red-500 border' : ''}>
-            <AddressAutocomplete
-              label=""
-              name="billing_address.address_1"
-              autoComplete="address-line1"
-              value={formData["billing_address.address_1"]}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              onAddressSelect={handleAddressSelect}
-              countryCodes={countriesInRegion}
-              required
-              data-testid="billing-address-input"
-            />
-          </div>
+          <AddressAutocomplete
+            label=""
+            name="billing_address.address_1"
+            autoComplete="address-line1"
+            value={formData["billing_address.address_1"]}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            onAddressSelect={handleAddressSelect}
+            countryCodes={countriesInRegion}
+            required
+            hasError={Boolean(errors["billing_address.address_1"])}
+            data-testid="billing-address-input"
+          />
           {errors["billing_address.address_1"] && (
             <p className="text-red-500 text-xs mt-1">{errors["billing_address.address_1"]}</p>
           )}
@@ -307,9 +309,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
             onInvalid={handleInvalid}
             required
             data-testid="billing-city-input"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-              errors["billing_address.city"] ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getRequiredInputClassName(Boolean(errors["billing_address.city"]))}
           />
           {errors["billing_address.city"] && (
             <p className="text-red-500 text-xs mt-1">{errors["billing_address.city"]}</p>
@@ -330,9 +330,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
               onInvalid={handleInvalid}
               required
               data-testid="billing-province-input"
-              className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-                errors["billing_address.province"] ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={getRequiredInputClassName(Boolean(errors["billing_address.province"]))}
             >
               <option value="">Select a state</option>
               {US_STATES.map((state) => (
@@ -360,9 +358,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
               onInvalid={handleInvalid}
               required
               data-testid="billing-postal-input"
-              className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-                errors["billing_address.postal_code"] ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={getRequiredInputClassName(Boolean(errors["billing_address.postal_code"]))}
             />
             {errors["billing_address.postal_code"] && (
               <p className="text-red-500 text-xs mt-1">{errors["billing_address.postal_code"]}</p>
@@ -383,9 +379,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
             onInvalid={handleInvalid}
             required
             data-testid="billing-country-select"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
-              errors["billing_address.country_code"] ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getRequiredInputClassName(Boolean(errors["billing_address.country_code"]))}
           >
             <option value="">Select a country</option>
             {cart?.region?.countries?.map((country) => (
