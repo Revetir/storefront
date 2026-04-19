@@ -27,6 +27,10 @@ export const paymentInfoMap: Record<
     title: "Bancontact",
     icon: <Bancontact />,
   },
+  pp_square_square: {
+    title: "Square",
+    icon: <CreditCard />,
+  },
   pp_paypal_paypal: {
     title: "PayPal",
     icon: <PayPal />,
@@ -42,6 +46,10 @@ export const paymentInfoMap: Record<
   paypal: {
     title: "PayPal",
     icon: <PayPal />,
+  },
+  square: {
+    title: "Square",
+    icon: <CreditCard />,
   },
   klarna: {
     title: "Klarna",
@@ -71,6 +79,9 @@ export const isStripe = (providerId?: string) => {
 }
 export const isPaypal = (providerId?: string) => {
   return providerId?.startsWith("pp_paypal")
+}
+export const isSquare = (providerId?: string) => {
+  return providerId?.startsWith("pp_square")
 }
 export const isManual = (providerId?: string) => {
   return providerId?.startsWith("pp_system_default")

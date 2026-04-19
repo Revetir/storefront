@@ -392,7 +392,12 @@ const Review = ({ cart }: { cart: any }) => {
     selectedPaymentMethod === "paypal_apple_pay" ||
     selectedPaymentMethod === "paypal_card"
 
-  if (isPaypalCheckoutMethod) {
+  const isSquareCheckoutMethod =
+    selectedPaymentMethod === "square_card" ||
+    selectedPaymentMethod === "square_apple_pay" ||
+    selectedPaymentMethod === "square_google_pay"
+
+  if (isPaypalCheckoutMethod || isSquareCheckoutMethod) {
     return <div id="checkout-review-payment-action-slot" className="w-full" />
   }
 

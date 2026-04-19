@@ -162,7 +162,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
             onInvalid={handleInvalid}
             required
             data-testid="billing-first-name-input"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
               errors["billing_address.first_name"] ? 'border-red-500' : 'border-gray-300'
             }`}
           />
@@ -185,7 +185,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
             onInvalid={handleInvalid}
             required
             data-testid="billing-last-name-input"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
               errors["billing_address.last_name"] ? 'border-red-500' : 'border-gray-300'
             }`}
           />
@@ -229,7 +229,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
               onChange={handleChange}
               onBlur={handleBlur}
               data-testid="billing-address-2-input"
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-black"
             />
           </div>
           <div className="w-3/5">
@@ -245,7 +245,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
               onBlur={handleBlur}
               autoComplete="organization"
               data-testid="billing-company-input"
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-black"
             />
           </div>
         </div>
@@ -264,7 +264,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
             onInvalid={handleInvalid}
             required
             data-testid="billing-city-input"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
               errors["billing_address.city"] ? 'border-red-500' : 'border-gray-300'
             }`}
           />
@@ -287,7 +287,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
               onInvalid={handleInvalid}
               required
               data-testid="billing-province-input"
-              className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+              className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
                 errors["billing_address.province"] ? 'border-red-500' : 'border-gray-300'
               }`}
             >
@@ -317,7 +317,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
               onInvalid={handleInvalid}
               required
               data-testid="billing-postal-input"
-              className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+              className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
                 errors["billing_address.postal_code"] ? 'border-red-500' : 'border-gray-300'
               }`}
             />
@@ -340,7 +340,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
             onInvalid={handleInvalid}
             required
             data-testid="billing-country-select"
-            className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+            className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
               errors["billing_address.country_code"] ? 'border-red-500' : 'border-gray-300'
             }`}
           >
@@ -368,7 +368,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
             onChange={handleChange}
             onBlur={handleBlur}
             data-testid="billing-phone-input"
-            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-black"
           />
         </div>
       </div>

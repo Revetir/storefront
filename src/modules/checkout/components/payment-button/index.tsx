@@ -1,6 +1,6 @@
 "use client"
 
-import { isManual, isPaypal, isStripe } from "@lib/constants"
+import { isManual, isPaypal, isSquare, isStripe } from "@lib/constants"
 import { placeOrder, updateCheckoutCart } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
@@ -250,6 +250,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         <ManualTestPaymentButton notReady={notReady} cart={cart} data-testid={dataTestId} />
       )
     case isPaypal(paymentSession?.provider_id):
+    case isSquare(paymentSession?.provider_id):
       return null
     default:
       // Unknown payment providers should simply not render a button instead of flashing the generic CTA.

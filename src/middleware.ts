@@ -131,6 +131,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  const pathname = request.nextUrl.pathname.toLowerCase()
+  const isSandboxCheckoutPath =
+    pathname === "/sandbox" ||
+    pathname.startsWith("/sandbox/") ||
+    /^\/[a-z]{2}\/sandbox(\/|$)/.test(pathname)
+
+  // Keep sandbox checkout test pages independent from Medusa region lookups.
+  if (isSandboxCheckoutPath) {
+    return attachCacheIdCookie(NextResponse.next())
+  }
+
   const regionMap = await getRegionMap(cacheId)
 
   const countryCode = regionMap && (await getCountryCode(request, regionMap))

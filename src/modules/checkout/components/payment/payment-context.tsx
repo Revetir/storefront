@@ -8,6 +8,9 @@ export type CheckoutPaymentMethod =
   | "paypal_wallet"
   | "paypal_apple_pay"
   | "paypal_card"
+  | "square_card"
+  | "square_apple_pay"
+  | "square_google_pay"
 
 interface PaymentContextType {
   selectedPaymentMethod: CheckoutPaymentMethod | null

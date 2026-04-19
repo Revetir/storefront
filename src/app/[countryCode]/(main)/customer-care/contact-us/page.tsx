@@ -211,7 +211,7 @@ export default function ContactUsPage() {
                 onChange={handleInputChange}
                 onInvalid={handleInvalid}
                 required
-                  className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                  className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
                     errors.request ? 'border-red-500' : 'border-gray-300'
                   }`}
               >
@@ -242,7 +242,7 @@ export default function ContactUsPage() {
                   onChange={handleInputChange}
                   onInvalid={handleInvalid}
                   required
-                  className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                  className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
                     errors.name ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -261,7 +261,7 @@ export default function ContactUsPage() {
                   name={orderFieldName}
                   value={formData[orderFieldName]}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-black"
                 />
               </div>
             </div>
@@ -279,7 +279,7 @@ export default function ContactUsPage() {
                 onBlur={handleBlur}
                 onInvalid={handleInvalid}
                 required
-                  className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                  className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
                     errors.email ? 'border-red-500' : 'border-gray-300'
                   }`}
               />
@@ -300,7 +300,7 @@ export default function ContactUsPage() {
                 onInvalid={handleInvalid}
                 required
                 rows={6}
-                  className={`w-full px-3 py-2 border focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                  className={`w-full px-3 py-2 border focus:outline-none focus:ring-0 focus:border-black ${
                     errors.message ? 'border-red-500' : 'border-gray-300'
                   }`}
               />

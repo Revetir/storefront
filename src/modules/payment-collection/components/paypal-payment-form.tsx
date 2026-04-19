@@ -70,8 +70,8 @@ const PAYPAL_CARD_FIELD_STYLE = {
     transition: "border-color 0.2s ease, box-shadow 0.2s ease",
   },
   ":focus": {
-    border: "1px solid transparent",
-    "box-shadow": "0 0 0 2px #000000",
+    border: "1px solid #000000",
+    "box-shadow": "none",
   },
   "::placeholder": {
     color: "#6b7280",

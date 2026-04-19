@@ -8,6 +8,41 @@ export function formatPaymentMethod(charge: any): string {
     return "Card"
   }
 
+  const squarePayment = charge?.square_payment || charge?.payment
+  const squareCard =
+    squarePayment?.card_details?.card ||
+    charge?.card_details?.card
+  const squareSourceType =
+    charge?.source_type ||
+    charge?.sourceType ||
+    charge?.square_source_type ||
+    squarePayment?.source_type ||
+    charge?.details?.method
+
+  if (squareCard || squareSourceType) {
+    const brand = (squareCard?.card_brand || squareCard?.brand || "Card")
+      .toString()
+      .charAt(0)
+      .toUpperCase() + (squareCard?.card_brand || squareCard?.brand || "Card").toString().slice(1).toLowerCase()
+    const last4 = squareCard?.last_4 || squareCard?.last4
+    const normalizedType = String(squareSourceType || "").toLowerCase()
+
+    if (normalizedType.includes("apple")) {
+      return last4 ? `Apple Pay (${brand} Â· ${last4})` : "Apple Pay"
+    }
+    if (normalizedType.includes("google")) {
+      return last4 ? `Google Pay (${brand} Â· ${last4})` : "Google Pay"
+    }
+    if (normalizedType.includes("afterpay")) {
+      return "Afterpay"
+    }
+    if (normalizedType.includes("cash app")) {
+      return "Cash App Pay"
+    }
+
+    return last4 ? `${brand} Â· ${last4}` : brand
+  }
+
   // If a PaymentMethod object was provided directly
   if (charge.object === "payment_method") {
     const pm = charge

@@ -1,5 +1,5 @@
 import { retrievePaymentCollectionCheckoutContext } from "@lib/data/payment-collection"
-import { isPaypal } from "@lib/constants"
+import { isPaypal, isSquare } from "@lib/constants"
 import { listCartPaymentMethods } from "@lib/data/payment"
 import { Heading, Text } from "@medusajs/ui"
 import ItemsPreviewTemplate from "@modules/cart/templates/preview"
@@ -7,6 +7,7 @@ import CartTotals from "@modules/common/components/cart-totals"
 import Divider from "@modules/common/components/divider"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import PayPalPaymentCollectionForm from "@modules/payment-collection/components/paypal-payment-form"
+import SquarePaymentCollectionForm from "@modules/payment-collection/components/square-payment-form"
 import { US_STATES } from "@modules/checkout/utils/us-states"
 import { notFound, redirect } from "next/navigation"
 
@@ -151,6 +152,10 @@ export default async function PaymentCollectionCheckoutTemplate({
   }
 
   const paymentMethods = await listCartPaymentMethods(context.order.region_id || "")
+  const squareProviderId =
+    paymentMethods?.find((provider) => isSquare(provider.id))?.id ||
+    "pp_square_square"
+  const squareEnabled = Boolean(paymentMethods?.some((provider) => isSquare(provider.id)))
   const paypalProviderId =
     paymentMethods?.find((provider) => isPaypal(provider.id))?.id ||
     "pp_paypal_paypal"
@@ -178,7 +183,15 @@ export default async function PaymentCollectionCheckoutTemplate({
         <ReadOnlyAddressSection title="Billing Address" address={context.order.billing_address} />
         <ReadOnlyShippingMethod order={context.order} />
 
-        {paypalEnabled ? (
+        {squareEnabled ? (
+          <SquarePaymentCollectionForm
+            paymentCollectionId={context.payment_collection.id}
+            paymentCollection={context.payment_collection}
+            order={context.order}
+            countryCode={context.country_code || countryCode || "us"}
+            squareProviderId={squareProviderId}
+          />
+        ) : paypalEnabled ? (
           <PayPalPaymentCollectionForm
             paymentCollectionId={context.payment_collection.id}
             paymentCollection={context.payment_collection}
@@ -195,7 +208,7 @@ export default async function PaymentCollectionCheckoutTemplate({
             </div>
             <Divider className="mb-6" />
             <Text className="text-ui-fg-subtle">
-              PayPal isn&apos;t enabled for this region yet. Please contact support.
+              Square isn&apos;t enabled for this region yet. Please contact support.
             </Text>
           </div>
         )}
@@ -213,7 +226,7 @@ export default async function PaymentCollectionCheckoutTemplate({
             </div>
             <Divider className="my-4" />
             <CartTotals totals={summaryLikeCart as any} forceFinalLabel />
-            {paypalEnabled && (
+            {(squareEnabled || paypalEnabled) && (
               <div className="mt-4">
                 <div id="payment-collection-review-payment-action-slot" className="w-full" />
               </div>

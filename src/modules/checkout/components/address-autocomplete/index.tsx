@@ -367,8 +367,8 @@ const AddressAutocomplete = React.forwardRef<
 
           .address-autocomplete-container .radar-autocomplete-input:focus {
             outline: none !important;
-            border-color: transparent !important;
-            box-shadow: 0 0 0 2px #000000 !important;
+            border-color: #000000 !important;
+            box-shadow: none !important;
             background-color: var(--ui-bg-field, #ffffff) !important;
           }
 
