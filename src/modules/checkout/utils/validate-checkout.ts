@@ -1,5 +1,11 @@
 import { HttpTypes } from "@medusajs/types"
 
+export const CHECKOUT_VALIDATION_ERRORS_EVENT = "checkout:validation-errors"
+
+type CheckoutValidationErrorsDetail = {
+  fieldNames: string[]
+}
+
 /**
  * Validates required checkout fields
  * Returns array of field names that are missing or invalid
@@ -63,6 +69,13 @@ export function validateCheckout(cart: HttpTypes.StoreCart | null): string[] {
 export function triggerFieldErrors(fieldNames: string[]): void {
   if (typeof window === "undefined") return
 
+  window.dispatchEvent(
+    new CustomEvent<CheckoutValidationErrorsDetail>(
+      CHECKOUT_VALIDATION_ERRORS_EVENT,
+      { detail: { fieldNames } }
+    )
+  )
+
   fieldNames.forEach((name) => {
     const field = document.querySelector(
       `[name="${name}"]`
@@ -76,6 +89,38 @@ export function triggerFieldErrors(fieldNames: string[]): void {
       // Focus the first invalid field
       if (fieldNames[0] === name) {
         field.focus()
+      }
+      return
+    }
+
+    const autocompleteSelector =
+      name === "shipping_address.address_1"
+        ? '[data-testid="shipping-address-input"] .radar-autocomplete-input'
+        : name === "billing_address.address_1"
+          ? '[data-testid="billing-address-input"] .radar-autocomplete-input'
+          : null
+
+    if (!autocompleteSelector) {
+      return
+    }
+
+    const autocompleteInput = document.querySelector(
+      autocompleteSelector
+    ) as HTMLInputElement | null
+
+    if (autocompleteInput) {
+      autocompleteInput.classList.add("checkout-invalid")
+      autocompleteInput.setAttribute("aria-invalid", "true")
+
+      const clearInvalid = () => {
+        autocompleteInput.classList.remove("checkout-invalid")
+        autocompleteInput.removeAttribute("aria-invalid")
+      }
+
+      autocompleteInput.addEventListener("input", clearInvalid, { once: true })
+
+      if (fieldNames[0] === name) {
+        autocompleteInput.focus()
       }
     }
   })

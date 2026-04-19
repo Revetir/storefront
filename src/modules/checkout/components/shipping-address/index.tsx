@@ -10,6 +10,7 @@ import AddressAutocomplete, {
 import { US_STATES } from "../../utils/us-states"
 import { setAddresses } from "@lib/data/cart"
 import { useCheckoutContext } from "../checkout-context"
+import { CHECKOUT_VALIDATION_ERRORS_EVENT } from "../../utils/validate-checkout"
 
 const ShippingAddress = ({
   customer,
@@ -71,6 +72,18 @@ const ShippingAddress = ({
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const getRequiredFieldError = useCallback((fieldName: string) => {
+    if (fieldName === "email") {
+      return "Please enter your email"
+    }
+
+    const label = fieldName
+      .replace("shipping_address.", "")
+      .replace(/_/g, " ")
+
+    return `Please enter your ${label}`
+  }, [])
 
   // Persist formData to sessionStorage when user is editing
   useEffect(() => {
@@ -243,6 +256,40 @@ const ShippingAddress = ({
       window.removeEventListener("checkout:submit-intent", cancelPendingAutoSave)
     }
   }, [debouncedSaveAddress])
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+
+    const handleValidationErrors = (event: Event) => {
+      const detail = (event as CustomEvent<{ fieldNames?: string[] }>).detail
+      const fieldNames = detail?.fieldNames || []
+
+      const nextErrors: Record<string, string> = {}
+      fieldNames.forEach((name) => {
+        if (name === "email" || name.startsWith("shipping_address.")) {
+          nextErrors[name] = getRequiredFieldError(name)
+        }
+      })
+
+      if (Object.keys(nextErrors).length > 0) {
+        setErrors((prev) => ({ ...prev, ...nextErrors }))
+      }
+    }
+
+    window.addEventListener(
+      CHECKOUT_VALIDATION_ERRORS_EVENT,
+      handleValidationErrors as EventListener
+    )
+
+    return () => {
+      window.removeEventListener(
+        CHECKOUT_VALIDATION_ERRORS_EVENT,
+        handleValidationErrors as EventListener
+      )
+    }
+  }, [getRequiredFieldError])
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target

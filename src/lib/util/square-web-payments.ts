@@ -144,10 +144,10 @@ export const SQUARE_CARD_STYLE = {
     color: "transparent",
   },
   ".message-text.is-error": {
-    color: "#dc2626",
+    color: "transparent",
   },
   ".message-icon.is-error": {
-    color: "#dc2626",
+    color: "transparent",
   },
   input: {
     backgroundColor: "#ffffff",

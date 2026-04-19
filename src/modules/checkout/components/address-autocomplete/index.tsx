@@ -372,6 +372,10 @@ const AddressAutocomplete = React.forwardRef<
             background-color: var(--ui-bg-field, #ffffff) !important;
           }
 
+          .address-autocomplete-container .radar-autocomplete-input.checkout-invalid {
+            border-color: #ef4444 !important;
+          }
+
           /* Hide search icon completely */
           .address-autocomplete-container .radar-autocomplete-search-icon {
             display: none !important;

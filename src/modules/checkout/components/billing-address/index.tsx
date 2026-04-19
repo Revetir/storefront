@@ -6,6 +6,7 @@ import AddressAutocomplete, {
 import { US_STATES } from "../../utils/us-states"
 import { setAddresses } from "@lib/data/cart"
 import { debounce } from "lodash"
+import { CHECKOUT_VALIDATION_ERRORS_EVENT } from "../../utils/validate-checkout"
 
 const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
   const [formData, setFormData] = useState<any>({
@@ -23,6 +24,14 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
 
   const [hasUserEdited, setHasUserEdited] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const getRequiredFieldError = useCallback((fieldName: string) => {
+    const label = fieldName
+      .replace("billing_address.", "")
+      .replace(/_/g, " ")
+
+    return `Please enter your ${label}`
+  }, [])
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -104,6 +113,40 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
       window.removeEventListener("checkout:submit-intent", cancelPendingAutoSave)
     }
   }, [debouncedSaveAddress])
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+
+    const handleValidationErrors = (event: Event) => {
+      const detail = (event as CustomEvent<{ fieldNames?: string[] }>).detail
+      const fieldNames = detail?.fieldNames || []
+
+      const nextErrors: Record<string, string> = {}
+      fieldNames.forEach((name) => {
+        if (name.startsWith("billing_address.")) {
+          nextErrors[name] = getRequiredFieldError(name)
+        }
+      })
+
+      if (Object.keys(nextErrors).length > 0) {
+        setErrors((prev) => ({ ...prev, ...nextErrors }))
+      }
+    }
+
+    window.addEventListener(
+      CHECKOUT_VALIDATION_ERRORS_EVENT,
+      handleValidationErrors as EventListener
+    )
+
+    return () => {
+      window.removeEventListener(
+        CHECKOUT_VALIDATION_ERRORS_EVENT,
+        handleValidationErrors as EventListener
+      )
+    }
+  }, [getRequiredFieldError])
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
     // Trigger auto-save on blur

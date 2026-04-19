@@ -42,6 +42,11 @@ const SQUARE_GOOGLE_PAY_BUTTON_OPTIONS = {
 } as const
 const SQUARE_APPLE_PAY_BUTTON_CLASSNAME =
   "w-full h-10 rounded-none border-0 cursor-pointer"
+const REQUIRED_CHECKOUT_FIELDS_MESSAGE =
+  "Please complete all required checkout fields before placing your order."
+const INVALID_CARD_NUMBER_MESSAGE = "Credit card number is not valid."
+const WALLET_CANCELED_MESSAGE =
+  "Payment was canceled before it completed. Please try again."
 
 type SquareWalletMethodType = Exclude<SquareCheckoutMethodType, "square_card">
 
@@ -117,6 +122,57 @@ const toErrorMessage = (error: unknown, fallback: string) => {
   }
 
   return fallback
+}
+
+const resolveSquareCheckoutErrorMessage = ({
+  error,
+  selectedMethod,
+  fallback,
+}: {
+  error: unknown
+  selectedMethod: SquareCheckoutMethodType
+  fallback: string
+}) => {
+  const raw = toErrorMessage(error, fallback)
+  const normalized = raw.toLowerCase()
+
+  if (normalized === REQUIRED_CHECKOUT_FIELDS_MESSAGE.toLowerCase()) {
+    return REQUIRED_CHECKOUT_FIELDS_MESSAGE
+  }
+
+  if (
+    selectedMethod === "square_card" &&
+    /(card number|invalid card|invalid pan|pan is invalid)/i.test(normalized)
+  ) {
+    return INVALID_CARD_NUMBER_MESSAGE
+  }
+
+  if (
+    selectedMethod === "square_card" &&
+    /(card|cvv|security code|expiration|expiry|postal|zip|token|tokenize|payment information|invalid)/i.test(
+      normalized
+    )
+  ) {
+    return "Please review your card details and try again."
+  }
+
+  if (
+    selectedMethod !== "square_card" &&
+    /(cancel|canceled|cancelled|aborted|abort|closed|dismissed|not completed)/i.test(
+      normalized
+    )
+  ) {
+    return WALLET_CANCELED_MESSAGE
+  }
+
+  if (
+    selectedMethod !== "square_card" &&
+    /(token|tokenize|nonce|payment information)/i.test(normalized)
+  ) {
+    return "We couldn't confirm your wallet payment. Please try again or use card."
+  }
+
+  return raw
 }
 
 const resolveCountryCodeForRedirect = (
@@ -558,15 +614,18 @@ const SquareCartPayment = ({ cart, squareProviderId }: SquareCartPaymentProps) =
     if (validationErrors.length > 0) {
       scrollToTop()
       triggerFieldErrors(validationErrors)
-      throw new Error("Please complete all required checkout fields before placing your order.")
+      throw new Error(REQUIRED_CHECKOUT_FIELDS_MESSAGE)
     }
 
     return checkoutCart
   }, [cart])
 
   const createSessionWithToken = useCallback(
-    async (sourceToken: string, sourceType: string): Promise<void> => {
-      const preparedCart = await validateAndPrepareCheckout()
+    async (
+      preparedCart: CartLike,
+      sourceToken: string,
+      sourceType: string
+    ): Promise<void> => {
 
       let paymentCollection: PaymentCollectionLike | null =
         (preparedCart.payment_collection as PaymentCollectionLike | null) || null
@@ -600,7 +659,7 @@ const SquareCartPayment = ({ cart, squareProviderId }: SquareCartPaymentProps) =
         }
       )
     },
-    [resolvedSquareProviderId, squareLocationId, validateAndPrepareCheckout]
+    [resolvedSquareProviderId, squareLocationId]
   )
 
   const tokenizeSelectedMethod = useCallback(async (): Promise<{
@@ -677,17 +736,29 @@ const SquareCartPayment = ({ cart, squareProviderId }: SquareCartPaymentProps) =
     setErrorMessage(null)
 
     try {
+      const preparedCart = await validateAndPrepareCheckout()
       const { token, sourceType } = await tokenizeSelectedMethod()
-      await createSessionWithToken(token, sourceType)
+      await createSessionWithToken(preparedCart, token, sourceType)
       redirectToCheckoutCompletion()
     } catch (error) {
       setErrorMessage(
-        toErrorMessage(error, "Square checkout failed. Please review your details and try again.")
+        resolveSquareCheckoutErrorMessage({
+          error,
+          selectedMethod,
+          fallback: "Square checkout failed. Please review your details and try again.",
+        })
       )
     } finally {
       setSubmitting(false)
     }
-  }, [createSessionWithToken, redirectToCheckoutCompletion, submitting, tokenizeSelectedMethod])
+  }, [
+    createSessionWithToken,
+    redirectToCheckoutCompletion,
+    selectedMethod,
+    submitting,
+    tokenizeSelectedMethod,
+    validateAndPrepareCheckout,
+  ])
 
   useEffect(() => {
     walletSubmitRef.current = () => {
