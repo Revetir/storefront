@@ -1,7 +1,7 @@
 "use client"
 
 import { sdk } from "@lib/config"
-import { Button, Heading } from "@medusajs/ui"
+import { Button, Heading, clx } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import CustomPaymentSelector from "@modules/checkout/components/payment/custom-payment-selector"
 import Divider from "@modules/common/components/divider"
@@ -37,7 +37,7 @@ const SQUARE_GOOGLE_PAY_BUTTON_OPTIONS = {
   buttonBorderType: "no_border",
 } as const
 const SQUARE_APPLE_PAY_BUTTON_CLASSNAME =
-  "w-full h-10 uppercase rounded-none border-0 bg-black text-white hover:bg-neutral-900 transition-colors duration-200 cursor-pointer"
+  "w-full h-10 rounded-none border-0 cursor-pointer"
 
 type SquareWalletMethodType = Exclude<SquareCheckoutMethodType, "square_card">
 
@@ -113,7 +113,7 @@ const resolveSquareCountryCode = ({
   )
 }
 
-const resolveMinorAmount = ({
+const resolvePaymentAmount = ({
   paymentCollection,
   order,
 }: {
@@ -122,12 +122,12 @@ const resolveMinorAmount = ({
 }) => {
   const collectionAmount = Number(paymentCollection?.amount)
   if (Number.isFinite(collectionAmount) && collectionAmount > 0) {
-    return Math.round(collectionAmount)
+    return collectionAmount
   }
 
   const orderTotal = Number(order?.total)
   if (Number.isFinite(orderTotal) && orderTotal > 0) {
-    return Math.round(orderTotal)
+    return orderTotal
   }
 
   return 0
@@ -302,11 +302,11 @@ const SquarePaymentCollectionForm = ({
 
   const buildWalletPaymentRequest = useCallback(
     (payments: SquarePayments): SquarePaymentRequest => {
-      const minorAmount = resolveMinorAmount({
+      const paymentAmount = resolvePaymentAmount({
         paymentCollection: collection,
         order,
       })
-      if (!minorAmount) {
+      if (!paymentAmount) {
         throw new Error("Missing order total for payment request.")
       }
 
@@ -314,7 +314,7 @@ const SquarePaymentCollectionForm = ({
         countryCode: resolveSquareCountryCode({ order, countryCode }),
         currencyCode,
         total: {
-          amount: formatSquareDisplayAmount(minorAmount, currencyCode),
+          amount: formatSquareDisplayAmount(paymentAmount, currencyCode),
           label: "Total",
         },
       })
@@ -501,7 +501,7 @@ const SquarePaymentCollectionForm = ({
           applePayButton.type = "button"
           applePayButton.className = SQUARE_APPLE_PAY_BUTTON_CLASSNAME
           applePayButton.setAttribute("aria-label", "Apple Pay")
-          applePayButton.textContent = "Apple Pay"
+          applePayButton.textContent = ""
           applePayButton.style.setProperty("-webkit-appearance", "-apple-pay-button")
           applePayButton.style.setProperty("-apple-pay-button-style", "black")
           applePayButton.style.setProperty("-apple-pay-button-type", "plain")
@@ -555,18 +555,6 @@ const SquarePaymentCollectionForm = ({
     selectedMethod,
   ])
 
-  const renderMethodDetail = (method: SquareCheckoutMethodType) => {
-    if (method !== "square_card") {
-      return null
-    }
-
-    return (
-      <div className="max-w-md pt-2 space-y-3">
-        <div id={SQUARE_CARD_CONTAINER_ID} className="min-h-[44px]" />
-      </div>
-    )
-  }
-
   const cardReviewAction =
     reviewActionSlot &&
     selectedMethod === "square_card" &&
@@ -619,8 +607,16 @@ const SquarePaymentCollectionForm = ({
           setSelectedMethod(method)
           setErrorMessage(null)
         }}
-        renderPaymentDetails={renderMethodDetail}
+        renderPaymentDetails={() => null}
       />
+      <div
+        className={clx("ml-8 max-w-md pt-2 space-y-3", {
+          hidden: selectedMethod !== "square_card",
+        })}
+        aria-hidden={selectedMethod !== "square_card"}
+      >
+        <div id={SQUARE_CARD_CONTAINER_ID} className="min-h-[44px]" />
+      </div>
       {cardReviewAction}
       {walletReviewAction}
 

@@ -71,11 +71,18 @@ export const getCurrencyDecimals = (currencyCode: string) =>
   CURRENCY_DECIMALS[String(currencyCode || "").toUpperCase()] ?? 2
 
 export const formatSquareDisplayAmount = (
-  minorAmount: number,
+  amount: number,
   currencyCode: string
 ): string => {
   const decimals = getCurrencyDecimals(currencyCode)
-  return (minorAmount / 10 ** decimals).toFixed(decimals)
+  const numeric = Number(amount)
+  if (!Number.isFinite(numeric)) {
+    return (0).toFixed(decimals)
+  }
+
+  const factor = 10 ** decimals
+  const rounded = Math.round(numeric * factor) / factor
+  return rounded.toFixed(decimals)
 }
 
 export const loadSquareScript = async (isSandbox: boolean): Promise<void> => {

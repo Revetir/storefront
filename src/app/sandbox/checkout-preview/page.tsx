@@ -61,7 +61,7 @@ const SQUARE_GOOGLE_PAY_BUTTON_OPTIONS = {
   buttonBorderType: "no_border",
 } as const
 const SQUARE_APPLE_PAY_BUTTON_CLASSNAME =
-  "w-full h-10 uppercase rounded-none border-0 bg-black text-white hover:bg-neutral-900 transition-colors duration-200 cursor-pointer"
+  "w-full h-10 rounded-none border-0 cursor-pointer"
 
 type SquareWalletMethodType = Exclude<SquareCheckoutMethodType, "square_card">
 
@@ -72,17 +72,17 @@ const SAMPLE_ITEM = {
   size: "M",
   color: "Black",
   quantity: 1,
-  unitPrice: 28900,
+  unitPrice: 289,
 }
 
 const SAMPLE_TOTALS = {
-  subtotal: 28900,
+  subtotal: 289,
   shipping_subtotal: 0,
   shipping_total: 0,
-  tax_total: 2312,
+  tax_total: 23.12,
   discount_total: 0,
   gift_card_total: 0,
-  total: 31212,
+  total: 312.12,
   currency_code: "usd",
   shipping_address: {
     address_1: "2 Park Ave",
@@ -474,7 +474,7 @@ export default function CheckoutPreviewPage() {
           applePayButton.type = "button"
           applePayButton.className = SQUARE_APPLE_PAY_BUTTON_CLASSNAME
           applePayButton.setAttribute("aria-label", "Apple Pay")
-          applePayButton.textContent = "Apple Pay"
+          applePayButton.textContent = ""
           applePayButton.style.setProperty("-webkit-appearance", "-apple-pay-button")
           applePayButton.style.setProperty("-apple-pay-button-style", "black")
           applePayButton.style.setProperty("-apple-pay-button-type", "plain")
@@ -527,18 +527,6 @@ export default function CheckoutPreviewPage() {
     sdkReady,
     selectedMethod,
   ])
-
-  const renderMethodDetail = (method: SquareCheckoutMethodType) => {
-    if (method === "square_card") {
-      return (
-        <div className="max-w-md pt-2 space-y-3">
-          <div id={SQUARE_CARD_CONTAINER_ID} className="min-h-[44px]" />
-        </div>
-      )
-    }
-
-    return null
-  }
 
   const cardReviewAction =
     reviewActionSlot &&
@@ -749,8 +737,16 @@ export default function CheckoutPreviewPage() {
               setSelectedMethod(method)
               setErrorMessage(null)
             }}
-            renderPaymentDetails={renderMethodDetail}
+            renderPaymentDetails={() => null}
           />
+          <div
+            className={clx("ml-8 max-w-md pt-2 space-y-3", {
+              hidden: selectedMethod !== "square_card",
+            })}
+            aria-hidden={selectedMethod !== "square_card"}
+          >
+            <div id={SQUARE_CARD_CONTAINER_ID} className="min-h-[44px]" />
+          </div>
 
           {!squareApplicationId || !squareLocationId ? (
             <p className="text-red-600 text-sm mt-4">

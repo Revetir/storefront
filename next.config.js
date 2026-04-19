@@ -105,7 +105,7 @@ const nextConfig = {
               "connect-src 'self' blob: https://application-production-0ced.up.railway.app https://google.com https://www.google.com https://pay.google.com https://payments.google.com https://api.stripe.com https://r.stripe.com https://*.stripe.com https://api.radar.io https://*.radar.io https://web.squarecdn.com https://sandbox.web.squarecdn.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com https://o160250.ingest.sentry.io https://www.paypal.com https://www.sandbox.paypal.com https://api-m.paypal.com https://api-m.sandbox.paypal.com https://*.paypal.com https://*.paypalobjects.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.facebook.com https://*.facebook.com https://*.facebook.net https://*.conversionsapigateway.com https://*.us-central1.run.app https://*.algolia.net https://*.algolianet.com https://*.algolia.io https://static.cloudflareinsights.com https://*.cloudflare.com https://res.17track.net https://*.sanity.io https://*.api.sanity.io",
               "style-src 'self' 'unsafe-inline' https://js.radar.com https://web.squarecdn.com https://sandbox.web.squarecdn.com",
               "img-src 'self' data: https: blob:",
-              "font-src 'self' data: https://static.radar.com https://square-fonts-production-f.squarecdn.com https://d1g145x70srn7h.cloudfront.net",
+              "font-src 'self' data: https://static.radar.com https://square-fonts-production-f.squarecdn.com https://cash-f.squarecdn.com https://d1g145x70srn7h.cloudfront.net",
             ].join('; '),
           },
         ],

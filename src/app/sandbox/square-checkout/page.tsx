@@ -14,7 +14,7 @@ const CARD_CONTAINER_ID = "square-sandbox-card-container"
 const SANDBOX_ITEM = {
   sku: "SQUARE-SANDBOX-TEE-TEST",
   title: "Square Sandbox Test Item",
-  amountMinor: 100,
+  amount: 1,
   currencyCode: "USD",
 }
 
@@ -25,8 +25,9 @@ type TestResult = {
   item?: {
     sku?: string
     title?: string
-    amountMinor?: number
-    currencyCode?: string
+      amountMinor?: number
+      amount?: number
+      currencyCode?: string
   }
   payment?: {
     id?: string | null
@@ -68,7 +69,7 @@ export default function SquareSandboxCheckoutPage() {
 
   const displayAmount = useMemo(() => {
     return formatSquareDisplayAmount(
-      SANDBOX_ITEM.amountMinor,
+      SANDBOX_ITEM.amount,
       SANDBOX_ITEM.currencyCode
     )
   }, [])
@@ -251,4 +252,3 @@ export default function SquareSandboxCheckoutPage() {
     </div>
   )
 }
-
