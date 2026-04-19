@@ -7,6 +7,12 @@ import {
   emitOptimisticCartAdd,
   emitOptimisticCartRevert,
 } from "@lib/util/cart-events"
+import {
+  getVariantPrice,
+  isAlgoliaProduct,
+} from "@lib/util/get-algolia-product-price"
+import { getProductPrice } from "@lib/util/get-product-price"
+import { convertToLocale } from "@lib/util/money"
 import { trackAddToBag, trackVariantSelected } from "@lib/util/analytics"
 import { trackAddToCart } from "@lib/util/meta-pixel"
 import { HttpTypes } from "@medusajs/types"
@@ -52,13 +58,10 @@ const buildOptimisticBrands = (
   const rawBrands = Array.isArray(brands) ? brands : [brands]
 
   return rawBrands
-    .filter(
-      (brand: any) =>
-        typeof brand?.name === "string" && typeof brand?.slug === "string"
-    )
+    .filter((brand: any) => typeof brand?.name === "string")
     .map((brand: any) => ({
       name: brand.name,
-      slug: brand.slug,
+      slug: typeof brand?.slug === "string" ? brand.slug : undefined,
     }))
 }
 
@@ -156,6 +159,56 @@ export default function ProductActions({
     return false
   }, [selectedVariant, product.variants])
 
+  const optimisticPriceData = useMemo(() => {
+    if (!selectedVariant) {
+      return {}
+    }
+
+    const calculatedAmount = selectedVariant.calculated_price?.calculated_amount
+    const calculatedCurrency = selectedVariant.calculated_price?.currency_code
+    const hasCalculatedPrice =
+      typeof calculatedAmount === "number" &&
+      typeof calculatedCurrency === "string"
+
+    if (hasCalculatedPrice) {
+      return {
+        unitPrice: calculatedAmount,
+        currencyCode: calculatedCurrency,
+      }
+    }
+
+    if (isAlgoliaProduct(product)) {
+      const algoliaVariantPrice = getVariantPrice(selectedVariant, countryCode)
+
+      if (
+        typeof algoliaVariantPrice?.calculated_price_number === "number" &&
+        typeof algoliaVariantPrice?.currency_code === "string"
+      ) {
+        return {
+          unitPrice: algoliaVariantPrice.calculated_price_number,
+          currencyCode: algoliaVariantPrice.currency_code,
+        }
+      }
+    }
+
+    const medusaVariantPrice = getProductPrice({
+      product,
+      variantId: selectedVariant.id,
+    }).variantPrice
+
+    if (
+      typeof medusaVariantPrice?.calculated_price_number === "number" &&
+      typeof medusaVariantPrice?.currency_code === "string"
+    ) {
+      return {
+        unitPrice: medusaVariantPrice.calculated_price_number,
+        currencyCode: medusaVariantPrice.currency_code,
+      }
+    }
+
+    return {}
+  }, [countryCode, product, selectedVariant])
+
   const actionsRef = useRef<HTMLDivElement>(null)
   const inView = useIntersection(actionsRef, "0px")
   const isAddUiLocked = isAdding || showAddLoading
@@ -197,6 +250,14 @@ export default function ProductActions({
     const optimisticRequestId = `${selectedVariant.id}-${Date.now()}-${Math.random()
       .toString(36)
       .slice(2, 8)}`
+    const optimisticDisplayPrice =
+      typeof optimisticPriceData.unitPrice === "number" &&
+      typeof optimisticPriceData.currencyCode === "string"
+        ? convertToLocale({
+            amount: optimisticPriceData.unitPrice,
+            currency_code: optimisticPriceData.currencyCode,
+          })
+        : undefined
 
     emitOptimisticCartAdd({
       quantity: 1,
@@ -207,14 +268,9 @@ export default function ProductActions({
         productHandle: product.handle ?? undefined,
         thumbnail: product.thumbnail ?? null,
         brands: buildOptimisticBrands((product as any)?.brands),
-        unitPrice:
-          typeof selectedVariant.calculated_price?.calculated_amount === "number"
-            ? selectedVariant.calculated_price.calculated_amount
-            : undefined,
-        currencyCode:
-          typeof selectedVariant.calculated_price?.currency_code === "string"
-            ? selectedVariant.calculated_price.currency_code
-            : undefined,
+        unitPrice: optimisticPriceData.unitPrice,
+        currencyCode: optimisticPriceData.currencyCode,
+        displayPrice: optimisticDisplayPrice,
       },
     })
 

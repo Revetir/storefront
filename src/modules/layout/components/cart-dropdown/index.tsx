@@ -245,17 +245,35 @@ const CartDropdown = ({
                     {optimisticItems.map((optimisticItem) => {
                       const preview = optimisticItem.preview
                       const optimisticBrands = preview?.brands || []
+                      const optimisticHrefBrands = optimisticBrands.filter(
+                        (brand): brand is { name: string; slug: string } =>
+                          typeof brand.slug === "string" && brand.slug.length > 0
+                      )
                       const optimisticHref =
                         preview?.productHandle
-                          ? getProductUrl(optimisticBrands, preview.productHandle)
+                          ? getProductUrl(
+                              optimisticHrefBrands,
+                              preview.productHandle
+                            )
                           : "/bag"
-                      const hasPrice =
+                      const optimisticCurrency =
+                        preview?.currencyCode || cartState?.currency_code
+                      const hasNumericPrice =
                         typeof preview?.unitPrice === "number" &&
-                        typeof preview?.currencyCode === "string"
+                        typeof optimisticCurrency === "string"
+                      const optimisticDisplayPrice =
+                        preview?.displayPrice ||
+                        (hasNumericPrice
+                          ? convertToLocale({
+                              amount:
+                                (preview?.unitPrice || 0) * optimisticItem.quantity,
+                              currency_code: optimisticCurrency || "usd",
+                            })
+                          : null)
 
                       return (
                         <div
-                          className="grid grid-cols-[132px_1fr] gap-x-4 opacity-80"
+                          className="grid grid-cols-[132px_1fr] gap-x-4"
                           key={optimisticItem.requestId}
                           data-testid="cart-item-optimistic"
                         >
@@ -304,22 +322,14 @@ const CartDropdown = ({
                                   )}
                               </div>
                               <div className="flex flex-col items-end gap-1">
-                                {hasPrice && (
+                                {optimisticDisplayPrice ? (
                                   <span className="text-xs text-ui-fg-base font-medium">
-                                    {convertToLocale({
-                                      amount:
-                                        (preview?.unitPrice || 0) *
-                                        optimisticItem.quantity,
-                                      currency_code: preview?.currencyCode || "usd",
-                                    })}
+                                    {optimisticDisplayPrice}
                                   </span>
-                                )}
-                                <div className="inline-flex items-center gap-2 text-ui-fg-muted text-xs whitespace-nowrap">
+                                ) : null}
+                                <div className="inline-flex items-center gap-1.5 text-ui-fg-muted text-xs whitespace-nowrap">
                                   <span className="normal-case whitespace-nowrap">
                                     Quantity: {optimisticItem.quantity}
-                                  </span>
-                                  <span className="uppercase tracking-[0.08em] animate-pulse">
-                                    Adding...
                                   </span>
                                 </div>
                               </div>

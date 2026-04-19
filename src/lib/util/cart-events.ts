@@ -3,7 +3,7 @@ const CART_OPTIMISTIC_REVERT_EVENT = "revetir:cart-optimistic-revert"
 
 export type CartOptimisticBrandPreview = {
   name: string
-  slug: string
+  slug?: string
 }
 
 export type CartOptimisticItemPreview = {
@@ -14,6 +14,7 @@ export type CartOptimisticItemPreview = {
   brands?: CartOptimisticBrandPreview[]
   unitPrice?: number
   currencyCode?: string
+  displayPrice?: string
 }
 
 export type CartOptimisticDetail = {
