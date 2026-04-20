@@ -317,6 +317,11 @@ export default function ProductActions({
     const optimisticRequestId = `${selectedVariant.id}-${Date.now()}-${Math.random()
       .toString(36)
       .slice(2, 8)}`
+    const optimisticVariantTitle =
+      selectedVariant.title ||
+      Object.values(options)
+        .filter((value): value is string => typeof value === "string" && value.length > 0)
+        .join(" / ")
     const optimisticBrands = buildOptimisticBrands(
       (product as any)?.brands ?? (selectedVariant as any)?.product?.brands
     )
@@ -344,7 +349,7 @@ export default function ProductActions({
       requestId: optimisticRequestId,
       item: {
         title: product.title ?? undefined,
-        variantTitle: selectedVariant.title ?? null,
+        variantTitle: optimisticVariantTitle || null,
         productHandle: product.handle ?? undefined,
         thumbnail: product.thumbnail ?? null,
         brands: optimisticBrands,
