@@ -18,7 +18,7 @@ export default async function ProductActionsWrapper({
     queryParams: {
       id: [id],
       fields:
-        "id,title,handle,thumbnail,+brands.*,*variants.calculated_price,+variants.inventory_quantity,+variants.ean,+variants.upc,+variants.barcode,*options.*,+categories.*",
+        "id,title,handle,thumbnail,+brands.*,*options,*options.values,*variants,*variants.options,*variants.calculated_price,+variants.inventory_quantity,+variants.ean,+variants.upc,+variants.barcode,+categories.*",
     },
     regionId: region.id,
   }).then(({ response }) => response.products[0])
