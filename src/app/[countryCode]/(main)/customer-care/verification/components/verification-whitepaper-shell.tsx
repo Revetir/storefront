@@ -671,7 +671,7 @@ Consistency checks across components and materials`,
         id: "accessory-functionality",
         anchor: { x: 376, y: 151 },
         bend: { x: 500, y: 92 },
-        end: { x: 698, y: 92 },
+        end: { x: 682, y: 92 },
         panelSide: "left",
         title: "Functionality",
         methodsUsed: `Basic operation check of functional components
@@ -1032,7 +1032,33 @@ type AnalysisPageGraphicProps = {
   className?: string
 }
 
+function BulletList({
+  items,
+  className = "",
+  itemClassName = "",
+}: {
+  items: string[]
+  className?: string
+  itemClassName?: string
+}) {
+  return (
+    <div role="list" className={`space-y-1 ${className}`.trim()}>
+      {items.map((item) => (
+        <div key={item} role="listitem" className={`relative pl-3 text-left ${itemClassName}`.trim()}>
+          <span aria-hidden="true" className="absolute left-0 top-[0.48em] h-[3px] w-[3px] rounded-full bg-current" />
+          {item}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function AnalysisCheckpointPanelContent({ checkpoint }: { checkpoint: AnalysisCheckpoint }) {
+  const protocolItems = checkpoint.methodsUsed
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+
   return (
     <div className="border border-black bg-white p-2 text-left shadow-[0_2px_6px_rgba(0,0,0,0.08)]">
       <p className="text-[9px] uppercase tracking-[0.05em] text-black/70">
@@ -1044,17 +1070,11 @@ function AnalysisCheckpointPanelContent({ checkpoint }: { checkpoint: AnalysisCh
       <p className="mt-1 text-[9px] uppercase tracking-[0.05em] text-black/70">
         Protocol
       </p>
-      <ul className="mt-1 text-[11px] leading-snug text-black/80">
-        {checkpoint.methodsUsed
-          .split("\n")
-          .map((line) => line.trim())
-          .filter(Boolean)
-          .map((line) => (
-            <li key={`${checkpoint.id}-${line}`} className="max-[430px]:!text-left">
-              {line}
-            </li>
-          ))}
-      </ul>
+      <BulletList
+        items={protocolItems}
+        className="mt-1 text-[11px] leading-snug text-black/80"
+        itemClassName="max-[430px]:!text-left"
+      />
     </div>
   )
 }
@@ -1854,12 +1874,11 @@ export default function VerificationWhitepaperShell() {
                                     <div className="grid grid-cols-1 gap-y-5 md:grid-cols-3 md:gap-x-6">
                                       {INTAKE_INPUT_COLUMNS.map((column) => (
                                         <div key={column.title} className="space-y-1.5">
-                                          <h3 className="text-[11px] uppercase tracking-[0.05em] text-black md:text-[12px]">{column.title}</h3>
-                                          <ul className="list-inside space-y-1 text-[11px] leading-snug text-black/80 md:text-[12px]">
-                                            {column.items.map((item) => (
-                                              <li key={item}>{item}</li>
-                                            ))}
-                                          </ul>
+                                          <h3 className="text-[11px] font-semibold uppercase tracking-[0.05em] text-black md:text-[12px]">{column.title}</h3>
+                                          <BulletList
+                                            items={column.items}
+                                            className="text-[11px] leading-snug text-black/80 md:text-[12px]"
+                                          />
                                         </div>
                                       ))}
                                     </div>
@@ -1883,7 +1902,7 @@ export default function VerificationWhitepaperShell() {
                                           </span>
                                           <div className="absolute inset-0 border-b border-l border-black/70" />
                                           <div className="absolute inset-0">
-                                            <div className="mx-auto grid h-full w-[9.5rem] grid-cols-3 items-end gap-3">
+                                            <div className="ml-1 grid h-full w-[9.5rem] grid-cols-3 items-end gap-3">
                                               {INTAKE_CHART_BARS.map((bar, index) => (
                                                 <div
                                                   key={`mobile-${bar.labelTop}-${bar.labelBottom}`}
@@ -1910,7 +1929,7 @@ export default function VerificationWhitepaperShell() {
                                           </div>
                                         </div>
                                         <div className="mt-2">
-                                          <div className="mx-auto grid w-[9.5rem] grid-cols-3 gap-3">
+                                          <div className="ml-1 grid w-[9.5rem] grid-cols-3 gap-3">
                                             {INTAKE_CHART_BARS.map((bar) => (
                                               <span
                                                 key={`mobile-label-${bar.labelTop}-${bar.labelBottom}`}
@@ -1961,7 +1980,7 @@ export default function VerificationWhitepaperShell() {
                                     </div>
                                     <div className="absolute inset-0 border-b border-l border-black/70" />
                                     <div className="absolute inset-x-0 inset-y-0">
-                                      <div className="mx-auto grid h-full w-[12.5rem] grid-cols-3 items-end gap-4">
+                                      <div className="ml-1 grid h-full w-[12.5rem] grid-cols-3 items-end gap-4">
                                         {INTAKE_CHART_BARS.map((bar, index) => (
                                           <div
                                             key={`${bar.labelTop}-${bar.labelBottom}`}
@@ -1988,7 +2007,7 @@ export default function VerificationWhitepaperShell() {
                                     </div>
                                   </div>
                                   <div className="mt-3">
-                                    <div className="mx-auto grid w-[12.5rem] grid-cols-3 gap-4">
+                                    <div className="ml-1 grid w-[12.5rem] grid-cols-3 gap-4">
                                       {INTAKE_CHART_BARS.map((bar) => (
                                         <span
                                           key={`label-${bar.labelTop}-${bar.labelBottom}`}
@@ -2034,7 +2053,7 @@ export default function VerificationWhitepaperShell() {
                                 <div className="mx-auto flex w-full max-w-[17.5rem] flex-col items-center min-[431px]:max-w-[30rem] md:h-full md:min-h-0 md:max-w-full md:justify-center">
                                   <div className="w-full md:flex md:h-full md:flex-col md:items-center">
                                     <div className="hidden w-full max-w-[30rem] items-center justify-between gap-4 pb-3 min-[431px]:flex md:max-w-[38rem]">
-                                      <div className="text-[10px] uppercase tracking-[0.14em] text-black/70">
+                                      <div className="text-[10px] uppercase tracking-[0.05em] text-black/70">
                                         {activeAnalysisPage.label}
                                       </div>
                                       <div className="flex items-center gap-3">
@@ -2426,12 +2445,11 @@ export default function VerificationWhitepaperShell() {
                                     <div className="grid grid-cols-1 gap-y-5 md:grid-cols-3 md:gap-x-6">
                                       {INTAKE_INPUT_COLUMNS.map((column) => (
                                         <div key={`paper-${column.title}`} className="space-y-1.5">
-                                          <h4 className="text-[10px] uppercase tracking-[0.05em] text-black">{column.title}</h4>
-                                          <ul className="list-inside space-y-1 text-[10px] leading-snug text-black/80">
-                                            {column.items.map((item) => (
-                                              <li key={item}>{item}</li>
-                                            ))}
-                                          </ul>
+                                          <h4 className="text-[10px] font-semibold uppercase tracking-[0.05em] text-black">{column.title}</h4>
+                                          <BulletList
+                                            items={column.items}
+                                            className="text-[10px] leading-snug text-black/80"
+                                          />
                                         </div>
                                       ))}
                                     </div>
@@ -2566,9 +2584,11 @@ export default function VerificationWhitepaperShell() {
           }
 
           .mobile-intake-flow-image {
-            width: calc(100% + 2px);
+            width: calc(100% + 6px);
             max-width: none;
-            margin-left: -1px;
+            margin-left: -3px;
+            clip-path: inset(0 3px 0 3px);
+            -webkit-clip-path: inset(0 3px 0 3px);
             transform: translateZ(0);
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
@@ -2609,6 +2629,16 @@ export default function VerificationWhitepaperShell() {
         .analysis-checkpoint-hotspot:focus,
         .analysis-checkpoint-hotspot:focus-visible {
           outline: none;
+        }
+
+        .verification-bullet-list,
+        .verification-bullet-list li {
+          list-style: none !important;
+          list-style-type: none !important;
+        }
+
+        .verification-bullet-list li::marker {
+          content: "" !important;
         }
 
         @keyframes analysisHintGlow {
