@@ -14,9 +14,9 @@ import {
   onOptimisticCartRevert,
 } from "@lib/util/cart-events"
 import { convertToLocale } from "@lib/util/money"
+import { Trash } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
-import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
 import LineItemPrice from "@modules/common/components/line-item-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -60,6 +60,11 @@ const CartDropdown = ({
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
   const [updatingLineId, setUpdatingLineId] = useState<string | null>(null)
   const [optimisticItems, setOptimisticItems] = useState<OptimisticCartItem[]>([])
+  const [optimisticHiddenServerLineIds, setOptimisticHiddenServerLineIds] = useState<
+    Set<string>
+  >(new Set())
+  const [optimisticDeletingServerLineIds, setOptimisticDeletingServerLineIds] =
+    useState<Set<string>>(new Set())
 
   const open = () => setCartDropdownOpen(true)
   const close = () => setCartDropdownOpen(false)
@@ -93,8 +98,13 @@ const CartDropdown = ({
   )
 
   const serverVisibleItems = useMemo(
-    () => sortedServerItems.filter((item) => !linkedLineIds.has(item.id)),
-    [sortedServerItems, linkedLineIds]
+    () =>
+      sortedServerItems.filter(
+        (item) =>
+          !linkedLineIds.has(item.id) &&
+          !optimisticHiddenServerLineIds.has(item.id)
+      ),
+    [sortedServerItems, linkedLineIds, optimisticHiddenServerLineIds]
   )
 
   const serverTotalItems =
@@ -121,7 +131,20 @@ const CartDropdown = ({
     }, 0)
   }, [lineById, optimisticItems])
 
-  const totalItems = Math.max(0, serverTotalItems + optimisticCountAdjustment)
+  const hiddenServerCountAdjustment = useMemo(() => {
+    return sortedServerItems.reduce((acc, item) => {
+      if (optimisticHiddenServerLineIds.has(item.id)) {
+        return acc - item.quantity
+      }
+
+      return acc
+    }, 0)
+  }, [sortedServerItems, optimisticHiddenServerLineIds])
+
+  const totalItems = Math.max(
+    0,
+    serverTotalItems + optimisticCountAdjustment + hiddenServerCountAdjustment
+  )
   const subtotal = cartState?.subtotal ?? 0
   const itemRef = useRef<number>(totalItems || 0)
 
@@ -140,6 +163,8 @@ const CartDropdown = ({
 
   const syncOptimisticOperation = useCallback(
     async (requestId: string, lineId: string, targetQuantity: number) => {
+      let didFail = false
+
       try {
         if (targetQuantity <= 0) {
           await deleteLineItem(lineId)
@@ -151,6 +176,9 @@ const CartDropdown = ({
         }
 
         router.refresh()
+      } catch (error) {
+        didFail = true
+        console.error("Optimistic cart sync failed", error)
       } finally {
         setOptimisticItems((prev) =>
           prev.map((item) =>
@@ -158,10 +186,18 @@ const CartDropdown = ({
               ? {
                   ...item,
                   isSyncing: false,
+                  // If the sync failed, clear the in-flight marker so reconcile can retry.
+                  lastRequestedQuantity: didFail
+                    ? undefined
+                    : item.lastRequestedQuantity,
                 }
               : item
           )
         )
+
+        if (didFail) {
+          router.refresh()
+        }
       }
     },
     [router]
@@ -197,6 +233,47 @@ const CartDropdown = ({
     )
   }
 
+  const removeOptimisticServerItem = async (lineId: string) => {
+    if (optimisticDeletingServerLineIds.has(lineId)) {
+      return
+    }
+
+    setOptimisticDeletingServerLineIds((prev) => {
+      if (prev.has(lineId)) {
+        return prev
+      }
+
+      const next = new Set(prev)
+      next.add(lineId)
+      return next
+    })
+
+    setOptimisticHiddenServerLineIds((prev) => {
+      const next = new Set(prev)
+      next.add(lineId)
+      return next
+    })
+
+    try {
+      await deleteLineItem(lineId)
+      router.refresh()
+    } catch (error) {
+      console.error("Optimistic server line delete failed", error)
+      setOptimisticHiddenServerLineIds((prev) => {
+        const next = new Set(prev)
+        next.delete(lineId)
+        return next
+      })
+      router.refresh()
+    } finally {
+      setOptimisticDeletingServerLineIds((prev) => {
+        const next = new Set(prev)
+        next.delete(lineId)
+        return next
+      })
+    }
+  }
+
   // Clean up timer on unmount.
   useEffect(() => {
     return () => {
@@ -205,6 +282,37 @@ const CartDropdown = ({
       }
     }
   }, [activeTimer])
+
+  // Prune local optimistic server-delete state as cart lines change.
+  useEffect(() => {
+    const currentServerLineIds = new Set(sortedServerItems.map((item) => item.id))
+
+    setOptimisticHiddenServerLineIds((prev) => {
+      let changed = false
+      const next = new Set<string>()
+      prev.forEach((id) => {
+        if (currentServerLineIds.has(id)) {
+          next.add(id)
+        } else {
+          changed = true
+        }
+      })
+      return changed ? next : prev
+    })
+
+    setOptimisticDeletingServerLineIds((prev) => {
+      let changed = false
+      const next = new Set<string>()
+      prev.forEach((id) => {
+        if (currentServerLineIds.has(id)) {
+          next.add(id)
+        } else {
+          changed = true
+        }
+      })
+      return changed ? next : prev
+    })
+  }, [sortedServerItems])
 
   // Subscribe to optimistic add/revert events.
   useEffect(() => {
@@ -688,15 +796,22 @@ const CartDropdown = ({
                                 </div>
                               </div>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => removeOptimisticItem(optimisticItem.requestId)}
-                              disabled={optimisticItem.isSyncing}
-                              className="mt-4 mb-1 self-start text-ui-fg-subtle hover:text-ui-fg-base text-small-regular disabled:opacity-40 disabled:cursor-not-allowed"
-                              data-testid="cart-item-remove-button-optimistic"
+                            <div
+                              className="mt-4 mb-1 self-start flex items-center justify-between text-small-regular"
                             >
-                              Remove
-                            </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  removeOptimisticItem(optimisticItem.requestId)
+                                }
+                                disabled={optimisticItem.isSyncing}
+                                className="flex gap-x-1 text-ui-fg-subtle hover:text-ui-fg-base cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                                data-testid="cart-item-remove-button-optimistic"
+                              >
+                                <Trash />
+                                <span>Remove</span>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       )
@@ -707,6 +822,7 @@ const CartDropdown = ({
                         ? 10
                         : MAX_QTY
                       const isUpdating = updatingLineId === item.id
+                      const isDeleting = optimisticDeletingServerLineIds.has(item.id)
 
                       return (
                         <div
@@ -816,13 +932,18 @@ const CartDropdown = ({
                                 </div>
                               </div>
                             </div>
-                            <DeleteButton
-                              id={item.id}
-                              className="mt-4 mb-1 self-start"
-                              data-testid="cart-item-remove-button"
-                            >
-                              Remove
-                            </DeleteButton>
+                            <div className="mt-4 mb-1 self-start flex items-center justify-between text-small-regular">
+                              <button
+                                type="button"
+                                onClick={() => removeOptimisticServerItem(item.id)}
+                                disabled={isDeleting}
+                                className="flex gap-x-1 text-ui-fg-subtle hover:text-ui-fg-base cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                                data-testid="cart-item-remove-button"
+                              >
+                                <Trash />
+                                <span>Remove</span>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       )
