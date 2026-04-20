@@ -14,6 +14,7 @@ import {
   onOptimisticCartRevert,
 } from "@lib/util/cart-events"
 import { convertToLocale } from "@lib/util/money"
+import { resolveLineItemPricing } from "@lib/util/resolve-line-item-pricing"
 import { Trash } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
@@ -32,6 +33,13 @@ type OptimisticCartItem = {
   variantId?: string
   hidden: boolean
   lineId?: string
+  isSyncing: boolean
+  lastRequestedQuantity?: number
+}
+
+type OptimisticServerLineState = {
+  hidden: boolean
+  quantity?: number
   isSyncing: boolean
   lastRequestedQuantity?: number
 }
@@ -58,13 +66,10 @@ const CartDropdown = ({
     null
   )
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
-  const [updatingLineId, setUpdatingLineId] = useState<string | null>(null)
   const [optimisticItems, setOptimisticItems] = useState<OptimisticCartItem[]>([])
-  const [optimisticHiddenServerLineIds, setOptimisticHiddenServerLineIds] = useState<
-    Set<string>
-  >(new Set())
-  const [optimisticDeletingServerLineIds, setOptimisticDeletingServerLineIds] =
-    useState<Set<string>>(new Set())
+  const [optimisticServerLineState, setOptimisticServerLineState] = useState<
+    Record<string, OptimisticServerLineState>
+  >({})
 
   const open = () => setCartDropdownOpen(true)
   const close = () => setCartDropdownOpen(false)
@@ -102,9 +107,9 @@ const CartDropdown = ({
       sortedServerItems.filter(
         (item) =>
           !linkedLineIds.has(item.id) &&
-          !optimisticHiddenServerLineIds.has(item.id)
+          !optimisticServerLineState[item.id]?.hidden
       ),
-    [sortedServerItems, linkedLineIds, optimisticHiddenServerLineIds]
+    [sortedServerItems, linkedLineIds, optimisticServerLineState]
   )
 
   const serverTotalItems =
@@ -131,21 +136,69 @@ const CartDropdown = ({
     }, 0)
   }, [lineById, optimisticItems])
 
-  const hiddenServerCountAdjustment = useMemo(() => {
+  const serverLineCountAdjustment = useMemo(() => {
     return sortedServerItems.reduce((acc, item) => {
-      if (optimisticHiddenServerLineIds.has(item.id)) {
-        return acc - item.quantity
+      const state = optimisticServerLineState[item.id]
+      if (!state) {
+        return acc
       }
 
-      return acc
+      const desiredQuantity = state.hidden
+        ? 0
+        : typeof state.quantity === "number"
+        ? state.quantity
+        : item.quantity
+
+      return acc + (desiredQuantity - item.quantity)
     }, 0)
-  }, [sortedServerItems, optimisticHiddenServerLineIds])
+  }, [optimisticServerLineState, sortedServerItems])
+
+  const optimisticSubtotalAdjustment = useMemo(() => {
+    let adjustment = 0
+
+    for (const item of optimisticItems) {
+      const line = item.lineId ? lineById.get(item.lineId) : undefined
+      const desiredQuantity = item.hidden || item.quantity <= 0 ? 0 : item.quantity
+
+      if (line) {
+        const pricing = resolveLineItemPricing(line)
+        const baseQuantity = line.quantity || 1
+        const unit = pricing.calculatedTotal / baseQuantity
+        adjustment += unit * (desiredQuantity - line.quantity)
+        continue
+      }
+
+      if (desiredQuantity > 0 && typeof item.preview?.unitPrice === "number") {
+        adjustment += item.preview.unitPrice * desiredQuantity
+      }
+    }
+
+    for (const line of sortedServerItems) {
+      const state = optimisticServerLineState[line.id]
+      if (!state) {
+        continue
+      }
+
+      const desiredQuantity = state.hidden
+        ? 0
+        : typeof state.quantity === "number"
+        ? state.quantity
+        : line.quantity
+      const pricing = resolveLineItemPricing(line)
+      const baseQuantity = line.quantity || 1
+      const unit = pricing.calculatedTotal / baseQuantity
+      adjustment += unit * (desiredQuantity - line.quantity)
+    }
+
+    return adjustment
+  }, [lineById, optimisticItems, optimisticServerLineState, sortedServerItems])
 
   const totalItems = Math.max(
     0,
-    serverTotalItems + optimisticCountAdjustment + hiddenServerCountAdjustment
+    serverTotalItems + optimisticCountAdjustment + serverLineCountAdjustment
   )
   const subtotal = cartState?.subtotal ?? 0
+  const optimisticSubtotal = Math.max(0, subtotal + optimisticSubtotalAdjustment)
   const itemRef = useRef<number>(totalItems || 0)
 
   const timedOpen = () => {
@@ -203,6 +256,54 @@ const CartDropdown = ({
     [router]
   )
 
+  const syncServerLineOperation = useCallback(
+    async (lineId: string, targetQuantity: number) => {
+      let didFail = false
+
+      try {
+        if (targetQuantity <= 0) {
+          await deleteLineItem(lineId)
+        } else {
+          await updateLineItem({
+            lineId,
+            quantity: targetQuantity,
+          })
+        }
+
+        router.refresh()
+      } catch (error) {
+        didFail = true
+        console.error("Optimistic server line sync failed", error)
+      } finally {
+        if (didFail) {
+          setOptimisticServerLineState((prev) => {
+            const next = { ...prev }
+            delete next[lineId]
+            return next
+          })
+          router.refresh()
+          return
+        }
+
+        setOptimisticServerLineState((prev) => {
+          const current = prev[lineId]
+          if (!current) {
+            return prev
+          }
+
+          return {
+            ...prev,
+            [lineId]: {
+              ...current,
+              isSyncing: false,
+            },
+          }
+        })
+      }
+    },
+    [router]
+  )
+
   const setOptimisticQuantity = (requestId: string, nextQuantity: number) => {
     const clampedQuantity = Math.max(1, Math.min(MAX_QTY, nextQuantity))
 
@@ -233,45 +334,36 @@ const CartDropdown = ({
     )
   }
 
-  const removeOptimisticServerItem = async (lineId: string) => {
-    if (optimisticDeletingServerLineIds.has(lineId)) {
-      return
-    }
+  const queueServerLineQuantity = (lineId: string, nextQuantity: number) => {
+    const clampedQuantity = Math.max(1, Math.min(MAX_QTY, nextQuantity))
 
-    setOptimisticDeletingServerLineIds((prev) => {
-      if (prev.has(lineId)) {
-        return prev
+    setOptimisticServerLineState((prev) => {
+      const current = prev[lineId]
+      return {
+        ...prev,
+        [lineId]: {
+          hidden: false,
+          quantity: clampedQuantity,
+          isSyncing: current?.isSyncing ?? false,
+          lastRequestedQuantity: current?.lastRequestedQuantity,
+        },
       }
-
-      const next = new Set(prev)
-      next.add(lineId)
-      return next
     })
+  }
 
-    setOptimisticHiddenServerLineIds((prev) => {
-      const next = new Set(prev)
-      next.add(lineId)
-      return next
+  const removeOptimisticServerItem = (lineId: string) => {
+    setOptimisticServerLineState((prev) => {
+      const current = prev[lineId]
+      return {
+        ...prev,
+        [lineId]: {
+          hidden: true,
+          quantity: 0,
+          isSyncing: current?.isSyncing ?? false,
+          lastRequestedQuantity: current?.lastRequestedQuantity,
+        },
+      }
     })
-
-    try {
-      await deleteLineItem(lineId)
-      router.refresh()
-    } catch (error) {
-      console.error("Optimistic server line delete failed", error)
-      setOptimisticHiddenServerLineIds((prev) => {
-        const next = new Set(prev)
-        next.delete(lineId)
-        return next
-      })
-      router.refresh()
-    } finally {
-      setOptimisticDeletingServerLineIds((prev) => {
-        const next = new Set(prev)
-        next.delete(lineId)
-        return next
-      })
-    }
   }
 
   // Clean up timer on unmount.
@@ -283,33 +375,22 @@ const CartDropdown = ({
     }
   }, [activeTimer])
 
-  // Prune local optimistic server-delete state as cart lines change.
+  // Prune local optimistic server-line state as cart lines change.
   useEffect(() => {
     const currentServerLineIds = new Set(sortedServerItems.map((item) => item.id))
 
-    setOptimisticHiddenServerLineIds((prev) => {
+    setOptimisticServerLineState((prev) => {
       let changed = false
-      const next = new Set<string>()
-      prev.forEach((id) => {
-        if (currentServerLineIds.has(id)) {
-          next.add(id)
-        } else {
-          changed = true
-        }
-      })
-      return changed ? next : prev
-    })
+      const next: Record<string, OptimisticServerLineState> = {}
 
-    setOptimisticDeletingServerLineIds((prev) => {
-      let changed = false
-      const next = new Set<string>()
-      prev.forEach((id) => {
-        if (currentServerLineIds.has(id)) {
-          next.add(id)
+      Object.entries(prev).forEach(([lineId, state]) => {
+        if (currentServerLineIds.has(lineId)) {
+          next[lineId] = state
         } else {
           changed = true
         }
       })
+
       return changed ? next : prev
     })
   }, [sortedServerItems])
@@ -492,11 +573,6 @@ const CartDropdown = ({
           continue
         }
 
-        if (line.quantity === item.quantity && !item.isSyncing) {
-          changed = true
-          continue
-        }
-
         if (!item.isSyncing && item.lastRequestedQuantity !== item.quantity) {
           changed = true
           nextItems.push({
@@ -527,6 +603,65 @@ const CartDropdown = ({
     })
   }, [lineById, optimisticItems, syncOptimisticOperation])
 
+  // Reconcile optimistic edits/deletes for already-loaded server lines.
+  useEffect(() => {
+    const operations: Array<{
+      lineId: string
+      targetQuantity: number
+    }> = []
+
+    setOptimisticServerLineState((prev) => {
+      if (!Object.keys(prev).length) {
+        return prev
+      }
+
+      let changed = false
+      const next: Record<string, OptimisticServerLineState> = {}
+
+      Object.entries(prev).forEach(([lineId, state]) => {
+        const line = lineById.get(lineId)
+
+        if (!line) {
+          changed = true
+          return
+        }
+
+        const desiredQuantity = state.hidden
+          ? 0
+          : typeof state.quantity === "number"
+          ? state.quantity
+          : line.quantity
+
+        if (!state.isSyncing && desiredQuantity === line.quantity) {
+          changed = true
+          return
+        }
+
+        if (!state.isSyncing && state.lastRequestedQuantity !== desiredQuantity) {
+          changed = true
+          next[lineId] = {
+            ...state,
+            isSyncing: true,
+            lastRequestedQuantity: desiredQuantity,
+          }
+          operations.push({
+            lineId,
+            targetQuantity: desiredQuantity,
+          })
+          return
+        }
+
+        next[lineId] = state
+      })
+
+      return changed ? next : prev
+    })
+
+    operations.forEach((operation) => {
+      void syncServerLineOperation(operation.lineId, operation.targetQuantity)
+    })
+  }, [lineById, optimisticServerLineState, syncServerLineOperation])
+
   const pathname = usePathname()
   const isCartLikePage = pathname.includes("/cart") || pathname.includes("/bag")
 
@@ -538,29 +673,6 @@ const CartDropdown = ({
     itemRef.current = totalItems
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalItems, isCartLikePage])
-
-  const changeItemQuantity = async (
-    item: HttpTypes.StoreCartLineItem,
-    nextQuantity: number
-  ) => {
-    const maxQuantity = item.variant?.manage_inventory ? 10 : MAX_QTY
-    const clampedQuantity = Math.max(1, Math.min(maxQuantity, nextQuantity))
-
-    if (clampedQuantity === item.quantity) {
-      return
-    }
-
-    try {
-      setUpdatingLineId(item.id)
-      await updateLineItem({
-        lineId: item.id,
-        quantity: clampedQuantity,
-      })
-      router.refresh()
-    } finally {
-      setUpdatingLineId(null)
-    }
-  }
 
   const hasRenderableItems =
     optimisticVisibleItems.length > 0 || serverVisibleItems.length > 0
@@ -679,8 +791,6 @@ const CartDropdown = ({
                             }).replace(/\s*USD$/, "")
                           : null)
 
-                      const isUpdating = optimisticItem.isSyncing
-
                       return (
                         <div
                           className="grid grid-cols-[132px_1fr] gap-x-4"
@@ -773,7 +883,7 @@ const CartDropdown = ({
                                           optimisticItem.quantity + 1
                                         )
                                       }
-                                      disabled={isUpdating || optimisticItem.quantity >= MAX_QTY}
+                                      disabled={optimisticItem.quantity >= MAX_QTY}
                                       className="w-3 h-2 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                     >
                                       <span className="w-0 h-0 border-l-[3px] border-r-[3px] border-b-[4px] border-l-transparent border-r-transparent border-b-current" />
@@ -787,7 +897,7 @@ const CartDropdown = ({
                                           optimisticItem.quantity - 1
                                         )
                                       }
-                                      disabled={isUpdating || optimisticItem.quantity <= 1}
+                                      disabled={optimisticItem.quantity <= 1}
                                       className="w-3 h-2 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                     >
                                       <span className="w-0 h-0 border-l-[3px] border-r-[3px] border-t-[4px] border-l-transparent border-r-transparent border-t-current" />
@@ -804,7 +914,6 @@ const CartDropdown = ({
                                 onClick={() =>
                                   removeOptimisticItem(optimisticItem.requestId)
                                 }
-                                disabled={optimisticItem.isSyncing}
                                 className="flex gap-x-1 text-ui-fg-subtle hover:text-ui-fg-base cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                                 data-testid="cart-item-remove-button-optimistic"
                               >
@@ -818,11 +927,14 @@ const CartDropdown = ({
                     })}
 
                     {serverVisibleItems.map((item) => {
+                      const optimisticState = optimisticServerLineState[item.id]
                       const maxQuantity = item.variant?.manage_inventory
                         ? 10
                         : MAX_QTY
-                      const isUpdating = updatingLineId === item.id
-                      const isDeleting = optimisticDeletingServerLineIds.has(item.id)
+                      const displayedQuantity =
+                        typeof optimisticState?.quantity === "number"
+                          ? optimisticState.quantity
+                          : item.quantity
 
                       return (
                         <div
@@ -900,19 +1012,22 @@ const CartDropdown = ({
                                 <div
                                   className="inline-flex items-center gap-1 text-ui-fg-muted text-xs whitespace-nowrap"
                                   data-testid="cart-item-quantity"
-                                  data-value={item.quantity}
+                                  data-value={displayedQuantity}
                                 >
                                   <span className="normal-case whitespace-nowrap">
-                                    Quantity: {item.quantity}
+                                    Quantity: {displayedQuantity}
                                   </span>
                                   <div className="flex flex-col gap-[1px]">
                                     <button
                                       type="button"
                                       aria-label="Increase quantity"
                                       onClick={() =>
-                                        changeItemQuantity(item, item.quantity + 1)
+                                        queueServerLineQuantity(
+                                          item.id,
+                                          displayedQuantity + 1
+                                        )
                                       }
-                                      disabled={isUpdating || item.quantity >= maxQuantity}
+                                      disabled={displayedQuantity >= maxQuantity}
                                       className="w-3 h-2 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                     >
                                       <span className="w-0 h-0 border-l-[3px] border-r-[3px] border-b-[4px] border-l-transparent border-r-transparent border-b-current" />
@@ -921,9 +1036,12 @@ const CartDropdown = ({
                                       type="button"
                                       aria-label="Decrease quantity"
                                       onClick={() =>
-                                        changeItemQuantity(item, item.quantity - 1)
+                                        queueServerLineQuantity(
+                                          item.id,
+                                          displayedQuantity - 1
+                                        )
                                       }
-                                      disabled={isUpdating || item.quantity <= 1}
+                                      disabled={displayedQuantity <= 1}
                                       className="w-3 h-2 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                     >
                                       <span className="w-0 h-0 border-l-[3px] border-r-[3px] border-t-[4px] border-l-transparent border-r-transparent border-t-current" />
@@ -936,7 +1054,6 @@ const CartDropdown = ({
                               <button
                                 type="button"
                                 onClick={() => removeOptimisticServerItem(item.id)}
-                                disabled={isDeleting}
                                 className="flex gap-x-1 text-ui-fg-subtle hover:text-ui-fg-base cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                                 data-testid="cart-item-remove-button"
                               >
@@ -958,10 +1075,10 @@ const CartDropdown = ({
                         <span
                           className="text-large-semi"
                           data-testid="cart-subtotal"
-                          data-value={subtotal}
+                          data-value={optimisticSubtotal}
                         >
                           {convertToLocale({
-                            amount: subtotal,
+                            amount: optimisticSubtotal,
                             currency_code: cartState.currency_code,
                           })}
                         </span>
