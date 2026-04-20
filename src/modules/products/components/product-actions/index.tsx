@@ -65,6 +65,38 @@ const buildOptimisticBrands = (
     }))
 }
 
+const toFiniteNumber = (value: unknown): number | undefined => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(value)
+    if (Number.isFinite(parsed)) {
+      return parsed
+    }
+  }
+
+  return undefined
+}
+
+const firstFiniteNumber = (...values: Array<unknown>): number | undefined => {
+  for (const value of values) {
+    const numericValue = toFiniteNumber(value)
+    if (typeof numericValue === "number") {
+      return numericValue
+    }
+  }
+
+  return undefined
+}
+
+const formatOptimisticPrice = (amount: number, currencyCode: string): string =>
+  convertToLocale({
+    amount,
+    currency_code: currencyCode,
+  }).replace(/\s*USD$/, "")
+
 export default function ProductActions({
   product,
   disabled,
@@ -164,16 +196,35 @@ export default function ProductActions({
       return {}
     }
 
-    const calculatedAmount = selectedVariant.calculated_price?.calculated_amount
-    const calculatedCurrency = selectedVariant.calculated_price?.currency_code
-    const hasCalculatedPrice =
-      typeof calculatedAmount === "number" &&
-      typeof calculatedCurrency === "string"
+    const variantCalculatedPrice = firstFiniteNumber(
+      selectedVariant.calculated_price?.calculated_amount_with_tax,
+      selectedVariant.calculated_price?.calculated_amount,
+      (selectedVariant.calculated_price as any)?.calculated?.amount
+    )
+    const variantOriginalPriceCandidate = firstFiniteNumber(
+      selectedVariant.calculated_price?.original_amount_with_tax,
+      selectedVariant.calculated_price?.original_amount,
+      (selectedVariant.calculated_price as any)?.original?.amount
+    )
+    const variantCurrency =
+      typeof selectedVariant.calculated_price?.currency_code === "string"
+        ? selectedVariant.calculated_price.currency_code
+        : undefined
 
-    if (hasCalculatedPrice) {
+    if (
+      typeof variantCalculatedPrice === "number" &&
+      typeof variantCurrency === "string"
+    ) {
+      const variantOriginalPrice =
+        typeof variantOriginalPriceCandidate === "number" &&
+        variantOriginalPriceCandidate > variantCalculatedPrice
+          ? variantOriginalPriceCandidate
+          : undefined
+
       return {
-        unitPrice: calculatedAmount,
-        currencyCode: calculatedCurrency,
+        unitPrice: variantCalculatedPrice,
+        originalUnitPrice: variantOriginalPrice,
+        currencyCode: variantCurrency,
       }
     }
 
@@ -184,8 +235,16 @@ export default function ProductActions({
         typeof algoliaVariantPrice?.calculated_price_number === "number" &&
         typeof algoliaVariantPrice?.currency_code === "string"
       ) {
+        const algoliaOriginalPrice =
+          typeof algoliaVariantPrice?.original_price_number === "number" &&
+          algoliaVariantPrice.original_price_number >
+            algoliaVariantPrice.calculated_price_number
+            ? algoliaVariantPrice.original_price_number
+            : undefined
+
         return {
           unitPrice: algoliaVariantPrice.calculated_price_number,
+          originalUnitPrice: algoliaOriginalPrice,
           currencyCode: algoliaVariantPrice.currency_code,
         }
       }
@@ -200,8 +259,16 @@ export default function ProductActions({
       typeof medusaVariantPrice?.calculated_price_number === "number" &&
       typeof medusaVariantPrice?.currency_code === "string"
     ) {
+      const medusaOriginalPrice =
+        typeof medusaVariantPrice?.original_price_number === "number" &&
+        medusaVariantPrice.original_price_number >
+          medusaVariantPrice.calculated_price_number
+          ? medusaVariantPrice.original_price_number
+          : undefined
+
       return {
         unitPrice: medusaVariantPrice.calculated_price_number,
+        originalUnitPrice: medusaOriginalPrice,
         currencyCode: medusaVariantPrice.currency_code,
       }
     }
@@ -250,13 +317,26 @@ export default function ProductActions({
     const optimisticRequestId = `${selectedVariant.id}-${Date.now()}-${Math.random()
       .toString(36)
       .slice(2, 8)}`
+    const optimisticBrands = buildOptimisticBrands(
+      (product as any)?.brands ?? (selectedVariant as any)?.product?.brands
+    )
     const optimisticDisplayPrice =
       typeof optimisticPriceData.unitPrice === "number" &&
       typeof optimisticPriceData.currencyCode === "string"
-        ? convertToLocale({
-            amount: optimisticPriceData.unitPrice,
-            currency_code: optimisticPriceData.currencyCode,
-          })
+        ? formatOptimisticPrice(
+            optimisticPriceData.unitPrice,
+            optimisticPriceData.currencyCode
+          )
+        : undefined
+    const optimisticDisplayOriginalPrice =
+      typeof optimisticPriceData.originalUnitPrice === "number" &&
+      typeof optimisticPriceData.unitPrice === "number" &&
+      optimisticPriceData.originalUnitPrice > optimisticPriceData.unitPrice &&
+      typeof optimisticPriceData.currencyCode === "string"
+        ? formatOptimisticPrice(
+            optimisticPriceData.originalUnitPrice,
+            optimisticPriceData.currencyCode
+          )
         : undefined
 
     emitOptimisticCartAdd({
@@ -267,10 +347,12 @@ export default function ProductActions({
         variantTitle: selectedVariant.title ?? null,
         productHandle: product.handle ?? undefined,
         thumbnail: product.thumbnail ?? null,
-        brands: buildOptimisticBrands((product as any)?.brands),
+        brands: optimisticBrands,
         unitPrice: optimisticPriceData.unitPrice,
+        originalUnitPrice: optimisticPriceData.originalUnitPrice,
         currencyCode: optimisticPriceData.currencyCode,
         displayPrice: optimisticDisplayPrice,
+        displayOriginalPrice: optimisticDisplayOriginalPrice,
       },
     })
 

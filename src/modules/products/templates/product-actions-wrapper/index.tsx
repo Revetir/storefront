@@ -17,7 +17,8 @@ export default async function ProductActionsWrapper({
   const product = await listProducts({
     queryParams: {
       id: [id],
-      fields: "*variants.calculated_price,+variants.inventory_quantity,+variants.ean,+variants.upc,+variants.barcode,*options.*, +categories.*",
+      fields:
+        "id,title,handle,thumbnail,+brands.*,*variants.calculated_price,+variants.inventory_quantity,+variants.ean,+variants.upc,+variants.barcode,*options.*,+categories.*",
     },
     regionId: region.id,
   }).then(({ response }) => response.products[0])

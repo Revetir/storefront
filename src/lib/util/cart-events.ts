@@ -13,8 +13,10 @@ export type CartOptimisticItemPreview = {
   thumbnail?: string | null
   brands?: CartOptimisticBrandPreview[]
   unitPrice?: number
+  originalUnitPrice?: number
   currencyCode?: string
   displayPrice?: string
+  displayOriginalPrice?: string
 }
 
 export type CartOptimisticDetail = {

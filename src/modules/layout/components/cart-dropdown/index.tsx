@@ -261,6 +261,10 @@ const CartDropdown = ({
                       const hasNumericPrice =
                         typeof preview?.unitPrice === "number" &&
                         typeof optimisticCurrency === "string"
+                      const hasNumericOriginalPrice =
+                        typeof preview?.originalUnitPrice === "number" &&
+                        hasNumericPrice &&
+                        preview.originalUnitPrice > (preview.unitPrice || 0)
                       const optimisticDisplayPrice =
                         preview?.displayPrice ||
                         (hasNumericPrice
@@ -268,7 +272,17 @@ const CartDropdown = ({
                               amount:
                                 (preview?.unitPrice || 0) * optimisticItem.quantity,
                               currency_code: optimisticCurrency || "usd",
-                            })
+                            }).replace(/\s*USD$/, "")
+                          : null)
+                      const optimisticDisplayOriginalPrice =
+                        preview?.displayOriginalPrice ||
+                        (hasNumericOriginalPrice
+                          ? convertToLocale({
+                              amount:
+                                (preview?.originalUnitPrice || 0) *
+                                optimisticItem.quantity,
+                              currency_code: optimisticCurrency || "usd",
+                            }).replace(/\s*USD$/, "")
                           : null)
 
                       return (
@@ -295,7 +309,9 @@ const CartDropdown = ({
                                 {optimisticBrands.length > 0 && (
                                   <span className="text-ui-fg-muted text-xs font-medium truncate block">
                                     {optimisticBrands.map((brand, idx, arr) => (
-                                      <Fragment key={`${brand.slug}-${idx}`}>
+                                      <Fragment
+                                        key={`${brand.slug || brand.name}-${idx}`}
+                                      >
                                         <span className="uppercase">{brand.name}</span>
                                         {idx < arr.length - 1 && <span> x </span>}
                                       </Fragment>
@@ -323,9 +339,22 @@ const CartDropdown = ({
                               </div>
                               <div className="flex flex-col items-end gap-1">
                                 {optimisticDisplayPrice ? (
-                                  <span className="text-xs text-ui-fg-base font-medium">
-                                    {optimisticDisplayPrice}
-                                  </span>
+                                  <div className="text-left">
+                                    {optimisticDisplayOriginalPrice ? (
+                                      <div className="flex flex-col items-start gap-0.5">
+                                        <span className="text-xs text-ui-fg-base font-medium">
+                                          {optimisticDisplayPrice}
+                                        </span>
+                                        <span className="line-through text-gray-500 text-xs">
+                                          {optimisticDisplayOriginalPrice}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-xs text-ui-fg-base font-medium">
+                                        {optimisticDisplayPrice}
+                                      </span>
+                                    )}
+                                  </div>
                                 ) : null}
                                 <div className="inline-flex items-center gap-1.5 text-ui-fg-muted text-xs whitespace-nowrap">
                                   <span className="normal-case whitespace-nowrap">
