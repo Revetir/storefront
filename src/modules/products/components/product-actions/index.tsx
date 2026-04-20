@@ -348,6 +348,7 @@ export default function ProductActions({
       quantity: 1,
       requestId: optimisticRequestId,
       item: {
+        variantId: selectedVariant.id,
         title: product.title ?? undefined,
         variantTitle: optimisticVariantTitle || null,
         productHandle: product.handle ?? undefined,
@@ -366,6 +367,7 @@ export default function ProductActions({
         variantId: selectedVariant.id,
         quantity: 1,
         countryCode,
+        optimisticRequestId,
       })
 
       router.refresh()

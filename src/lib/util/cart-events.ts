@@ -7,6 +7,7 @@ export type CartOptimisticBrandPreview = {
 }
 
 export type CartOptimisticItemPreview = {
+  variantId?: string
   title?: string
   variantTitle?: string | null
   productHandle?: string

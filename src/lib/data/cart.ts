@@ -181,10 +181,12 @@ export async function addToCart({
   variantId,
   quantity,
   countryCode,
+  optimisticRequestId,
 }: {
   variantId: string
   quantity: number
   countryCode: string
+  optimisticRequestId?: string
 }) {
   if (!variantId) {
     throw new Error("Missing variant ID when adding to cart")
@@ -200,14 +202,26 @@ export async function addToCart({
     ...(await getAuthHeaders()),
   }
 
+  const createLineItemPayload: {
+    variant_id: string
+    quantity: number
+    metadata?: Record<string, string>
+  } = {
+    variant_id: variantId,
+    quantity,
+  }
+
+  if (optimisticRequestId) {
+    createLineItemPayload.metadata = {
+      optimistic_request_id: optimisticRequestId,
+    }
+  }
+
   // Batch the line item creation and cache invalidation
   await sdk.store.cart
     .createLineItem(
       cart.id,
-      {
-        variant_id: variantId,
-        quantity,
-      },
+      createLineItemPayload,
       {},
       headers
     )
