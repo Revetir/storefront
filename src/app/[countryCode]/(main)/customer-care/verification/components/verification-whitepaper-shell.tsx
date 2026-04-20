@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react"
+import { type CSSProperties, type ReactNode, useEffect, useMemo, useRef, useState } from "react"
 
 type GraphicSlot = {
   id: string
@@ -33,6 +33,23 @@ type AnalysisCheckpoint = {
   methodsUsed: string
 }
 
+type AnalysisGraphicBounds = {
+  width: number
+  height: number
+  viewBoxMinX: number
+}
+
+type AnalysisPage = {
+  id: string
+  label: string
+  enabled: boolean
+  bounds: AnalysisGraphicBounds
+  checkpoints: AnalysisCheckpoint[]
+  mobileLeftShiftCheckpointIds?: Set<string>
+  panelVerticalTranslateByCheckpointId?: Record<string, string>
+  renderGraphic: () => ReactNode
+}
+
 type ReconciliationChecklistSection = {
   title: string
   checks: string[]
@@ -54,6 +71,7 @@ const ANALYSIS_INTRO_TEXT =
   "Analysis is the granular item-level review stage where each submitted listing is evaluated against known brand and model characteristics. At this stage, shape, materials, construction details, and identity markers are digitally examined in context to assess whether the product is consistent with expected design standards and free from well-known counterfeit patterns."
 const ASSURANCE_LOOP_ROTATION_SECONDS = 8.4
 const MOBILE_ASSURANCE_HOLD_DELAY_MS = 180
+const ASSURANCE_HINT_DISMISS_HOLD_MS = 320
 const MOBILE_ASSURANCE_MOVE_TOLERANCE_PX = 8
 const MOBILE_ASSURANCE_SCROLL_CANCEL_PX = 10
 const ASSURANCE_STAMP_ITEMS: AssuranceStampItem[] = [
@@ -205,79 +223,464 @@ const RECONCILIATION_CHECKLIST_SECTIONS: ReconciliationChecklistSection[] = [
   },
 ]
 
-const ANALYSIS_SVG_WIDTH = 760
-const ANALYSIS_SVG_HEIGHT = 500
-const ANALYSIS_CENTERLINE_X = 324
-const ANALYSIS_VIEWBOX_MIN_X = ANALYSIS_CENTERLINE_X - ANALYSIS_SVG_WIDTH / 2
-const ANALYSIS_MOBILE_LEFT_SHIFT_CHECKPOINT_IDS = new Set(["c1", "c5"])
-const ANALYSIS_CHECKPOINTS: AnalysisCheckpoint[] = [
+const createAnalysisBounds = (width: number, height: number, centerlineX: number): AnalysisGraphicBounds => ({
+  width,
+  height,
+  viewBoxMinX: centerlineX - width / 2,
+})
+
+const renderClothingAnalysisGraphic = () => (
+  <>
+    <path
+      d="M216 44H430L524 134L478 202L438 166V458H210V166L170 202L124 134Z"
+      fill="none"
+      stroke="black"
+      strokeWidth="1.5"
+    />
+    <path
+      d="M300 44C309 91 337 91 346 44"
+      fill="none"
+      stroke="black"
+      strokeWidth="1.5"
+    />
+    <rect
+      x={309}
+      y={52}
+      width={28}
+      height={17}
+      fill="none"
+      stroke="black"
+      strokeWidth="1.2"
+    />
+    <line
+      x1={314}
+      y1={60}
+      x2={332}
+      y2={60}
+      stroke="black"
+      strokeWidth="0.9"
+    />
+    <image
+      href="/images/logo_transparent.svg"
+      x={271}
+      y={148}
+      width={106}
+      height={24}
+      preserveAspectRatio="xMidYMid meet"
+      overflow="visible"
+    />
+    <rect
+      x={98}
+      y={272}
+      width={84}
+      height={136}
+      fill="none"
+      stroke="black"
+      strokeWidth="1.5"
+    />
+    <path
+      d="M118 272V244C118 226 132 214 140 214C148 214 162 226 162 244V272"
+      fill="none"
+      stroke="black"
+      strokeWidth="1.5"
+    />
+    <text
+      x={140}
+      y={338}
+      textAnchor="middle"
+      fill="black"
+      fontSize="11"
+      letterSpacing="0.02em"
+    >
+      @shoprevetir
+    </text>
+  </>
+)
+
+const renderShoeAnalysisGraphic = () => (
+  <>
+    <g transform="translate(82 78) scale(0.95)">
+      <image
+        href="/images/logo_transparent.svg"
+        x={334}
+        y={166}
+        width={88}
+        height={22}
+        opacity={0.9}
+        preserveAspectRatio="xMidYMid meet"
+        overflow="visible"
+      />
+      <path
+        d="M222.432 34.5L327.932 91L451.432 138L492.432 120.5"
+        fill="none"
+        stroke="black"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M74.4317 56C107.9 87.0973 144.12 82.9684 178.932 55.5"
+        fill="none"
+        stroke="black"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M287.932 69L183.932 194.5"
+        fill="none"
+        stroke="black"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M328.932 91.5L265.432 202.5"
+        fill="none"
+        stroke="black"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M0.931626 175.5C0.903697 104.018 13.4744 75.4022 29.4316 23C48.1501 21.2739 56.6133 24.6579 69.9316 34.5L79.9316 82.5C112.112 109.82 157.361 91.6892 182.932 64C157.319 10.4468 217.154 0.5 257.932 0.5L492.932 120.5C525.391 124.487 596.015 125.54 598.932 170C412.877 242.393 193.113 189.789 0.931626 175.5Z"
+        fill="none"
+        stroke="black"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M0.931702 176C-0.379977 209.331 0.599094 225.054 13.9317 237C208.654 240.568 417.669 270.83 604.432 202.5C606.895 198.39 613.528 162.791 598.932 170"
+        fill="none"
+        stroke="black"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+  </>
+)
+
+const renderAccessoriesAnalysisGraphic = () => {
+  const leftChainBeads = [
+    { x: 295, y: 26, r: 5.6 },
+    { x: 298.4, y: 48.6, r: 5.6 },
+    { x: 301.9, y: 71.1, r: 5.6 },
+    { x: 305.3, y: 93.7, r: 5.6 },
+    { x: 308.7, y: 116.3, r: 5.6 },
+    { x: 312.1, y: 138.9, r: 5.6 },
+    { x: 315.6, y: 161.4, r: 5.6 },
+    { x: 319, y: 184, r: 5.6 },
+  ]
+  const rightChainBeads = [
+    { x: 393, y: 26, r: 5.6 },
+    { x: 389.6, y: 48.6, r: 5.6 },
+    { x: 386.1, y: 71.1, r: 5.6 },
+    { x: 382.7, y: 93.7, r: 5.6 },
+    { x: 379.3, y: 116.3, r: 5.6 },
+    { x: 375.9, y: 138.9, r: 5.6 },
+    { x: 372.4, y: 161.4, r: 5.6 },
+    { x: 369, y: 184, r: 5.6 },
+  ]
+
+  return (
+    <>
+      <path
+        d="M295 0L295 26L298.4 48.6L301.9 71.1L305.3 93.7L308.7 116.3L312.1 138.9L315.6 161.4L319 184"
+        fill="none"
+        stroke="black"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M393 0L393 26L389.6 48.6L386.1 71.1L382.7 93.7L379.3 116.3L375.9 138.9L372.4 161.4L369 184"
+        fill="none"
+        stroke="black"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {leftChainBeads.map((bead) => (
+        <circle
+          key={`accessory-left-bead-${bead.y}`}
+          cx={bead.x}
+          cy={bead.y}
+          r={bead.r}
+          fill="white"
+          stroke="black"
+          strokeWidth="1.2"
+        />
+      ))}
+      {rightChainBeads.map((bead) => (
+        <circle
+          key={`accessory-right-bead-${bead.y}`}
+          cx={bead.x}
+          cy={bead.y}
+          r={bead.r}
+          fill="white"
+          stroke="black"
+          strokeWidth="1.2"
+        />
+      ))}
+      <image
+        href="/images/logo_transparent.svg"
+        x={347}
+        y={245.5}
+        width={34}
+        height={10}
+        opacity={0.9}
+        preserveAspectRatio="xMidYMid meet"
+        overflow="visible"
+      />
+      <g transform="translate(224 391.5) scale(0.04 -0.04)">
+        <path
+          d="M2920 5253 c-70 -24 -183 -108 -270 -199 -46 -50 -82 -80 -85 -73
+          -12 19 -97 49 -155 56 -87 9 -163 -17 -222 -77 -27 -26 -48 -52 -48 -57 0 -6
+          14 -13 31 -17 63 -12 230 -213 297 -356 98 -211 190 -450 242 -628 36 -123 32
+          -130 -70 -102 -89 25 -285 121 -429 210 -130 81 -268 212 -297 282 -10 27 -22
+          48 -25 48 -24 0 -78 -53 -101 -99 -49 -96 -30 -218 45 -299 12 -13 17 -26 11
+          -30 -5 -5 -39 -32 -76 -61 -157 -122 -212 -263 -153 -389 27 -58 123 -161 193
+          -207 23 -15 42 -29 42 -32 0 -2 -12 -27 -27 -56 -23 -44 -28 -64 -28 -132 0
+          -68 4 -89 28 -137 15 -31 42 -69 60 -84 29 -24 32 -25 36 -9 10 53 62 110 176
+          192 213 154 412 237 609 256 l49 4 -7 -256 c-3 -141 -8 -272 -11 -291 -2 -19
+          -9 -78 -16 -130 -35 -297 -150 -688 -283 -957 -62 -125 -171 -292 -246 -376
+          -51 -56 -52 -58 -35 -77 29 -32 115 -69 183 -78 93 -13 181 5 273 55 4 2 19
+          -18 34 -44 43 -73 140 -196 182 -229 120 -95 191 -98 288 -13 41 37 175 193
+          215 251 l24 36 51 -26 c46 -25 59 -27 165 -26 124 0 170 14 235 68 l30 26 -45
+          47 c-79 83 -158 196 -227 323 -149 272 -279 700 -323 1063 -13 110 -31 620
+          -22 629 10 9 196 -18 262 -37 74 -23 249 -110 335 -167 139 -93 201 -151 251
+          -234 11 -18 14 -17 48 15 78 75 99 226 46 336 -13 28 -24 53 -24 56 -1 4 27
+          28 61 53 116 88 184 181 199 272 15 97 -95 256 -246 355 l-24 16 26 31 c95
+          113 93 273 -5 357 -22 19 -44 35 -48 35 -4 0 -17 -21 -29 -46 -60 -123 -231
+          -259 -500 -396 -155 -79 -288 -127 -311 -112 -16 10 -9 43 45 206 95 288 200
+          533 282 660 57 89 177 214 220 230 19 6 34 15 34 19 0 22 -53 77 -100 103 -50
+          28 -63 31 -140 31 -76 0 -91 -4 -142 -32 l-57 -31 -16 25 c-25 37 -154 161
+          -205 196 -57 40 -147 77 -185 76 -16 0 -50 -7 -75 -16z"
+          fill="none"
+          stroke="black"
+          strokeWidth="30"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+    </>
+  )
+}
+
+const ANALYSIS_PAGES: AnalysisPage[] = [
   {
-    id: "c1",
-    anchor: { x: 250, y: 120 },
-    bend: { x: 184, y: 88 },
-    end: { x: 70, y: 88 },
-    panelSide: "right",
-    title: "Shape/Silhouette",
-    methodsUsed: `Garment outline extraction and geometric profile comparison
+    id: "clothing",
+    label: "Clothing",
+    enabled: true,
+    bounds: createAnalysisBounds(760, 500, 324),
+    mobileLeftShiftCheckpointIds: new Set(["clothing-shape", "clothing-material"]),
+    panelVerticalTranslateByCheckpointId: {
+      "clothing-material": "-72%",
+    },
+    checkpoints: [
+      {
+        id: "clothing-shape",
+        anchor: { x: 250, y: 120 },
+        bend: { x: 184, y: 88 },
+        end: { x: 70, y: 88 },
+        panelSide: "right",
+        title: "Shape/Silhouette",
+        methodsUsed: `Garment outline extraction and geometric profile comparison
 Measurement-based dimensional ratio analysis
 Deviation scoring against known model templates`,
-  },
-  {
-    id: "c2",
-    anchor: { x: 323, y: 58 },
-    bend: { x: 454, y: 30 },
-    end: { x: 656, y: 30 },
-    panelSide: "left",
-    title: "Brand Label",
-    methodsUsed: `Brand typography comparison against reference glyph sets
+      },
+      {
+        id: "clothing-label",
+        anchor: { x: 323, y: 58 },
+        bend: { x: 454, y: 30 },
+        end: { x: 656, y: 30 },
+        panelSide: "left",
+        title: "Brand Label",
+        methodsUsed: `Brand typography comparison against reference glyph sets
 Label proportion and placement normalization
 Weave pattern and material classification`,
-  },
-  {
-    id: "c3",
-    anchor: { x: 324, y: 174 },
-    bend: { x: 454, y: 206 },
-    end: { x: 656, y: 206 },
-    panelSide: "left",
-    title: "Main Design",
-    methodsUsed: `Region-of-interest segmentation
+      },
+      {
+        id: "clothing-design",
+        anchor: { x: 324, y: 174 },
+        bend: { x: 454, y: 206 },
+        end: { x: 656, y: 206 },
+        panelSide: "left",
+        title: "Main Design",
+        methodsUsed: `Region-of-interest segmentation
 Logo vector shape and proportion comparison to known logo geometry
 Print/embroidery classification using surface and edge feature extraction`,
-  },
-  {
-    id: "c4",
-    anchor: { x: 423, y: 352 },
-    bend: { x: 468, y: 270 },
-    end: { x: 656, y: 270 },
-    panelSide: "left",
-    title: "Care Label",
-    methodsUsed: `Structured label parsing by symbol sequence and layout hierarchy
+      },
+      {
+        id: "clothing-care",
+        anchor: { x: 423, y: 352 },
+        bend: { x: 468, y: 270 },
+        end: { x: 656, y: 270 },
+        panelSide: "left",
+        title: "Care Label",
+        methodsUsed: `Structured label parsing by symbol sequence and layout hierarchy
 Typographic pattern comparison
 Instruction set validation against known brand formats`,
-  },
-  {
-    id: "c5",
-    anchor: { x: 250, y: 458 },
-    bend: { x: 178, y: 468 },
-    end: { x: 72, y: 468 },
-    panelSide: "right",
-    title: "Material & Stitching",
-    methodsUsed: `Texture and surface pattern analysis
+      },
+      {
+        id: "clothing-material",
+        anchor: { x: 250, y: 458 },
+        bend: { x: 178, y: 468 },
+        end: { x: 72, y: 468 },
+        panelSide: "right",
+        title: "Material & Stitching",
+        methodsUsed: `Texture and surface pattern analysis
 Stitch density and uniformity quantification
 Seam construction pattern recognition`,
-  },
-  {
-    id: "c6",
-    anchor: { x: 134, y: 302 },
-    bend: { x: 108, y: 248 },
-    end: { x: 30, y: 248 },
-    panelSide: "right",
-    title: "Accessories & Packaging",
-    methodsUsed: `Component identification and benchmarking against expected inclusions
+      },
+      {
+        id: "clothing-packaging",
+        anchor: { x: 134, y: 302 },
+        bend: { x: 108, y: 248 },
+        end: { x: 30, y: 248 },
+        panelSide: "right",
+        title: "Accessories & Packaging",
+        methodsUsed: `Component identification and benchmarking against expected inclusions
 Textual feature extraction and typographic comparison
 Construction and assembly similarity gating`,
+      },
+    ],
+    renderGraphic: renderClothingAnalysisGraphic,
+  },
+  {
+    id: "shoes",
+    label: "Shoes",
+    enabled: true,
+    bounds: createAnalysisBounds(760, 500, 380),
+    mobileLeftShiftCheckpointIds: new Set(["shoe-silhouette", "shoe-heel"]),
+    checkpoints: [
+      {
+        id: "shoe-silhouette",
+        anchor: { x: 296, y: 202 },
+        bend: { x: 198, y: 230 },
+        end: { x: 26, y: 230 },
+        panelSide: "right",
+        title: "Silhouette",
+        methodsUsed: `Side-profile contour extraction and last-shape comparison
+Toe spring and collar pitch ratio analysis
+Deviation scoring against known low-top reference geometry`,
+      },
+      {
+        id: "shoe-tongue",
+        anchor: { x: 300, y: 98 },
+        bend: { x: 246, y: 62 },
+        end: { x: 124, y: 62 },
+        panelSide: "right",
+        title: "Tongue",
+        methodsUsed: `Label patch proportion and placement normalization
+Typographic spacing comparison against reference glyph sets
+Tongue height and fold behavior consistency checks`,
+      },
+      {
+        id: "shoe-laces",
+        anchor: { x: 434, y: 153 },
+        bend: { x: 478, y: 86 },
+        end: { x: 688, y: 86 },
+        panelSide: "left",
+        title: "Lace Field",
+        methodsUsed: `Eyestay angle and spacing analysis
+Lace row density benchmarking
+Panel-edge alignment checks across the throat opening`,
+      },
+      {
+        id: "shoe-quarter",
+        anchor: { x: 582, y: 210 },
+        bend: { x: 622, y: 166 },
+        end: { x: 722, y: 166 },
+        panelSide: "left",
+        title: "Panels & Stitching",
+        methodsUsed: `Panel seam path comparison against reference patterns
+Stitch run uniformity and spacing quantification
+Overlay shape matching across sidewall sections`,
+      },
+      {
+        id: "shoe-sole",
+        anchor: { x: 575, y: 273 },
+        bend: { x: 628, y: 344 },
+        end: { x: 702, y: 344 },
+        panelSide: "left",
+        title: "Sole",
+        methodsUsed: `Midsole profile segmentation and foxing height comparison
+Heel-to-toe tooling proportion analysis
+Outsole edge and stitch channel consistency checks`,
+      },
+      {
+        id: "shoe-heel",
+        anchor: { x: 128, y: 126 },
+        bend: { x: 92, y: 104 },
+        end: { x: 34, y: 104 },
+        panelSide: "right",
+        title: "Heel Counter",
+        methodsUsed: `Heel tab and counter geometry comparison
+Lining finish and collar construction classification
+Expected box and insert inclusion gating against known issue patterns`,
+      },
+    ],
+    renderGraphic: renderShoeAnalysisGraphic,
+  },
+  {
+    id: "accessories",
+    label: "Accessories",
+    enabled: true,
+    bounds: createAnalysisBounds(760, 500, 344),
+    mobileLeftShiftCheckpointIds: new Set(["accessory-shape", "accessory-surface-finish"]),
+    checkpoints: [
+      {
+        id: "accessory-shape",
+        anchor: { x: 344, y: 220 },
+        bend: { x: 248, y: 165 },
+        end: { x: 112, y: 165 },
+        panelSide: "right",
+        title: "Shape",
+        methodsUsed: `Object outline extraction and comparison against known product profiles
+Measurement-based dimensional ratio analysis
+Deviation scoring against known model templates`,
+      },
+      {
+        id: "accessory-brand-markings",
+        anchor: { x: 386, y: 248 },
+        bend: { x: 484, y: 222 },
+        end: { x: 618, y: 222 },
+        panelSide: "left",
+        title: "Brand Markings",
+        methodsUsed: `Logo and hallmark detection across relevant regions
+Brand typography comparison against reference glyph sets
+Symbol placement and alignment validation`,
+      },
+      {
+        id: "accessory-surface-finish",
+        anchor: { x: 328, y: 309 },
+        bend: { x: 262, y: 356 },
+        end: { x: 76, y: 356 },
+        panelSide: "right",
+        title: "Surface & Finish",
+        methodsUsed: `High-resolution texture analysis
+Finish classification
+Consistency checks across components and materials`,
+      },
+      {
+        id: "accessory-functionality",
+        anchor: { x: 376, y: 151 },
+        bend: { x: 500, y: 92 },
+        end: { x: 698, y: 92 },
+        panelSide: "left",
+        title: "Functionality",
+        methodsUsed: `Basic operation check of functional components
+Assessment of structural consistency with intended use`,
+      },
+    ],
+    renderGraphic: renderAccessoriesAnalysisGraphic,
   },
 ]
+
+const ENABLED_ANALYSIS_PAGES = ANALYSIS_PAGES.filter((page) => page.enabled)
 const INTAKE_INPUT_COLUMNS = [
   {
     title: "Seller Qualification",
@@ -616,12 +1019,168 @@ function ReconciliationChecklistGraphic({ className }: { className?: string }) {
   )
 }
 
+type AnalysisPageGraphicProps = {
+  page: AnalysisPage
+  activeCheckpointId: string | null
+  showHintGlow: boolean
+  onCheckpointClick: (id: string) => void
+  getPanelPosition: (checkpoint: AnalysisCheckpoint, page: AnalysisPage) => CSSProperties
+  setActivePanelRef: (element: HTMLDivElement | null) => void
+  className?: string
+}
+
+function AnalysisPageGraphic({
+  page,
+  activeCheckpointId,
+  showHintGlow,
+  onCheckpointClick,
+  getPanelPosition,
+  setActivePanelRef,
+  className,
+}: AnalysisPageGraphicProps) {
+  const { bounds } = page
+  const gradientId = `analysis-yellow-ring-gradient-${page.id}`
+
+  return (
+    <div className={`relative ${className ?? ""}`.trim()}>
+      <svg
+        viewBox={`${bounds.viewBoxMinX} 0 ${bounds.width} ${bounds.height}`}
+        className="block h-auto w-full md:h-full md:w-auto md:max-h-full md:max-w-full"
+        role="img"
+        aria-label={`${page.label} analysis checkpoint map`}
+      >
+        <defs>
+          <radialGradient id={gradientId} cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#9ca3af" stopOpacity="0" />
+            <stop offset="64%" stopColor="#9ca3af" stopOpacity="0" />
+            <stop offset="82%" stopColor="#9ca3af" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#9ca3af" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+
+        {page.renderGraphic()}
+
+        {page.checkpoints.map((checkpoint) => {
+          const isActive = activeCheckpointId === checkpoint.id
+          const markerStroke = isActive ? 1.25 : 0.9
+
+          return (
+            <g key={`analysis-checkpoint-${page.id}-${checkpoint.id}`}>
+              <polyline
+                points={`${checkpoint.anchor.x},${checkpoint.anchor.y} ${checkpoint.bend.x},${checkpoint.bend.y} ${checkpoint.end.x},${checkpoint.end.y}`}
+                fill="none"
+                stroke="black"
+                strokeWidth="0.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
+              />
+              <circle
+                cx={checkpoint.end.x}
+                cy={checkpoint.end.y}
+                r={20}
+                fill="white"
+                stroke="black"
+                strokeWidth={markerStroke}
+              />
+              <path
+                d={`
+                  M ${checkpoint.end.x} ${checkpoint.end.y}
+                  m -33 0
+                  a 33 33 0 1 0 66 0
+                  a 33 33 0 1 0 -66 0
+                  M ${checkpoint.end.x} ${checkpoint.end.y}
+                  m -23 0
+                  a 23 23 0 1 1 46 0
+                  a 23 23 0 1 1 -46 0
+                `}
+                fill={`url(#${gradientId})`}
+                fillRule="evenodd"
+                clipRule="evenodd"
+                className={`analysis-hint-glow ${showHintGlow ? "is-active" : ""}`}
+              />
+              {isActive ? (
+                <circle
+                  cx={checkpoint.end.x}
+                  cy={checkpoint.end.y}
+                  r={28}
+                  fill="none"
+                  stroke="black"
+                  strokeWidth="0.6"
+                  strokeDasharray="2.3 2.3"
+                />
+              ) : null}
+              <circle
+                cx={checkpoint.end.x}
+                cy={checkpoint.end.y}
+                r={20}
+                fill="transparent"
+                stroke="transparent"
+                strokeWidth="0"
+                data-analysis-hotspot="true"
+                aria-label={`Toggle ${checkpoint.title} details`}
+                onPointerDown={(event) => {
+                  event.preventDefault()
+                }}
+                onClick={() => {
+                  onCheckpointClick(checkpoint.id)
+                }}
+                className="analysis-checkpoint-hotspot cursor-pointer"
+              />
+            </g>
+          )
+        })}
+      </svg>
+
+      {page.checkpoints.map((checkpoint) => {
+        if (checkpoint.id !== activeCheckpointId) return null
+
+        return (
+          <div
+            key={`analysis-panel-${page.id}-${checkpoint.id}`}
+            className="pointer-events-none absolute z-20 w-[10rem] min-[431px]:w-[12rem] md:w-[13rem]"
+            style={getPanelPosition(checkpoint, page)}
+            ref={setActivePanelRef}
+          >
+            <div className="border border-black bg-white p-2 text-left shadow-[0_2px_6px_rgba(0,0,0,0.08)]">
+              <p className="text-[9px] uppercase tracking-[0.05em] text-black/70">
+                Checkpoint
+              </p>
+              <p className="mt-1 text-[11px] leading-snug text-black/85">
+                {checkpoint.title}
+              </p>
+              <p className="mt-1 text-[9px] uppercase tracking-[0.05em] text-black/70">
+                Protocol
+              </p>
+              <ul className="mt-1 text-[11px] leading-snug text-black/80">
+                {checkpoint.methodsUsed
+                  .split("\n")
+                  .map((line) => line.trim())
+                  .filter(Boolean)
+                  .map((line) => (
+                    <li key={`${checkpoint.id}-${line}`} className="max-[430px]:!text-left">
+                      {line}
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function VerificationWhitepaperShell() {
   const [activeSectionId, setActiveSectionId] = useState<string>(DOSSIER_SECTIONS[0].id)
   const [viewMode, setViewMode] = useState<ViewMode>("dossier")
   const [showCover, setShowCover] = useState(true)
   const [intakeAllBarsAboveThreshold, setIntakeAllBarsAboveThreshold] = useState(false)
   const [mobileIntakeSlide, setMobileIntakeSlide] = useState(0)
+  const [activeAnalysisPageId, setActiveAnalysisPageId] = useState<string>(ENABLED_ANALYSIS_PAGES[0]?.id ?? "")
+  const [mobileAnalysisSlide, setMobileAnalysisSlide] = useState(0)
+  const [isAnalysisHintDismissed, setIsAnalysisHintDismissed] = useState(false)
+  const [isAssuranceHintDismissed, setIsAssuranceHintDismissed] = useState(false)
   const [isAssuranceLoopHeld, setIsAssuranceLoopHeld] = useState(false)
   const [activeAssuranceItemId, setActiveAssuranceItemId] = useState<string>(
     getUprightAssuranceItemId(ASSURANCE_INITIAL_ROTATION_DEG)
@@ -632,6 +1191,7 @@ export default function VerificationWhitepaperShell() {
   const intakeBarRefs = useRef<Array<HTMLDivElement | null>>([])
   const mobileIntakeBarRefs = useRef<Array<HTMLDivElement | null>>([])
   const mobileIntakeCarouselRef = useRef<HTMLDivElement | null>(null)
+  const mobileAnalysisCarouselRef = useRef<HTMLDivElement | null>(null)
   const dossierSectionScrollRef = useRef<HTMLDivElement | null>(null)
   const activeAnalysisPanelRef = useRef<HTMLDivElement | null>(null)
   const assuranceLoopRingRef = useRef<SVGGElement | null>(null)
@@ -640,6 +1200,7 @@ export default function VerificationWhitepaperShell() {
   const assuranceLoopRotationRef = useRef(ASSURANCE_INITIAL_ROTATION_DEG)
   const assurancePointerIdRef = useRef<number | null>(null)
   const assuranceHoldTimerRef = useRef<number | null>(null)
+  const assuranceHintDismissTimerRef = useRef<number | null>(null)
   const assurancePointerStartRef = useRef<{ x: number; y: number } | null>(null)
   const assuranceHoldActivatedRef = useRef(false)
 
@@ -647,11 +1208,12 @@ export default function VerificationWhitepaperShell() {
     () => DOSSIER_SECTIONS.find((section) => section.id === activeSectionId) ?? DOSSIER_SECTIONS[0],
     [activeSectionId]
   )
-  const activeAnalysisCheckpoint = useMemo(
-    () =>
-      ANALYSIS_CHECKPOINTS.find((checkpoint) => checkpoint.id === activeAnalysisCheckpointId) ?? null,
-    [activeAnalysisCheckpointId]
-  )
+  const activeAnalysisPageIndex = useMemo(() => {
+    const index = ENABLED_ANALYSIS_PAGES.findIndex((page) => page.id === activeAnalysisPageId)
+    return index >= 0 ? index : 0
+  }, [activeAnalysisPageId])
+  const activeAnalysisPage =
+    ENABLED_ANALYSIS_PAGES[activeAnalysisPageIndex] ?? ENABLED_ANALYSIS_PAGES[0]!
   const activeAssuranceItem = useMemo(
     () =>
       ASSURANCE_STAMP_ITEMS.find((item) => item.id === activeAssuranceItemId) ??
@@ -754,6 +1316,11 @@ export default function VerificationWhitepaperShell() {
   }, [activeSectionId, viewMode])
 
   useEffect(() => {
+    setActiveAnalysisCheckpointId(null)
+    setIsAnalysisHintHovered(false)
+  }, [activeAnalysisPageId])
+
+  useEffect(() => {
     if (activeAnalysisCheckpointId) {
       setIsAnalysisHintHovered(false)
     }
@@ -763,6 +1330,21 @@ export default function VerificationWhitepaperShell() {
     if (viewMode === "dossier" && activeSectionId === "analysis") return
     setIsAnalysisHintHovered(false)
   }, [activeSectionId, viewMode])
+
+  useEffect(() => {
+    if (!(viewMode === "dossier" && activeSectionId === "analysis")) return
+    if (!isMobileViewport) return
+
+    setMobileAnalysisSlide((current) => (current === activeAnalysisPageIndex ? current : activeAnalysisPageIndex))
+
+    const carousel = mobileAnalysisCarouselRef.current
+    if (!carousel) return
+
+    const targetLeft = carousel.clientWidth * activeAnalysisPageIndex
+    if (Math.abs(carousel.scrollLeft - targetLeft) < 1) return
+
+    carousel.scrollTo({ left: targetLeft, behavior: "auto" })
+  }, [activeAnalysisPageIndex, activeSectionId, isMobileViewport, viewMode])
 
   useEffect(() => {
     if (!activeAnalysisCheckpointId) return
@@ -834,6 +1416,7 @@ export default function VerificationWhitepaperShell() {
   useEffect(() => {
     return () => {
       clearAssuranceHoldTimer()
+      clearAssuranceHintDismissTimer()
     }
   }, [])
 
@@ -948,8 +1531,25 @@ export default function VerificationWhitepaperShell() {
     assuranceHoldTimerRef.current = null
   }
 
+  const clearAssuranceHintDismissTimer = () => {
+    if (assuranceHintDismissTimerRef.current === null) return
+    window.clearTimeout(assuranceHintDismissTimerRef.current)
+    assuranceHintDismissTimerRef.current = null
+  }
+
+  const startAssuranceHintDismissTimer = () => {
+    if (isAssuranceHintDismissed) return
+
+    clearAssuranceHintDismissTimer()
+    assuranceHintDismissTimerRef.current = window.setTimeout(() => {
+      setIsAssuranceHintDismissed(true)
+      assuranceHintDismissTimerRef.current = null
+    }, ASSURANCE_HINT_DISMISS_HOLD_MS)
+  }
+
   const resetAssurancePointerGesture = () => {
     clearAssuranceHoldTimer()
+    clearAssuranceHintDismissTimer()
     assurancePointerIdRef.current = null
     assurancePointerStartRef.current = null
     assuranceHoldActivatedRef.current = false
@@ -964,6 +1564,8 @@ export default function VerificationWhitepaperShell() {
     isMobileViewport && (pointerType === "touch" || pointerType === "pen")
 
   const onAssurancePointerDown = (event: { pointerType: string; pointerId: number; clientX: number; clientY: number }) => {
+    startAssuranceHintDismissTimer()
+
     if (!isMobileTouchPointer(event.pointerType)) {
       setIsAssuranceLoopHeld(true)
       return
@@ -1001,21 +1603,71 @@ export default function VerificationWhitepaperShell() {
 
     if (!assuranceHoldActivatedRef.current && (absDx > MOBILE_ASSURANCE_MOVE_TOLERANCE_PX || absDy > MOBILE_ASSURANCE_MOVE_TOLERANCE_PX)) {
       clearAssuranceHoldTimer()
+      clearAssuranceHintDismissTimer()
     }
   }
 
-  const onAnalysisCheckpointClick = (id: string) => {
-    setActiveAnalysisCheckpointId((current) => (current === id ? null : id))
+  const onMobileAnalysisCarouselScroll = () => {
+    const carousel = mobileAnalysisCarouselRef.current
+    if (!carousel) return
+
+    const slideWidth = Math.max(carousel.clientWidth, 1)
+    const maxSlide = Math.max(ENABLED_ANALYSIS_PAGES.length - 1, 0)
+    const nextSlide = Math.max(0, Math.min(maxSlide, Math.round(carousel.scrollLeft / slideWidth)))
+    const nextPage = ENABLED_ANALYSIS_PAGES[nextSlide]
+
+    setMobileAnalysisSlide((current) => (current === nextSlide ? current : nextSlide))
+    if (nextPage && nextPage.id !== activeAnalysisPageId) {
+      setActiveAnalysisPageId(nextPage.id)
+    }
   }
 
-  const analysisXToPercent = (x: number) => ((x - ANALYSIS_VIEWBOX_MIN_X) / ANALYSIS_SVG_WIDTH) * 100
+  const scrollToMobileAnalysisSlide = (index: number) => {
+    const carousel = mobileAnalysisCarouselRef.current
+    if (!carousel) return
 
-  const getAnalysisPanelPosition = (checkpoint: AnalysisCheckpoint): CSSProperties => {
-    const left = `${analysisXToPercent(checkpoint.end.x)}%`
-    const top = `${(checkpoint.end.y / ANALYSIS_SVG_HEIGHT) * 100}%`
+    const maxSlide = Math.max(ENABLED_ANALYSIS_PAGES.length - 1, 0)
+    const clamped = Math.max(0, Math.min(maxSlide, index))
+    const nextPage = ENABLED_ANALYSIS_PAGES[clamped]
+
+    carousel.scrollTo({ left: carousel.clientWidth * clamped, behavior: "smooth" })
+    setMobileAnalysisSlide(clamped)
+    if (nextPage) {
+      setActiveAnalysisPageId(nextPage.id)
+    }
+  }
+
+  const stepAnalysisPage = (direction: -1 | 1) => {
+    if (!ENABLED_ANALYSIS_PAGES.length) return
+
+    const nextIndex = Math.max(0, Math.min(ENABLED_ANALYSIS_PAGES.length - 1, activeAnalysisPageIndex + direction))
+    const nextPage = ENABLED_ANALYSIS_PAGES[nextIndex]
+    if (!nextPage || nextPage.id === activeAnalysisPageId) return
+
+    setActiveAnalysisPageId(nextPage.id)
+  }
+
+  const onAnalysisCheckpointClick = (id: string) => {
+    setActiveAnalysisCheckpointId((current) => {
+      const nextId = current === id ? null : id
+      if (nextId && !isAnalysisHintDismissed) {
+        setIsAnalysisHintDismissed(true)
+      }
+      return nextId
+    })
+  }
+
+  const analysisXToPercent = (x: number, page: AnalysisPage) =>
+    ((x - page.bounds.viewBoxMinX) / page.bounds.width) * 100
+
+  const getAnalysisPanelPosition = (checkpoint: AnalysisCheckpoint, page: AnalysisPage): CSSProperties => {
+    const left = `${analysisXToPercent(checkpoint.end.x, page)}%`
+    const top = `${(checkpoint.end.y / page.bounds.height) * 100}%`
     const mobileRightPanelShiftRem =
-      isMobileViewport && ANALYSIS_MOBILE_LEFT_SHIFT_CHECKPOINT_IDS.has(checkpoint.id) ? 2.2 : 4.8
-    const verticalTranslate = !isMobileViewport && checkpoint.id === "c5" ? "-72%" : "-50%"
+      isMobileViewport && page.mobileLeftShiftCheckpointIds?.has(checkpoint.id) ? 2.2 : 4.8
+    const verticalTranslate = !isMobileViewport
+      ? page.panelVerticalTranslateByCheckpointId?.[checkpoint.id] ?? "-50%"
+      : "-50%"
     const transform =
       checkpoint.panelSide === "right"
         ? `translate(${mobileRightPanelShiftRem}rem, ${verticalTranslate})`
@@ -1365,202 +2017,122 @@ export default function VerificationWhitepaperShell() {
                               <div className="w-full pt-1 md:flex md:flex-1 md:min-h-0 md:justify-center md:pt-0">
                                 <div className="mx-auto flex w-full max-w-[17.5rem] flex-col items-center min-[431px]:max-w-[30rem] md:h-full md:min-h-0 md:max-w-full md:justify-center">
                                   <div className="w-full md:flex md:h-full md:flex-col md:items-center">
-                                  <div className="relative w-full md:min-h-0 md:flex-1 md:w-fit md:max-w-full">
-                                  <svg
-                                    viewBox={`${ANALYSIS_VIEWBOX_MIN_X} 0 ${ANALYSIS_SVG_WIDTH} ${ANALYSIS_SVG_HEIGHT}`}
-                                    className="h-auto w-full md:h-full md:w-auto md:max-h-full md:max-w-full"
-                                    role="img"
-                                    aria-label="Analysis checkpoint map"
-                                  >
-                                    <defs>
-                                      <radialGradient id="analysis-yellow-ring-gradient" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stopColor="#9ca3af" stopOpacity="0" />
-                                        <stop offset="64%" stopColor="#9ca3af" stopOpacity="0" />
-                                        <stop offset="82%" stopColor="#9ca3af" stopOpacity="0.9" />
-                                        <stop offset="100%" stopColor="#9ca3af" stopOpacity="0" />
-                                      </radialGradient>
-                                    </defs>
-                                    <path
-                                      d="M216 44H430L524 134L478 202L438 166V458H210V166L170 202L124 134Z"
-                                      fill="none"
-                                      stroke="black"
-                                      strokeWidth="2.2"
-                                    />
-                                    <path
-                                      d="M300 44C309 91 337 91 346 44"
-                                      fill="none"
-                                      stroke="black"
-                                      strokeWidth="2.2"
-                                    />
-                                    <rect
-                                      x={309}
-                                      y={52}
-                                      width={28}
-                                      height={17}
-                                      fill="none"
-                                      stroke="black"
-                                      strokeWidth="1.8"
-                                    />
-                                    <line
-                                      x1={314}
-                                      y1={60}
-                                      x2={332}
-                                      y2={60}
-                                      stroke="black"
-                                      strokeWidth="1.4"
-                                    />
-                                    <image
-                                      href="/images/logo_transparent.svg"
-                                      x={271}
-                                      y={148}
-                                      width={106}
-                                      height={24}
-                                      preserveAspectRatio="xMidYMid meet"
-                                      overflow="visible"
-                                    />
-                                    <rect
-                                      x={98}
-                                      y={272}
-                                      width={84}
-                                      height={136}
-                                      fill="none"
-                                      stroke="black"
-                                      strokeWidth="2"
-                                    />
-                                    <path
-                                      d="M118 272V244C118 226 132 214 140 214C148 214 162 226 162 244V272"
-                                      fill="none"
-                                      stroke="black"
-                                      strokeWidth="2"
-                                    />
-                                    <text
-                                      x={140}
-                                      y={338}
-                                      textAnchor="middle"
-                                      fill="black"
-                                      fontSize="11"
-                                      letterSpacing="0.02em"
-                                    >
-                                      @shoprevetir
-                                    </text>
+                                    <div className="hidden w-full max-w-[30rem] items-center justify-between gap-4 pb-3 min-[431px]:flex md:max-w-[38rem]">
+                                      <div className="text-[10px] uppercase tracking-[0.14em] text-black/70">
+                                        {activeAnalysisPage.label}
+                                      </div>
+                                      <div className="flex items-center gap-3">
+                                        <span className="text-[10px] uppercase tracking-[0.14em] text-black/65">
+                                          {activeAnalysisPageIndex + 1} / {ENABLED_ANALYSIS_PAGES.length}
+                                        </span>
+                                        <div className="flex items-center gap-1.5">
+                                          {([-1, 1] as const).map((direction) => {
+                                            const isDisabled =
+                                              direction === -1
+                                                ? activeAnalysisPageIndex === 0
+                                                : activeAnalysisPageIndex === ENABLED_ANALYSIS_PAGES.length - 1
 
-                                    {ANALYSIS_CHECKPOINTS.map((checkpoint) => {
-                                      const isActive = activeAnalysisCheckpointId === checkpoint.id
-                                      const markerStroke = isActive ? 1.25 : 0.9
-                                      const showHintGlow = isAnalysisHintHovered && !activeAnalysisCheckpointId
-
-                                      return (
-                                        <g key={`analysis-checkpoint-${checkpoint.id}`}>
-                                          <polyline
-                                            points={`${checkpoint.anchor.x},${checkpoint.anchor.y} ${checkpoint.bend.x},${checkpoint.bend.y} ${checkpoint.end.x},${checkpoint.end.y}`}
-                                            fill="none"
-                                            stroke="black"
-                                            strokeWidth="0.6"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            vectorEffect="non-scaling-stroke"
-                                          />
-                                          <circle
-                                            cx={checkpoint.end.x}
-                                            cy={checkpoint.end.y}
-                                            r={20}
-                                            fill="white"
-                                            stroke="black"
-                                            strokeWidth={markerStroke}
-                                          />
-                                          <path
-                                            d={`
-                                              M ${checkpoint.end.x} ${checkpoint.end.y}
-                                              m -33 0
-                                              a 33 33 0 1 0 66 0
-                                              a 33 33 0 1 0 -66 0
-                                              M ${checkpoint.end.x} ${checkpoint.end.y}
-                                              m -23 0
-                                              a 23 23 0 1 1 46 0
-                                              a 23 23 0 1 1 -46 0
-                                            `}
-                                            fill="url(#analysis-yellow-ring-gradient)"
-                                            fillRule="evenodd"
-                                            clipRule="evenodd"
-                                            className={`analysis-hint-glow ${showHintGlow ? "is-active" : ""}`}
-                                          />
-                                          {isActive ? (
-                                            <circle
-                                              cx={checkpoint.end.x}
-                                              cy={checkpoint.end.y}
-                                              r={28}
-                                              fill="none"
-                                              stroke="black"
-                                              strokeWidth="0.6"
-                                              strokeDasharray="2.3 2.3"
-                                            />
-                                          ) : null}
-                                          <circle
-                                            cx={checkpoint.end.x}
-                                            cy={checkpoint.end.y}
-                                            r={20}
-                                            fill="transparent"
-                                            stroke="transparent"
-                                            strokeWidth="0"
-                                            data-analysis-hotspot="true"
-                                            aria-label={`Toggle ${checkpoint.title} details`}
-                                            onPointerDown={(event) => {
-                                              event.preventDefault()
-                                            }}
-                                            onClick={() => {
-                                              onAnalysisCheckpointClick(checkpoint.id)
-                                            }}
-                                            className="analysis-checkpoint-hotspot cursor-pointer"
-                                          />
-                                        </g>
-                                      )
-                                    })}
-                                  </svg>
-
-                                  {ANALYSIS_CHECKPOINTS.map((checkpoint) => {
-                                    if (checkpoint.id !== activeAnalysisCheckpointId) return null
-
-                                    return (
-                                      <div
-                                        key={`analysis-panel-${checkpoint.id}`}
-                                        className="pointer-events-none absolute z-20 w-[10rem] min-[431px]:w-[12rem] md:w-[13rem]"
-                                        style={getAnalysisPanelPosition(checkpoint)}
-                                        ref={(element) => {
-                                          if (checkpoint.id === activeAnalysisCheckpointId) {
-                                            activeAnalysisPanelRef.current = element
-                                          }
-                                        }}
-                                      >
-                                        <div className="border border-black bg-white p-2 text-left shadow-[0_2px_6px_rgba(0,0,0,0.08)]">
-                                          <p className="text-[9px] uppercase tracking-[0.05em] text-black/70">
-                                            Checkpoint
-                                          </p>
-                                          <p className="mt-1 text-[11px] leading-snug text-black/85">
-                                            {checkpoint.title}
-                                          </p>
-                                          <p className="mt-1 text-[9px] uppercase tracking-[0.05em] text-black/70">
-                                            Protocol
-                                          </p>
-                                          <ul className="mt-1 text-[11px] leading-snug text-black/80">
-                                            {checkpoint.methodsUsed
-                                              .split("\n")
-                                              .map((line) => line.trim())
-                                              .filter(Boolean)
-                                              .map((line) => (
-                                                <li key={`${checkpoint.id}-${line}`} className="max-[430px]:!text-left">
-                                                  {line}
-                                                </li>
-                                              ))}
-                                          </ul>
+                                            return (
+                                              <button
+                                                key={`analysis-page-direction-${direction}`}
+                                                type="button"
+                                                onClick={() => stepAnalysisPage(direction)}
+                                                disabled={isDisabled}
+                                                aria-label={direction === -1 ? "Show previous analysis page" : "Show next analysis page"}
+                                                className={`flex h-8 w-8 items-center justify-center border border-black transition-colors ${
+                                                  isDisabled ? "cursor-not-allowed border-black/20 text-black/25" : "hover:bg-black hover:text-white"
+                                                }`}
+                                              >
+                                                <svg
+                                                  viewBox="0 0 12 12"
+                                                  className="h-3 w-3"
+                                                  aria-hidden="true"
+                                                  fill="none"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                  <path
+                                                    d={direction === -1 ? "M7.75 2.5L4.25 6L7.75 9.5" : "M4.25 2.5L7.75 6L4.25 9.5"}
+                                                    stroke="currentColor"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="1.2"
+                                                  />
+                                                </svg>
+                                              </button>
+                                            )
+                                          })}
                                         </div>
                                       </div>
-                                    )
-                                  })}
-                                  </div>
+                                    </div>
+
+                                    <div className="w-full min-[431px]:hidden">
+                                      <div className="flex flex-col items-center gap-3">
+                                        <div
+                                          ref={mobileAnalysisCarouselRef}
+                                          onScroll={onMobileAnalysisCarouselScroll}
+                                          className="no-scrollbar flex w-full max-w-[17.5rem] snap-x snap-mandatory overflow-x-auto scroll-smooth"
+                                        >
+                                          {ENABLED_ANALYSIS_PAGES.map((page) => {
+                                            const isActivePage = page.id === activeAnalysisPage.id
+                                            const showHintGlow = isActivePage && isAnalysisHintHovered && !activeAnalysisCheckpointId
+                                            const activeCheckpointId = isActivePage ? activeAnalysisCheckpointId : null
+
+                                            return (
+                                              <div key={`analysis-mobile-slide-${page.id}`} className="w-full shrink-0 snap-start">
+                                                <div className="mx-auto w-full max-w-[17.5rem]">
+                                                  <AnalysisPageGraphic
+                                                    page={page}
+                                                    activeCheckpointId={activeCheckpointId}
+                                                    showHintGlow={showHintGlow}
+                                                    onCheckpointClick={onAnalysisCheckpointClick}
+                                                    getPanelPosition={getAnalysisPanelPosition}
+                                                    setActivePanelRef={(element) => {
+                                                      if (isActivePage) {
+                                                        activeAnalysisPanelRef.current = element
+                                                      }
+                                                    }}
+                                                    className="w-full"
+                                                  />
+                                                </div>
+                                              </div>
+                                            )
+                                          })}
+                                        </div>
+                                        <div className="flex items-center justify-center gap-2">
+                                          {ENABLED_ANALYSIS_PAGES.map((page, index) => (
+                                            <button
+                                              key={`analysis-mobile-dot-${page.id}`}
+                                              type="button"
+                                              onClick={() => scrollToMobileAnalysisSlide(index)}
+                                              aria-label={`Show ${page.label.toLowerCase()} analysis page`}
+                                              className={`h-1 w-1 rounded-full transition-colors ${
+                                                mobileAnalysisSlide === index ? "bg-zinc-500" : "bg-zinc-300"
+                                              }`}
+                                            />
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="relative hidden w-full min-[431px]:block md:min-h-0 md:flex-1 md:w-fit md:max-w-full">
+                                      <AnalysisPageGraphic
+                                        page={activeAnalysisPage}
+                                        activeCheckpointId={activeAnalysisCheckpointId}
+                                        showHintGlow={isAnalysisHintHovered && !activeAnalysisCheckpointId}
+                                        onCheckpointClick={onAnalysisCheckpointClick}
+                                        getPanelPosition={getAnalysisPanelPosition}
+                                        setActivePanelRef={(element) => {
+                                          activeAnalysisPanelRef.current = element
+                                        }}
+                                        className="w-full md:h-full"
+                                      />
+                                    </div>
                                   <p
                                     onMouseEnter={() => setIsAnalysisHintHovered(true)}
                                     onMouseLeave={() => setIsAnalysisHintHovered(false)}
-                                    className="mt-1 text-center text-[12px] leading-relaxed text-black/75 md:mt-2 md:shrink-0"
+                                    className={`mt-1 text-center text-[12px] leading-relaxed text-black/75 transition-opacity duration-500 md:mt-2 md:shrink-0 ${
+                                      isAnalysisHintDismissed ? "opacity-0" : "opacity-100"
+                                    }`}
                                   >
                                     Select a checkpoint to view analysis details.
                                   </p>
@@ -1617,14 +2189,16 @@ export default function VerificationWhitepaperShell() {
                                       onPointerLeave={endAssuranceHoldInteraction}
                                       onPointerCancel={endAssuranceHoldInteraction}
                                       onKeyDown={(event) => {
-                                        if (event.key === " " || event.key === "Enter") {
+                                        if ((event.key === " " || event.key === "Enter") && !event.repeat) {
                                           event.preventDefault()
+                                          startAssuranceHintDismissTimer()
                                           setIsAssuranceLoopHeld(true)
                                         }
                                       }}
                                       onKeyUp={(event) => {
                                         if (event.key === " " || event.key === "Enter") {
                                           event.preventDefault()
+                                          clearAssuranceHintDismissTimer()
                                           setIsAssuranceLoopHeld(false)
                                         }
                                       }}
@@ -1676,7 +2250,9 @@ export default function VerificationWhitepaperShell() {
                                     </button>
                                     <p
                                       id="assurance-loop-hint"
-                                      className="mt-2 w-full max-w-[16.5rem] text-center text-[11px] leading-snug text-black/70 min-[431px]:max-w-[19rem] md:max-w-[21rem] md:text-[12px]"
+                                      className={`mt-2 w-full max-w-[16.5rem] text-center text-[11px] leading-snug text-black/70 transition-opacity duration-500 min-[431px]:max-w-[19rem] md:max-w-[21rem] md:text-[12px] ${
+                                        isAssuranceHintDismissed ? "opacity-0" : "opacity-100"
+                                      }`}
                                     >
                                       Press and hold to switch focus area.
                                     </p>
