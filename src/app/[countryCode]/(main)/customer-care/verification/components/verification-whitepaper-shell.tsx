@@ -364,6 +364,7 @@ const renderShoeAnalysisGraphic = () => (
 
 const renderAccessoriesAnalysisGraphic = () => {
   const leftChainBeads = [
+    { x: 291.6, y: 3.4, r: 5.6 },
     { x: 295, y: 26, r: 5.6 },
     { x: 298.4, y: 48.6, r: 5.6 },
     { x: 301.9, y: 71.1, r: 5.6 },
@@ -374,6 +375,7 @@ const renderAccessoriesAnalysisGraphic = () => {
     { x: 319, y: 184, r: 5.6 },
   ]
   const rightChainBeads = [
+    { x: 396.4, y: 3.4, r: 5.6 },
     { x: 393, y: 26, r: 5.6 },
     { x: 389.6, y: 48.6, r: 5.6 },
     { x: 386.1, y: 71.1, r: 5.6 },
@@ -387,7 +389,7 @@ const renderAccessoriesAnalysisGraphic = () => {
   return (
     <>
       <path
-        d="M295 0L295 26L298.4 48.6L301.9 71.1L305.3 93.7L308.7 116.3L312.1 138.9L315.6 161.4L319 184"
+        d="M295 0L291.6 3.4L295 26L298.4 48.6L301.9 71.1L305.3 93.7L308.7 116.3L312.1 138.9L315.6 161.4L319 184"
         fill="none"
         stroke="black"
         strokeWidth="1.2"
@@ -395,7 +397,7 @@ const renderAccessoriesAnalysisGraphic = () => {
         strokeLinejoin="round"
       />
       <path
-        d="M393 0L393 26L389.6 48.6L386.1 71.1L382.7 93.7L379.3 116.3L375.9 138.9L372.4 161.4L369 184"
+        d="M393 0L396.4 3.4L393 26L389.6 48.6L386.1 71.1L382.7 93.7L379.3 116.3L375.9 138.9L372.4 161.4L369 184"
         fill="none"
         stroke="black"
         strokeWidth="1.2"
@@ -560,7 +562,7 @@ Construction and assembly similarity gating`,
         id: "shoe-silhouette",
         anchor: { x: 296, y: 202 },
         bend: { x: 198, y: 230 },
-        end: { x: 26, y: 230 },
+        end: { x: 44, y: 230 },
         panelSide: "right",
         title: "Silhouette",
         methodsUsed: `Side-profile contour extraction and last-shape comparison
@@ -1026,7 +1028,35 @@ type AnalysisPageGraphicProps = {
   onCheckpointClick: (id: string) => void
   getPanelPosition: (checkpoint: AnalysisCheckpoint, page: AnalysisPage) => CSSProperties
   setActivePanelRef: (element: HTMLDivElement | null) => void
+  renderFloatingPanel?: boolean
   className?: string
+}
+
+function AnalysisCheckpointPanelContent({ checkpoint }: { checkpoint: AnalysisCheckpoint }) {
+  return (
+    <div className="border border-black bg-white p-2 text-left shadow-[0_2px_6px_rgba(0,0,0,0.08)]">
+      <p className="text-[9px] uppercase tracking-[0.05em] text-black/70">
+        Checkpoint
+      </p>
+      <p className="mt-1 text-[11px] leading-snug text-black/85">
+        {checkpoint.title}
+      </p>
+      <p className="mt-1 text-[9px] uppercase tracking-[0.05em] text-black/70">
+        Protocol
+      </p>
+      <ul className="mt-1 text-[11px] leading-snug text-black/80">
+        {checkpoint.methodsUsed
+          .split("\n")
+          .map((line) => line.trim())
+          .filter(Boolean)
+          .map((line) => (
+            <li key={`${checkpoint.id}-${line}`} className="max-[430px]:!text-left">
+              {line}
+            </li>
+          ))}
+      </ul>
+    </div>
+  )
 }
 
 function AnalysisPageGraphic({
@@ -1036,6 +1066,7 @@ function AnalysisPageGraphic({
   onCheckpointClick,
   getPanelPosition,
   setActivePanelRef,
+  renderFloatingPanel = true,
   className,
 }: AnalysisPageGraphicProps) {
   const { bounds } = page
@@ -1132,7 +1163,8 @@ function AnalysisPageGraphic({
         })}
       </svg>
 
-      {page.checkpoints.map((checkpoint) => {
+      {renderFloatingPanel
+        ? page.checkpoints.map((checkpoint) => {
         if (checkpoint.id !== activeCheckpointId) return null
 
         return (
@@ -1142,31 +1174,11 @@ function AnalysisPageGraphic({
             style={getPanelPosition(checkpoint, page)}
             ref={setActivePanelRef}
           >
-            <div className="border border-black bg-white p-2 text-left shadow-[0_2px_6px_rgba(0,0,0,0.08)]">
-              <p className="text-[9px] uppercase tracking-[0.05em] text-black/70">
-                Checkpoint
-              </p>
-              <p className="mt-1 text-[11px] leading-snug text-black/85">
-                {checkpoint.title}
-              </p>
-              <p className="mt-1 text-[9px] uppercase tracking-[0.05em] text-black/70">
-                Protocol
-              </p>
-              <ul className="mt-1 text-[11px] leading-snug text-black/80">
-                {checkpoint.methodsUsed
-                  .split("\n")
-                  .map((line) => line.trim())
-                  .filter(Boolean)
-                  .map((line) => (
-                    <li key={`${checkpoint.id}-${line}`} className="max-[430px]:!text-left">
-                      {line}
-                    </li>
-                  ))}
-              </ul>
-            </div>
+            <AnalysisCheckpointPanelContent checkpoint={checkpoint} />
           </div>
         )
-      })}
+      })
+        : null}
     </div>
   )
 }
@@ -1214,6 +1226,10 @@ export default function VerificationWhitepaperShell() {
   }, [activeAnalysisPageId])
   const activeAnalysisPage =
     ENABLED_ANALYSIS_PAGES[activeAnalysisPageIndex] ?? ENABLED_ANALYSIS_PAGES[0]!
+  const activeAnalysisCheckpoint = useMemo(
+    () => activeAnalysisPage.checkpoints.find((checkpoint) => checkpoint.id === activeAnalysisCheckpointId) ?? null,
+    [activeAnalysisCheckpointId, activeAnalysisPage]
+  )
   const activeAssuranceItem = useMemo(
     () =>
       ASSURANCE_STAMP_ITEMS.find((item) => item.id === activeAssuranceItemId) ??
@@ -2074,7 +2090,11 @@ export default function VerificationWhitepaperShell() {
                                         >
                                           {ENABLED_ANALYSIS_PAGES.map((page) => {
                                             const isActivePage = page.id === activeAnalysisPage.id
-                                            const showHintGlow = isActivePage && isAnalysisHintHovered && !activeAnalysisCheckpointId
+                                            const showHintGlow =
+                                              isActivePage &&
+                                              !isMobileViewport &&
+                                              isAnalysisHintHovered &&
+                                              !activeAnalysisCheckpointId
                                             const activeCheckpointId = isActivePage ? activeAnalysisCheckpointId : null
 
                                             return (
@@ -2086,11 +2106,8 @@ export default function VerificationWhitepaperShell() {
                                                     showHintGlow={showHintGlow}
                                                     onCheckpointClick={onAnalysisCheckpointClick}
                                                     getPanelPosition={getAnalysisPanelPosition}
-                                                    setActivePanelRef={(element) => {
-                                                      if (isActivePage) {
-                                                        activeAnalysisPanelRef.current = element
-                                                      }
-                                                    }}
+                                                    setActivePanelRef={() => {}}
+                                                    renderFloatingPanel={false}
                                                     className="w-full"
                                                   />
                                                 </div>
@@ -2118,7 +2135,7 @@ export default function VerificationWhitepaperShell() {
                                       <AnalysisPageGraphic
                                         page={activeAnalysisPage}
                                         activeCheckpointId={activeAnalysisCheckpointId}
-                                        showHintGlow={isAnalysisHintHovered && !activeAnalysisCheckpointId}
+                                        showHintGlow={!isMobileViewport && isAnalysisHintHovered && !activeAnalysisCheckpointId}
                                         onCheckpointClick={onAnalysisCheckpointClick}
                                         getPanelPosition={getAnalysisPanelPosition}
                                         setActivePanelRef={(element) => {
@@ -2128,14 +2145,31 @@ export default function VerificationWhitepaperShell() {
                                       />
                                     </div>
                                   <p
-                                    onMouseEnter={() => setIsAnalysisHintHovered(true)}
-                                    onMouseLeave={() => setIsAnalysisHintHovered(false)}
-                                    className={`mt-1 text-center text-[12px] leading-relaxed text-black/75 transition-opacity duration-500 md:mt-2 md:shrink-0 ${
-                                      isAnalysisHintDismissed ? "opacity-0" : "opacity-100"
+                                    onMouseEnter={() => {
+                                      if (!isMobileViewport) setIsAnalysisHintHovered(true)
+                                    }}
+                                    onMouseLeave={() => {
+                                      if (!isMobileViewport) setIsAnalysisHintHovered(false)
+                                    }}
+                                    className={`text-center text-[12px] leading-relaxed text-black/75 transition-[margin,max-height,opacity] duration-500 min-[431px]:mt-1 min-[431px]:max-h-none md:mt-2 md:shrink-0 ${
+                                      isAnalysisHintDismissed
+                                        ? "mt-0 max-h-0 overflow-hidden opacity-0"
+                                        : "mt-3 max-h-12 opacity-100"
                                     }`}
                                   >
                                     Select a checkpoint to view analysis details.
                                   </p>
+                                  <div className="mt-3 w-full min-[431px]:hidden">
+                                    {activeAnalysisCheckpoint ? (
+                                      <div
+                                        ref={(element) => {
+                                          activeAnalysisPanelRef.current = element
+                                        }}
+                                      >
+                                        <AnalysisCheckpointPanelContent checkpoint={activeAnalysisCheckpoint} />
+                                      </div>
+                                    ) : null}
+                                  </div>
                                   </div>
                                 </div>
                               </div>
