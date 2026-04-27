@@ -38,7 +38,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     }
 
     const title = `${brand.name} ${categoryDisplay} for ${genderDisplay}`
-    const description = `Shop ${brand.name} ${categorySlug} for ${genderDisplay} at REVETIR. Premium fashion with free shipping and returns.`
+    const crossBlurb = brand.category_blurbs?.[categorySlug]
+    const description = crossBlurb
+      ? crossBlurb.slice(0, 160)
+      : `Shop ${brand.name} ${categorySlug} for ${genderDisplay} at REVETIR. Premium fashion with free shipping and returns.`
 
     return {
       title,
@@ -127,9 +130,11 @@ export default async function BrandCategoryPage(props: Props) {
     }
   }
 
-  // For brand+category pages, use brand name and blurb (brand takes priority)
+  // For brand+category pages, prefer a specific cross-blurb (brand X category),
+  // falling back to the general brand blurb
   const editorialTitle = brand.name
-  const editorialBlurb = brand.blurb
+  const crossBlurb = brand.category_blurbs?.[categorySlug]
+  const editorialBlurb = crossBlurb || brand.blurb
 
   return (
     <CategoryTemplate

@@ -8,6 +8,7 @@ export interface Brand {
   name: string
   slug: string
   blurb?: string
+  category_blurbs?: Record<string, string> | null
 }
 
 export const listBrands = async (): Promise<Brand[]> => {
